@@ -1,12 +1,12 @@
 Package: neuroatlas
-Title: What the Package Does (One Line, Title Case)
+Title: atlases for neuroimaging analysis
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Bradley",
+           family = "Buchsbaum",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
+           email = "brad.buchsbaum@gmail.com")
+Description: Provides access to several neuroimaging atlases and parcellations
 License: What license it uses
 Encoding: UTF-8
 LazyData: true
