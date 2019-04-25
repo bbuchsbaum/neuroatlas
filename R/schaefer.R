@@ -6,12 +6,25 @@
 #' @param networks the network number
 #' @param resolution the resolution of the atlas in MNI space (1mm or 2mm)
 #' @param outdim an optional 3-element vector indicating dimensions to resample atlas to.
-#' @return a an image of type \code{NeuroVol}
+#' @export
+#'
+#' @importFrom neuroim2 read_vol
+#' @importFrom downloder download
 #'
 #' @examples
 #'
 #' v1 <- get_schaefer_atlas(parcels="300")
 #' v2 <- get_schaefer_atlas(parcels="300", outdim=c(40,40,40))
+#'
+#' @return
+#'
+#' a list with three elemenents:
+#'
+#' \describe{
+#'   \item{atlas}{ a NeuroVol instance with integer indices coding the ROIs}
+#'   \item{cmap}{ a data.frame indicating the colors associated with each ROI}
+#'   \item{legend}{a data.frame providing label information about each ROI}
+#' }
 #'
 #' @details
 #'
@@ -24,8 +37,9 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   resolution <- match.arg(resolution)
 
   fname <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
-  path <- paste0("https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/",
-                 fname)
+
+  rpath <- "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
+  path <- paste0(rpath,fname)
 
   des <- paste0(tempdir(), "/", fname)
   ret <- download(path, des)
@@ -42,7 +56,26 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     vol <- NeuroVol(arr2, NeuroSpace(outdim, ospacing))
   }
 
-  vol
+  label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
+  des2 <- paste0(tempdir(), "/", label_name)
+  ret <- download(paste0(rpath, label_name), des2)
+  labels <- read.table(des2, as.is=TRUE)
+  labels <- labels[, 1:5]
+  names(labels) <- c("ROINUM", "label", "red", "green", "blue")
+  labels$label <- gsub(paste0(networks, "Networks", "_"), "", labels$label)
+  hemi <- substr(labels$label, 1,2)
+  labels$hemi <- hemi
+
+  labels$hemi <- sapply(strsplit(labels$label, "_"), "[[", 1)
+  labels$network <-  sapply(strsplit(labels$label, "_"), "[[", 2)
+  labels$name <-   sapply(strsplit(labels$label, "_"), function(x) paste(x[(length(x)-1):length(x)], collapse="_"))
+
+  ret <- list(
+    atlas=vol,
+    cmap=labels[,3:5],
+    legend=labels[,c(1:2, 6:ncol(labels))])
+
+  ret
 
 }
 
