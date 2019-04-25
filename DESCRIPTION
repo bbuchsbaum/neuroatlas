@@ -1,5 +1,5 @@
 Package: neuroatlas
-Title: atlases for neuroimaging analysis
+Title: useful atlases for neuroimaging analysis
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Bradley",
@@ -11,3 +11,4 @@ License: What license it uses
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+
