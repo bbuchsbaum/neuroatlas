@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @importFrom neuroim2 read_vol
-#' @importFrom downloder download
+#' @importFrom downloader download
 #'
 #' @examples
 #'
