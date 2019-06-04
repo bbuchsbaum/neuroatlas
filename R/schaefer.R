@@ -73,10 +73,13 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   ret <- list(
     atlas=vol,
     cmap=labels[,3:5],
-    legend=labels[,c(1:2, 6:ncol(labels))])
+    ids=1:nrow(labels),
+    labels=labels$name,
+    network=labels$network,
+    hemi=labels=hemi)
 
+  class(ret) <- "atlas"
   ret
-
 }
 
 
