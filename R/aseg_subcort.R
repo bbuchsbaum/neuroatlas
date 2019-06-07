@@ -44,7 +44,7 @@ get_aseg_atlas <- function() {
     165, 42,  42)
   
   ret <- list(
-    atlas=vol,
+    atlas=atlas,
     cmap=cmap,
     ids=ids,
     labels=labels,
