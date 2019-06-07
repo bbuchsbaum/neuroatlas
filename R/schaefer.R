@@ -71,6 +71,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   labels$name <-   sapply(strsplit(labels$label, "_"), function(x) paste(x[(length(x)-1):length(x)], collapse="_"))
 
   ret <- list(
+    name=paste0("Schaefer-", parcels, "-", networks, "networks"),
     atlas=vol,
     cmap=labels[,3:5],
     ids=1:nrow(labels),
