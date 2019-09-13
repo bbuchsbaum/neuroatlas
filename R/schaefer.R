@@ -14,7 +14,7 @@
 #' @examples
 #'
 #' v1 <- get_schaefer_atlas(parcels="300")
-#' v2 <- get_schaefer_atlas(parcels="300", outdim=c(40,40,40))
+#'
 #'
 #' @return
 #'
@@ -50,7 +50,12 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     assertthat::assert_that(length(dim(outspace)) == 3)
     cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
     grid <- coord_to_grid(vol, cds) - .5
-
+    for (i in 1:3) {
+      g <- grid[,i]
+      g[g < 1] = 1
+      g[g > dim(vol)[i]] <- dim(vol)[i]
+      grid[,i] <- g
+    }
     arr2 <- vol[grid]
     vol <- NeuroVol(arr2, outspace)
   }
