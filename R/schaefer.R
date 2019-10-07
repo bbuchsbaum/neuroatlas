@@ -1,5 +1,17 @@
 
 
+resample <- function(vol, outdim) {
+  
+  assertthat::assert_that(length(outdim) == 3)
+  arr <- vol@.Data
+  ospacing <- dim(vol) / outdim * spacing(vol)
+  im <- imager::as.cimg(arr)
+  imr <- resize(im, outdim[1], outdim[2], outdim[3], interpolation_type = 1)
+  arr2 <- drop(as.array(imr))
+  vol <- NeuroVol(arr2, NeuroSpace(outdim, ospacing))
+  
+}
+
 #' Retrieve and load Schaefer network parcellation from github repository
 #'
 #' @param parcels the number rof parcels in hte atlas
@@ -47,13 +59,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   vol <- read_vol(des)
 
   if (!is.null(outdim)) {
-    assertthat::assert_that(length(outdim) == 3)
-    arr <- vol@.Data
-    ospacing <- dim(vol)/outdim * spacing(vol)
-    im <- imager::as.cimg(arr)
-    imr <- resize(im, outdim[1], outdim[2], outdim[3],interpolation_type=1)
-    arr2 <- drop(as.array(imr))
-    vol <- NeuroVol(arr2, NeuroSpace(outdim, ospacing))
+    vol <- resample(vol, outdim)
   }
 
   label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
@@ -70,6 +76,9 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   labels$network <-  sapply(strsplit(labels$label, "_"), "[[", 2)
   labels$name <-   sapply(strsplit(labels$label, "_"), function(x) paste(x[(length(x)-1):length(x)], collapse="_"))
 
+  labels$hemi[hemi == "LH"] <- "left"
+  labels$hemi[hemi == "RH"] <- "right"
+  
   ret <- list(
     name=paste0("Schaefer-", parcels, "-", networks, "networks"),
     atlas=vol,
@@ -79,7 +88,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     network=labels$network,
     hemi=labels$hemi)
 
-  class(ret) <- "atlas"
+  class(ret) <- c("schaefer", "atlas")
   ret
 }
 
