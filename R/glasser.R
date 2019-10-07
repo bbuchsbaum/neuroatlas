@@ -12,7 +12,7 @@
 #' @examples
 #'
 #' v1 <- get_glasser_atlas()
-#' v2 <- get_glasser_atlas(outdim=c(40,40,40))
+#' 
 #'
 #' @return
 #'
@@ -27,9 +27,8 @@
 #' @details
 #'
 #' Files are downloaded from the github repository: https://github.com/PennBBL/xcpEngine/
-get_glasser_atlas <- function(outdim=NULL) {
+get_glasser_atlas <- function(outspace=NULL) {
   
-
   fname <- "glasser360MNI.nii.gz"
   rpath= "https://github.com/PennBBL/xcpEngine/raw/master/atlas/glasser360/"
   path <- paste0(rpath,fname)
@@ -39,8 +38,8 @@ get_glasser_atlas <- function(outdim=NULL) {
   
   vol <- neuroim2::read_vol(des)
   
-  if (!is.null(outdim)) {
-    vol <- resample(vol, outdim)
+  if (!is.null(outspace)) {
+    vol <- resample(vol, outspace)
   }
   
   label_name <- "glasser360NodeNames.txt"

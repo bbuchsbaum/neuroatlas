@@ -1,14 +1,25 @@
 
 
-resample <- function(vol, outdim) {
+resample <- function(vol, outspace) {
   
-  assertthat::assert_that(length(outdim) == 3)
-  arr <- vol@.Data
-  ospacing <- dim(vol) / outdim * spacing(vol)
-  im <- imager::as.cimg(arr)
-  imr <- resize(im, outdim[1], outdim[2], outdim[3], interpolation_type = 1)
-  arr2 <- drop(as.array(imr))
-  vol <- NeuroVol(arr2, NeuroSpace(outdim, ospacing))
+  assertthat::assert_that(length(dim(outspace)) == 3)
+  cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
+  grid <- coord_to_grid(vol, cds) - .5
+  for (i in 1:3) {
+    g <- grid[,i]
+    g[g < 1] = 1
+    g[g > dim(vol)[i]] <- dim(vol)[i]
+    grid[,i] <- g
+  }
+  arr2 <- vol[grid]
+  vol <- NeuroVol(arr2, outspace)
+  
+  # arr <- vol@.Data
+  # ospacing <- dim(vol) / outdim * spacing(vol)
+  # im <- imager::as.cimg(arr)
+  # imr <- resize(im, outdim[1], outdim[2], outdim[3], interpolation_type = 1)
+  # arr2 <- drop(as.array(imr))
+  # vol <- NeuroVol(arr2, NeuroSpace(outdim, ospacing))
   
 }
 
@@ -26,7 +37,7 @@ resample <- function(vol, outdim) {
 #' @examples
 #'
 #' v1 <- get_schaefer_atlas(parcels="300")
-#' v2 <- get_schaefer_atlas(parcels="300", outdim=c(40,40,40))
+#'
 #'
 #' @return
 #'
@@ -42,7 +53,7 @@ resample <- function(vol, outdim) {
 #'
 #' Files are downloaded from the github repository: https://github.com/ThomasYeoLab/CBIG/
 get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
-                               networks=c("7","17"),resolution=c("1","2"), outdim=NULL) {
+                               networks=c("7","17"),resolution=c("1","2"), outspace=NULL) {
 
   parcels <- match.arg(parcels)
   networks <- match.arg(networks)
@@ -58,8 +69,9 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 
   vol <- read_vol(des)
 
-  if (!is.null(outdim)) {
-    vol <- resample(vol, outdim)
+  if (!is.null(outspace)) {
+    assertthat::assert_that(length(dim(outspace)) == 3)
+    vol <- resample(vol, outspace)
   }
 
   label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
