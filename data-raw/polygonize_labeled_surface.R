@@ -29,6 +29,8 @@ mkContours <- function(rstobj){
   if (mx < 200) {
     return(NULL)
   }
+
+
   tmp.rst <- rstobj
   tmp.rst[tmp.rst == 0] <- NA
 
@@ -74,6 +76,9 @@ do_snapshots <- function(hemi, side) {
     image_write(im, path = tiff, format = 'tiff')
     rstobj <- raster::brick(tiff)
 
+    lab <- stringr::str_remove(annot@labels[id], "17Networks_[RL]H_")
+    names(rstobj) <- lab
+
     ret[[id]] <- list(
       hemi=hemi,
       side=side,
@@ -84,26 +89,66 @@ do_snapshots <- function(hemi, side) {
 
   }
 
+  rgl.close()
+
   ret
 }
 
-ras_lh <- do_hemi("lh")
+ras_lat_lh <- do_snapshots("lh", "lateral")
+ras_med_lh <- do_snapshots("lh", "medial")
+ras_lat_rh <- do_snapshots("rh", "lateral")
+ras_med_rh <- do_snapshots("rh", "medial")
+
+contourobjs <- list(ras_lat_lh, ras_med_lh, ras_lat_rh, ras_med_rh)
+kp <- !map_lgl(contourobjs, is.null)
+
+contourobjsDF <- do.call(rbind, contourobjs)
 
 
-## create an image of a single ROI
-tmp = annot == 321
-plot(tmp, irange=c(0,1), threshold=c(-55,.3), bgcol="seashell4",cmap= raibow(1))
-rgl.snapshot("roi_321.png")
-im1=image_read("roi_321.png")
+schaefer.df <- filter(ho.df, kp)
+ho.df <- bind_cols(contourobjsDF, ho.df)
+## Now we need to place them into their own panes
+## Bounding box for all
+bball <- st_bbox(ho.df)
+ho.df <-  mutate(ho.df, geometry=geometry - bball[c("xmin", "ymin")])
 
-## converting and thresholding
-im1 %>% image_convert(colorspace="HSL") %>% image_channel("1") %>% image_threshold(threshold="10%")
+## ifelse approach doesn't seem to work, so split it up
+ho.dfA <- ho.df %>%
+  filter(hemi=="lh", side=="med") %>%
+  mutate(geometry=geometry+c(600,0))
 
-## smoothing polygon
-library(smoothr)
-smooth(g, method="ksmooth", smoothness=2)
+ho.dfB <- ho.df %>%
+  filter(hemi=="rh", side=="med") %>%
+  mutate(geometry=geometry+c(2*600,0))
 
-## converting to tiff and re-reading
-tiff_file <- tempfile()
-image_write(im4, path = tiff_file, format = 'tiff')
-rstobj <- raster::brick(tiff_file)
+ho.dfC <- ho.df %>%
+  filter(hemi=="rh", side=="lat") %>%
+  mutate(geometry=geometry+c(3*600,0))
+
+ho.dfD <- ho.df %>%
+  filter(hemi=="lh", side=="lat")
+
+ho.df.panes <- rbind(ho.dfD, ho.dfA, ho.dfB, ho.dfC)
+#ho.df.panes.simple <- st_simplify(ho.df.panes, preserveTopology = TRUE, dTolerance=0.75)
+ho.df.panes.simple <- rmapshaper::ms_simplify(ho.df.panes)
+
+plot(ho.df.panes.simple)
+
+library(ggseg)
+library(ggsegExtra)
+
+## Not sure whether the range of values really matters. The other atlases look like they
+## may be giving the coordinates in physical units of some sort.
+## Lets pretend each picture is 10cm square. Divide point values by 60 at the end.
+
+ho.df.final <- mutate(ho.df.panes.simple,
+                      id=1:nrow(ho.df.panes.simple),
+                      coords = map(geometry, ~(st_coordinates(.x)[, c("X", "Y")])),
+                      coords = map(coords, as.tibble),
+                      coords = map(coords, ~mutate(.x, order=1:nrow(.x))))
+ho.df.final$geometry <- NULL
+ho.df.final <- unnest(ho.df.final, .drop=TRUE)
+ho.df.final <- rename(ho.df.final, long=X, lat=Y)
+ggseg(atlas=ho.df.final, mapping=aes(fill=area), color="white") + theme(legend.position = "none")
+
+save(ho.df.panes.simple, ho.df.final, file="ho_atlases.Rda")
