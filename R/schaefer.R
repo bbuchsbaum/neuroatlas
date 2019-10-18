@@ -1,7 +1,7 @@
 
 
 resample <- function(vol, outspace) {
-  
+
   assertthat::assert_that(length(dim(outspace)) == 3)
   cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
   grid <- coord_to_grid(vol, cds) - .5
@@ -13,14 +13,14 @@ resample <- function(vol, outspace) {
   }
   arr2 <- vol[grid]
   vol <- NeuroVol(arr2, outspace)
-  
+
   # arr <- vol@.Data
   # ospacing <- dim(vol) / outdim * spacing(vol)
   # im <- imager::as.cimg(arr)
   # imr <- resize(im, outdim[1], outdim[2], outdim[3], interpolation_type = 1)
   # arr2 <- drop(as.array(imr))
   # vol <- NeuroVol(arr2, NeuroSpace(outdim, ospacing))
-  
+
 }
 
 #' Retrieve and load Schaefer network parcellation from github repository
@@ -65,7 +65,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   path <- paste0(rpath,fname)
 
   des <- paste0(tempdir(), "/", fname)
-  ret <- download(path, des)
+  ret <- downloader::download(path, des)
 
   vol <- read_vol(des)
 
@@ -76,7 +76,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 
   label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
   des2 <- paste0(tempdir(), "/", label_name)
-  ret <- download(paste0(rpath, label_name), des2)
+  ret <- downloader::download(paste0(rpath, label_name), des2)
   labels <- read.table(des2, as.is=TRUE)
   labels <- labels[, 1:5]
   names(labels) <- c("ROINUM", "label", "red", "green", "blue")
@@ -90,7 +90,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 
   labels$hemi[hemi == "LH"] <- "left"
   labels$hemi[hemi == "RH"] <- "right"
-  
+
   ret <- list(
     name=paste0("Schaefer-", parcels, "-", networks, "networks"),
     atlas=vol,

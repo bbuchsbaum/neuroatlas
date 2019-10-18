@@ -5,7 +5,10 @@ library(stars)
 library(sf)
 library(rmapshaper)
 library(neurosurf)
+library(purrr)
+library(rgl)
 
+setwd("data-raw")
 
 geometry_lh = neurosurf::read_surf("fsaverage6/lh.inflated")
 geometry_rh = neurosurf::read_surf("fsaverage6/rh.inflated")
@@ -19,11 +22,12 @@ hemi <- stringr::str_extract(origlabels, "[RL]H")
 side <- stringr::str_extract(region, "...$")
 region <- stringr::str_remove(region, "_...$")
 origlabel <- stringr::str_remove(origlabel, "_...$")
-ho.df <- tibble(area=region, hemi=hemi, side=side, label=origlabel)
-ho.df <- mutate(ho.df, area=stringr::str_replace_all(area, "\\.+", " "))
+#ho.df <- tibble(area=region, hemi=hemi, side=side, label=origlabel)
+#ho.df <- mutate(ho.df, area=stringr::str_replace_all(area, "\\.+", " "))
 
 
-mkContours <- function(rstobj){
+mkContours <- function(rst){
+  rstobj = rst$rstobj
   mx <- cellStats(rstobj, stat=max)
   # Filter out the blank images
   if (mx < 200) {
@@ -48,6 +52,8 @@ mkContours <- function(rstobj){
   g <-st_sf(g)
   names(g)[[1]] <- "region"
   g$region <- names(rstobj)
+  g$hemi <- rst$hemi
+  g$side <- rst$side
   return(g)
 
 }
@@ -99,56 +105,58 @@ ras_med_lh <- do_snapshots("lh", "medial")
 ras_lat_rh <- do_snapshots("rh", "lateral")
 ras_med_rh <- do_snapshots("rh", "medial")
 
-contourobjs <- list(ras_lat_lh, ras_med_lh, ras_lat_rh, ras_med_rh)
+raslis <- c(ras_lat_lh, ras_med_lh, ras_lat_rh, ras_med_rh)
+contourobjs <- map(raslis, ~ mkContours(.))
+
 kp <- !map_lgl(contourobjs, is.null)
+contourobjs <- contourobjs[kp]
+scontourobjs <- map(contourobjs, ~ smoothr::smooth(., method="ksmooth", smoothness=3))
+contourobjsDF <- do.call(rbind, scontourobjs)
 
-contourobjsDF <- do.call(rbind, contourobjs)
-
-
-schaefer.df <- filter(ho.df, kp)
-ho.df <- bind_cols(contourobjsDF, ho.df)
+#schaefer.df <- filter(ho.df, kp)
+#ho.df <- bind_cols(contourobjsDF, ho.df)
 ## Now we need to place them into their own panes
 ## Bounding box for all
-bball <- st_bbox(ho.df)
-ho.df <-  mutate(ho.df, geometry=geometry - bball[c("xmin", "ymin")])
+bball <- st_bbox(contourobjsDF)
+contourobjsDF <-  mutate(contourobjsDF, geometry=geometry - bball[c("xmin", "ymin")])
 
 ## ifelse approach doesn't seem to work, so split it up
-ho.dfA <- ho.df %>%
-  filter(hemi=="lh", side=="med") %>%
+dfA <- contourobjsDF %>%
+  filter(hemi=="lh", side=="medial") %>%
   mutate(geometry=geometry+c(600,0))
 
-ho.dfB <- ho.df %>%
-  filter(hemi=="rh", side=="med") %>%
+dfB <- contourobjsDF %>%
+  filter(hemi=="rh", side=="medial") %>%
   mutate(geometry=geometry+c(2*600,0))
 
-ho.dfC <- ho.df %>%
-  filter(hemi=="rh", side=="lat") %>%
+dfC <- contourobjsDF %>%
+  filter(hemi=="rh", side=="lateral") %>%
   mutate(geometry=geometry+c(3*600,0))
 
-ho.dfD <- ho.df %>%
-  filter(hemi=="lh", side=="lat")
+dfD <- contourobjsDF %>%
+  filter(hemi=="lh", side=="lateral")
 
-ho.df.panes <- rbind(ho.dfD, ho.dfA, ho.dfB, ho.dfC)
-#ho.df.panes.simple <- st_simplify(ho.df.panes, preserveTopology = TRUE, dTolerance=0.75)
-ho.df.panes.simple <- rmapshaper::ms_simplify(ho.df.panes)
-
-plot(ho.df.panes.simple)
-
-library(ggseg)
-library(ggsegExtra)
+dfpanes <- rbind(dfD, dfA, dfB, dfC)
+dfpanes_simple <- rmapshaper::ms_simplify(contourobjsDF)
+dfpanes_simple <- st_buffer(dfpanes_simple, .5)
+dfpanes_simple <- st_difference(dfpanes_simple,dfpanes_simple)
 
 ## Not sure whether the range of values really matters. The other atlases look like they
 ## may be giving the coordinates in physical units of some sort.
 ## Lets pretend each picture is 10cm square. Divide point values by 60 at the end.
 
-ho.df.final <- mutate(ho.df.panes.simple,
-                      id=1:nrow(ho.df.panes.simple),
-                      coords = map(geometry, ~(st_coordinates(.x)[, c("X", "Y")])),
-                      coords = map(coords, as.tibble),
-                      coords = map(coords, ~mutate(.x, order=1:nrow(.x))))
-ho.df.final$geometry <- NULL
-ho.df.final <- unnest(ho.df.final, .drop=TRUE)
-ho.df.final <- rename(ho.df.final, long=X, lat=Y)
-ggseg(atlas=ho.df.final, mapping=aes(fill=area), color="white") + theme(legend.position = "none")
+## ggseg .long  .lat   .id .order
+df_final <- mutate(dfpanes_simple,
+                      ggseg = map(geometry, ~(st_coordinates(.x)[, c("X", "Y")])),
+                      ggseg = map(ggseg, as.tibble),
+                      ggseg = map(ggseg, ~mutate(.x, .lon=.x$X, .lat=.x$Y, .order=1:nrow(.x))))
+df_final <- df_final %>% mutate(ggseg = map(ggseg, ~ mutate(.lon=.$X, .lat=.$Y)))
+
+
+df_final$geometry <- NULL
+df_final <- unnest(df_final, .drop=TRUE)
+df_final <- rename(df_final, long=X, lat=Y)
+df_final <- df_final %>% mutate(atlas="SchaeferYeo400")
+ggseg(atlas=df_final, color="white") + theme(legend.position = "none")
 
 save(ho.df.panes.simple, ho.df.final, file="ho_atlases.Rda")
