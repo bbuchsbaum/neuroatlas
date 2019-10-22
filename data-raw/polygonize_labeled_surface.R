@@ -110,8 +110,10 @@ contourobjs <- map(raslis, ~ mkContours(.))
 
 kp <- !map_lgl(contourobjs, is.null)
 contourobjs <- contourobjs[kp]
-scontourobjs <- map(contourobjs, ~ smoothr::smooth(., method="ksmooth", smoothness=3))
-contourobjsDF <- do.call(rbind, scontourobjs)
+#scontourobjs <- map(contourobjs, ~ smoothr::smooth(., method="ksmooth", smoothness=3))
+#contourobjsDF <- do.call(rbind, scontourobjs)
+contourobjsDF <- do.call(rbind, contourobjs)
+
 
 #schaefer.df <- filter(ho.df, kp)
 #ho.df <- bind_cols(contourobjsDF, ho.df)
@@ -147,9 +149,10 @@ dfpanes_simple <- dfpanes_simple %>% as_tibble() %>% dplyr::select(region,hemi,s
 
 ## ggseg .long  .lat   .id .order
 df_final <- mutate(dfpanes_simple,
+                      id=1:nrow(dfpanes_simple),
                       ggseg = map(geometry, ~(st_coordinates(.x)[, c("X", "Y")])),
                       ggseg = map(ggseg, as.tibble),
-                      ggseg = map(ggseg, ~mutate(.x, .lon=.x$X, .lat=.x$Y, .order=1:nrow(.x))))
+                      ggseg = map(ggseg, ~mutate(.x, .long=.x$X, .lat=.x$Y, .order=1:nrow(.x)) %>% dplyr::select(-X,-Y)))
 
 
 
@@ -157,4 +160,4 @@ df_final <- df_final %>% mutate(atlas="SchaeferYeo400") %>% dplyr::select(-geome
 df_final <- as_ggseg_atlas(df_final)
 ggseg(atlas=df_final, color="white") + theme(legend.position = "none")
 
-save(ho.df.panes.simple, ho.df.final, file="ho_atlases.Rda")
+saveRDS(df_final, file="Schaefer-Yeo400.rds")
