@@ -21,7 +21,7 @@ region <- stringr::str_remove(origlabels, "17Networks_[RL]H_")
 hemi <- stringr::str_extract(origlabels, "[RL]H")
 side <- stringr::str_extract(region, "...$")
 region <- stringr::str_remove(region, "_...$")
-origlabel <- stringr::str_remove(origlabel, "_...$")
+#origlabel <- stringr::str_remove(origlabel, "_...$")
 #ho.df <- tibble(area=region, hemi=hemi, side=side, label=origlabel)
 #ho.df <- mutate(ho.df, area=stringr::str_replace_all(area, "\\.+", " "))
 
@@ -137,10 +137,10 @@ dfD <- contourobjsDF %>%
   filter(hemi=="lh", side=="lateral")
 
 dfpanes <- rbind(dfD, dfA, dfB, dfC)
-dfpanes_simple <- rmapshaper::ms_simplify(contourobjsDF)
-dfpanes_simple <- st_buffer(dfpanes_simple, .5)
+dfpanes_simple <- rmapshaper::ms_simplify(dfpanes)
+dfpanes_simple <- st_buffer(dfpanes_simple, .2)
 dfpanes_simple <- st_difference(dfpanes_simple,dfpanes_simple)
-
+dfpanes_simple <- dfpanes_simple %>% as_tibble() %>% dplyr::select(region,hemi,side, geometry)
 ## Not sure whether the range of values really matters. The other atlases look like they
 ## may be giving the coordinates in physical units of some sort.
 ## Lets pretend each picture is 10cm square. Divide point values by 60 at the end.
@@ -150,13 +150,11 @@ df_final <- mutate(dfpanes_simple,
                       ggseg = map(geometry, ~(st_coordinates(.x)[, c("X", "Y")])),
                       ggseg = map(ggseg, as.tibble),
                       ggseg = map(ggseg, ~mutate(.x, .lon=.x$X, .lat=.x$Y, .order=1:nrow(.x))))
-df_final <- df_final %>% mutate(ggseg = map(ggseg, ~ mutate(.lon=.$X, .lat=.$Y)))
 
 
-df_final$geometry <- NULL
-df_final <- unnest(df_final, .drop=TRUE)
-df_final <- rename(df_final, long=X, lat=Y)
-df_final <- df_final %>% mutate(atlas="SchaeferYeo400")
+
+df_final <- df_final %>% mutate(atlas="SchaeferYeo400") %>% dplyr::select(-geometry) %>% dplyr::rename(area=region)
+df_final <- as_ggseg_atlas(df_final)
 ggseg(atlas=df_final, color="white") + theme(legend.position = "none")
 
 save(ho.df.panes.simple, ho.df.final, file="ho_atlases.Rda")
