@@ -1,19 +1,24 @@
 library(magick)
-library(tidyverse)
 library(raster)
 library(stars)
 library(sf)
 library(rmapshaper)
 library(neurosurf)
-library(purrr)
 library(rgl)
+library(here)
+library(tidyverse)
 
-setwd("data-raw")
+setwd(paste0(here::here(), "/data-raw"))
+
+nparcels <- 400
 
 geometry_lh = neurosurf::read_surf("fsaverage6/lh.inflated")
 geometry_rh = neurosurf::read_surf("fsaverage6/rh.inflated")
-annot_lh=neurosurf::read_freesurfer_annot("Schaefer-yeo/lh.Schaefer2018_400Parcels_17Networks_order.annot", geometry_lh)
-annot_rh=neurosurf::read_freesurfer_annot("Schaefer-yeo/rh.Schaefer2018_400Parcels_17Networks_order.annot", geometry_rh)
+
+annot_lh=neurosurf::read_freesurfer_annot(
+  paste0("Schaefer-yeo/lh.Schaefer2018_", nparcels, "Parcels_17Networks_order.annot", geometry_lh))
+annot_rh=neurosurf::read_freesurfer_annot(
+  paste0("Schaefer-yeo/rh.Schaefer2018_", nparcels, "Parcels_17Networks_order.annot", geometry_rh))
 
 origlabels <- c(annot_lh@labels, annot_rh@labels)
 region <- stringr::str_remove(origlabels, "17Networks_[RL]H_")
@@ -70,16 +75,16 @@ do_snapshots <- function(hemi, side) {
   ret <- vector(length(ids), mode="list")
   for (id in ids) {
     tmp = annot == id
-    plot(tmp, irange=c(0,1), threshold=c(-55,.3), bgcol="seashell4",cmap= rainbow(1), view=side)
+    neurosurf::plot(tmp, irange=c(0,1), threshold=c(-55,.3), bgcol="seashell4",cmap= rainbow(1), view=side)
     fname1 <- tempfile(fileext=".png")
     rgl.snapshot(filename=fname1)
     rgl.clear()
-    im=image_read(fname1)
+    im=magick::image_read(fname1)
     ## converting and thresholding
     im <- im %>% image_convert(colorspace="HSL") %>% image_channel("1") %>% image_threshold(threshold="10%")
 
     tiff <- tempfile()
-    image_write(im, path = tiff, format = 'tiff')
+    magick::image_write(im, path = tiff, format = 'tiff')
     rstobj <- raster::brick(tiff)
 
     lab <- stringr::str_remove(annot@labels[id], "17Networks_[RL]H_")
@@ -110,9 +115,9 @@ contourobjs <- map(raslis, ~ mkContours(.))
 
 kp <- !map_lgl(contourobjs, is.null)
 contourobjs <- contourobjs[kp]
-#scontourobjs <- map(contourobjs, ~ smoothr::smooth(., method="ksmooth", smoothness=3))
-#contourobjsDF <- do.call(rbind, scontourobjs)
-contourobjsDF <- do.call(rbind, contourobjs)
+scontourobjs <- map(contourobjs, ~ smoothr::smooth(., method="ksmooth", smoothness=3))
+contourobjsDF <- do.call(rbind, scontourobjs)
+#contourobjsDF <- do.call(rbind, contourobjs)
 
 
 #schaefer.df <- filter(ho.df, kp)
@@ -125,24 +130,25 @@ contourobjsDF <-  mutate(contourobjsDF, geometry=geometry - bball[c("xmin", "ymi
 ## ifelse approach doesn't seem to work, so split it up
 dfA <- contourobjsDF %>%
   filter(hemi=="lh", side=="medial") %>%
-  mutate(geometry=geometry+c(600,0))
+  mutate(geometry=geometry+c(240,0))
 
 dfB <- contourobjsDF %>%
   filter(hemi=="rh", side=="medial") %>%
-  mutate(geometry=geometry+c(2*600,0))
+  mutate(geometry=geometry+c(2*240,0))
 
 dfC <- contourobjsDF %>%
   filter(hemi=="rh", side=="lateral") %>%
-  mutate(geometry=geometry+c(3*600,0))
+  mutate(geometry=geometry+c(3*240,0))
 
 dfD <- contourobjsDF %>%
   filter(hemi=="lh", side=="lateral")
 
 dfpanes <- rbind(dfD, dfA, dfB, dfC)
 dfpanes_simple <- rmapshaper::ms_simplify(dfpanes)
-dfpanes_simple <- st_buffer(dfpanes_simple, .2)
-dfpanes_simple <- st_difference(dfpanes_simple,dfpanes_simple)
+#dfpanes_simple <- st_buffer(dfpanes_simple, .2)
+#dfpanes_simple <- st_difference(dfpanes_simple,dfpanes_simple)
 dfpanes_simple <- dfpanes_simple %>% as_tibble() %>% dplyr::select(region,hemi,side, geometry)
+
 ## Not sure whether the range of values really matters. The other atlases look like they
 ## may be giving the coordinates in physical units of some sort.
 ## Lets pretend each picture is 10cm square. Divide point values by 60 at the end.
@@ -156,8 +162,11 @@ df_final <- mutate(dfpanes_simple,
 
 
 
-df_final <- df_final %>% mutate(atlas="SchaeferYeo400") %>% dplyr::select(-geometry) %>% dplyr::rename(area=region)
+df_final <- df_final %>% mutate(atlas="SchaeferYeo400") %>% 
+  dplyr::select(-geometry) %>% dplyr::rename(area=region) %>%
+  mutate(hemi = ifelse(hemi == "lh", "left", "right"))
 df_final <- as_ggseg_atlas(df_final)
-ggseg(atlas=df_final, color="white") + theme(legend.position = "none")
+ggseg(atlas=df_final, color="black", size=.7, position="stacked",mapping=aes(fill=area)) + 
+  theme(legend.position = "none") + theme_darkbrain()
 
 saveRDS(df_final, file="Schaefer-Yeo400.rds")
