@@ -10,13 +10,15 @@ library(tidyverse)
 
 setwd(paste0(here::here(), "/data-raw"))
 
-nparcels <- 200
+nparcels <- 400
+buffer_dist <- 1
 
 geometry_lh = neurosurf::read_surf("fsaverage6/lh.inflated")
 geometry_rh = neurosurf::read_surf("fsaverage6/rh.inflated")
 
 annot_lh=neurosurf::read_freesurfer_annot(
   paste0("Schaefer-yeo/lh.Schaefer2018_", nparcels, "Parcels_17Networks_order.annot"), geometry_lh)
+
 annot_rh=neurosurf::read_freesurfer_annot(
   paste0("Schaefer-yeo/rh.Schaefer2018_", nparcels, "Parcels_17Networks_order.annot"), geometry_rh)
 
@@ -113,7 +115,7 @@ contourobjs <- map(raslis, ~ mkContours(.))
 
 kp <- !map_lgl(contourobjs, is.null)
 contourobjs <- contourobjs[kp]
-scontourobjs <- map(contourobjs, ~ smoothr::smooth(., method="ksmooth", smoothness=4))
+scontourobjs <- map(contourobjs, ~ smoothr::smooth(., method="ksmooth", smoothness=3.5))
 contourobjsDF <- do.call(rbind, scontourobjs)
 
 ## Now we need to place them into their own panes
@@ -139,7 +141,7 @@ dfD <- contourobjsDF %>%
 
 dfpanes <- rbind(dfD, dfA, dfB, dfC)
 dfpanes_simple <- rmapshaper::ms_simplify(dfpanes)
-
+dfpanes_simple <- st_buffer(dfpanes_simple, dist=buffer_dist)
 #dfpanes_simple <- st_buffer(dfpanes_simple, .2)
 #dfpanes_simple <- st_difference(dfpanes_simple,dfpanes_simple)
 
@@ -161,7 +163,9 @@ df_final <- mutate(dfpanes_simple,
 df_final <- df_final %>% mutate(atlas="SchaeferYeo400") %>%
   dplyr::select(-geometry) %>% dplyr::rename(area=region)
 df_final <- as_ggseg_atlas(df_final)
-ggseg(atlas=df_final, color="black", size=.7, position="stacked",mapping=aes(fill=area)) +
+ggseg(atlas=df_final, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
   theme(legend.position = "none") + theme_darkbrain()
+#ggseg(atlas=glasser, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
+#  theme(legend.position = "none") + theme_darkbrain()
 
-saveRDS(df_final, file=paste0("Schaefer-Yeo-17Networks", nparcels, "400.rds"))
+saveRDS(df_final, file=paste0("Schaefer-Yeo-17Networks", nparcels, ".rds"))
