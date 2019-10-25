@@ -78,6 +78,8 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   des2 <- paste0(tempdir(), "/", label_name)
   ret <- downloader::download(paste0(rpath, label_name), des2)
   labels <- read.table(des2, as.is=TRUE)
+
+  full_label <- labels[,2]
   labels <- labels[, 1:5]
   names(labels) <- c("ROINUM", "label", "red", "green", "blue")
   labels$label <- gsub(paste0(networks, "Networks", "_"), "", labels$label)
@@ -97,6 +99,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     cmap=labels[,3:5],
     ids=1:nrow(labels),
     labels=labels$name,
+    orig_labels=full_label,
     network=labels$network,
     hemi=labels$hemi)
 
