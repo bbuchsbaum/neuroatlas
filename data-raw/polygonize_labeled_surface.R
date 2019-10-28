@@ -52,6 +52,7 @@ mkContours <- function(rst){
   g <-st_sf(g)
   names(g)[[1]] <- "region"
   g$region <- names(rstobj)
+  g$label <- rst$region
   g$hemi <- rst$hemi
   g$side <- rst$side
   return(g)
@@ -145,7 +146,7 @@ dfpanes_simple <- st_buffer(dfpanes_simple, dist=buffer_dist)
 #dfpanes_simple <- st_buffer(dfpanes_simple, .2)
 #dfpanes_simple <- st_difference(dfpanes_simple,dfpanes_simple)
 
-dfpanes_simple <- dfpanes_simple %>% as_tibble() %>% dplyr::select(region,hemi,side, geometry)
+dfpanes_simple <- dfpanes_simple %>% as_tibble() %>% dplyr::select(region, label, hemi,side, geometry)
 
 ## Not sure whether the range of values really matters. The other atlases look like they
 ## may be giving the coordinates in physical units of some sort.
@@ -160,12 +161,23 @@ df_final <- mutate(dfpanes_simple,
 
 
 
-df_final <- df_final %>% mutate(atlas="SchaeferYeo400") %>%
+df_final <- df_final %>% mutate(atlas="Schaefer_N17_400") %>%
   dplyr::select(-geometry) %>% dplyr::rename(area=region)
 df_final <- as_ggseg_atlas(df_final)
-ggseg(atlas=df_final, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
-  theme(legend.position = "none") + theme_darkbrain()
+
+
+if (nparcels == 200) {
+  Schaefer17_200 <- ggseg::as_ggseg_atlas(df_final)
+  usethis::use_data(Schaefer17_200, internal = FALSE, overwrite = TRUE, compress = "xz")
+} else if (nparcels == 400) {
+  Schaefer17_400 <- as_ggseg_atlas(df_final)
+  usethis::use_data(Schaefer17_400, internal = FALSE, overwrite = TRUE, compress = "xz")
+}
+
+
+#ggseg(atlas=df_final, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
+#  theme(legend.position = "none") + theme_darkbrain()
 #ggseg(atlas=glasser, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
 #  theme(legend.position = "none") + theme_darkbrain()
 
-saveRDS(df_final, file=paste0("Schaefer-Yeo-17Networks", nparcels, ".rds"))
+#saveRDS(df_final, file=paste0("Schaefer-Yeo-17Networks", nparcels, ".rds"))
