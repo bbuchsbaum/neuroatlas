@@ -1,0 +1,16 @@
+L_Ant_Hipp
+L_CA1       
+L_CA3_DG    
+L_ERC      
+L_PHC       
+L_Post_Hipp
+L_PRC       
+L_Sub       
+R_Ant_Hipp  
+R_CA1       
+R_CA3_DG   
+R_ERC       
+R_PHC       
+R_Post_Hipp 
+R_PRC       
+R_Sub      
