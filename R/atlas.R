@@ -1,4 +1,27 @@
 
+merge_atlases <- function(atlas1, atlas2) {
+  assertthat::assert_that(all(dim(atlas1$atas) == dim(atlas2$atlas)))
+
+  atl2 <- atlas2$atlas
+  atl2[atl2 != 0] <- atl2[atl2 != 0] + max(atlas1$ids) + 1
+  atlmerged <- atlas1$atlas
+  atlmerged[atl2 != 0] <- atl2[atl2 != 0]
+
+  ret <- list(
+    name=paste0(atlas1$name,"::", atlas2$name),
+    atlas=atlmerged,
+    cmap=rbind(atlas1$cmap, atlas2$cmap),
+    ids=c(atlas1$ids, atlas2$ids),
+    labels=c(atlas1$labels, atlas2$labels),
+    orig_labels=c(atlas1$orig_labels, atlas2$orig_labels),
+    hemi=c(atlas1$hemi, atlas2$hemi)
+  )
+
+  class(ret) <- c(paste0(atlas1$name,"::", atlas2$name), "atlas")
+  ret
+}
+
+
 #' @importFrom neuroim2 space ROIVol index_to_grid
 get_roi.atlas <- function(x, label, id=NULL, hemi=NULL) {
   if (!is.null(label) && !is.null(id)) {
@@ -28,3 +51,5 @@ get_roi.atlas <- function(x, label, id=NULL, hemi=NULL) {
     ret
   }
 }
+
+

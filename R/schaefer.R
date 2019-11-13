@@ -1,7 +1,7 @@
 
 
 resample <- function(vol, outspace) {
-
+  assertthat::assert_that(inherits(outspace, "NeuroSpace"))
   assertthat::assert_that(length(dim(outspace)) == 3)
   cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
   grid <- coord_to_grid(vol, cds) - .5
