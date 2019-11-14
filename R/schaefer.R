@@ -76,7 +76,7 @@ resample <- function(vol, outspace, smooth=FALSE) {
 #'
 #' Files are downloaded from the github repository: https://github.com/ThomasYeoLab/CBIG/
 get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
-                               networks=c("7","17"),resolution=c("1","2"), outspace=NULL) {
+                               networks=c("7","17"),resolution=c("1","2"), outspace=NULL, smooth=FALSE) {
 
   parcels <- match.arg(parcels)
   networks <- match.arg(networks)
@@ -95,7 +95,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   if (!is.null(outspace)) {
     print(outspace)
     assertthat::assert_that(length(dim(outspace)) == 3)
-    vol <- resample(vol, outspace, TRUE)
+    vol <- resample(vol, outspace, smooth)
   }
 
   label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
