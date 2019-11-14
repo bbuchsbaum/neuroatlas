@@ -1,6 +1,6 @@
 
 
-resample <- function(vol, outspace) {
+resample <- function(vol, outspace, smooth=TRUE) {
   assertthat::assert_that(inherits(outspace, "NeuroSpace"))
   assertthat::assert_that(length(dim(outspace)) == 3)
   cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
@@ -13,6 +13,10 @@ resample <- function(vol, outspace) {
   }
   arr2 <- vol[grid]
   vol <- NeuroVol(arr2, outspace)
+
+  if (smooth) {
+    browser()
+  }
 
   # arr <- vol@.Data
   # ospacing <- dim(vol) / outdim * spacing(vol)
@@ -70,8 +74,9 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
   vol <- read_vol(des)
 
   if (!is.null(outspace)) {
+    print(outspace)
     assertthat::assert_that(length(dim(outspace)) == 3)
-    vol <- resample(vol, outspace)
+    vol <- resample(vol, outspace, TRUE)
   }
 
   label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
