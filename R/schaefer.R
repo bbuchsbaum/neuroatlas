@@ -1,10 +1,15 @@
 
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
 
-resample <- function(vol, outspace, smooth=TRUE) {
+resample <- function(vol, outspace, smooth=FALSE) {
   assertthat::assert_that(inherits(outspace, "NeuroSpace"))
   assertthat::assert_that(length(dim(outspace)) == 3)
   cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
   grid <- coord_to_grid(vol, cds) - .5
+
   for (i in 1:3) {
     g <- grid[,i]
     g[g < 1] = 1
@@ -15,8 +20,22 @@ resample <- function(vol, outspace, smooth=TRUE) {
   vol <- NeuroVol(arr2, outspace)
 
   if (smooth) {
-    browser()
+    ds <- spacing(vol)
+    mask <- as.logical(vol != 0)
+    sl <- neuroim2::searchlight_coords(mask, radius=min(ds)+.5, nonzero=TRUE)
+    for (i in 1:length(sl)) {
+      cds <- sl[[i]]
+      labels <- vol[cds]
+      md <- getmode(labels)
+      if (md != 0) {
+        vol[cds] <- md
+      }
+    }
+
+    vol[mask == 0] <- 0
   }
+
+  vol
 
   # arr <- vol@.Data
   # ospacing <- dim(vol) / outdim * spacing(vol)
