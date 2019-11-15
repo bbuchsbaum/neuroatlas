@@ -10,7 +10,7 @@ library(tidyverse)
 
 setwd(paste0(here::here(), "/data-raw"))
 
-nparcels <- 400
+nparcels <- 600
 buffer_dist <- 1
 
 geometry_lh = neurosurf::read_surf("fsaverage6/lh.inflated")
@@ -172,6 +172,9 @@ if (nparcels == 200) {
 } else if (nparcels == 400) {
   Schaefer17_400 <- as_ggseg_atlas(df_final)
   usethis::use_data(Schaefer17_400, internal = FALSE, overwrite = TRUE, compress = "xz")
+} else if (nparcels == 600) {
+  Schaefer17_600 <- as_ggseg_atlas(df_final)
+  usethis::use_data(Schaefer17_600, internal = FALSE, overwrite = TRUE, compress = "xz")
 }
 
 
