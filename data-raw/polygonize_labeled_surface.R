@@ -160,6 +160,7 @@ df_final <- mutate(dfpanes_simple,
                       ggseg = map(ggseg, ~mutate(.x, .long=.x$X, .lat=.x$Y, .order=1:nrow(.x)) %>% dplyr::select(-X,-Y)))
 
 
+library(ggseg)
 
 df_final <- df_final %>% mutate(atlas="Schaefer_N17_400") %>%
   dplyr::select(-geometry) %>% dplyr::rename(area=region)
@@ -178,8 +179,8 @@ if (nparcels == 200) {
 }
 
 
-#ggseg(atlas=df_final, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
-#  theme(legend.position = "none") + theme_darkbrain()
+ggseg(atlas=Schaefer17_600, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
+  theme(legend.position = "none") + theme_darkbrain()
 #ggseg(atlas=glasser, color="black", size=.5, position="stacked",mapping=aes(fill=area)) +
 #  theme(legend.position = "none") + theme_darkbrain()
 
