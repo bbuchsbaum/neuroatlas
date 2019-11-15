@@ -22,13 +22,18 @@ resample <- function(vol, outspace, smooth=FALSE) {
   if (smooth) {
     ds <- spacing(vol)
     mask <- as.logical(vol != 0)
-    sl <- neuroim2::searchlight_coords(mask, radius=min(ds)+.5, nonzero=TRUE)
+    sl <- neuroim2::searchlight_coords(mask, radius=max(ds)+.1, nonzero=TRUE)
     for (i in 1:length(sl)) {
       cds <- sl[[i]]
-      labels <- vol[cds]
-      md <- getmode(labels)
-      if (md != 0) {
-        vol[cds] <- md
+
+      if (nrow(cds) > 2) {
+        labels <- vol[cds]
+        if (all(labels[1] != labels[2:length(labels)])) {
+          md <- getmode(labels)
+          if (md != 0) {
+            vol[cds] <- md
+          }
+        }
       }
     }
 
