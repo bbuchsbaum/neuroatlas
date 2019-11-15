@@ -18,7 +18,7 @@ resample <- function(vol, outspace, smooth=FALSE) {
   }
   arr2 <- vol[grid]
   vol <- NeuroVol(arr2, outspace)
-
+  vol2 <- vol
   if (smooth) {
     ds <- spacing(vol)
     mask <- as.logical(vol != 0)
@@ -31,13 +31,14 @@ resample <- function(vol, outspace, smooth=FALSE) {
         if (all(labels[1] != labels[2:length(labels)])) {
           md <- getmode(labels)
           if (md != 0) {
-            vol[cds] <- md
+            vol2[cds[1,,drop=FALSE]] <- md
           }
         }
       }
     }
 
-    vol[mask == 0] <- 0
+    vol2[mask == 0] <- 0
+    vol <- vol2
   }
 
   vol
