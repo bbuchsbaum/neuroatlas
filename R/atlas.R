@@ -1,4 +1,6 @@
 
+
+#' @export
 merge_atlases <- function(atlas1, atlas2) {
   assertthat::assert_that(all(dim(atlas1$atas) == dim(atlas2$atlas)))
 
