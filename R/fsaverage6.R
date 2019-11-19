@@ -4,3 +4,4 @@
 #'
 #' @export
 "fsaverage"
+NULL
