@@ -6,7 +6,7 @@
 \usage{
 get_schaefer_atlas(parcels = c("100", "200", "300", "400", "500", "600",
   "800", "1000"), networks = c("7", "17"), resolution = c("1", "2"),
-  outdim = NULL)
+  outspace = NULL, smooth = FALSE)
 }
 \arguments{
 \item{parcels}{the number rof parcels in hte atlas}
@@ -35,6 +35,6 @@ Files are downloaded from the github repository: https://github.com/ThomasYeoLab
 \examples{
 
 v1 <- get_schaefer_atlas(parcels="300")
-v2 <- get_schaefer_atlas(parcels="300", outdim=c(40,40,40))
+
 
 }

@@ -52,6 +52,31 @@ resample <- function(vol, outspace, smooth=FALSE) {
 
 }
 
+
+schaefer_metainfo <- function(rpath, parcels, networks) {
+  label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
+  des2 <- paste0(tempdir(), "/", label_name)
+  ret <- downloader::download(paste0(rpath, label_name), des2)
+  labels <- read.table(des2, as.is=TRUE)
+
+  full_label <- labels[,2]
+  labels <- labels[, 1:5]
+  names(labels) <- c("ROINUM", "label", "red", "green", "blue")
+  labels$label <- gsub(paste0(networks, "Networks", "_"), "", labels$label)
+  hemi <- substr(labels$label, 1,2)
+  labels$hemi <- hemi
+
+  labels$hemi <- sapply(strsplit(labels$label, "_"), "[[", 1)
+  labels$network <-  sapply(strsplit(labels$label, "_"), "[[", 2)
+  labels$name <-   sapply(strsplit(labels$label, "_"), function(x) paste(x[(length(x)-1):length(x)], collapse="_"))
+
+  labels$hemi[hemi == "LH"] <- "left"
+  labels$hemi[hemi == "RH"] <- "right"
+
+  labels
+
+}
+
 #' Retrieve and load Schaefer network parcellation from github repository
 #'
 #' @param parcels the number rof parcels in hte atlas
@@ -104,24 +129,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     vol <- resample(vol, outspace, smooth)
   }
 
-  label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
-  des2 <- paste0(tempdir(), "/", label_name)
-  ret <- downloader::download(paste0(rpath, label_name), des2)
-  labels <- read.table(des2, as.is=TRUE)
-
-  full_label <- labels[,2]
-  labels <- labels[, 1:5]
-  names(labels) <- c("ROINUM", "label", "red", "green", "blue")
-  labels$label <- gsub(paste0(networks, "Networks", "_"), "", labels$label)
-  hemi <- substr(labels$label, 1,2)
-  labels$hemi <- hemi
-
-  labels$hemi <- sapply(strsplit(labels$label, "_"), "[[", 1)
-  labels$network <-  sapply(strsplit(labels$label, "_"), "[[", 2)
-  labels$name <-   sapply(strsplit(labels$label, "_"), function(x) paste(x[(length(x)-1):length(x)], collapse="_"))
-
-  labels$hemi[hemi == "LH"] <- "left"
-  labels$hemi[hemi == "RH"] <- "right"
+  labels <- schaefer_metainfo(rpath, parcels, networks)
 
   ret <- list(
     name=paste0("Schaefer-", parcels, "-", networks, "networks"),
@@ -129,12 +137,60 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     cmap=labels[,3:5],
     ids=1:nrow(labels),
     labels=labels$name,
-    orig_labels=full_label,
+    orig_labels=labels[,2],
     network=labels$network,
     hemi=labels$hemi)
 
-  class(ret) <- c("schaefer", "atlas")
+  class(ret) <- c("schaefer", "volatlas", "atlas")
   ret
 }
+
+
+get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
+                                 networks=c("7","17"), surf=c("orig", "inflated", "white", "pial")) {
+
+
+  #https://github.com/ThomasYeoLab/CBIG/blob/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/lh.Schaefer2018_1000Parcels_17Networks_order.annot
+
+  data(fsaverage)
+
+  get_hemi <- function(hemi) {
+    fname <- paste0(hemi, ".", "Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.annot")
+
+    rpath <- "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/"
+    path <- paste0(rpath,fname)
+
+    des <- paste0(tempdir(), "/", fname)
+    ret <- downloader::download(path, des)
+
+    geom <- paste0(hemi, "_", surf)
+    annot <- neurosurf::read_freesurfer_annot(des, fsaverage[[geom]])
+  }
+
+
+  rp <-  "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
+
+  labels <- schaefer_metainfo(rp, parcels, networks)
+
+  lh_surf <- get_hemi("lh")
+  rh_surf <- get_hemi("rh")
+
+  ret <- list(
+    surf_type=surf,
+    lh_atlas = lh_surf,
+    rh_atlas = rh_surf,
+    name=paste0("Schaefer-", parcels, "-", networks, "networks"),
+    cmap=labels[,3:5],
+    ids=1:nrow(labels),
+    labels=labels$name,
+    orig_labels=labels[,2],
+    network=labels$network,
+    hemi=labels$hemi)
+
+  class(ret) <- c("schaefer", "surfatlas", "atlas")
+  ret
+}
+
+
 
 
