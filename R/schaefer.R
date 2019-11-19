@@ -146,6 +146,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 }
 
 
+#' @export
 get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
                                  networks=c("7","17"), surf=c("orig", "inflated", "white", "pial")) {
 
