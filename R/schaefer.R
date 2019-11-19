@@ -61,7 +61,7 @@ schaefer_metainfo <- function(rpath, parcels, networks) {
 
   full_label <- labels[,2]
   labels <- labels[, 1:5]
-  names(labels) <- c("ROINUM", "label", "red", "green", "blue")
+  names(labels) <- c("roinum", "label", "red", "green", "blue")
   labels$label <- gsub(paste0(networks, "Networks", "_"), "", labels$label)
   hemi <- substr(labels$label, 1,2)
   labels$hemi <- hemi
