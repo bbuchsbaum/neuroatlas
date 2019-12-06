@@ -166,6 +166,21 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
     geom <- paste0(hemi, "_", surf)
     annot <- neurosurf::read_freesurfer_annot(des, fsaverage[[geom]])
+
+    nrois <- as.integer(parcels)
+
+    if (hemi == "rh") {
+      annot@data <- annot@data + nrois/2
+      annot@data <- annot@data - 1
+      annot@data[annot@data == nrois/2] <- 0
+      annot@labels <- annot@labels[-1]
+    } else {
+      annot@data <- annot@data - 1
+      annot@labels <- annot@labels[-1]
+    }
+
+
+
   }
 
 
