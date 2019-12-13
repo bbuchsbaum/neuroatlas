@@ -70,6 +70,8 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
       hemi=c(rep("left", apsections), rep("right", apsections)),
       cmap=t(col2rgb(rainbow(apsections*2)))
     )
+
+  ret$orig_labels <- paste0(ret$hemi, "_", ret$labels)
   class(ret) <- c("hippocampus", "atlas")
   ret
 
