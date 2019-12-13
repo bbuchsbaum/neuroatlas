@@ -50,8 +50,9 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
 
   ind <- which(atlas>0)
   grid <- neuroim2::index_to_coord(atlas, which(atlas > 0))
+
   if (apsections > 1) {
-    qz <- cut(grid[,3], apsections)
+    qz <- cut(grid[,2], apsections)
     levels(qz) <- paste0(seq(1,apsections))
     for (lev in levels(qz)) {
       atlas[ind[qz == lev]] <- as.numeric(lev)
