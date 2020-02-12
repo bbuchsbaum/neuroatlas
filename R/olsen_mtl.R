@@ -20,8 +20,8 @@
 
 
 get_olsen_mtl <- function(outspace=NULL) {
+  data(olsen_mtl)
   if (is.null(outspace)) {
-    data(olsen_mtl)
     olsen_mtl
   } else {
     atres <- resample(olsen_mtl$atlas, outspace)
@@ -38,6 +38,7 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
     data(olsen_mtl)
     olsen_mtl
   } else {
+    data(olsen_mtl)
     atres <- resample(olsen_mtl$atlas, outspace)
     tmp <- olsen_mtl
     tmp$atlas <- atres
