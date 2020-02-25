@@ -13,7 +13,7 @@ merge_atlases <- function(atlas1, atlas2) {
     name=paste0(atlas1$name,"::", atlas2$name),
     atlas=atlmerged,
     cmap=rbind(atlas1$cmap, atlas2$cmap),
-    ids=c(atlas1$ids, atlas2$ids),
+    ids=c(atlas1$ids, atlas2$ids + max(atlas1$ids) + 1),
     labels=c(atlas1$labels, atlas2$labels),
     orig_labels=c(atlas1$orig_labels, atlas2$orig_labels),
     hemi=c(atlas1$hemi, atlas2$hemi)
