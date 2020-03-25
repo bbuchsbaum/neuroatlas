@@ -4,9 +4,14 @@
 \alias{get_schaefer_atlas}
 \title{Retrieve and load Schaefer network parcellation from github repository}
 \usage{
-get_schaefer_atlas(parcels = c("100", "200", "300", "400", "500", "600",
-  "800", "1000"), networks = c("7", "17"), resolution = c("1", "2"),
-  outspace = NULL, smooth = FALSE)
+get_schaefer_atlas(
+  parcels = c("100", "200", "300", "400", "500", "600", "800", "1000"),
+  networks = c("7", "17"),
+  resolution = c("1", "2"),
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE
+)
 }
 \arguments{
 \item{parcels}{the number rof parcels in hte atlas}

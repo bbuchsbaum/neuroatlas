@@ -1,4 +1,30 @@
 
+#' @export
+print.atlas <- function(x) {
+  cat("Atlas:", x$name, "\n")
+  cat("num regions: ", length(x$ids), "\n")
+}
+  
+
+create_cache_dir <- function() {
+  dname <- paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
+  if (!dir.exists(dname)) {
+    dir.create(dname)
+  }
+  dname
+}
+
+get_cache_dir <- function() {
+  create_cache_dir()
+  #paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
+}
+
+clear_cache <- function() {
+  dname <- paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
+  fnames <- list.files(dname, full.names=TRUE)
+  sapply(fnames, unlink)
+}
+
 
 #' @export
 merge_atlases <- function(atlas1, atlas2) {

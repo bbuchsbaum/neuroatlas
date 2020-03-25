@@ -1,4 +1,9 @@
 
+
+schaefer_path <- list(
+  rpath = "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
+)
+
 getmode <- function(v) {
   uniqv <- unique(v)
   uniqv[which.max(tabulate(match(v, uniqv)))]
@@ -53,12 +58,61 @@ resample <- function(vol, outspace, smooth=FALSE) {
 }
 
 
-schaefer_metainfo <- function(rpath, parcels, networks) {
-  label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
-  des2 <- paste0(tempdir(), "/", label_name)
-  ret <- downloader::download(paste0(rpath, label_name), des2)
-  labels <- read.table(des2, as.is=TRUE)
+load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
+  fname <- paste0("Schaefer2018_", parcels, "Parcels_", 
+                  networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
+  
+  vol <- if (use_cache) {
+    pname <- paste0(get_cache_dir(), "/", fname)
+    if (file.exists(pname)) {
+      read_vol(pname)
+    }
+  }
+  
+  
+  if (is.null(vol)) {
+    ##fname <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
+    path <- paste0(schaefer_path$rpath,fname)
+    
+    des <- paste0(tempdir(), "/", fname)
+    ret <- downloader::download(path, des)
+    
+    vol <- read_vol(des)
+  
+    cdir <- get_cache_dir()
+    write_vol(vol, paste0(get_cache_dir(), "/", fname))
+    
+  }
+  
+  vol
+  
+}
 
+load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
+  label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
+  labels <- NULL
+  if (use_cache) {
+    if (file.exists(paste0(get_cache_dir(), "/", label_name))) {
+      labels <- read.table(paste0(get_cache_dir(), "/", label_name), header=FALSE, as.is=TRUE)
+    }
+  }
+  
+  if (is.null(labels)) {
+    des2 <- paste0(tempdir(), "/", label_name)
+    ret <- downloader::download(paste0(schaefer_path$rpath, label_name), des2)
+    labels <- read.table(des2, header=FALSE, as.is=TRUE)
+    file.copy(des2, paste0(get_cache_dir(), "/", label_name), overwrite=TRUE)
+  }
+  
+  labels
+}
+
+
+schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
+  #browser()
+  labels = load_schaefer_labels(parcels, networks)
+
+  #browser()
   full_label <- labels[,2]
   labels <- labels[, 1:5]
   names(labels) <- c("roinum", "label", "red", "green", "blue")
@@ -107,29 +161,30 @@ schaefer_metainfo <- function(rpath, parcels, networks) {
 #'
 #' Files are downloaded from the github repository: https://github.com/ThomasYeoLab/CBIG/
 get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
-                               networks=c("7","17"),resolution=c("1","2"), outspace=NULL, smooth=FALSE) {
+                               networks=c("7","17"),resolution=c("1","2"), outspace=NULL, smooth=FALSE, use_cache=TRUE) {
 
   parcels <- match.arg(parcels)
   networks <- match.arg(networks)
   resolution <- match.arg(resolution)
 
-  fname <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
-
-  rpath <- "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
-  path <- paste0(rpath,fname)
-
-  des <- paste0(tempdir(), "/", fname)
-  ret <- downloader::download(path, des)
-
-  vol <- read_vol(des)
-
+ 
+  vol <- load_schaefer_vol(parcels, networks, resolution, use_cache)
+  
   if (!is.null(outspace)) {
-    print(outspace)
+    #print(outspace)
     assertthat::assert_that(length(dim(outspace)) == 3)
     vol <- resample(vol, outspace, smooth)
   }
+  
+  #browser()
+ 
 
-  labels <- schaefer_metainfo(rpath, parcels, networks)
+  labels <- schaefer_metainfo(parcels, networks, use_cache)
+  cids <- 1:nrow(labels)
+  label_map <- as.list(cids)
+  names(label_map) <- labels$name
+  
+  vol <- ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], label_map=label_map)
 
   ret <- list(
     name=paste0("Schaefer-", parcels, "-", networks, "networks"),
