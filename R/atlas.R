@@ -1,8 +1,9 @@
 
 #' @export
 print.atlas <- function(x) {
-  cat("Atlas:", x$name, "\n")
-  cat("num regions: ", length(x$ids), "\n")
+  cat("Atlas name:", x$name, "\n")
+  cat("Number of regions: ", length(x$ids), "\n\n")
+  print(x$atlas)
 }
   
 

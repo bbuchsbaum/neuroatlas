@@ -12,18 +12,21 @@ getmode <- function(v) {
 resample <- function(vol, outspace, smooth=FALSE) {
   assertthat::assert_that(inherits(outspace, "NeuroSpace"))
   assertthat::assert_that(length(dim(outspace)) == 3)
-  cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
-  grid <- coord_to_grid(vol, cds) - .5
-
-  for (i in 1:3) {
-    g <- grid[,i]
-    g[g < 1] = 1
-    g[g > dim(vol)[i]] <- dim(vol)[i]
-    grid[,i] <- g
-  }
-  arr2 <- vol[grid]
-  vol <- NeuroVol(arr2, outspace)
+  
+  vol <- neuroim2::resample(vol, outspace)
   vol2 <- vol
+  # cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
+  # grid <- coord_to_grid(vol, cds) - .5
+  # 
+  # for (i in 1:3) {
+  #   g <- grid[,i]
+  #   g[g < 1] = 1
+  #   g[g > dim(vol)[i]] <- dim(vol)[i]
+  #   grid[,i] <- g
+  # }
+  # arr2 <- vol[grid]
+  # vol <- NeuroVol(arr2, outspace)
+  # vol2 <- vol
   if (smooth) {
     ds <- spacing(vol)
     mask <- as.logical(vol != 0)
