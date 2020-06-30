@@ -13,7 +13,7 @@ resample <- function(vol, outspace, smooth=FALSE) {
   assertthat::assert_that(inherits(outspace, "NeuroSpace"))
   assertthat::assert_that(length(dim(outspace)) == 3)
   
-  vol <- neuroim2::resample(vol, outspace)
+  vol <- neuroim2::resample(vol, outspace, interpolation=0)
   vol2 <- vol
   # cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
   # grid <- coord_to_grid(vol, cds) - .5
@@ -148,7 +148,10 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' @examples
 #'
 #' v1 <- get_schaefer_atlas(parcels="300")
-#' v2 <- neuroim2::NeuroSpace(dim=c(91,109,91), spacing=c(2,2,2), origin=c(90,-130,-72))
+#' 
+#' tr <- neuroim2::trans(v1$atlas)
+#' tr[cbind(1:3, 1:3)] <- tr[cbind(1:3, 1:3)] * 2
+#' v2 <- neuroim2::NeuroSpace(dim=c(91,109,91), spacing=c(2,2,2), trans=tr)
 #' v3 <- get_schaefer_atlas(parcels="300", outspace=v2)
 #'
 #'
@@ -181,7 +184,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     vol <- resample(vol, outspace, smooth)
   }
   
-
+  #browser()
 
   labels <- schaefer_metainfo(parcels, networks, use_cache)
   cids <- 1:nrow(labels)
