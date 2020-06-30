@@ -144,10 +144,12 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #'
 #' @importFrom neuroim2 read_vol
 #' @importFrom downloader download
-#'
+#' @importFrom neuroim2 ClusteredNeuroVol
 #' @examples
 #'
 #' v1 <- get_schaefer_atlas(parcels="300")
+#' v2 <- neuroim2::NeuroSpace(dim=c(91,109,91), spacing=c(2,2,2), origin=c(90,-130,-72))
+#' v3 <- get_schaefer_atlas(parcels="300", outspace=v2)
 #'
 #'
 #' @return
@@ -179,15 +181,14 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     vol <- resample(vol, outspace, smooth)
   }
   
-  #browser()
- 
+
 
   labels <- schaefer_metainfo(parcels, networks, use_cache)
   cids <- 1:nrow(labels)
   label_map <- as.list(cids)
   names(label_map) <- labels$name
   
-  vol <- ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], label_map=label_map)
+  vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], label_map=label_map)
 
   ret <- list(
     name=paste0("Schaefer-", parcels, "-", networks, "networks"),
