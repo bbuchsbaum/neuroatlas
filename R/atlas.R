@@ -29,12 +29,28 @@ clear_cache <- function() {
 
 #' @export
 merge_atlases <- function(atlas1, atlas2) {
-  assertthat::assert_that(all(dim(atlas1$atas) == dim(atlas2$atlas)))
+  assertthat::assert_that(all(dim(atlas1$atlas) == dim(atlas2$atlas)))
 
   atl2 <- atlas2$atlas
-  atl2[atl2 != 0] <- atl2[atl2 != 0] + max(atlas1$ids) + 1
-  atlmerged <- atlas1$atlas
+  atl2[atl2 != 0] <- atl2[atl2 != 0] + max(atlas1$ids) 
+  atlmerged <- neuroim2::NeuroVol(as.numeric(atlas1$atlas@data), space=space(atlas1$atlas))
+  
+  
   atlmerged[atl2 != 0] <- atl2[atl2 != 0]
+  
+  #vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], 
+  #                                   label_map=label_map)
+  
+  ids <- atlmerged[atlmerged != 0]
+  cids <- 1:length(unique(ids))
+  label_map <- as.list(cids)
+  names(label_map) <- c(atlas1$orig_labels, atlas2$orig_labels)
+  
+  atlmerged <- neuroim2::ClusteredNeuroVol(as.logical(atlmerged),
+                                           clusters=atlmerged[atlmerged != 0],
+                                           label_map=label_map)
+                                           
+  
 
   ret <- list(
     name=paste0(atlas1$name,"::", atlas2$name),
