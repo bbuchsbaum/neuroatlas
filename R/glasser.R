@@ -52,7 +52,14 @@ get_glasser_atlas <- function(outspace=NULL) {
   cols <- as.data.frame(cols)
   hemi <- tolower(sapply(strsplit(labels[,1], "_"), "[[", 1))
   region <- sapply(strsplit(labels[,1], "_"), "[[", 2)
- 
+  
+  cids <- 1:nrow(labels)
+  label_map <- as.list(cids)
+  names(label_map) <- region
+  
+  vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], label_map=label_map)
+  
+
   ret <- list(
     name="Glasser360",
     atlas=vol,
