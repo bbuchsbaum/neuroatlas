@@ -4,7 +4,8 @@
 \name{olsen_mtl}
 \alias{olsen_mtl}
 \title{Medial Temporal Lobe atlas from Rosanna Olsen}
-\format{A list of the 'atlas' class with 7 elements
+\format{
+A list of the 'atlas' class with 7 elements
 \describe{
   \item{name}{the name of the atlas}
   \item{atlas}{the atlas in MNI space with 1X1X1 resolution }
@@ -12,7 +13,8 @@
   \item{orig_labels}{the full labels (including hemisphere)}
   \item{ids}{the integer ids from 1 to 16}
   \item{hemi}{the hemisphere of each region}
-}}
+}
+}
 \usage{
 olsen_mtl
 }

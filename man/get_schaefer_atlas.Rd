@@ -41,5 +41,10 @@ Files are downloaded from the github repository: https://github.com/ThomasYeoLab
 
 v1 <- get_schaefer_atlas(parcels="300")
 
+tr <- neuroim2::trans(v1$atlas)
+tr[cbind(1:3, 1:3)] <- tr[cbind(1:3, 1:3)] * 2
+v2 <- neuroim2::NeuroSpace(dim=c(91,109,91), spacing=c(2,2,2), trans=tr)
+v3 <- get_schaefer_atlas(parcels="300", outspace=v2)
+
 
 }

@@ -4,7 +4,9 @@
 \name{fsaverage}
 \alias{fsaverage}
 \title{Surface geometry for the fsaverage6 atlas}
-\format{An object of class \code{list} of length 7.}
+\format{
+An object of class \code{list} of length 7.
+}
 \usage{
 data(fsaverage)
 }
