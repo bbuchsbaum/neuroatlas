@@ -215,6 +215,10 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
   #https://github.com/ThomasYeoLab/CBIG/blob/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/lh.Schaefer2018_1000Parcels_17Networks_order.annot
 
+  parcels <- match.arg(parcels)
+  networks <- match.arg(networks)
+  resolution <- match.arg(resolution)
+  
   data(fsaverage)
 
   get_hemi <- function(hemi) {
@@ -248,7 +252,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
   rp <-  "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
 
-  labels <- schaefer_metainfo(rp, parcels, networks)
+  labels <- schaefer_metainfo(parcels, networks)
 
   lh_surf <- get_hemi("lh")
   rh_surf <- get_hemi("rh")
