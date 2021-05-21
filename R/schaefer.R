@@ -217,7 +217,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
   parcels <- match.arg(parcels)
   networks <- match.arg(networks)
-  resolution <- match.arg(resolution)
+  #resolution <- match.arg(resolution)
   
   data(fsaverage)
 
