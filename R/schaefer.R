@@ -102,7 +102,9 @@ load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
   
   if (is.null(labels)) {
     des2 <- paste0(tempdir(), "/", label_name)
-    ret <- downloader::download(paste0(schaefer_path$rpath, label_name), des2)
+    #ret <- downloader::download(paste0(schaefer_path$rpath, label_name), des2)
+    message("downloading: ", paste0(schaefer_path$rpath, "/freeview_lut/", label_name))
+    ret <- downloader::download(paste0(schaefer_path$rpath, "/freeview_lut/", label_name), des2)
     labels <- read.table(des2, header=FALSE, as.is=TRUE)
     file.copy(des2, paste0(get_cache_dir(), "/", label_name), overwrite=TRUE)
   }
