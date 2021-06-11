@@ -115,7 +115,7 @@ load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
 
 schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
   #browser()
-  labels = load_schaefer_labels(parcels, networks)
+  labels = load_schaefer_labels(parcels, networks, use_cache)
 
   #browser()
   full_label <- labels[,2]
@@ -212,18 +212,21 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 
 #' @export
 get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
-                                 networks=c("7","17"), surf=c("orig", "inflated", "white", "pial")) {
+                                 networks=c("7","17"), surf=c("inflated", "white", "pial"), 
+                                 use_cache=TRUE) {
 
 
   #https://github.com/ThomasYeoLab/CBIG/blob/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/lh.Schaefer2018_1000Parcels_17Networks_order.annot
 
   parcels <- match.arg(parcels)
   networks <- match.arg(networks)
+  surf <- match.arg(surf)
   #resolution <- match.arg(resolution)
   
   data(fsaverage)
 
   get_hemi <- function(hemi) {
+
     fname <- paste0(hemi, ".", "Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.annot")
 
     rpath <- "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/"
@@ -247,15 +250,15 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
       annot@labels <- annot@labels[-1]
     }
 
-  annot
+    annot
 
   }
 
+ 
+  ##rp <-  "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
 
-  rp <-  "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
-
-  labels <- schaefer_metainfo(parcels, networks)
-
+  labels <- schaefer_metainfo(parcels, networks, use_cache=use_cache)
+  #browser()
   lh_surf <- get_hemi("lh")
   rh_surf <- get_hemi("rh")
 
