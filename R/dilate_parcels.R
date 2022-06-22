@@ -1,5 +1,6 @@
 
-
+#' dilate the boundaries of an atlas parcellation within a mask
+#' 
 #' @param atlas the brain atlas
 #' @param mask the mask of voxels to include for potential dilation 
 #' @param radius the dilation expansion radius
