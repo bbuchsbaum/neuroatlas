@@ -1,11 +1,21 @@
 
-#' dilate the boundaries of an atlas parcellation within a mask
-#' 
-#' @param atlas the brain atlas
-#' @param mask the mask of voxels to include for potential dilation 
-#' @param radius the dilation expansion radius
-#' @param maxn the maximum number of neighbors to consider for dilation
+#' Dilate the Boundaries of an Atlas Parcellation within a Mask
+#'
+#' This function dilates the boundaries of an atlas parcellation within a specified mask,
+#' expanding the parcellation by a given radius.
+#'
+#' @param atlas A brain atlas object. Must have the class "atlas".
+#' @param mask A mask of voxels to include for potential dilation.
+#' @param radius The dilation expansion radius (default: 4).
+#' @param maxn The maximum number of neighbors to consider for dilation (default: 50).
+#'
+#' @return A ClusteredNeuroVol object representing the dilated atlas parcellation.
+#'
 #' @export
+#' @examples
+#' atlas <- get_aseg_atlas()
+#' mask <- create_brain_mask(atlas)
+#' dilated_atlas <- dilate_atlas(atlas, mask, radius = 4, maxn = 50)
 dilate_atlas <- function(atlas, mask, radius=4, maxn=50) {
   assertthat::assert_that(inherits(atlas, "atlas"), msg="`atlas` arg must be an atlas")
   atlas2 <- as.dense(atlas$atlas)

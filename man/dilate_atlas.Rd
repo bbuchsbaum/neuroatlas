@@ -2,19 +2,28 @@
 % Please edit documentation in R/dilate_parcels.R
 \name{dilate_atlas}
 \alias{dilate_atlas}
-\title{dilate the boundaries of an atlas parcellation within a mask}
+\title{Dilate the Boundaries of an Atlas Parcellation within a Mask}
 \usage{
 dilate_atlas(atlas, mask, radius = 4, maxn = 50)
 }
 \arguments{
-\item{atlas}{the brain atlas}
+\item{atlas}{A brain atlas object. Must have the class "atlas".}
 
-\item{mask}{the mask of voxels to include for potential dilation}
+\item{mask}{A mask of voxels to include for potential dilation.}
 
-\item{radius}{the dilation expansion radius}
+\item{radius}{The dilation expansion radius (default: 4).}
 
-\item{maxn}{the maximum number of neighbors to consider for dilation}
+\item{maxn}{The maximum number of neighbors to consider for dilation (default: 50).}
+}
+\value{
+A ClusteredNeuroVol object representing the dilated atlas parcellation.
 }
 \description{
-dilate the boundaries of an atlas parcellation within a mask
+This function dilates the boundaries of an atlas parcellation within a specified mask,
+expanding the parcellation by a given radius.
+}
+\examples{
+atlas <- get_aseg_atlas()
+mask <- create_brain_mask(atlas)
+dilated_atlas <- dilate_atlas(atlas, mask, radius = 4, maxn = 50)
 }

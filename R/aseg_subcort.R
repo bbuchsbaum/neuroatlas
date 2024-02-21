@@ -1,3 +1,22 @@
+#' Get the ASEG Atlas
+#'
+#' This function reads the ASEG atlas file provided by the neuroatlas package and
+#' returns a list containing the atlas volume, colormap, region IDs, labels, and hemisphere information.
+#' The atlas can be resampled to a different space if the `outspace` argument is provided.
+#'
+#' @param outspace (Optional) A NeuroSpace object specifying the desired output space for the atlas.
+#'                 If provided, the atlas will be resampled to this space. Default is `NULL`,
+#'                 meaning the atlas will be returned in its original space.
+#'
+#' @return A list with class 'aseg' and 'atlas' containing the following elements:
+#' \itemize{
+#'   \item{atlas}{A NeuroVol object representing the atlas volume.}
+#'   \item{cmap}{A data frame with columns 'red', 'green', and 'blue', representing the colormap for the atlas.}
+#'   \item{ids}{A numeric vector containing the unique region IDs in the atlas.}
+#'   \item{labels}{A character vector containing the anatomical region labels corresponding to the region IDs.}
+#'   \item{hemi}{A character vector containing the hemisphere information ('left', 'right', or 'NA') for each region.}
+#' }
+#'
 #' @export
 get_aseg_atlas <- function(outspace=NULL) {
   fname <- system.file("extdata/atlas_aparc_aseg_prob33.nii.gz", package="neuroatlas")

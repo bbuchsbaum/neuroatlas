@@ -1,4 +1,7 @@
 
+
+
+
 #' @export
 print.atlas <- function(x) {
   cat("Atlas name:", x$name, "\n")
@@ -7,6 +10,8 @@ print.atlas <- function(x) {
 }
   
 
+#' @keywords internal
+#' @noRd
 create_cache_dir <- function() {
   dname <- paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
   if (!dir.exists(dname)) {
@@ -15,11 +20,15 @@ create_cache_dir <- function() {
   dname
 }
 
+#' @keywords internal
+#' @noRd
 get_cache_dir <- function() {
   create_cache_dir()
   #paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
 }
 
+#' @keywords internal
+#' @noRd
 clear_cache <- function() {
   dname <- paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
   fnames <- list.files(dname, full.names=TRUE)
@@ -27,7 +36,29 @@ clear_cache <- function() {
 }
 
 
+#' Merge Atlases
+#'
+#' This function merges two atlases into a single atlas object, combining their
+#' labels, color maps, ids, and hemispheres.
+#'
+#' @param atlas1 The first atlas object to merge.
+#' @param atlas2 The second atlas object to merge.
+#'
+#' @return A list containing the merged atlas information:
+#'   \itemize{
+#'     \item{name}{The concatenated names of the input atlases, separated by "::".}
+#'     \item{atlas}{A ClusteredNeuroVol object representing the merged atlas.}
+#'     \item{cmap}{A matrix containing the color maps of both atlases.}
+#'     \item{ids}{A vector containing the combined ids of both atlases.}
+#'     \item{labels}{A vector containing the combined labels of both atlases.}
+#'     \item{orig_labels}{A vector containing the combined original labels of both atlases.}
+#'     \item{hemi}{A vector containing the combined hemispheres of both atlases.}
+#'   }
 #' @export
+#' @examples
+#' atlas1 <- get_aseg_atlas()
+#' atlas2 <- get_aseg_atlas()
+#' merged_atlas <- merge_atlases(atlas1, atlas2)
 merge_atlases <- function(atlas1, atlas2) {
   assertthat::assert_that(all(dim(atlas1$atlas) == dim(atlas2$atlas)))
 
