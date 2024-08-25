@@ -20,10 +20,12 @@ Imports:
   ggseg,
   ggsegGlasser,
   ggsegSchaefer,
-  scico
+  scico,
+  ggiraph
 Remotes: 
   YeeJeremy/rflann,
   bbuchsbaum/neuroim2,
   bbuchsbaum/neurosurf,
+  bbuchsbaum/ggseg,
   ggseg/ggsegGlasser,
   ggseg/ggsegSchaefer
