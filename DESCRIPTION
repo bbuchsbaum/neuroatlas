@@ -15,7 +15,8 @@ Imports:
   rflann,
   downloader,
   reticulate,
-  dplyr
+  dplyr,
+  geojsonsf
 Remotes: 
   YeeJeremy/rflann,
   bbuchsbaum/neuroim2,
