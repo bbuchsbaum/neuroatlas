@@ -13,6 +13,8 @@ LazyData: true
 RoxygenNote: 7.2.3
 Imports:
   rflann,
-  downloader
+  downloader,
+  reticulate,
+  dplyr
 Remotes: 
   YeeJeremy/rflann
