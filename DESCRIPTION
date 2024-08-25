@@ -17,8 +17,13 @@ Imports:
   reticulate,
   dplyr,
   geojsonsf,
-  ggseg
+  ggseg,
+  ggsegGlasser,
+  ggsegSchaefer,
+  scico
 Remotes: 
   YeeJeremy/rflann,
   bbuchsbaum/neuroim2,
-  bbuchsbaum/neurosurf
+  bbuchsbaum/neurosurf,
+  ggseg/ggsegGlasser,
+  ggseg/ggsegSchaefer
