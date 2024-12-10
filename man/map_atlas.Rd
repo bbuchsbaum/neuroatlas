@@ -2,17 +2,25 @@
 % Please edit documentation in R/all_generic.R
 \name{map_atlas}
 \alias{map_atlas}
-\title{map a set of values to an atlas}
+\title{Map values to an atlas}
 \usage{
 map_atlas(x, vals, thresh, ...)
 }
 \arguments{
-\item{x}{the atlas to map values to}
+\item{x}{An atlas object to map values onto}
 
-\item{vals}{the values to map}
+\item{vals}{Numeric vector of values to map to atlas regions. Length should match
+the number of regions in the atlas}
 
-\item{thresh}{optional (min,max) threshold vector}
+\item{thresh}{Optional numeric vector of length 2 specifying (min, max) thresholds
+for the mapped values. Values outside this range will be clamped.}
+
+\item{...}{Additional arguments passed to methods}
+}
+\value{
+Returns the atlas object with mapped values
 }
 \description{
-map a set of values to an atlas
+Maps a set of values to regions/parcels in an atlas object. This can be used
+to visualize data (like statistics or measurements) across atlas regions.
 }

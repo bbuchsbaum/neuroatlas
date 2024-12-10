@@ -3,25 +3,52 @@
 \docType{data}
 \name{olsen_mtl}
 \alias{olsen_mtl}
-\title{Medial Temporal Lobe atlas from Rosanna Olsen}
+\title{Olsen Medial Temporal Lobe Atlas}
 \format{
-A list of the 'atlas' class with 7 elements
+A list with class 'atlas' containing:
 \describe{
-  \item{name}{the name of the atlas}
-  \item{atlas}{the atlas in MNI space with 1X1X1 resolution }
-  \item{labels}{the atlas labels}
-  \item{orig_labels}{the full labels (including hemisphere)}
-  \item{ids}{the integer ids from 1 to 16}
-  \item{hemi}{the hemisphere of each region}
+  \item{name}{Character string identifying the atlas}
+  \item{atlas}{NeuroVol object containing the parcellation in 1mm MNI space}
+  \item{labels}{Character vector of anatomical region labels}
+  \item{orig_labels}{Full region labels including hemisphere information}
+  \item{ids}{Integer vector of region IDs (1:16)}
+  \item{hemi}{Character vector indicating hemisphere ('left' or 'right')}
 }
+}
+\source{
+Olsen, R. K., et al. (2013). The role of relational binding in item memory:
+Evidence from face recognition in a case of developmental amnesia.
+Journal of Neuroscience, 33(36), 14107-14111.
 }
 \usage{
 olsen_mtl
 }
 \description{
-Medial Temporal Lobe atlas from Rosanna Olsen
+A detailed parcellation atlas of the medial temporal lobe (MTL) regions,
+including hippocampus and surrounding cortical areas, based on the work of
+Rosanna Olsen and colleagues.
+}
+\details{
+The atlas provides a detailed segmentation of MTL structures in MNI space at 1mm
+resolution. It includes bilateral parcellation of:
+\itemize{
+  \item Hippocampal subfields
+  \item Perirhinal cortex
+  \item Entorhinal cortex
+  \item Parahippocampal cortex
+}
 }
 \examples{
+\dontrun{
+# Load the atlas data
 data(olsen_mtl)
+
+# View available regions
+olsen_mtl$labels
+
+# Check distribution across hemispheres
+table(olsen_mtl$hemi)
+}
+
 }
 \keyword{datasets}

@@ -2,28 +2,66 @@
 % Please edit documentation in R/dilate_parcels.R
 \name{dilate_atlas}
 \alias{dilate_atlas}
-\title{Dilate the Boundaries of an Atlas Parcellation within a Mask}
+\title{Dilate Atlas Parcellation Boundaries}
 \usage{
 dilate_atlas(atlas, mask, radius = 4, maxn = 50)
 }
 \arguments{
-\item{atlas}{A brain atlas object. Must have the class "atlas".}
+\item{atlas}{An object of class "atlas" containing the parcellation to be dilated}
 
-\item{mask}{A mask of voxels to include for potential dilation.}
+\item{mask}{A binary mask (NeuroVol object) specifying valid voxels for dilation.
+Dilation will only occur within non-zero mask values.}
 
-\item{radius}{The dilation expansion radius (default: 4).}
+\item{radius}{Numeric. The maximum distance (in voxels) to search for neighboring
+parcels when dilating. Default: 4}
 
-\item{maxn}{The maximum number of neighbors to consider for dilation (default: 50).}
+\item{maxn}{Integer. Maximum number of neighboring voxels to consider when
+determining parcel assignment. Default: 50}
 }
 \value{
-A ClusteredNeuroVol object representing the dilated atlas parcellation.
+A \code{ClusteredNeuroVol} object containing the dilated parcellation.
+  The object maintains the original label mappings but may include additional
+  voxels in existing parcels.
 }
 \description{
-This function dilates the boundaries of an atlas parcellation within a specified mask,
-expanding the parcellation by a given radius.
+Expands the boundaries of brain atlas parcels by dilating them into adjacent
+unassigned voxels within a specified mask. This is useful for filling small gaps
+between parcels or extending parcels into neighboring regions.
+}
+\details{
+The dilation process:
+\itemize{
+  \item Identifies unassigned voxels within the mask that are adjacent to existing parcels
+  \item For each unassigned voxel, finds nearby assigned voxels within the specified radius
+  \item Assigns the unassigned voxel to the nearest parcel
+  \item Respects mask boundaries to prevent dilation into unwanted regions
+}
+
+The function uses a k-d tree implementation (via rflann) for efficient nearest
+neighbor searches in 3D space.
 }
 \examples{
+\dontrun{
+# Load an atlas
 atlas <- get_aseg_atlas()
+
+# Create a brain mask
 mask <- create_brain_mask(atlas)
-dilated_atlas <- dilate_atlas(atlas, mask, radius = 4, maxn = 50)
+
+# Dilate parcels by 4 voxels
+dilated <- dilate_atlas(atlas, mask, radius = 4)
+
+# More conservative dilation with fewer neighbors
+dilated_conservative <- dilate_atlas(atlas, mask, radius = 2, maxn = 20)
+}
+
+}
+\references{
+The algorithm uses the FLANN library for efficient nearest neighbor searches:
+Muja, M., & Lowe, D. G. (2014). Scalable nearest neighbor algorithms for high
+dimensional data. IEEE Transactions on Pattern Analysis and Machine Intelligence,
+36(11), 2227-2240.
+}
+\seealso{
+\code{\link{create_brain_mask}} for creating appropriate masks
 }

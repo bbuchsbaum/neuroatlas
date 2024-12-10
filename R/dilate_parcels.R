@@ -1,87 +1,143 @@
-
-#' Dilate the Boundaries of an Atlas Parcellation within a Mask
+#' Dilate Atlas Parcellation Boundaries
 #'
-#' This function dilates the boundaries of an atlas parcellation within a specified mask,
-#' expanding the parcellation by a given radius.
+#' @description
+#' Expands the boundaries of brain atlas parcels by dilating them into adjacent
+#' unassigned voxels within a specified mask. This is useful for filling small gaps
+#' between parcels or extending parcels into neighboring regions.
 #'
-#' @param atlas A brain atlas object. Must have the class "atlas".
-#' @param mask A mask of voxels to include for potential dilation.
-#' @param radius The dilation expansion radius (default: 4).
-#' @param maxn The maximum number of neighbors to consider for dilation (default: 50).
+#' @details
+#' The dilation process:
+#' \itemize{
+#'   \item Identifies unassigned voxels within the mask that are adjacent to existing parcels
+#'   \item For each unassigned voxel, finds nearby assigned voxels within the specified radius
+#'   \item Assigns the unassigned voxel to the nearest parcel
+#'   \item Respects mask boundaries to prevent dilation into unwanted regions
+#' }
 #'
-#' @return A ClusteredNeuroVol object representing the dilated atlas parcellation.
+#' The function uses a k-d tree implementation (via rflann) for efficient nearest
+#' neighbor searches in 3D space.
 #'
-#' @export
+#' @param atlas An object of class "atlas" containing the parcellation to be dilated
+#' @param mask A binary mask (NeuroVol object) specifying valid voxels for dilation.
+#'   Dilation will only occur within non-zero mask values.
+#' @param radius Numeric. The maximum distance (in voxels) to search for neighboring
+#'   parcels when dilating. Default: 4
+#' @param maxn Integer. Maximum number of neighboring voxels to consider when
+#'   determining parcel assignment. Default: 50
+#'
+#' @return A \code{ClusteredNeuroVol} object containing the dilated parcellation.
+#'   The object maintains the original label mappings but may include additional
+#'   voxels in existing parcels.
+#'
 #' @examples
+#' \dontrun{
+#' # Load an atlas
 #' atlas <- get_aseg_atlas()
+#'
+#' # Create a brain mask
 #' mask <- create_brain_mask(atlas)
-#' dilated_atlas <- dilate_atlas(atlas, mask, radius = 4, maxn = 50)
+#'
+#' # Dilate parcels by 4 voxels
+#' dilated <- dilate_atlas(atlas, mask, radius = 4)
+#'
+#' # More conservative dilation with fewer neighbors
+#' dilated_conservative <- dilate_atlas(atlas, mask, radius = 2, maxn = 20)
+#' }
+#'
+#' @seealso
+#' \code{\link{create_brain_mask}} for creating appropriate masks
+#'
+#' @references
+#' The algorithm uses the FLANN library for efficient nearest neighbor searches:
+#' Muja, M., & Lowe, D. G. (2014). Scalable nearest neighbor algorithms for high
+#' dimensional data. IEEE Transactions on Pattern Analysis and Machine Intelligence,
+#' 36(11), 2227-2240.
+#'
+#' @importFrom assertthat assert_that
+#' @importFrom neuroim2 index_to_coord index_to_grid ClusteredNeuroVol
+#' @importFrom rflann RadiusSearch
+#' @export
 dilate_atlas <- function(atlas, mask, radius=4, maxn=50) {
-  assertthat::assert_that(inherits(atlas, "atlas"), msg="`atlas` arg must be an atlas")
+  # Validate inputs
+  assertthat::assert_that(inherits(atlas, "atlas"), 
+                         msg="`atlas` arg must be an atlas")
+  assertthat::assert_that(inherits(mask, "NeuroVol"), 
+                         msg="`mask` must be a NeuroVol object")
+  assertthat::assert_that(radius > 0, msg="radius must be positive")
+  assertthat::assert_that(maxn > 0, msg="maxn must be positive")
+  
+  # Convert atlas to dense representation
   atlas2 <- as.dense(atlas$atlas)
+  
+  # Get indices of currently labeled voxels and mask voxels
   atlas_idx <- which(atlas$atlas > 0)
-  mask_idx <-  which(mask>0)
+  mask_idx <- which(mask > 0)
   diff_idx <- setdiff(mask_idx, atlas_idx)
   
+  # Early return if nothing to dilate
+  if (length(diff_idx) == 0) {
+    return(atlas$atlas)
+  }
+  
+  # Convert indices to real-space coordinates
   cd1 <- index_to_coord(mask, atlas_idx)
-  cd2 <- index_to_coord(mask,diff_idx)
+  cd2 <- index_to_coord(mask, diff_idx)
   
   grid1 <- index_to_grid(mask, atlas_idx)
   grid2 <- index_to_grid(mask, diff_idx)
   
+  # Find neighbors
   ret <- rflann::RadiusSearch(cd2, cd1, radius=radius, max_neighbour=maxn)
   
   qlen <- sapply(ret$indices, function(x) length(x))
   indset <- ret$indices[qlen > 0]
-  indices <- which(qlen>0)
+  indices <- which(qlen > 0)
   dset <- ret$distances[qlen > 0]
   
+  # Prepare output container
   out <- vector(length(indices), mode="list")
+  
+  # For each unlabeled voxel with neighbors
   for (i in 1:length(indices)) {
     ind <- indset[[i]]
     g <- grid1[ind,,drop=FALSE]
     g2 <- grid2[indices[i],,drop=FALSE]
-    out[[i]] <- cbind(g2, atlas2[g][1])
+    
+    # Get labels and distances of neighbors
+    neighbor_labels <- atlas2[g]
+    neighbor_distances <- dset[[i]]
+    
+    # Weight votes by inverse distance
+    weights <- 1 / (neighbor_distances + .Machine$double.eps)
+    
+    # Count weighted votes for each label
+    label_votes <- tapply(weights, neighbor_labels, sum)
+    
+    # Choose label with highest weighted vote
+    chosen_label <- as.numeric(names(which.max(label_votes)))
+    
+    out[[i]] <- cbind(g2, chosen_label)
   }
   
+  # Combine all assignments
   out <- do.call(rbind, out)
+  
+  # Update atlas with new assignments
   atlas2[out[,1:3]] <- out[,4]
   
-  newatl <- neuroim2::ClusteredNeuroVol(as.logical(atlas2), 
-                                        clusters=atlas2[atlas2!=0], 
-                                        label_map=atlas2@label_map)
+  # Verify label_map matches all values in atlas2
+  unique_labels <- unique(atlas2[atlas2 != 0])
+  missing_labels <- setdiff(unique_labels, as.numeric(names(atlas2@label_map)))
   
+  if (length(missing_labels) > 0) {
+    stop(sprintf(
+      "Found labels in dilated atlas that are not in label_map: %s",
+      paste(missing_labels, collapse=", ")
+    ))
+  }
   
+  # Create and return new ClusteredNeuroVol
+  neuroim2::ClusteredNeuroVol(as.logical(atlas2), 
+                             clusters=atlas2[atlas2!=0], 
+                             label_map=atlas2@label_map)
 }
-## this requires dilating the mask, then expanding clusters to dilated part
-# 
-# dilate_parcels <- function(atlas, mask, radius=NULL) {
-#   
-#   ds <- spacing(mask)
-#   vol <- NeuroVol(as.vector(atlas$atlas@data), space(atlas$atlas@mask))
-#   
-#   if (is.null(radius)) {
-#     radius=max(ds)+.1
-#   }
-# 
-#   sl <- neuroim2::searchlight_coords(mask, radius=radius, nonzero=FALSE)
-#   
-#   for (i in 1:length(sl)) {
-#     cds <- sl[[i]]
-# 
-#     if (nrow(cds) > 2) {
-#       labels <- vol[cds]
-#       if (all(labels[1] != labels[2:length(labels)])) {
-#         md <- getmode(labels)
-# 
-#         if (md != 0) {
-#           vol2[cds[1,,drop=FALSE]] <- md
-#         }
-#       }
-#     }
-#   }
-# 
-#   vol2[mask == 0] <- 0
-#   vol <- vol2
-# 
-# }

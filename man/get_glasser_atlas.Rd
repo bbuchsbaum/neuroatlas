@@ -2,37 +2,58 @@
 % Please edit documentation in R/glasser.R
 \name{get_glasser_atlas}
 \alias{get_glasser_atlas}
-\title{Retrieve and load Glasser360 network parcellation from PennBBL github repository}
+\title{Load Glasser Atlas}
+\source{
+Atlas files are downloaded from:
+\url{https://github.com/PennBBL/xcpEngine/tree/master/atlas/glasser360}
+}
 \usage{
 get_glasser_atlas(outspace = NULL)
 }
 \arguments{
-\item{parcels}{the number rof parcels in hte atlas}
-
-\item{networks}{the network number}
-
-\item{resolution}{the resolution of the atlas in MNI space (1mm or 2mm)}
-
-\item{outdim}{an optional 3-element vector indicating dimensions to resample atlas to.}
+\item{outspace}{Optional \code{NeuroSpace} object specifying desired output space.
+If provided, the atlas will be resampled to this space. Default: NULL}
 }
 \value{
-a list with three elemenents:
-
+A list with class 'glasser' and 'atlas' containing:
 \describe{
-  \item{atlas}{ a NeuroVol instance with integer indices coding the ROIs}
-  \item{cmap}{ a data.frame indicating the colors associated with each ROI}
-  \item{legend}{a data.frame providing label information about each ROI}
+  \item{name}{Character string "Glasser360"}
+  \item{atlas}{A \code{ClusteredNeuroVol} object containing the parcellation}
+  \item{cmap}{Data frame with RGB color specifications for each region}
+  \item{ids}{Integer vector of region IDs (1:360)}
+  \item{labels}{Character vector of anatomical labels}
+  \item{hemi}{Character vector indicating hemisphere ('left' or 'right')}
 }
 }
 \description{
-Retrieve and load Glasser360 network parcellation from PennBBL github repository
+Retrieves and loads the Glasser360 cortical parcellation atlas from the PennBBL
+repository. The atlas provides a detailed parcellation of the human cerebral cortex
+based on multi-modal neuroimaging data.
 }
 \details{
-Files are downloaded from the github repository: https://github.com/PennBBL/xcpEngine/
+The Glasser atlas divides each hemisphere into 180 areas (360 total) based on
+cortical architecture, function, connectivity, and topography. The atlas is
+downloaded from the PennBBL xcpEngine repository and includes:
+\itemize{
+  \item Volume data in MNI space
+  \item Region labels and hemisphere information
+  \item Color specifications for visualization
+}
 }
 \examples{
+\dontrun{
+# Load atlas in native space
+atlas <- get_glasser_atlas()
 
-v1 <- get_glasser_atlas()
+# View region labels
+head(atlas$labels)
 
+# Check number of regions per hemisphere
+table(atlas$hemi)
+}
 
+}
+\references{
+Glasser, M. F., et al. (2016). A multi-modal parcellation of human cerebral
+cortex. Nature, 536(7615), 171-178.
 }

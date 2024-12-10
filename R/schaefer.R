@@ -1,42 +1,101 @@
-
-
+#' Base URL for Schaefer Atlas Files
+#' @keywords internal
+#' @noRd
 schaefer_path <- list(
   rpath = "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
 )
 
+#' Find Mode of a Vector
+#'
+#' @description
+#' Internal helper function to find the most frequent value in a vector.
+#'
+#' @param v Numeric vector
+#' @return The most frequent value in the vector
+#' @keywords internal
+#' @noRd
 getmode <- function(v) {
   uniqv <- unique(v)
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
-resample <- function(vol, outspace, smooth=FALSE) {
-  assertthat::assert_that(inherits(outspace, "NeuroSpace"))
-  assertthat::assert_that(length(dim(outspace)) == 3)
-  
-  vol <- neuroim2::resample(vol, outspace, interpolation=0)
+#' Resample Volume to New Space
+#'
+#' @description
+#' Resamples a volume to a new space with optional smoothing of parcel boundaries.
+#' This is particularly useful for atlas parcellations where maintaining discrete
+#' labels is important.
+#'
+#' @details
+#' The resampling process:
+#' \itemize{
+#'   \item First performs nearest-neighbor interpolation to the new space
+#'   \item Optionally smooths boundaries using a local majority voting scheme
+#'   \item Preserves zeros in the mask (background)
+#' }
+#'
+#' @param vol A NeuroVol object to be resampled
+#' @param outspace A NeuroSpace object specifying the target space
+#' @param smooth Logical. Whether to apply boundary smoothing after resampling.
+#'   Default: FALSE
+#' @param interp Integer. Interpolation method (0=nearest neighbor, 1=linear).
+#'   Default: 0
+#' @param radius Numeric. Radius for smoothing neighborhood in voxels.
+#'   If NULL, uses max(spacing)+0.5. Default: NULL
+#' @param min_neighbors Integer. Minimum number of neighbors required for smoothing.
+#'   Default: 3
+#'
+#' @return A resampled NeuroVol object in the new space
+#'
+#' @importFrom assertthat assert_that
+#' @importFrom neuroim2 resample searchlight_coords spacing
+#' @export
+resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
+                    min_neighbors=3) {
+  # Input validation
+  assertthat::assert_that(inherits(vol, "NeuroVol"),
+                         msg="'vol' must be a NeuroVol object")
+  assertthat::assert_that(inherits(outspace, "NeuroSpace"),
+                         msg="'outspace' must be a NeuroSpace object")
+  assertthat::assert_that(length(dim(outspace)) == 3,
+                         msg="'outspace' must have 3 dimensions")
+  assertthat::assert_that(interp %in% c(0,1),
+                         msg="'interp' must be 0 (nearest) or 1 (linear)")
+  if (!is.null(radius)) {
+    assertthat::assert_that(radius > 0,
+                           msg="'radius' must be positive")
+  }
+  assertthat::assert_that(min_neighbors >= 2,
+                         msg="'min_neighbors' must be >= 2")
+
+  # Store original labels for validation
+  orig_labels <- sort(unique(as.vector(vol[vol != 0])))
+
+  # Initial resampling
+  vol <- neuroim2::resample(vol, outspace, interpolation=interp)
   vol2 <- vol
-  # cds <- index_to_coord(outspace, 1:prod(dim(outspace)))
-  # grid <- coord_to_grid(vol, cds) - .5
-  # 
-  # for (i in 1:3) {
-  #   g <- grid[,i]
-  #   g[g < 1] = 1
-  #   g[g > dim(vol)[i]] <- dim(vol)[i]
-  #   grid[,i] <- g
-  # }
-  # arr2 <- vol[grid]
-  # vol <- NeuroVol(arr2, outspace)
-  # vol2 <- vol
+
   if (smooth) {
     ds <- spacing(vol)
     mask <- as.logical(vol != 0)
-    sl <- neuroim2::searchlight_coords(mask, radius=max(ds)+.1, nonzero=TRUE)
+
+    # Set radius if not provided
+    if (is.null(radius)) {
+      radius <- max(ds) + 0.5
+    }
+
+    sl <- neuroim2::searchlight_coords(mask, radius=radius, nonzero=TRUE)
+
     for (i in 1:length(sl)) {
       cds <- sl[[i]]
 
-      if (nrow(cds) > 2) {
+      if (nrow(cds) >= min_neighbors) {
         labels <- vol[cds]
-        if (all(labels[1] != labels[2:length(labels)])) {
+        center_label <- labels[1]
+        neighbor_labels <- labels[2:length(labels)]
+
+        # Modified smoothing logic: smooth if majority differs from center
+        if (sum(neighbor_labels != center_label) > length(neighbor_labels)/2) {
           md <- getmode(labels)
           if (md != 0) {
             vol2[cds[1,,drop=FALSE]] <- md
@@ -45,52 +104,59 @@ resample <- function(vol, outspace, smooth=FALSE) {
       }
     }
 
+    # Preserve mask
     vol2[mask == 0] <- 0
     vol <- vol2
   }
 
+  # Validate output
+  final_labels <- sort(unique(as.vector(vol[vol != 0])))
+  if (!all(final_labels %in% orig_labels)) {
+    warning("Resampling introduced new label values")
+  }
+  if (!all(orig_labels %in% final_labels)) {
+    warning("Some original labels were lost during resampling")
+  }
+
   vol
-
-  # arr <- vol@.Data
-  # ospacing <- dim(vol) / outdim * spacing(vol)
-  # im <- imager::as.cimg(arr)
-  # imr <- resize(im, outdim[1], outdim[2], outdim[3], interpolation_type = 1)
-  # arr2 <- drop(as.array(imr))
-  # vol <- NeuroVol(arr2, NeuroSpace(outdim, ospacing))
-
 }
 
-
+#' Load Schaefer Atlas Volume
+#'
+#' @description
+#' Internal function to download and load Schaefer atlas volume files.
+#'
+#' @param parcels Number of parcels
+#' @param networks Number of networks
+#' @param resolution Resolution in mm
+#' @param use_cache Whether to use cached files
+#' @return A NeuroVol object containing the atlas
+#' @keywords internal
+#' @noRd
 load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
-  fname <- paste0("Schaefer2018_", parcels, "Parcels_", 
-                  networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
-  
+  fname <- paste0("Schaefer2018_", parcels, "Parcels_",
+                 networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
+
   vol <- if (use_cache) {
     pname <- paste0(get_cache_dir(), "/", fname)
     if (file.exists(pname)) {
       read_vol(pname)
     }
   }
-  
-  
+
   if (is.null(vol)) {
-    ##fname <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
-    path <- paste0(schaefer_path$rpath,fname)
-    
+    path <- paste0(schaefer_path$rpath, fname)
     des <- paste0(tempdir(), "/", fname)
     ret <- downloader::download(path, des)
-    
     vol <- read_vol(des)
-  
-    cdir <- get_cache_dir()
     write_vol(vol, paste0(get_cache_dir(), "/", fname))
-    
   }
-  
+
   vol
-  
 }
 
+#' @noRd
+#' @keywords internal
 load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
   label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
   labels <- NULL
@@ -99,7 +165,7 @@ load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
       labels <- read.table(paste0(get_cache_dir(), "/", label_name), header=FALSE, as.is=TRUE)
     }
   }
-  
+
   if (is.null(labels)) {
     des2 <- paste0(tempdir(), "/", label_name)
     #ret <- downloader::download(paste0(schaefer_path$rpath, label_name), des2)
@@ -108,11 +174,13 @@ load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
     labels <- read.table(des2, header=FALSE, as.is=TRUE)
     file.copy(des2, paste0(get_cache_dir(), "/", label_name), overwrite=TRUE)
   }
-  
+
   labels
 }
 
 
+#' @noRd
+#' @keywords internal
 schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
   #browser()
   labels = load_schaefer_labels(parcels, networks, use_cache)
@@ -136,63 +204,105 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 
 }
 
-#' Retrieve and load Schaefer network parcellation from github repository
+#' Load Schaefer Brain Parcellation Atlas
 #'
-#' @param parcels the number rof parcels in hte atlas
-#' @param networks the network number
-#' @param resolution the resolution of the atlas in MNI space (1mm or 2mm)
-#' @param outdim an optional 3-element vector indicating dimensions to resample atlas to.
-#' @export
-#'
-#' @importFrom neuroim2 read_vol
-#' @importFrom downloader download
-#' @importFrom neuroim2 ClusteredNeuroVol
-#' @examples
-#'
-#' v1 <- get_schaefer_atlas(parcels="300")
-#' 
-#' tr <- neuroim2::trans(v1$atlas)
-#' tr[cbind(1:3, 1:3)] <- tr[cbind(1:3, 1:3)] * 2
-#' v2 <- neuroim2::NeuroSpace(dim=c(91,109,91), spacing=c(2,2,2), trans=tr)
-#' v3 <- get_schaefer_atlas(parcels="300", outspace=v2)
-#'
-#'
-#' @return
-#'
-#' a list with three elemenents:
-#'
-#' \describe{
-#'   \item{atlas}{ a NeuroVol instance with integer indices coding the ROIs}
-#'   \item{cmap}{ a data.frame indicating the colors associated with each ROI}
-#'   \item{legend}{a data.frame providing label information about each ROI}
-#' }
+#' @description
+#' Retrieves and loads the Schaefer brain parcellation atlas, which provides a
+#' data-driven parcellation of the cerebral cortex based on both local gradient
+#' and global similarity approaches.
 #'
 #' @details
+#' The Schaefer atlas offers multiple resolutions of cortical parcellation
+#' (100-1000 parcels) and two network versions (7 or 17 networks). The atlas
+#' is based on resting-state functional connectivity from 1489 subjects.
+#' Features include:
+#' \itemize{
+#'   \item Multiple granularity levels (100-1000 parcels)
+#'   \item Network assignments (7 or 17 networks)
+#'   \item Bilateral parcellation
+#'   \item Available in different resolutions (1mm or 2mm)
+#' }
 #'
-#' Files are downloaded from the github repository: https://github.com/ThomasYeoLab/CBIG/
+#' @param parcels Character string specifying number of parcels.
+#'   Options: "100", "200", "300", "400", "500", "600", "800", "1000"
+#' @param networks Character string specifying network count.
+#'   Options: "7", "17"
+#' @param resolution Character string specifying MNI space resolution in mm.
+#'   Options: "1", "2"
+#' @param outspace Optional \code{NeuroSpace} object for resampling the atlas
+#' @param smooth Logical. Whether to smooth parcel boundaries after resampling.
+#'   Default: FALSE
+#' @param use_cache Logical. Whether to cache downloaded files. Default: TRUE
+#'
+#' @return A list with classes c("schaefer", "volatlas", "atlas") containing:
+#' \describe{
+#'   \item{name}{Character string identifying atlas version}
+#'   \item{atlas}{\code{ClusteredNeuroVol} object containing the parcellation}
+#'   \item{cmap}{Data frame with RGB colors for visualization}
+#'   \item{ids}{Integer vector of region IDs}
+#'   \item{labels}{Character vector of region names}
+#'   \item{orig_labels}{Original region labels from source data}
+#'   \item{network}{Network assignment for each region}
+#'   \item{hemi}{Hemisphere designation for each region}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' # Load 300-parcel atlas with 7 networks
+#' atlas <- get_schaefer_atlas(parcels = "300", networks = "7")
+#'
+#' # Load high-resolution version
+#' atlas_hires <- get_schaefer_atlas(parcels = "400",
+#'                                  networks = "17",
+#'                                  resolution = "1")
+#'
+#' # Resample to a different space
+#' new_space <- neuroim2::NeuroSpace(dim = c(91,109,91),
+#'                                  spacing = c(2,2,2))
+#' atlas_resampled <- get_schaefer_atlas(parcels = "300",
+#'                                      outspace = new_space)
+#' }
+#'
+#' @references
+#' Schaefer, A., et al. (2018). Local-Global Parcellation of the Human Cerebral
+#' Cortex from Intrinsic Functional Connectivity MRI. Cerebral Cortex, 28(9),
+#' 3095-3114.
+#'
+#' @source
+#' \url{https://github.com/ThomasYeoLab/CBIG/}
+#'
+#' @seealso
+#' \code{\link{get_schaefer_surfatlas}} for surface-based version
+#'
+#' @importFrom neuroim2 read_vol ClusteredNeuroVol write_vol
+#' @importFrom downloader download
+#' @importFrom assertthat assert_that
+#'
+#' @export
 get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
-                               networks=c("7","17"),resolution=c("1","2"), outspace=NULL, smooth=FALSE, use_cache=TRUE) {
+                              networks=c("7","17"), resolution=c("1","2"),
+                              outspace=NULL, smooth=FALSE, use_cache=TRUE) {
 
   parcels <- match.arg(parcels)
   networks <- match.arg(networks)
   resolution <- match.arg(resolution)
 
- 
+
   vol <- load_schaefer_vol(parcels, networks, resolution, use_cache)
-  
+
   if (!is.null(outspace)) {
     #print(outspace)
     assertthat::assert_that(length(dim(outspace)) == 3)
     vol <- resample(vol, outspace, smooth)
   }
-  
+
   #browser()
 
   labels <- schaefer_metainfo(parcels, networks, use_cache)
   cids <- 1:nrow(labels)
   label_map <- as.list(cids)
   names(label_map) <- labels$name
-  
+
   vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], label_map=label_map)
 
   ret <- list(
@@ -210,10 +320,61 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 }
 
 
+#' Load Surface-Based Schaefer Atlas
+#'
+#' @description
+#' Loads the surface-based version of the Schaefer parcellation atlas, compatible
+#' with FreeSurfer surface representations.
+#'
+#' @details
+#' Provides the Schaefer parcellation mapped to FreeSurfer surface meshes. The
+#' atlas can be loaded onto different surface representations (inflated, white,
+#' or pial) and maintains the same parcellation scheme as the volumetric version.
+#'
+#' @param parcels Character string specifying number of parcels.
+#'   Options: "100", "200", "300", "400", "500", "600", "800", "1000"
+#' @param networks Character string specifying network count.
+#'   Options: "7", "17"
+#' @param surf Character string specifying surface type.
+#'   Options: "inflated", "white", "pial"
+#' @param use_cache Logical. Whether to cache downloaded files. Default: TRUE
+#'
+#' @return A list with classes c("schaefer", "surfatlas", "atlas") containing:
+#' \describe{
+#'   \item{surf_type}{Surface type used}
+#'   \item{lh_atlas}{Left hemisphere surface atlas}
+#'   \item{rh_atlas}{Right hemisphere surface atlas}
+#'   \item{name}{Atlas identifier}
+#'   \item{cmap}{RGB color specifications}
+#'   \item{ids}{Region IDs}
+#'   \item{labels}{Region names}
+#'   \item{orig_labels}{Original region labels}
+#'   \item{network}{Network assignments}
+#'   \item{hemi}{Hemisphere designations}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' # Load inflated surface atlas
+#' surf_atlas <- get_schaefer_surfatlas(parcels = "300",
+#'                                     networks = "7",
+#'                                     surf = "inflated")
+#'
+#' # Load pial surface version
+#' pial_atlas <- get_schaefer_surfatlas(parcels = "400",
+#'                                     networks = "17",
+#'                                     surf = "pial")
+#' }
+#'
+#' @seealso
+#' \code{\link{get_schaefer_atlas}} for volumetric version
+#'
+#' @importFrom neurosurf read_freesurfer_annot
+#' @importFrom downloader download
 #' @export
 get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
-                                 networks=c("7","17"), surf=c("inflated", "white", "pial"), 
-                                 use_cache=TRUE) {
+                                  networks=c("7","17"), surf=c("inflated", "white", "pial"),
+                                  use_cache=TRUE) {
 
 
   #https://github.com/ThomasYeoLab/CBIG/blob/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/lh.Schaefer2018_1000Parcels_17Networks_order.annot
@@ -222,7 +383,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   networks <- match.arg(networks)
   surf <- match.arg(surf)
   #resolution <- match.arg(resolution)
-  
+
   data(fsaverage)
 
   get_hemi <- function(hemi) {
@@ -254,7 +415,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
   }
 
- 
+
   ##rp <-  "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
 
   labels <- schaefer_metainfo(parcels, networks, use_cache=use_cache)

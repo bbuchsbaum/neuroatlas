@@ -2,33 +2,55 @@
 % Please edit documentation in R/atlas.R
 \name{merge_atlases}
 \alias{merge_atlases}
-\title{Merge Atlases}
+\title{Merge Two Brain Atlases}
 \usage{
 merge_atlases(atlas1, atlas2)
 }
 \arguments{
-\item{atlas1}{The first atlas object to merge.}
+\item{atlas1}{The first atlas object to merge}
 
-\item{atlas2}{The second atlas object to merge.}
+\item{atlas2}{The second atlas object to merge}
 }
 \value{
-A list containing the merged atlas information:
-  \itemize{
-    \item{name}{The concatenated names of the input atlases, separated by "::".}
-    \item{atlas}{A ClusteredNeuroVol object representing the merged atlas.}
-    \item{cmap}{A matrix containing the color maps of both atlases.}
-    \item{ids}{A vector containing the combined ids of both atlases.}
-    \item{labels}{A vector containing the combined labels of both atlases.}
-    \item{orig_labels}{A vector containing the combined original labels of both atlases.}
-    \item{hemi}{A vector containing the combined hemispheres of both atlases.}
-  }
+A new atlas object containing:
+\describe{
+  \item{name}{Combined names of input atlases (atlas1::atlas2)}
+  \item{atlas}{Combined \code{ClusteredNeuroVol} object}
+  \item{cmap}{Combined colormap for all regions}
+  \item{ids}{Adjusted vector of all region IDs}
+  \item{labels}{Combined vector of region labels}
+  \item{orig_labels}{Original labels from both atlases}
+  \item{hemi}{Combined hemisphere designations}
+}
 }
 \description{
-This function merges two atlases into a single atlas object, combining their
-labels, color maps, ids, and hemispheres.
+Combines two brain atlases into a single unified atlas object, preserving all
+region information and adjusting region IDs to prevent conflicts. This is useful
+for creating composite atlases that combine different parcellation schemes.
+}
+\details{
+The merging process:
+\itemize{
+  \item Verifies that both atlases have the same dimensions
+  \item Adjusts region IDs in the second atlas to avoid overlap
+  \item Combines color maps, labels, and hemisphere information
+  \item Creates a new ClusteredNeuroVol object for the merged atlas
+}
 }
 \examples{
+\dontrun{
+# Load two atlases
 atlas1 <- get_aseg_atlas()
 atlas2 <- get_aseg_atlas()
-merged_atlas <- merge_atlases(atlas1, atlas2)
+
+# Merge the atlases
+merged <- merge_atlases(atlas1, atlas2)
+
+# Check the combined regions
+print(merged)
+}
+
+}
+\seealso{
+\code{\link{get_aseg_atlas}}, \code{\link{get_roi}}
 }

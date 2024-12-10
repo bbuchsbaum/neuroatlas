@@ -2,27 +2,60 @@
 % Please edit documentation in R/aseg_subcort.R
 \name{get_aseg_atlas}
 \alias{get_aseg_atlas}
-\title{Get the ASEG Atlas}
+\title{Get the FreeSurfer Subcortical Atlas (ASEG)}
 \usage{
 get_aseg_atlas(outspace = NULL)
 }
 \arguments{
-\item{outspace}{(Optional) A NeuroSpace object specifying the desired output space for the atlas.
-If provided, the atlas will be resampled to this space. Default is `NULL`,
-meaning the atlas will be returned in its original space.}
+\item{outspace}{Optional \code{NeuroSpace} object specifying the desired output space
+for resampling the atlas. If NULL (default), returns the atlas in its native space.}
 }
 \value{
-A list with class 'aseg' and 'atlas' containing the following elements:
-\itemize{
-  \item{atlas}{A NeuroVol object representing the atlas volume.}
-  \item{cmap}{A data frame with columns 'red', 'green', and 'blue', representing the colormap for the atlas.}
-  \item{ids}{A numeric vector containing the unique region IDs in the atlas.}
-  \item{labels}{A character vector containing the anatomical region labels corresponding to the region IDs.}
-  \item{hemi}{A character vector containing the hemisphere information ('left', 'right', or 'NA') for each region.}
+A list with classes 'aseg' and 'atlas' containing:
+\describe{
+  \item{atlas}{A \code{NeuroVol} object containing the 3D volume of atlas labels}
+  \item{cmap}{A data frame with RGB color specifications for each region}
+  \item{ids}{Integer vector of region IDs present in the atlas}
+  \item{labels}{Character vector of anatomical labels corresponding to each ID}
+  \item{hemi}{Character vector indicating hemisphere ('left', 'right', or NA) for each region}
 }
 }
 \description{
-This function reads the ASEG atlas file provided by the neuroatlas package and
-returns a list containing the atlas volume, colormap, region IDs, labels, and hemisphere information.
-The atlas can be resampled to a different space if the `outspace` argument is provided.
+Loads and returns the FreeSurfer subcortical segmentation (ASEG) atlas, which provides
+probabilistic labels for key subcortical structures in the brain. The atlas includes
+bilateral structures such as the thalamus, caudate, putamen, and limbic regions,
+as well as midline structures like the brainstem.
+}
+\details{
+The ASEG atlas is derived from FreeSurfer's automatic subcortical segmentation
+algorithm and has been transformed into standard space. Each voxel contains an
+integer ID corresponding to a specific anatomical structure. The atlas includes
+major subcortical structures for both hemispheres:
+\itemize{
+  \item Bilateral deep gray structures (thalamus, caudate, putamen, pallidum)
+  \item Limbic structures (hippocampus, amygdala)
+  \item Ventral structures (nucleus accumbens, ventral diencephalon)
+  \item Midline structures (brainstem)
+}
+}
+\examples{
+\dontrun{
+# Load the atlas in native space
+aseg <- get_aseg_atlas()
+
+# View the available region labels
+aseg$labels
+
+# Get the unique region IDs
+aseg$ids
+}
+
+}
+\references{
+Fischl, B., et al. (2002). Whole brain segmentation: automated labeling of
+neuroanatomical structures in the human brain. Neuron, 33(3), 341-355.
+}
+\seealso{
+\code{\link{map_atlas}} for mapping values onto atlas regions
+\code{\link{get_roi}} for extracting specific regions of interest
 }

@@ -1,15 +1,67 @@
-
-
-
-
+#' Print Method for Atlas Objects
+#'
+#' @description
+#' Displays a formatted summary of an atlas object, including its name, dimensions,
+#' number of regions, and a color-coded breakdown of anatomical structures.
+#'
+#' @param x An object of class 'atlas'
+#' @param ... Additional arguments passed to print methods
+#'
+#' @details
+#' This print method provides a visually enhanced display of atlas information using
+#' colored output via the crayon package. It shows:
+#' \itemize{
+#'   \item Atlas name and type
+#'   \item Volume dimensions and spacing
+#'   \item Total number of regions
+#'   \item Summary of anatomical structures by hemisphere
+#' }
+#'
+#' @importFrom crayon bold green blue red white
+#' @importFrom cli rule symbol
 #' @export
-print.atlas <- function(x) {
-  cat("Atlas name:", x$name, "\n")
-  cat("Number of regions: ", length(x$ids), "\n\n")
-  print(x$atlas)
-}
+print.atlas <- function(x, ...) {
+  # Header
+  cat(cli::rule(left = crayon::bold("Atlas Summary"), col = "cyan", width = 60), "\n\n")
   
+  # Basic info
+  cat(crayon::blue(cli::symbol$pointer), " ", 
+      crayon::bold("Name:   "), crayon::white(x$name), "\n", sep="")
+  
+  # Volume info
+  dims <- dim(x$atlas)
+  cat(crayon::blue(cli::symbol$pointer), " ",
+      crayon::bold("Dimensions: "), 
+      crayon::white(paste0(dims[1], " × ", dims[2], " × ", dims[3])), "\n", sep="")
+  
+  # Region counts
+  cat(crayon::blue(cli::symbol$pointer), " ",
+      crayon::bold("Regions: "), 
+      crayon::green(length(x$ids)), "\n", sep="")
+  
+  # Hemisphere breakdown
+  left_count <- sum(x$hemi == "left", na.rm=TRUE)
+  right_count <- sum(x$hemi == "right", na.rm=TRUE)
+  bilateral_count <- sum(is.na(x$hemi))
+  
+  cat("\n", crayon::bold("Structure Distribution:"), "\n", sep="")
+  cat(crayon::red("├─"), " Left hemisphere:     ", 
+      crayon::white(left_count), "\n", sep="")
+  cat(crayon::red("├─"), " Right hemisphere:    ", 
+      crayon::white(right_count), "\n", sep="")
+  cat(crayon::red("└─"), " Bilateral/Midline:   ", 
+      crayon::white(bilateral_count), "\n", sep="")
+  
+  # Footer
+  cat("\n", cli::rule(col = "cyan", width = 60), "\n", sep="")
+}
 
+#' Create Cache Directory for Atlas Data
+#'
+#' @description
+#' Creates a hidden directory in the user's home folder for caching atlas data.
+#'
+#' @return Character string containing the path to the cache directory
 #' @keywords internal
 #' @noRd
 create_cache_dir <- function() {
@@ -20,13 +72,24 @@ create_cache_dir <- function() {
   dname
 }
 
+#' Get Cache Directory Path
+#'
+#' @description
+#' Returns the path to the atlas cache directory, creating it if necessary.
+#'
+#' @return Character string containing the path to the cache directory
 #' @keywords internal
 #' @noRd
 get_cache_dir <- function() {
   create_cache_dir()
-  #paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
 }
 
+#' Clear Atlas Cache
+#'
+#' @description
+#' Removes all cached atlas files from the cache directory.
+#'
+#' @return None
 #' @keywords internal
 #' @noRd
 clear_cache <- function() {
@@ -35,30 +98,55 @@ clear_cache <- function() {
   sapply(fnames, unlink)
 }
 
-
-#' Merge Atlases
+#' Merge Two Brain Atlases
 #'
-#' This function merges two atlases into a single atlas object, combining their
-#' labels, color maps, ids, and hemispheres.
+#' @description
+#' Combines two brain atlases into a single unified atlas object, preserving all
+#' region information and adjusting region IDs to prevent conflicts. This is useful
+#' for creating composite atlases that combine different parcellation schemes.
 #'
-#' @param atlas1 The first atlas object to merge.
-#' @param atlas2 The second atlas object to merge.
+#' @details
+#' The merging process:
+#' \itemize{
+#'   \item Verifies that both atlases have the same dimensions
+#'   \item Adjusts region IDs in the second atlas to avoid overlap
+#'   \item Combines color maps, labels, and hemisphere information
+#'   \item Creates a new ClusteredNeuroVol object for the merged atlas
+#' }
 #'
-#' @return A list containing the merged atlas information:
-#'   \itemize{
-#'     \item{name}{The concatenated names of the input atlases, separated by "::".}
-#'     \item{atlas}{A ClusteredNeuroVol object representing the merged atlas.}
-#'     \item{cmap}{A matrix containing the color maps of both atlases.}
-#'     \item{ids}{A vector containing the combined ids of both atlases.}
-#'     \item{labels}{A vector containing the combined labels of both atlases.}
-#'     \item{orig_labels}{A vector containing the combined original labels of both atlases.}
-#'     \item{hemi}{A vector containing the combined hemispheres of both atlases.}
-#'   }
-#' @export
+#' @param atlas1 The first atlas object to merge
+#' @param atlas2 The second atlas object to merge
+#'
+#' @return A new atlas object containing:
+#' \describe{
+#'   \item{name}{Combined names of input atlases (atlas1::atlas2)}
+#'   \item{atlas}{Combined \code{ClusteredNeuroVol} object}
+#'   \item{cmap}{Combined colormap for all regions}
+#'   \item{ids}{Adjusted vector of all region IDs}
+#'   \item{labels}{Combined vector of region labels}
+#'   \item{orig_labels}{Original labels from both atlases}
+#'   \item{hemi}{Combined hemisphere designations}
+#' }
+#'
 #' @examples
+#' \dontrun{
+#' # Load two atlases
 #' atlas1 <- get_aseg_atlas()
 #' atlas2 <- get_aseg_atlas()
-#' merged_atlas <- merge_atlases(atlas1, atlas2)
+#'
+#' # Merge the atlases
+#' merged <- merge_atlases(atlas1, atlas2)
+#'
+#' # Check the combined regions
+#' print(merged)
+#' }
+#'
+#' @seealso
+#' \code{\link{get_aseg_atlas}}, \code{\link{get_roi}}
+#'
+#' @importFrom assertthat assert_that
+#' @importFrom neuroim2 NeuroVol ClusteredNeuroVol space
+#' @export
 merge_atlases <- function(atlas1, atlas2) {
   assertthat::assert_that(all(dim(atlas1$atlas) == dim(atlas2$atlas)))
 

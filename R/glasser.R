@@ -1,37 +1,61 @@
-#' Retrieve and load Glasser360 network parcellation from PennBBL github repository
+#' Load Glasser Atlas
 #'
-#' @param parcels the number rof parcels in hte atlas
-#' @param networks the network number
-#' @param resolution the resolution of the atlas in MNI space (1mm or 2mm)
-#' @param outdim an optional 3-element vector indicating dimensions to resample atlas to.
-#' @export
-#'
-#' @importFrom neuroim2 read_vol
-#' @importFrom downloader download
-#'
-#' @examples
-#'
-#' v1 <- get_glasser_atlas()
-#' 
-#'
-#' @return
-#'
-#' a list with three elemenents:
-#'
-#' \describe{
-#'   \item{atlas}{ a NeuroVol instance with integer indices coding the ROIs}
-#'   \item{cmap}{ a data.frame indicating the colors associated with each ROI}
-#'   \item{legend}{a data.frame providing label information about each ROI}
-#' }
+#' @description
+#' Retrieves and loads the Glasser360 cortical parcellation atlas from the PennBBL
+#' repository. The atlas provides a detailed parcellation of the human cerebral cortex
+#' based on multi-modal neuroimaging data.
 #'
 #' @details
+#' The Glasser atlas divides each hemisphere into 180 areas (360 total) based on
+#' cortical architecture, function, connectivity, and topography. The atlas is
+#' downloaded from the PennBBL xcpEngine repository and includes:
+#' \itemize{
+#'   \item Volume data in MNI space
+#'   \item Region labels and hemisphere information
+#'   \item Color specifications for visualization
+#' }
 #'
-#' Files are downloaded from the github repository: https://github.com/PennBBL/xcpEngine/
+#' @param outspace Optional \code{NeuroSpace} object specifying desired output space.
+#'   If provided, the atlas will be resampled to this space. Default: NULL
+#'
+#' @return A list with class 'glasser' and 'atlas' containing:
+#' \describe{
+#'   \item{name}{Character string "Glasser360"}
+#'   \item{atlas}{A \code{ClusteredNeuroVol} object containing the parcellation}
+#'   \item{cmap}{Data frame with RGB color specifications for each region}
+#'   \item{ids}{Integer vector of region IDs (1:360)}
+#'   \item{labels}{Character vector of anatomical labels}
+#'   \item{hemi}{Character vector indicating hemisphere ('left' or 'right')}
+#' }
+#'
+#' @references
+#' Glasser, M. F., et al. (2016). A multi-modal parcellation of human cerebral
+#' cortex. Nature, 536(7615), 171-178.
+#'
+#' @source
+#' Atlas files are downloaded from:
+#' \url{https://github.com/PennBBL/xcpEngine/tree/master/atlas/glasser360}
+#'
+#' @examples
+#' \dontrun{
+#' # Load atlas in native space
+#' atlas <- get_glasser_atlas()
+#'
+#' # View region labels
+#' head(atlas$labels)
+#'
+#' # Check number of regions per hemisphere
+#' table(atlas$hemi)
+#' }
+#'
+#' @importFrom neuroim2 read_vol ClusteredNeuroVol
+#' @importFrom downloader download
+#' @export
 get_glasser_atlas <- function(outspace=NULL) {
-  
+  # Download and read atlas volume
   fname <- "glasser360MNI.nii.gz"
-  rpath= "https://github.com/PennBBL/xcpEngine/raw/master/atlas/glasser360/"
-  path <- paste0(rpath,fname)
+  rpath <- "https://github.com/PennBBL/xcpEngine/raw/master/atlas/glasser360/"
+  path <- paste0(rpath, fname)
   
   des <- paste0(tempdir(), "/", fname)
   ret <- download(path, des)
@@ -42,6 +66,7 @@ get_glasser_atlas <- function(outspace=NULL) {
     vol <- resample(vol, outspace)
   }
   
+  # Download and process labels
   label_name <- "glasser360NodeNames.txt"
   des2 <- paste0(tempdir(), "/", label_name)
   ret <- download(paste0(rpath, label_name), des2)
@@ -53,13 +78,16 @@ get_glasser_atlas <- function(outspace=NULL) {
   hemi <- tolower(sapply(strsplit(labels[,1], "_"), "[[", 1))
   region <- sapply(strsplit(labels[,1], "_"), "[[", 2)
   
+  # Create label mapping
   cids <- 1:nrow(labels)
   label_map <- as.list(cids)
   names(label_map) <- region
   
-  vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], label_map=label_map)
+  vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), 
+                                    clusters=vol[vol!=0], 
+                                    label_map=label_map)
   
-
+  # Return atlas object
   ret <- list(
     name="Glasser360",
     atlas=vol,
@@ -72,72 +100,178 @@ get_glasser_atlas <- function(outspace=NULL) {
   ret
 }
 
-
-#' @export
-#' @import ggsegGlasser 
+#' Map Values to Glasser Atlas
+#'
+#' @description
+#' Maps numeric values to regions in the Glasser atlas for visualization using
+#' ggseg plotting functions.
+#'
+#' @param x A Glasser atlas object
+#' @param vals Numeric vector of values to map to atlas regions
+#' @param thresh Numeric vector of length 2 specifying (min, max) thresholds.
+#'   Values outside this range will be set to NA
+#' @param pos Logical. If TRUE, uses raw values; if FALSE, uses absolute values
+#'   for thresholding
+#' @param ... Additional arguments passed to methods
+#'
+#' @return A ggseg brain atlas object with mapped values
+#'
+#' @import ggsegGlasser
 #' @importFrom ggiraph geom_polygon_interactive
+#' @importFrom dplyr left_join mutate
+#' @importFrom tibble tibble
+#' @export
 map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
-  fun <- if (pos) {
-    identity
-  } else {
-    abs
-  }
+  fun <- if (pos) identity else abs
   
-  ids <- ifelse(x$hemi == "left", paste0("lh_L_", x$label), paste0("rh_R_", x$label))
+  ids <- ifelse(x$hemi == "left", 
+                paste0("lh_L_", x$label), 
+                paste0("rh_R_", x$label))
   
   ret <- tibble(statistic=vals, region=x$labels, label=ids, hemi=x$hemi)
-  
   
   rboth <- ggsegGlasser::glasser %>%
     as_tibble() %>%
     left_join(ret) %>%
-    mutate(statistic=ifelse(fun(statistic) <= thresh[1] | fun(statistic) > thresh[2], 
-                            statistic, NA)) %>%
+    mutate(statistic=ifelse(fun(statistic) <= thresh[1] | 
+                           fun(statistic) > thresh[2], 
+                           statistic, NA)) %>%
     as_brain_atlas()
   
-  
-  # ggseg(atlas=rboth, position="stacked", colour="gray", interactive=FALSE, guide=TRUE,
-  #       mapping=aes(fill=statistic, tooltip=region,data_id=label)) + scale_fill_distiller(palette="Spectral", 
-  #                                                                                         #breaks=seq(limits[1], limits[2], length.out=10),
-  #                                                                                         limits=lim,
-  #                                                                                         direction=-1,
-  #                                                                                         #na.value="grey",
-  #                                                                                         oob=squish) 
-  # 
   rboth
-  
 }
 
-
-#' @inheritParams map_atlas
-#' @export
+#' Plot Glasser Atlas
+#'
+#' @description
+#' Creates an interactive visualization of the Glasser atlas with mapped values
+#' using ggseg and ggiraph.
+#'
+#' @param x A Glasser atlas object
+#' @param y Ignored (required for compatibility with generic plot method)
+#' @param vals Numeric vector of values to visualize. If NULL (default), all regions
+#'   will be assigned a value of 1, creating a uniform visualization
+#' @param thresh Numeric vector of length 2 for thresholding values
+#' @param pos Logical. If TRUE, uses raw values for thresholding
+#' @param position Character. Layout type ("stacked" or "dispersed")
+#' @param colour Character. Border color for regions
+#' @param guide Logical. Whether to show color guide
+#' @param palette Character. Name of scico color palette
+#' @param lim Numeric vector of length 2 for color scale limits. If NULL, will be
+#'   set to range of vals
+#' @param ... Additional arguments passed to methods
+#'
+#' @return A ggiraph interactive plot object
+#'
 #' @importFrom tibble tibble
 #' @importFrom magrittr %>%
-#' @import dplyr
+#' @importFrom dplyr mutate left_join
 #' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection
 #' @importFrom ggplot2 aes
-#' @importFrom scales squish
+#' @importFrom scico scale_fill_scico
 #' @import scico
-plot.glasser <- function(x, y, vals, thresh=c(0,0), pos=FALSE, position="stacked", 
-                         colour="gray", guide=TRUE, palette="cork", lim=range(vals), 
-                         ...) {
-  gatl <- map_atlas(x,vals,thresh=thresh, pos=pos)
+#' @export
+plot.glasser <- function(x, y, vals=NULL, thresh=c(0,0), pos=FALSE, 
+                        position="stacked", colour="gray", guide=TRUE,
+                        palette="cork", lim=NULL, ...) {
+  if (is.null(vals)) {
+    vals <- rep(1, length(x$labels))
+  }
   
-  gg <- ggseg(atlas=gatl, position=position, colour=colour, interactive=FALSE, guide=guide,
-              mapping=aes(fill=statistic, tooltip=region,data_id=label)) + 
-              scale_fill_scico(palette=palette, 
-              #breaks=seq(limits[1], limits[2], length.out=10),
-              limits=lim,
-              direction=-1,
-              #na.value="grey",
-              oob=scales::squish)
+  if (is.null(lim)) {
+    lim <- range(vals)
+  }
   
+  gatl <- map_atlas(x, vals, thresh=thresh, pos=pos)
   
-  girafe(ggobj=gg,width_svg=8, height_svg=6, options=list(
-    opts_tooltip(opacity = .7,
-                 css="font-family: Arial, Helvetica, sans-serif;"),
-    opts_hover(css = "fill:yellow;"),
-    opts_selection(css="fill:red;", type = "single", 
-                   only_shiny = FALSE)))
+  gg <- ggseg(atlas=gatl, 
+              position=position, 
+              colour=colour, 
+              interactive=FALSE, 
+              guide=guide,
+              mapping=aes(fill=statistic, 
+                         tooltip=region,
+                         data_id=label)) + 
+    scale_fill_scico(palette=palette,
+                     limits=lim,
+                     direction=-1,
+                     oob=scales::squish)
   
+  girafe(ggobj=gg,
+         width_svg=8, 
+         height_svg=6, 
+         options=list(
+           opts_tooltip(opacity=.7,
+                       css="font-family: Arial, Helvetica, sans-serif;"),
+           opts_hover(css="fill:yellow;"),
+           opts_selection(css="fill:red;", 
+                         type="single", 
+                         only_shiny=FALSE)))
+}
+
+#' Print Method for Glasser Atlas Objects
+#'
+#' @description
+#' Displays a formatted summary of a Glasser atlas object, including region counts,
+#' hemisphere distribution, and basic metadata.
+#'
+#' @param x A Glasser atlas object
+#' @param ... Additional arguments passed to print methods
+#'
+#' @importFrom crayon bold green blue red white yellow
+#' @importFrom cli rule symbol
+#' @export
+print.glasser <- function(x, ...) {
+  # Header with fancy border
+  cat(cli::rule(left = crayon::bold(crayon::blue("Glasser Atlas Summary")), 
+                col = "cyan", width = 65), "\n\n")
+  
+  # Basic info section
+  cat(crayon::yellow(cli::symbol$info), " ", 
+      crayon::bold("Atlas Type: "), 
+      crayon::white("Glasser Multi-Modal Parcellation"), "\n", sep="")
+  
+  cat(crayon::yellow(cli::symbol$info), " ",
+      crayon::bold("Resolution: "), 
+      crayon::white("MNI Space"), "\n", sep="")
+  
+  # Volume dimensions
+  dims <- dim(x$atlas)
+  cat(crayon::yellow(cli::symbol$info), " ",
+      crayon::bold("Dimensions: "), 
+      crayon::white(paste0(dims[1], " × ", dims[2], " × ", dims[3])), "\n\n", sep="")
+  
+  # Region counts
+  total_regions <- length(x$ids)
+  left_regions <- sum(x$hemi == "left")
+  right_regions <- sum(x$hemi == "right")
+  
+  cat(crayon::green(cli::symbol$circle_filled), " ",
+      crayon::bold("Region Summary:"), "\n", sep="")
+  
+  cat(crayon::blue("├─"), " Total Regions:      ", 
+      crayon::white(total_regions), "\n", sep="")
+  cat(crayon::blue("├─"), " Left Hemisphere:    ", 
+      crayon::white(left_regions), "\n", sep="")
+  cat(crayon::blue("└─"), " Right Hemisphere:   ", 
+      crayon::white(right_regions), "\n\n", sep="")
+  
+  # Sample regions
+  cat(crayon::green(cli::symbol$circle_filled), " ",
+      crayon::bold("Example Regions:"), "\n", sep="")
+  
+  # Show first 3 regions from each hemisphere
+  left_examples <- head(x$labels[x$hemi == "left"], 3)
+  right_examples <- head(x$labels[x$hemi == "right"], 3)
+  
+  cat(crayon::blue("├─"), " Left:  ", 
+      crayon::white(paste(left_examples, collapse=", ")), "...\n", sep="")
+  cat(crayon::blue("└─"), " Right: ", 
+      crayon::white(paste(right_examples, collapse=", ")), "...\n", sep="")
+  
+  # Footer
+  cat("\n", cli::rule(
+    left = crayon::blue(cli::symbol$info), 
+    right = "Use plot() for visualization",
+    col = "cyan", width = 65), "\n", sep="")
 }
