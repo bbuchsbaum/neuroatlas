@@ -57,87 +57,46 @@
 #' @importFrom neuroim2 index_to_coord index_to_grid ClusteredNeuroVol
 #' @importFrom rflann RadiusSearch
 #' @export
-dilate_atlas <- function(atlas, mask, radius=4, maxn=50) {
-  # Validate inputs
-  assertthat::assert_that(inherits(atlas, "atlas"), 
-                         msg="`atlas` arg must be an atlas")
-  assertthat::assert_that(inherits(mask, "NeuroVol"), 
-                         msg="`mask` must be a NeuroVol object")
-  assertthat::assert_that(radius > 0, msg="radius must be positive")
-  assertthat::assert_that(maxn > 0, msg="maxn must be positive")
-  
-  # Convert atlas to dense representation
-  atlas2 <- as.dense(atlas$atlas)
-  
-  # Get indices of currently labeled voxels and mask voxels
-  atlas_idx <- which(atlas$atlas > 0)
-  mask_idx <- which(mask > 0)
-  diff_idx <- setdiff(mask_idx, atlas_idx)
-  
-  # Early return if nothing to dilate
-  if (length(diff_idx) == 0) {
-    return(atlas$atlas)
-  }
-  
-  # Convert indices to real-space coordinates
-  cd1 <- index_to_coord(mask, atlas_idx)
-  cd2 <- index_to_coord(mask, diff_idx)
-  
-  grid1 <- index_to_grid(mask, atlas_idx)
-  grid2 <- index_to_grid(mask, diff_idx)
-  
-  # Find neighbors
-  ret <- rflann::RadiusSearch(cd2, cd1, radius=radius, max_neighbour=maxn)
-  
-  qlen <- sapply(ret$indices, function(x) length(x))
-  indset <- ret$indices[qlen > 0]
-  indices <- which(qlen > 0)
-  dset <- ret$distances[qlen > 0]
-  
-  # Prepare output container
-  out <- vector(length(indices), mode="list")
-  
-  # For each unlabeled voxel with neighbors
-  for (i in 1:length(indices)) {
-    ind <- indset[[i]]
-    g <- grid1[ind,,drop=FALSE]
-    g2 <- grid2[indices[i],,drop=FALSE]
-    
-    # Get labels and distances of neighbors
-    neighbor_labels <- atlas2[g]
-    neighbor_distances <- dset[[i]]
-    
-    # Weight votes by inverse distance
-    weights <- 1 / (neighbor_distances + .Machine$double.eps)
-    
-    # Count weighted votes for each label
-    label_votes <- tapply(weights, neighbor_labels, sum)
-    
-    # Choose label with highest weighted vote
-    chosen_label <- as.numeric(names(which.max(label_votes)))
-    
-    out[[i]] <- cbind(g2, chosen_label)
-  }
-  
-  # Combine all assignments
-  out <- do.call(rbind, out)
-  
-  # Update atlas with new assignments
-  atlas2[out[,1:3]] <- out[,4]
-  
-  # Verify label_map matches all values in atlas2
-  unique_labels <- unique(atlas2[atlas2 != 0])
-  missing_labels <- setdiff(unique_labels, as.numeric(names(atlas2@label_map)))
-  
-  if (length(missing_labels) > 0) {
-    stop(sprintf(
-      "Found labels in dilated atlas that are not in label_map: %s",
-      paste(missing_labels, collapse=", ")
-    ))
-  }
-  
-  # Create and return new ClusteredNeuroVol
-  neuroim2::ClusteredNeuroVol(as.logical(atlas2), 
-                             clusters=atlas2[atlas2!=0], 
-                             label_map=atlas2@label_map)
+assertthat::assert_that(inherits(atlas, "atlas"), msg = "`atlas` arg must be an atlas")
+    assertthat::assert_that(inherits(mask, "NeuroVol"), msg = "`mask` must be a NeuroVol object")
+    assertthat::assert_that(radius > 0, msg = "radius must be positive")
+    assertthat::assert_that(maxn > 0, msg = "maxn must be positive")
+    atlas2 <- as.dense(atlas$atlas)
+    atlas_idx <- which(atlas2 > 0)
+    mask_idx <- which(mask > 0)
+    diff_idx <- setdiff(mask_idx, atlas_idx)
+    if (length(diff_idx) == 0) {
+        return(atlas$atlas)
+    }
+    cd1 <- index_to_coord(mask, atlas_idx)
+    cd2 <- index_to_coord(mask, diff_idx)
+    grid1 <- index_to_grid(mask, atlas_idx)
+    grid2 <- index_to_grid(mask, diff_idx)
+    ret <- rflann::RadiusSearch(cd2, cd1, radius = radius, max_neighbour = maxn)
+    qlen <- sapply(ret$indices, function(x) length(x))
+    indset <- ret$indices[qlen > 0]
+    indices <- which(qlen > 0)
+    dset <- ret$distances[qlen > 0]
+    out <- vector(length(indices), mode = "list")
+    for (i in 1:length(indices)) {
+        ind <- indset[[i]]
+        g <- grid1[ind, , drop = FALSE]
+        g2 <- grid2[indices[i], , drop = FALSE]
+        neighbor_labels <- atlas2[g]
+        neighbor_distances <- dset[[i]]
+        weights <- 1/(neighbor_distances + .Machine$double.eps)
+        label_votes <- tapply(weights, neighbor_labels, sum)
+        chosen_label <- as.numeric(names(which.max(label_votes)))
+        out[[i]] <- cbind(g2, chosen_label)
+    }
+    out <- do.call(rbind, out)
+    atlas2[out[, 1:3]] <- out[, 4]
+    unique_labels <- unique(atlas2[atlas2 != 0])
+    missing_labels <- setdiff(unique_labels, as.numeric(names(atlas2@label_map)))
+    if (length(missing_labels) > 0) {
+        stop(sprintf("Found labels in dilated atlas that are not in label_map: %s", 
+            paste(missing_labels, collapse = ", ")))
+    }
+    neuroim2::ClusteredNeuroVol(as.logical(atlas2), clusters = atlas2[atlas2 != 
+        0], label_map = atlas2@label_map)
 }

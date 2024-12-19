@@ -21,7 +21,8 @@ Imports:
   ggsegGlasser,
   ggsegSchaefer,
   scico,
-  ggiraph
+  ggiraph,
+  neurosurf
 Remotes: 
   YeeJeremy/rflann,
   bbuchsbaum/neuroim2,
