@@ -145,7 +145,7 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
 
     # Check that we haven't introduced any labels not present in label_map
     unique_labels <- unique(atlas2[atlas2 != 0])
-    missing_labels <- setdiff(unique_labels, as.numeric(names(atlas$atlas@label_map)))
+    missing_labels <- setdiff(unique_labels, unlist(atlas$atlas@label_map))
     if (length(missing_labels) > 0) {
         stop(sprintf(
             "Found labels in dilated atlas that are not in label_map: %s",
