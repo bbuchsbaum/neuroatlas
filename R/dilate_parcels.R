@@ -57,46 +57,103 @@
 #' @importFrom neuroim2 index_to_coord index_to_grid ClusteredNeuroVol
 #' @importFrom rflann RadiusSearch
 #' @export
-assertthat::assert_that(inherits(atlas, "atlas"), msg = "`atlas` arg must be an atlas")
+dilate_parcels <- function(atlas, mask, radius = 4, maxn = 50) {
+    assertthat::assert_that(inherits(atlas, "atlas"), msg = "`atlas` arg must be an atlas")
     assertthat::assert_that(inherits(mask, "NeuroVol"), msg = "`mask` must be a NeuroVol object")
     assertthat::assert_that(radius > 0, msg = "radius must be positive")
     assertthat::assert_that(maxn > 0, msg = "maxn must be positive")
+    
+    # Convert atlas to a dense array (3D), assuming as.dense() returns a plain numeric array
     atlas2 <- as.dense(atlas$atlas)
+    
     atlas_idx <- which(atlas2 > 0)
-    mask_idx <- which(mask > 0)
+    mask_idx <- which(as.logical(mask))
     diff_idx <- setdiff(mask_idx, atlas_idx)
     if (length(diff_idx) == 0) {
+        return(atlas$atlas)  # no dilation needed
+    }
+    
+    # Convert indices to coordinates
+    cd_atlas <- index_to_coord(mask, atlas_idx)  # Nx3 coords of labeled voxels
+    cd_diff <- index_to_coord(mask, diff_idx)    # Mx3 coords of unlabeled voxels to fill
+    
+    # Use RadiusSearch to find neighbors within radius
+    # cd_diff: query points, cd_atlas: database points
+    ret <- rflann::RadiusSearch(cd_diff, cd_atlas, radius = radius, max_neighbour = maxn)
+    
+    qlen <- sapply(ret$indices, length)
+    have_neighbors <- which(qlen > 0)
+    if (length(have_neighbors) == 0) {
+        # No neighbors found, no change
         return(atlas$atlas)
     }
-    cd1 <- index_to_coord(mask, atlas_idx)
-    cd2 <- index_to_coord(mask, diff_idx)
-    grid1 <- index_to_grid(mask, atlas_idx)
-    grid2 <- index_to_grid(mask, diff_idx)
-    ret <- rflann::RadiusSearch(cd2, cd1, radius = radius, max_neighbour = maxn)
-    qlen <- sapply(ret$indices, function(x) length(x))
-    indset <- ret$indices[qlen > 0]
-    indices <- which(qlen > 0)
-    dset <- ret$distances[qlen > 0]
-    out <- vector(length(indices), mode = "list")
-    for (i in 1:length(indices)) {
-        ind <- indset[[i]]
-        g <- grid1[ind, , drop = FALSE]
-        g2 <- grid2[indices[i], , drop = FALSE]
-        neighbor_labels <- atlas2[g]
-        neighbor_distances <- dset[[i]]
-        weights <- 1/(neighbor_distances + .Machine$double.eps)
-        label_votes <- tapply(weights, neighbor_labels, sum)
-        chosen_label <- as.numeric(names(which.max(label_votes)))
-        out[[i]] <- cbind(g2, chosen_label)
+    
+    indset <- ret$indices[have_neighbors]
+    dset <- ret$distances[have_neighbors]
+    
+    # Pre-allocate result matrix: [x, y, z, chosen_label]
+    # We'll fill only for voxels that had neighbors
+    out <- matrix(NA_real_, nrow = length(have_neighbors), ncol = 4)
+    
+    # Convert atlas coordinates to linear indices for fast labeling lookups
+    # We'll need a function to convert from (x,y,z) to linear indices
+    dims <- dim(atlas2)
+    sub2ind <- function(sz, x, y, z) {
+        (z - 1) * sz[1] * sz[2] + (y - 1) * sz[1] + x
     }
-    out <- do.call(rbind, out)
-    atlas2[out[, 1:3]] <- out[, 4]
+    
+    # Precompute linear indices for atlas points
+    atlas_lin_idx <- atlas_idx  # we already have them
+    # atlas_idx are linear indices. For neighbors, we have coordinates, so to get labels:
+    # We'll also need to do this for each neighbor voxel coordinate set
+    
+    # Loop over diff voxels that have neighbors
+    for (i in seq_along(have_neighbors)) {
+        voxel_idx <- have_neighbors[i]
+        # Coordinates of voxel to fill
+        vx_coord <- cd_diff[voxel_idx, ]
+        
+        # Neighbor indices (in atlas_idx order)
+        neighbors <- indset[[i]]
+        distances <- dset[[i]]
+        
+        # Get the corresponding atlas linear indices of these neighbors
+        # neighbors are indices into cd_atlas, which correspond directly to atlas_idx
+        neighbor_lin_idx <- atlas_idx[neighbors]
+        
+        # Retrieve neighbor labels
+        neighbor_labels <- atlas2[neighbor_lin_idx]
+        
+        # Compute weights = 1/(distance+eps)
+        weights <- 1/(distances + .Machine$double.eps)
+        
+        # Compute weighted vote
+        # If labels are integers, we can use tapply or a more optimized approach:
+        label_votes <- tapply(weights, neighbor_labels, sum)
+        
+        chosen_label <- as.numeric(names(which.max(label_votes)))
+        
+        out[i, ] <- c(vx_coord, chosen_label)
+    }
+    
+    # Now assign new labels to these diff voxels
+    # Convert their coordinates to linear indices
+    new_lin_idx <- sub2ind(dims, out[,1], out[,2], out[,3])
+    atlas2[new_lin_idx] <- out[,4]
+    
+    # Check for missing labels
     unique_labels <- unique(atlas2[atlas2 != 0])
     missing_labels <- setdiff(unique_labels, as.numeric(names(atlas2@label_map)))
     if (length(missing_labels) > 0) {
         stop(sprintf("Found labels in dilated atlas that are not in label_map: %s", 
-            paste(missing_labels, collapse = ", ")))
+                     paste(missing_labels, collapse = ", ")))
     }
-    neuroim2::ClusteredNeuroVol(as.logical(atlas2), clusters = atlas2[atlas2 != 
-        0], label_map = atlas2@label_map)
+    
+    # Return a new ClusteredNeuroVol
+    # Make sure to reconstruct properly from atlas2
+    # atlas2 is now a numeric array with labels
+    mask_vol <- atlas2 != 0
+    neuroim2::ClusteredNeuroVol(mask = as.logical(mask_vol),
+                                clusters = atlas2[mask_vol],
+                                label_map = atlas2@label_map)
 }
