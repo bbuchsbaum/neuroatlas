@@ -29,3 +29,8 @@ Remotes:
   bbuchsbaum/ggseg,
   ggseg/ggsegGlasser,
   ggseg/ggsegSchaefer
+Suggests:
+  geojsonio,
+  echarts4r,
+  geojsonsf
+  
