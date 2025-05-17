@@ -77,6 +77,7 @@ get_glasser_atlas <- function(outspace=NULL) {
   cols <- as.data.frame(cols)
   hemi <- tolower(sapply(strsplit(labels[,1], "_"), "[[", 1))
   region <- sapply(strsplit(labels[,1], "_"), "[[", 2)
+  orig_labels <- labels[,1]
   
   # Create label mapping
   cids <- 1:nrow(labels)
@@ -94,7 +95,9 @@ get_glasser_atlas <- function(outspace=NULL) {
     cmap=cols,
     ids=1:nrow(labels),
     labels=region,
-    hemi=hemi)
+    orig_labels=orig_labels,
+    hemi=hemi,
+    network=NULL)
   
   class(ret) <- c("glasser", "atlas")
   ret

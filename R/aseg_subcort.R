@@ -103,11 +103,14 @@ get_aseg_atlas <- function(outspace=NULL) {
     165, 42,  42)
 
   ret <- list(
+    name="ASEG",
     atlas=atlas,
     cmap=cmap,
     ids=ids,
     labels=labels,
-    hemi=hemi)
+    orig_labels=labels,
+    hemi=hemi,
+    network=NULL)
 
   class(ret) <- c("aseg", "atlas")
   ret
