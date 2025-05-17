@@ -1,19 +1,8 @@
-#' Default atlas mapping method
-#'
-#' Provides a fallback implementation of `map_atlas` for atlas objects.
-#' Specific atlas classes can override this method if custom handling is
-#' required.
-#'
-#' @param x An atlas object
-#' @param vals Numeric vector of values to map
-#' @param thresh Numeric vector of length two specifying a lower and upper
-#'   threshold. Values outside this range are replaced with `NA`.
-#' @param pos Logical. If `TRUE`, values are thresholded using their raw values;
-#'   otherwise absolute values are used.
-#' @param ... Additional arguments passed to methods
-#'
-#' @return A data frame with mapped statistics and region information or a
-#'   `ggseg` atlas object when supported.
+#' @rdname map_atlas-methods
+#' @inheritParams map_atlas
+#' @param pos Logical. If `TRUE`, values are thresholded using raw values;
+#'   otherwise the absolute values are used.
+#' @describeIn map_atlas Default mapping for generic atlas objects.
 #' @export
 map_atlas.atlas <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
   if (inherits(x, "schaefer")) {
@@ -30,14 +19,8 @@ map_atlas.atlas <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
   )
 }
 
-#' Default plot method for atlas objects
-#'
-#' Provides a simple plot wrapper that dispatches to atlas specific plotting
-#' functions when available.
-#'
-#' @param x An atlas object
-#' @param y Unused
-#' @param ... Additional arguments passed to plotting functions
+#' @rdname plot-methods
+#' @describeIn plot Plot method for generic atlas objects.
 #' @export
 plot.atlas <- function(x, y, ...) {
   if (inherits(x, "schaefer")) {
