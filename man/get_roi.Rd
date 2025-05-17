@@ -22,3 +22,12 @@ Returns a subset of the atlas containing only the specified ROI
 Extracts a specific region of interest from an atlas object based on label, ID,
 and hemisphere information.
 }
+\examples{
+\dontrun{
+# Load the aseg atlas
+atlas <- get_aseg_atlas()
+
+# Extract the hippocampus ROI
+roi <- get_roi(atlas, label = "Hippocampus")
+}
+}
