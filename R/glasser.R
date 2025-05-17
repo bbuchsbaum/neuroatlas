@@ -105,18 +105,11 @@ get_glasser_atlas <- function(outspace=NULL) {
 
 #' Map Values to Glasser Atlas
 #'
-#' @description
-#' Maps numeric values to regions in the Glasser atlas for visualization using
-#' ggseg plotting functions.
-#'
-#' @param x A Glasser atlas object
-#' @param vals Numeric vector of values to map to atlas regions
-#' @param thresh Numeric vector of length 2 specifying (min, max) thresholds.
-#'   Values outside this range will be set to NA
+#' @rdname map_atlas-methods
+#' @inheritParams map_atlas
 #' @param pos Logical. If TRUE, uses raw values; if FALSE, uses absolute values
 #'   for thresholding
-#' @param ... Additional arguments passed to methods
-#'
+#' @describeIn map_atlas Map values to a Glasser atlas object.
 #' @return A ggseg brain atlas object with mapped values
 #'
 #' @import ggsegGlasser
@@ -156,6 +149,7 @@ map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
 #'   will be assigned a value of 1, creating a uniform visualization
 #' @param thresh Numeric vector of length 2 for thresholding values
 #' @param pos Logical. If TRUE, uses raw values for thresholding
+#' @rdname plot-methods
 #' @param position Character. Layout type ("stacked" or "dispersed")
 #' @param colour Character. Border color for regions
 #' @param guide Logical. Whether to show color guide
@@ -163,7 +157,7 @@ map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
 #' @param lim Numeric vector of length 2 for color scale limits. If NULL, will be
 #'   set to range of vals
 #' @param ... Additional arguments passed to methods
-#'
+#' @describeIn plot Visualization for Glasser atlas objects.
 #' @return A ggiraph interactive plot object
 #'
 #' @importFrom tibble tibble
@@ -217,10 +211,10 @@ plot.glasser <- function(x, y, vals=NULL, thresh=c(0,0), pos=FALSE,
 #' @description
 #' Displays a formatted summary of a Glasser atlas object, including region counts,
 #' hemisphere distribution, and basic metadata.
-#'
+#' @rdname print-methods
 #' @param x A Glasser atlas object
 #' @param ... Additional arguments passed to print methods
-#'
+#' @describeIn print Print summary for Glasser atlas objects.
 #' @importFrom crayon bold green blue red white yellow
 #' @importFrom cli rule symbol
 #' @export

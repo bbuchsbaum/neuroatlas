@@ -2,6 +2,8 @@
 % Please edit documentation in R/all_generic.R
 \name{map_atlas}
 \alias{map_atlas}
+\alias{map_atlas.atlas}
+\alias{map_atlas.glasser}
 \title{Map values to an atlas}
 \usage{
 map_atlas(x, vals, thresh, ...)

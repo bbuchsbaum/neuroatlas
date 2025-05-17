@@ -1,22 +1,7 @@
-#' Print Method for Atlas Objects
-#'
-#' @description
-#' Displays a formatted summary of an atlas object, including its name, dimensions,
-#' number of regions, and a color-coded breakdown of anatomical structures.
-#'
+#' @rdname print-methods
 #' @param x An object of class 'atlas'
 #' @param ... Additional arguments passed to print methods
-#'
-#' @details
-#' This print method provides a visually enhanced display of atlas information using
-#' colored output via the crayon package. It shows:
-#' \itemize{
-#'   \item Atlas name and type
-#'   \item Volume dimensions and spacing
-#'   \item Total number of regions
-#'   \item Summary of anatomical structures by hemisphere
-#' }
-#'
+#' @describeIn print Print method for atlas objects.
 #' @importFrom crayon bold green blue red white
 #' @importFrom cli rule symbol
 #' @export
@@ -186,7 +171,11 @@ merge_atlases <- function(atlas1, atlas2) {
 }
 
 
+#' @rdname get_roi-methods
+#' @inheritParams get_roi
 #' @importFrom neuroim2 space ROIVol index_to_grid
+#' @describeIn get_roi Extract ROI from a generic atlas object.
+#' @export
 get_roi.atlas <- function(x, label, id=NULL, hemi=NULL) {
   if (!is.null(label) && !is.null(id)) {
     stop("must supply one of 'id' or 'label' but not both")

@@ -2,6 +2,7 @@
 % Please edit documentation in R/all_generic.R
 \name{get_roi}
 \alias{get_roi}
+\alias{get_roi.atlas}
 \title{Extract a region of interest (ROI) from an atlas}
 \usage{
 get_roi(x, label, id, hemi)
