@@ -205,4 +205,52 @@ get_roi.atlas <- function(x, label, id=NULL, hemi=NULL) {
   }
 }
 
+#' @rdname reduce_atlas
+#' @export
+#' @method reduce_atlas atlas
+reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
+
+  # --- Input Validation ---
+  if (!methods::is(data_vol, "NeuroVol") && !methods::is(data_vol, "NeuroVec")) {
+    stop("'data_vol' must be a NeuroVol or NeuroVec object.")
+  }
+  if (!is.function(stat_func)) {
+    stop("'stat_func' must be a function.")
+  }
+
+  # --- Determine ROI definition volume from 'atlas' (which is an 'atlas' object) ---
+  # For an 'atlas' class object, the ROI definition is expected in atlas$atlas
+  roi_definition_vol <- NULL
+  if (!is.null(atlas$atlas) && methods::is(atlas$atlas, "NeuroVol")) {
+    roi_definition_vol <- atlas$atlas
+  } else if (!is.null(atlas$data) && methods::is(atlas$data, "NeuroVol")) { 
+    # This handles Glasser-like structures if they are passed directly and are also of class 'atlas'
+    # However, typically for a well-defined 'atlas' object, atlas$atlas is primary.
+    # Consider if Glasser objects should have their own S3 method reduce_atlas.glasser_atlas if structure differs significantly
+    # For now, this provides a fallback if atlas$atlas is not present but atlas$data is.
+    roi_definition_vol <- atlas$data
+  }
+
+  if (is.null(roi_definition_vol)) {
+    stop("Could not determine the ROI definition volume from the input 'atlas' object. Expected a NeuroVol in element 'atlas$atlas' or 'atlas$data'.")
+  }
+
+  # --- Extract data using neuroim2::extract_roi_data ---
+  extracted_values <- neuroim2::extract_roi_data(data_vol, roi_definition_vol, fun = stat_func, ...)
+
+  # --- Convert to tibble ---
+  result_tibble <- NULL
+  if (is.vector(extracted_values)) {
+    result_tibble <- tibble::as_tibble(as.list(extracted_values))
+  } else if (is.matrix(extracted_values)) {
+    transposed_matrix <- t(extracted_values)
+    result_tibble <- tibble::as_tibble(transposed_matrix)
+    result_tibble <- tibble::add_column(result_tibble, time = 1:nrow(result_tibble), .before = TRUE)
+  } else {
+    stop("Unexpected output format from neuroim2::extract_roi_data. Expected vector or matrix.")
+  }
+
+  return(result_tibble)
+}
+
 
