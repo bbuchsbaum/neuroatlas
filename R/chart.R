@@ -123,21 +123,3 @@ get_chart <- function(geo, data, var, name, show = TRUE) {
     echarts4r::e_group("4charts")
 }
 
-#' Helper Function to Create Individual Brain Charts
-#' @keywords internal
-#' @noRd
-get_chart <- function(geo, data, var, name, show = TRUE) {
-  data %>%
-    echarts4r::e_charts(label) %>%
-    echarts4r::e_map_register(name, geo) %>%
-    echarts4r::e_map_(var, map = name, nameProperty = "label") %>%
-    echarts4r::e_visual_map_(var,
-      show = show,
-      padding = 0,
-      orient = "horizontal",
-      left = "center",
-      bottom = 0
-    ) %>%
-    echarts4r::e_theme("dark") %>%
-    echarts4r::e_group("4charts")
-}
