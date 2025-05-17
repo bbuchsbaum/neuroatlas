@@ -20,6 +20,9 @@
 #' @param atlas An object of class "atlas" containing the parcellation to be dilated
 #' @param mask A binary mask (NeuroVol object) specifying valid voxels for dilation.
 #'   Dilation will only occur within non-zero mask values.
+#'   Can also be a character string representing a TemplateFlow space ID (e.g., "MNI152NLin2009cAsym"),
+#'   in which case the corresponding standard brain mask will be fetched from TemplateFlow.
+#'   Alternatively, can be a list of arguments to pass to `neuroatlas::get_template` to fetch a specific mask.
 #' @param radius Numeric. The maximum distance (in voxels) to search for neighboring
 #'   parcels when dilating. Default: 4
 #' @param maxn Integer. Maximum number of neighboring voxels to consider when
@@ -58,11 +61,36 @@
 #' @importFrom rflann RadiusSearch
 #' @export
 dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
+    # --- Resolve mask input --- 
+    if (!inherits(mask, "NeuroVol")) {
+        resolved_mask_arg <- NULL
+        if (is.character(mask) && length(mask) == 1) {
+            message("Interpreting 'mask' string \"", mask, "\" as a request for its standard brain mask from TemplateFlow.")
+            # Prepare args for get_template to fetch the brain mask for the given space ID
+            resolved_mask_arg <- list(space = mask, variant = "mask") 
+        } else if (is.list(mask)) {
+            message("Interpreting 'mask' list as TemplateFlow parameters.")
+            resolved_mask_arg <- mask
+        } else {
+            stop("`mask` must be a NeuroVol object, a TemplateFlow space ID string, or a list of TemplateFlow parameters for get_template.")
+        }
+
+        mask <- tryCatch({
+            # Ensure .resolve_template_input is accessible. If in same package, neuroatlas::: might not be needed
+            # but for clarity during dev or if it's not exported, using it.
+            # Assuming .resolve_template_input is available in the package's namespace.
+            neuroatlas:::.resolve_template_input(resolved_mask_arg, target_type = "NeuroVol")
+        }, error = function(e) {
+            query_str <- paste(names(resolved_mask_arg), sapply(resolved_mask_arg, function(x) if(is.list(x)) "<list>" else as.character(x)), sep="=", collapse=", ")
+            stop(paste0("Failed to resolve 'mask' (", query_str, ") to a NeuroVol via TemplateFlow: ", conditionMessage(e)))
+        })
+    }
+
     # Validate inputs
     assertthat::assert_that(inherits(atlas, "atlas"),
                             msg = "`atlas` arg must be an atlas")
-    assertthat::assert_that(inherits(mask, "NeuroVol"),
-                            msg = "`mask` must be a NeuroVol object")
+    assertthat::assert_that(inherits(mask, "NeuroVol"), # This now checks the resolved mask
+                            msg = "`mask` must be a NeuroVol object or a valid TemplateFlow specifier that resolves to one.")
     assertthat::assert_that(radius > 0,
                             msg = "`radius` must be positive")
     assertthat::assert_that(maxn > 0,

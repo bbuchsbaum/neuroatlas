@@ -2,6 +2,22 @@
 % Please edit documentation in R/schaefer.R
 \name{get_schaefer_atlas}
 \alias{get_schaefer_atlas}
+\alias{sy_100_7}
+\alias{sy_100_17}
+\alias{sy_200_7}
+\alias{sy_200_17}
+\alias{sy_300_7}
+\alias{sy_300_17}
+\alias{sy_400_7}
+\alias{sy_400_17}
+\alias{sy_500_7}
+\alias{sy_500_17}
+\alias{sy_600_7}
+\alias{sy_600_17}
+\alias{sy_800_7}
+\alias{sy_800_17}
+\alias{sy_1000_7}
+\alias{sy_1000_17}
 \title{Load Schaefer Brain Parcellation Atlas}
 \source{
 \url{https://github.com/ThomasYeoLab/CBIG/}
@@ -14,6 +30,134 @@ get_schaefer_atlas(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE
+)
+
+sy_100_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_100_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_200_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_200_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_300_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_300_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_400_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_400_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_500_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_500_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_600_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_600_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_800_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_800_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_1000_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_1000_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
 )
 }
 \arguments{
@@ -50,6 +194,38 @@ A list with classes c("schaefer", "volatlas", "atlas") containing:
 Retrieves and loads the Schaefer brain parcellation atlas, which provides a
 data-driven parcellation of the cerebral cortex based on both local gradient
 and global similarity approaches.
+
+Shorthand for Schaefer atlas with 100 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 100 parcels and 17 networks.
+
+Shorthand for Schaefer atlas with 200 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 200 parcels and 17 networks.
+
+Shorthand for Schaefer atlas with 300 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 300 parcels and 17 networks.
+
+Shorthand for Schaefer atlas with 400 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 400 parcels and 17 networks.
+
+Shorthand for Schaefer atlas with 500 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 500 parcels and 17 networks.
+
+Shorthand for Schaefer atlas with 600 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 600 parcels and 17 networks.
+
+Shorthand for Schaefer atlas with 800 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 800 parcels and 17 networks.
+
+Shorthand for Schaefer atlas with 1000 parcels and 7 networks.
+
+Shorthand for Schaefer atlas with 1000 parcels and 17 networks.
 }
 \details{
 The Schaefer atlas offers multiple resolutions of cortical parcellation
@@ -63,6 +239,29 @@ Features include:
   \item Available in different resolutions (1mm or 2mm)
 }
 }
+\section{Convenience Functions}{
+
+Shorthand functions are provided for common Schaefer atlas configurations. These functions call \code{get_schaefer_atlas} with the \code{parcels} and \code{networks} arguments pre-set. They all accept \code{resolution} (default "2"), \code{outspace}, \code{smooth}, \code{use_cache}, and \code{...} arguments.
+\itemize{
+  \item \code{sy_100_7()}: 100 parcels, 7 networks.
+  \item \code{sy_100_17()}: 100 parcels, 17 networks.
+  \item \code{sy_200_7()}: 200 parcels, 7 networks.
+  \item \code{sy_200_17()}: 200 parcels, 17 networks.
+  \item \code{sy_300_7()}: 300 parcels, 7 networks.
+  \item \code{sy_300_17()}: 300 parcels, 17 networks.
+  \item \code{sy_400_7()}: 400 parcels, 7 networks.
+  \item \code{sy_400_17()}: 400 parcels, 17 networks.
+  \item \code{sy_500_7()}: 500 parcels, 7 networks.
+  \item \code{sy_500_17()}: 500 parcels, 17 networks.
+  \item \code{sy_600_7()}: 600 parcels, 7 networks.
+  \item \code{sy_600_17()}: 600 parcels, 17 networks.
+  \item \code{sy_800_7()}: 800 parcels, 7 networks.
+  \item \code{sy_800_17()}: 800 parcels, 17 networks.
+  \item \code{sy_1000_7()}: 1000 parcels, 7 networks.
+  \item \code{sy_1000_17()}: 1000 parcels, 17 networks.
+}
+}
+
 \examples{
 \dontrun{
 # Load 300-parcel atlas with 7 networks

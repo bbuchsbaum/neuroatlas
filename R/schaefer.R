@@ -274,6 +274,27 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' @seealso
 #' \code{\link{get_schaefer_surfatlas}} for surface-based version
 #'
+#' @section Convenience Functions:
+#' Shorthand functions are provided for common Schaefer atlas configurations. These functions call \code{get_schaefer_atlas} with the \code{parcels} and \code{networks} arguments pre-set. They all accept \code{resolution} (default "2"), \code{outspace}, \code{smooth}, \code{use_cache}, and \code{...} arguments.
+#' \itemize{
+#'   \item \code{sy_100_7()}: 100 parcels, 7 networks.
+#'   \item \code{sy_100_17()}: 100 parcels, 17 networks.
+#'   \item \code{sy_200_7()}: 200 parcels, 7 networks.
+#'   \item \code{sy_200_17()}: 200 parcels, 17 networks.
+#'   \item \code{sy_300_7()}: 300 parcels, 7 networks.
+#'   \item \code{sy_300_17()}: 300 parcels, 17 networks.
+#'   \item \code{sy_400_7()}: 400 parcels, 7 networks.
+#'   \item \code{sy_400_17()}: 400 parcels, 17 networks.
+#'   \item \code{sy_500_7()}: 500 parcels, 7 networks.
+#'   \item \code{sy_500_17()}: 500 parcels, 17 networks.
+#'   \item \code{sy_600_7()}: 600 parcels, 7 networks.
+#'   \item \code{sy_600_17()}: 600 parcels, 17 networks.
+#'   \item \code{sy_800_7()}: 800 parcels, 7 networks.
+#'   \item \code{sy_800_17()}: 800 parcels, 17 networks.
+#'   \item \code{sy_1000_7()}: 1000 parcels, 7 networks.
+#'   \item \code{sy_1000_17()}: 1000 parcels, 17 networks.
+#' }
+#'
 #' @importFrom neuroim2 read_vol ClusteredNeuroVol write_vol
 #' @importFrom downloader download
 #' @importFrom assertthat assert_that
@@ -283,10 +304,31 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
                               networks=c("7","17"), resolution=c("1","2"),
                               outspace=NULL, smooth=FALSE, use_cache=TRUE) {
 
-  parcels <- match.arg(parcels)
-  networks <- match.arg(networks)
-  resolution <- match.arg(resolution)
+  parcels <- match.arg(as.character(parcels))
+  networks <- match.arg(as.character(networks))
+  resolution <- match.arg(as.character(resolution))
 
+  # Resolve outspace if it's not NULL and not already a NeuroSpace (T6.1.4)
+  if (!is.null(outspace) && !neuroim2::is.NeuroSpace(outspace)) {
+    message("Attempting to resolve 'outspace' argument via TemplateFlow...")
+    # We need .resolve_template_input to be available. 
+    # Assuming it's exported from neuroatlas or accessible.
+    # If it's internal, this call would need neuroatlas:::.resolve_template_input
+    # For now, assuming it becomes an exported utility or is otherwise accessible.
+    # If this file is part of the same package, direct call might work if NAMESPACE handles it.
+    resolved_outspace <- tryCatch({
+      neuroatlas:::.resolve_template_input(outspace, target_type = "NeuroSpace")
+    }, error = function(e) {
+      stop("Failed to resolve 'outspace' via TemplateFlow: ", conditionMessage(e),
+           "\n'outspace' must be a NeuroSpace object, a TemplateFlow space ID string, or a list of get_template() arguments.")
+      return(NULL) # Should be caught by stop
+    })
+    
+    if (is.null(resolved_outspace) || !neuroim2::is.NeuroSpace(resolved_outspace)) {
+        stop("Resolution of 'outspace' did not result in a valid NeuroSpace object.")
+    }
+    outspace <- resolved_outspace # Replace original outspace with the resolved NeuroSpace
+  }
 
   vol <- load_schaefer_vol(parcels, networks, resolution, use_cache)
 
@@ -296,7 +338,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     vol <- resample(vol, outspace, smooth)
   }
 
-  #browser()
+
 
   labels <- schaefer_metainfo(parcels, networks, use_cache)
   cids <- 1:nrow(labels)
@@ -437,6 +479,120 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
   class(ret) <- c("schaefer", "surfatlas", "atlas")
   ret
+}
+
+
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_100_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "100", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_100_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "100", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_200_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "200", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_200_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "200", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_300_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "300", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_300_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "300", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_400_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "400", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_400_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "400", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_500_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "500", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_500_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "500", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_600_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "600", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_600_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "600", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_800_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "800", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_800_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "800", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_1000_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "1000", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_1000_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "1000", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
 }
 
 

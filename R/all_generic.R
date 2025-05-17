@@ -52,3 +52,21 @@ get_roi <- function(x, label, id, hemi) {
 map_atlas <- function(x, vals, thresh, ...) {
   UseMethod("map_atlas")
 }
+
+#' Reduce a NeuroVol or NeuroVec by an Atlas
+#'
+#' Applies a summary function to data within each ROI defined by an atlas.
+#' This is an S3 generic function.
+#'
+#' @param atlas An atlas object or another object for which a method is defined.
+#' @param data_vol A \code{NeuroVol} (3D) or \code{NeuroVec} (4D) object containing the data
+#'   to be summarized.
+#' @param stat_func The function to apply to the data within each ROI (e.g., \code{mean},
+#'   \code{sd}, \code{sum}).
+#' @param ... Additional arguments to be passed to \code{stat_func} or other methods.
+#'
+#' @return A \code{tibble} summarizing the data_vol by atlas regions.
+#' @export
+reduce_atlas <- function(atlas, data_vol, stat_func, ...) {
+  UseMethod("reduce_atlas")
+}
