@@ -31,7 +31,7 @@
 #' Journal of Neuroscience, 33(36), 14107-14111.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load the atlas data
 #' data(olsen_mtl)
 #'
@@ -57,7 +57,7 @@
 #' @return A list with class 'atlas' containing the MTL parcellation
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load in native space
 #' mtl <- get_olsen_mtl()
 #'
