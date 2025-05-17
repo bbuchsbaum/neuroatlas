@@ -31,7 +31,7 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load the atlas in native space
 #' aseg <- get_aseg_atlas()
 #'

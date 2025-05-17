@@ -10,6 +10,12 @@
 #' @param hemi Character string specifying hemisphere ('left' or 'right')
 #'
 #' @return Returns a subset of the atlas containing only the specified ROI
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_aseg_atlas()
+#' roi <- get_roi(atlas, label = atlas$labels[1])
+#' }
 #' @export
 get_roi <- function(x, label, id, hemi) {
   UseMethod("get_roi")
@@ -29,6 +35,12 @@ get_roi <- function(x, label, id, hemi) {
 #' @param ... Additional arguments passed to methods
 #'
 #' @return Returns the atlas object with mapped values
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_aseg_atlas()
+#' map_atlas(atlas, rnorm(length(atlas$labels)))
+#' }
 #' @export
 map_atlas <- function(x, vals, thresh, ...) {
   UseMethod("map_atlas")

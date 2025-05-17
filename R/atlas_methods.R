@@ -14,6 +14,12 @@
 #'
 #' @return A data frame with mapped statistics and region information or a
 #'   `ggseg` atlas object when supported.
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_aseg_atlas()
+#' map_atlas(atlas, rnorm(length(atlas$labels)))
+#' }
 #' @export
 map_atlas.atlas <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
   if (inherits(x, "schaefer")) {
@@ -38,6 +44,15 @@ map_atlas.atlas <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
 #' @param x An atlas object
 #' @param y Unused
 #' @param ... Additional arguments passed to plotting functions
+#'
+#' @return A plot object or visualization produced by the atlas specific
+#'   plotting function
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_schaefer_atlas(parcels="100", networks="7")
+#' plot(atlas, vals = rnorm(length(atlas$labels)))
+#' }
 #' @export
 plot.atlas <- function(x, y, ...) {
   if (inherits(x, "schaefer")) {

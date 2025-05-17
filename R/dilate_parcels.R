@@ -30,7 +30,7 @@
 #'   voxels in existing parcels.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load an atlas
 #' atlas <- get_aseg_atlas()
 #'

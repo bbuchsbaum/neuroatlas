@@ -37,7 +37,7 @@
 #' \url{https://github.com/PennBBL/xcpEngine/tree/master/atlas/glasser360}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load atlas in native space
 #' atlas <- get_glasser_atlas()
 #'
@@ -119,6 +119,13 @@ get_glasser_atlas <- function(outspace=NULL) {
 #'
 #' @return A ggseg brain atlas object with mapped values
 #'
+#' @examples
+#' \donttest{
+#' atlas <- get_glasser_atlas()
+#' vals <- rnorm(length(atlas$labels))
+#' mapped <- map_atlas(atlas, vals)
+#' }
+#'
 #' @import ggsegGlasser
 #' @importFrom ggiraph geom_polygon_interactive
 #' @importFrom dplyr left_join mutate
@@ -165,6 +172,13 @@ map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
 #' @param ... Additional arguments passed to methods
 #'
 #' @return A ggiraph interactive plot object
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_glasser_atlas()
+#' vals <- rnorm(length(atlas$labels))
+#' plot(atlas, vals = vals)
+#' }
 #'
 #' @importFrom tibble tibble
 #' @importFrom magrittr %>%
@@ -221,6 +235,14 @@ plot.glasser <- function(x, y, vals=NULL, thresh=c(0,0), pos=FALSE,
 #' @param x A Glasser atlas object
 #' @param ... Additional arguments passed to print methods
 #'
+#' @return Invisibly returns the input atlas object
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_glasser_atlas()
+#' print(atlas)
+#' }
+#'
 #' @importFrom crayon bold green blue red white yellow
 #' @importFrom cli rule symbol
 #' @export
@@ -274,7 +296,8 @@ print.glasser <- function(x, ...) {
   
   # Footer
   cat("\n", cli::rule(
-    left = crayon::blue(cli::symbol$info), 
+    left = crayon::blue(cli::symbol$info),
     right = "Use plot() for visualization",
     col = "cyan", width = 65), "\n", sep="")
+  invisible(x)
 }

@@ -13,6 +13,12 @@
 #'
 #' @return A ggseg brain atlas object for visualization
 #'
+#' @examples
+#' \donttest{
+#' atlas <- get_schaefer_atlas(parcels="100", networks="7")
+#' gg_atlas <- get_ggseg_atlas(atlas)
+#' }
+#'
 #' @details
 #' The function extracts the network count and parcel count from the atlas name
 #' and returns the corresponding ggseg-compatible atlas object. Supports Schaefer
@@ -49,6 +55,13 @@ get_ggseg_atlas <- function(atlas) {
 #'   for thresholding. Default: FALSE
 #'
 #' @return A ggseg brain atlas object with mapped values
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_schaefer_atlas(parcels="100", networks="7")
+#' vals <- rnorm(length(atlas$labels))
+#' mapped <- map_to_schaefer(atlas, vals)
+#' }
 #'
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr mutate left_join filter
@@ -104,7 +117,7 @@ map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
 #'   (if interactive=TRUE) showing the visualization
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load Schaefer atlas
 #' atlas <- get_schaefer_atlas("7networks", 100)
 #'

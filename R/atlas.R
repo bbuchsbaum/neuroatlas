@@ -17,6 +17,14 @@
 #'   \item Summary of anatomical structures by hemisphere
 #' }
 #'
+#' @return Invisibly returns the input atlas object
+#'
+#' @examples
+#' \donttest{
+#' atlas <- get_aseg_atlas()
+#' print(atlas)
+#' }
+#'
 #' @importFrom crayon bold green blue red white
 #' @importFrom cli rule symbol
 #' @export
@@ -54,6 +62,7 @@ print.atlas <- function(x, ...) {
   
   # Footer
   cat("\n", cli::rule(col = "cyan", width = 60), "\n", sep="")
+  invisible(x)
 }
 
 #' Create Cache Directory for Atlas Data
@@ -129,7 +138,7 @@ clear_cache <- function() {
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load two atlases
 #' atlas1 <- get_aseg_atlas()
 #' atlas2 <- get_aseg_atlas()

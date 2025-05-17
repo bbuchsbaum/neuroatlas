@@ -20,7 +20,7 @@
 #' @return An echarts4r visualization object containing the 2x2 grid of brain views
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Basic visualization with uniform coloring
 #' plot_glasser()
 #'

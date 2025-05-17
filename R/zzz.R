@@ -8,8 +8,23 @@ tflow <<- NULL
   
 }
 
+#' Install TemplateFlow Python Dependencies
+#'
+#' @description
+#' Installs the TemplateFlow and scipy Python packages using reticulate.
+#'
+#' @param method Installation method passed to `reticulate::py_install`.
+#' @param conda Conda environment to use for installation.
+#'
+#' @return Invisibly returns `TRUE` when installation succeeds.
+#'
+#' @examples
+#' \donttest{
+#' install_templateflow()
+#' }
 #' @export
 install_templateflow <- function(method = "auto", conda = "auto") {
   reticulate::py_install("scipy", method = method, conda = conda, pip=TRUE)
   reticulate::py_install("templateflow", method = method, conda = conda, pip=TRUE)
+  invisible(TRUE)
 }

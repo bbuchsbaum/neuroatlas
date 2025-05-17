@@ -44,7 +44,7 @@
 #' @return A NeuroVol object containing the requested template
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Get standard brain-extracted MNI template
 #' mni <- get_template()
 #'
@@ -86,8 +86,13 @@ get_template <- function(name="MNI152NLin2009cAsym", desc="brain", resolution=1,
 #'
 #' @inheritParams get_template
 #' @return A NeuroVol object containing the binary brain mask
+#'
+#' @examples
+#' \donttest{
+#' mask <- get_template_brainmask()
+#' }
 #' @export
-get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1, 
+get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
                                   extension=".nii.gz") {
   get_template(name=name, desc="brainmask", suffix="mask", 
               resolution=resolution)
@@ -101,8 +106,13 @@ get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @inheritParams get_template
 #' @param label Character string specifying tissue type ("GM", "WM", or "CSF")
 #' @return A NeuroVol object containing the probability map
+#'
+#' @examples
+#' \donttest{
+#' gm_prob <- get_template_probseg(label = "GM")
+#' }
 #' @export
-get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM", 
+get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
                                 resolution=1, extension=".nii.gz") {
   get_template(name=name, desc=NULL, label=label, suffix="probseg", 
               resolution=resolution)
@@ -117,6 +127,11 @@ get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
 #' @param parcels Number of parcels (400 default)
 #' @param networks Number of networks (17 default)
 #' @return A NeuroVol object containing the parcellation
+#'
+#' @examples
+#' \donttest{
+#' sch <- get_template_schaefer(parcels = 200, networks = 7)
+#' }
 #' @export
 get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
                                  parcels=400, networks=17, extension=".nii.gz") {
@@ -131,6 +146,11 @@ get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Returns a list of all available templates in the Templateflow repository.
 #'
 #' @return A character vector of available template names
+#'
+#' @examples
+#' \donttest{
+#' head(templates())
+#' }
 #' @export
 templates <- function() {
   tflow$api$templates()
@@ -143,8 +163,13 @@ templates <- function() {
 #'
 #' @inheritParams get_template
 #' @return A NeuroVol object containing the head template
+#'
+#' @examples
+#' \donttest{
+#' head_img <- get_template_head()
+#' }
 #' @export
-get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1, 
+get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
                             extension=".nii.gz") {
   get_template(name=name, desc="head", suffix="T1w", resolution=resolution)
 }
@@ -156,8 +181,13 @@ get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
 #'
 #' @inheritParams get_template
 #' @return A NeuroVol object containing the CSF probability map
+#'
+#' @examples
+#' \donttest{
+#' csf_prob <- get_template_csf()
+#' }
 #' @export
-get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1, 
+get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
                             extension=".nii.gz") {
   get_template_probseg(name=name, label="CSF", resolution=resolution)
 }
@@ -169,8 +199,13 @@ get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
 #'
 #' @inheritParams get_template
 #' @return A NeuroVol object containing the gray matter probability map
+#'
+#' @examples
+#' \donttest{
+#' gm_prob <- get_template_gm()
+#' }
 #' @export
-get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1, 
+get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
                            extension=".nii.gz") {
   get_template_probseg(name=name, label="GM", resolution=resolution)
 }
@@ -182,8 +217,13 @@ get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #'
 #' @inheritParams get_template
 #' @return A NeuroVol object containing the white matter probability map
+#'
+#' @examples
+#' \donttest{
+#' wm_prob <- get_template_wm()
+#' }
 #' @export
-get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1, 
+get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
                            extension=".nii.gz") {
   get_template_probseg(name=name, label="WM", resolution=resolution)
 }

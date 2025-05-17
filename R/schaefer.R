@@ -47,6 +47,15 @@ getmode <- function(v) {
 #'
 #' @return A resampled NeuroVol object in the new space
 #'
+#' @examples
+#' \donttest{
+#' vol <- neuroim2::read_vol(
+#'   system.file("extdata/atlas_aparc_aseg_prob33.nii.gz", package = "neuroatlas")
+#' )
+#' ns <- neuroim2::NeuroSpace(dim = c(10,10,10), spacing = c(1,1,1))
+#' res <- resample(vol, ns)
+#' }
+#'
 #' @importFrom assertthat assert_that
 #' @importFrom neuroim2 resample searchlight_coords spacing
 #' @export
@@ -247,7 +256,7 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load 300-parcel atlas with 7 networks
 #' atlas <- get_schaefer_atlas(parcels = "300", networks = "7")
 #'
@@ -354,7 +363,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load inflated surface atlas
 #' surf_atlas <- get_schaefer_surfatlas(parcels = "300",
 #'                                     networks = "7",
