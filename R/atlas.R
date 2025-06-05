@@ -238,6 +238,21 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
   # --- Extract data using neuroim2::extract_roi_data ---
   extracted_values <- neuroim2::extract_roi_data(data_vol, roi_definition_vol, fun = stat_func, ...)
 
+  label_names <- NULL
+  if (!is.null(atlas$orig_labels)) {
+    label_names <- atlas$orig_labels
+  } else if (!is.null(atlas$labels)) {
+    label_names <- atlas$labels
+  }
+
+  if (!is.null(label_names)) {
+    if (is.vector(extracted_values)) {
+      names(extracted_values) <- label_names
+    } else if (is.matrix(extracted_values)) {
+      colnames(extracted_values) <- label_names
+    }
+  }
+
   # --- Convert to tibble ---
   result_tibble <- NULL
   if (is.vector(extracted_values)) {
