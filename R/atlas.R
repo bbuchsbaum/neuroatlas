@@ -218,22 +218,8 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
     stop("'stat_func' must be a function.")
   }
 
-  # --- Determine ROI definition volume from 'atlas' (which is an 'atlas' object) ---
-  # For an 'atlas' class object, the ROI definition is expected in atlas$atlas
-  roi_definition_vol <- NULL
-  if (!is.null(atlas$atlas) && methods::is(atlas$atlas, "NeuroVol")) {
-    roi_definition_vol <- atlas$atlas
-  } else if (!is.null(atlas$data) && methods::is(atlas$data, "NeuroVol")) { 
-    # This handles Glasser-like structures if they are passed directly and are also of class 'atlas'
-    # However, typically for a well-defined 'atlas' object, atlas$atlas is primary.
-    # Consider if Glasser objects should have their own S3 method reduce_atlas.glasser_atlas if structure differs significantly
-    # For now, this provides a fallback if atlas$atlas is not present but atlas$data is.
-    roi_definition_vol <- atlas$data
-  }
-
-  if (is.null(roi_definition_vol)) {
-    stop("Could not determine the ROI definition volume from the input 'atlas' object. Expected a NeuroVol in element 'atlas$atlas' or 'atlas$data'.")
-  }
+  # --- Determine ROI definition volume from 'atlas' ---
+  roi_definition_vol <- .get_atlas_volume(atlas)
 
   # --- Extract data using neuroim2::extract_roi_data ---
   extracted_values <- neuroim2::extract_roi_data(data_vol, roi_definition_vol, fun = stat_func, ...)
