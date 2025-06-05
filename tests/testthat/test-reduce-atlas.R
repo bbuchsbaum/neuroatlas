@@ -12,6 +12,7 @@ test_that("reduce_atlas computes summary statistics", {
   expect_equal(nrow(stats), 1)
 })
 
+
 test_that("reduce_atlas errors with mismatched dimensions", {
   skip_on_cran()
   atl <- get_aseg_atlas()
@@ -20,4 +21,16 @@ test_that("reduce_atlas errors with mismatched dimensions", {
                                     spacing = neuroim2::spacing(neuroim2::space(atl$atlas)))
   vol <- neuroim2::NeuroVol(array(0, dim = wrong_dim), space = new_space)
   expect_error(reduce_atlas(atl, vol, mean), "dimensions")
+})
+
+test_that("reduce_atlas works on Glasser atlas", {
+  skip_on_cran()
+  gl <- get_glasser_atlas()
+  vol <- neuroim2::NeuroVol(array(rnorm(prod(dim(gl$atlas))), dim=dim(gl$atlas)),
+                             space = neuroim2::space(gl$atlas))
+  stats <- reduce_atlas(gl, vol, mean)
+
+  expect_s3_class(stats, "tbl_df")
+  expect_equal(ncol(stats), length(gl$ids))
+
 })

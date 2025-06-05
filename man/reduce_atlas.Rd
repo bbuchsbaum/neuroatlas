@@ -12,16 +12,18 @@ reduce_atlas(atlas, data_vol, stat_func, ...)
 \arguments{
 \item{atlas}{An atlas object or another object for which a method is defined.}
 
-\item{data_vol}{A \code{NeuroVol} (3D) or \code{NeuroVec} (4D) object containing the data
-to be summarized.}
+\item{data_vol}{A \code{NeuroVol} (3D) or \code{NeuroVec} (4D) with the data to be summarized.
+When a 3D volume is supplied the result contains a single row; 4D inputs yield one
+row per time point.}
 
 \item{stat_func}{The function to apply to the data within each ROI (e.g., \code{mean},
 \code{sd}, \code{sum}).}
 
-\item{...}{Additional arguments to be passed to \code{stat_func} or other methods.}
+\item{...}{Additional arguments passed to \code{stat_func}.}
 }
 \value{
-A \code{tibble} summarizing the data_vol by atlas regions.
+A \code{tibble} with one column per ROI. For \code{NeuroVec} inputs a \code{time} column
+indexes each volume.
 }
 \description{
 Applies a summary function to data within each ROI defined by an atlas.

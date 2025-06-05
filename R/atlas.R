@@ -160,7 +160,7 @@ merge_atlases <- function(atlas1, atlas2) {
     name=paste0(atlas1$name,"::", atlas2$name),
     atlas=atlmerged,
     cmap=rbind(atlas1$cmap, atlas2$cmap),
-    ids=c(atlas1$ids, atlas2$ids + max(atlas1$ids) + 1),
+    ids=c(atlas1$ids, atlas2$ids + max(atlas1$ids)),
     labels=c(atlas1$labels, atlas2$labels),
     orig_labels=c(atlas1$orig_labels, atlas2$orig_labels),
     hemi=c(atlas1$hemi, atlas2$hemi)
@@ -206,6 +206,13 @@ get_roi.atlas <- function(x, label, id=NULL, hemi=NULL) {
 }
 
 #' @rdname reduce_atlas
+#' @inheritParams reduce_atlas
+#'
+#' When \code{data_vol} is a 3D \code{NeuroVol}, the returned tibble contains a
+#' single row with one column per ROI. If a 4D \code{NeuroVec} is supplied, each
+#' time point is summarised separately and a \code{time} column is added to the
+#' tibble.
+#'
 #' @export
 #' @method reduce_atlas atlas
 reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
@@ -218,22 +225,8 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
     stop("'stat_func' must be a function.")
   }
 
-  # --- Determine ROI definition volume from 'atlas' (which is an 'atlas' object) ---
-  # For an 'atlas' class object, the ROI definition is expected in atlas$atlas
-  roi_definition_vol <- NULL
-  if (!is.null(atlas$atlas) && methods::is(atlas$atlas, "NeuroVol")) {
-    roi_definition_vol <- atlas$atlas
-  } else if (!is.null(atlas$data) && methods::is(atlas$data, "NeuroVol")) { 
-    # This handles Glasser-like structures if they are passed directly and are also of class 'atlas'
-    # However, typically for a well-defined 'atlas' object, atlas$atlas is primary.
-    # Consider if Glasser objects should have their own S3 method reduce_atlas.glasser_atlas if structure differs significantly
-    # For now, this provides a fallback if atlas$atlas is not present but atlas$data is.
-    roi_definition_vol <- atlas$data
-  }
-
-  if (is.null(roi_definition_vol)) {
-    stop("Could not determine the ROI definition volume from the input 'atlas' object. Expected a NeuroVol in element 'atlas$atlas' or 'atlas$data'.")
-  }
+  # --- Determine ROI definition volume from 'atlas' ---
+  roi_definition_vol <- .get_atlas_volume(atlas)
 
   # --- Ensure data_vol and ROI definition share dimensions ---
   if (!all(dim(data_vol) == dim(roi_definition_vol))) {
