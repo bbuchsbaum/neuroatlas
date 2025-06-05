@@ -327,13 +327,19 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
 
   # --- Extract data using ROI matching ---
   # Get unique ROI labels (excluding 0/background)
-  roi_vol_data <- if (inherits(roi_definition_vol, "NeuroVol")) {
-    roi_definition_vol[,,]
+  if (inherits(roi_definition_vol, "ClusteredNeuroVol")) {
+    # For ClusteredNeuroVol, get labels from clusters
+    roi_labels <- sort(unique(roi_definition_vol@clusters))
+    roi_labels <- roi_labels[roi_labels != 0]
+    # Create a full volume for masking
+    roi_vol_data <- array(0, dim = dim(roi_definition_vol))
+    roi_vol_data[which(roi_definition_vol@mask)] <- roi_definition_vol@clusters
   } else {
-    as.vector(roi_definition_vol)
+    # For regular NeuroVol
+    roi_vol_data <- roi_definition_vol[,,]
+    roi_labels <- sort(unique(as.vector(roi_vol_data)))
+    roi_labels <- roi_labels[roi_labels != 0]
   }
-  roi_labels <- sort(unique(as.vector(roi_vol_data)))
-  roi_labels <- roi_labels[roi_labels != 0]
 
   # Extract values for each ROI
   if (inherits(data_vol, "NeuroVol")) {
@@ -384,15 +390,19 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
   }
 
   if (!is.null(id_to_label)) {
-    region_labels <- id_to_label[colnames(extracted_values)]
-    colnames(extracted_values) <- region_labels
+    region_labels <- id_to_label[as.character(colnames(extracted_values))]
+    # Only update non-NA labels
+    valid_labels <- !is.na(region_labels)
+    if (any(valid_labels)) {
+      colnames(extracted_values)[valid_labels] <- region_labels[valid_labels]
+    }
   }
 
   # --- Convert to tibble ---
   if (nrow(extracted_values) == 1) {
-    result_tibble <- tibble::as_tibble(extracted_values)
+    result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
   } else {
-    result_tibble <- tibble::as_tibble(extracted_values)
+    result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
     result_tibble <- tibble::add_column(result_tibble, time = seq_len(nrow(result_tibble)), .before = TRUE)
   }
 

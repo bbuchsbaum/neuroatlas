@@ -22,8 +22,8 @@ row per time point.}
 \item{...}{Additional arguments passed to \code{stat_func}.}
 }
 \value{
-A \code{tibble} with one column per ROI. For \code{NeuroVec} inputs a \code{time} column
-indexes each volume.
+A \code{tibble} with one column per ROI. For \code{NeuroVec} inputs a
+  \code{time} column indexes each volume.
 }
 \description{
 Applies a summary function to data within each ROI defined by an atlas.
@@ -35,7 +35,7 @@ This is an S3 generic function.
 atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
 
 # Create example data (random values in brain space)
-brain_data <- neuroim2::NeuroVol(rnorm(prod(dim(atlas$atlas))), 
+brain_data <- neuroim2::NeuroVol(rnorm(prod(dim(atlas$atlas))),
                                  space = space(atlas$atlas))
 
 # Compute mean values within each atlas region

@@ -16,7 +16,9 @@ test_that("reduce_atlas computes summary statistics", {
 test_that("reduce_atlas names columns for matrix output", {
   skip_on_cran()
   atl <- get_aseg_atlas()
-  arr <- array(rnorm(prod(dim(atl$atlas)) * 2), dim=c(dim(atl$atlas), 2))
+  # Create 4D array with correct dimensions
+  dims <- dim(atl$atlas)
+  arr <- array(rnorm(prod(dims) * 2), dim=c(dims[1], dims[2], dims[3], 2))
   vec <- neuroim2::NeuroVec(arr, space = neuroim2::space(atl$atlas))
   stats <- reduce_atlas(atl, vec, mean)
 

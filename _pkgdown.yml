@@ -1,0 +1,80 @@
+url: https://github.com/bbuchsbaum/neuroatlas
+
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+
+navbar:
+  structure:
+    left: [intro, reference, articles, tutorials, news]
+    right: [search, github]
+
+reference:
+- title: "Atlas Loading Functions"
+  desc: "Functions to load various neuroimaging atlases"
+  contents:
+  - get_schaefer_atlas
+  - get_glasser_atlas
+  - get_aseg_atlas
+  - get_olsen_mtl
+  - get_hipp_atlas
+  - get_schaefer_surfatlas
+  - starts_with("sy_")
+
+- title: "Atlas Operations"
+  desc: "Functions to manipulate and work with atlases"
+  contents:
+  - get_roi
+  - map_atlas
+  - reduce_atlas
+  - merge_atlases
+  - dilate_atlas
+  - resample
+
+- title: "Visualization"
+  desc: "Functions for visualizing atlas data"
+  contents:
+  - plot_glasser
+  - ggseg_schaefer
+  - map_to_schaefer
+  - get_ggseg_atlas
+
+- title: "TemplateFlow Integration"
+  desc: "Functions for working with TemplateFlow templates"
+  contents:
+  - create_templateflow
+  - get_template
+  - get_volume_template
+  - get_surface_template
+  - tflow_spaces
+  - tflow_files
+  - install_templateflow
+  - starts_with("get_template_")
+  - templates
+
+- title: "S3 Methods"
+  desc: "S3 methods for atlas objects"
+  contents:
+  - print.atlas
+  - plot.atlas
+  - has_concept("methods")
+
+- title: "Data"
+  desc: "Pre-loaded atlas data"
+  contents:
+  - Schaefer17_200
+  - Schaefer17_400
+  - Schaefer17_600
+  - fsaverage
+  - olsen_mtl
+
+articles:
+- title: "Getting Started"
+  navbar: ~
+  contents:
+  - neuroatlas-overview
+
+- title: "Advanced Topics"
+  navbar: ~
+  contents:
+  - working-with-templateflow
