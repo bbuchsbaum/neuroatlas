@@ -329,43 +329,38 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
   }
   roi_labels <- sort(unique(as.vector(roi_vol_data)))
   roi_labels <- roi_labels[roi_labels != 0]
-  
-  # Extract values for each ROI
+
   if (inherits(data_vol, "NeuroVol")) {
-    # 3D data
+    # 3D data -> single row with one column per ROI
     data_vol_data <- data_vol[,,]
     extracted_values <- sapply(roi_labels, function(label) {
-      mask <- as.vector(roi_vol_data == label)
-      roi_data <- as.vector(data_vol_data)[mask]
+      mask <- roi_vol_data == label
+      roi_data <- data_vol_data[mask]
       if (length(roi_data) > 0) {
         stat_func(roi_data, ...)
       } else {
         NA
       }
     })
-    names(extracted_values) <- roi_labels
+    extracted_values <- matrix(extracted_values, nrow = 1)
+    colnames(extracted_values) <- as.character(roi_labels)
   } else if (inherits(data_vol, "NeuroVec")) {
-    # 4D data - extract time series for each ROI
-    nvol <- dim(data_vol)[4]  # number of time points
+    # 4D data -> each row is a time point
+    nvol <- dim(data_vol)[4]
     extracted_values <- matrix(NA, nrow = nvol, ncol = length(roi_labels))
-    
+
     for (i in seq_along(roi_labels)) {
       label <- roi_labels[i]
-      mask <- as.logical(roi_vol_data == label)
-      
-      # Extract time series for this ROI
-      roi_ts <- numeric(nvol)
-      for (t in 1:nvol) {
-        vol_t <- data_vol[,,,t]
-        # Convert mask to array indices for subsetting
-        roi_data <- vol_t[which(mask)]
+      mask <- roi_vol_data == label
+      for (t in seq_len(nvol)) {
+        vol_t <- data_vol[,,, t]
+        roi_data <- vol_t[mask]
         if (length(roi_data) > 0) {
-          roi_ts[t] <- stat_func(roi_data, ...)
+          extracted_values[t, i] <- stat_func(roi_data, ...)
         } else {
-          roi_ts[t] <- NA
+          extracted_values[t, i] <- NA
         }
       }
-      extracted_values[, i] <- roi_ts
     }
     colnames(extracted_values) <- as.character(roi_labels)
   } else {
@@ -379,32 +374,17 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
     id_to_label <- setNames(as.character(atlas$labels), atlas$ids)
   }
 
-  region_labels <- NULL
   if (!is.null(id_to_label)) {
-    region_labels <- id_to_label[as.character(roi_labels)]
+    region_labels <- id_to_label[colnames(extracted_values)]
+    colnames(extracted_values) <- region_labels
   }
 
   # --- Convert to tibble ---
-  if (is.vector(extracted_values)) {
-    # For 3D data, return a tibble with region id/label and value columns
-    result_tibble <- tibble::tibble(
-      region_id = roi_labels,
-      value = as.numeric(extracted_values)
-    )
-    if (!is.null(region_labels)) {
-      result_tibble <- tibble::add_column(result_tibble, label = region_labels, .after = "region_id")
-    }
-  } else if (is.matrix(extracted_values)) {
-    # For 4D data, return a tibble with time as rows and regions as columns
-    if (!is.null(region_labels)) {
-      colnames(extracted_values) <- region_labels
-    } else {
-      colnames(extracted_values) <- as.character(roi_labels)
-    }
+  if (nrow(extracted_values) == 1) {
     result_tibble <- tibble::as_tibble(extracted_values)
-    result_tibble <- tibble::add_column(result_tibble, time = 1:nrow(result_tibble), .before = TRUE)
   } else {
-    stop("Unexpected output format from stat_func. Expected vector or matrix.")
+    result_tibble <- tibble::as_tibble(extracted_values)
+    result_tibble <- tibble::add_column(result_tibble, time = seq_len(nrow(result_tibble)), .before = TRUE)
   }
 
   return(result_tibble)
