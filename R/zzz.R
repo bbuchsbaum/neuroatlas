@@ -1,11 +1,7 @@
-tflow <<- NULL
-
 #' @import reticulate
 .onLoad <- function(libname, pkgname) {
-  # use superassignment to update global reference to scipy
-  #tflow <<- reticulate::import("scipy", delay_load = TRUE)
-  tflow <<- try(reticulate::import("templateflow", delay_load=TRUE))
-  
+  # TemplateFlow initialization is now handled by .init_templateflow_api() in template_flow.R
+  # This provides better error handling and environment management
 }
 
 #' Install Templateflow Python package

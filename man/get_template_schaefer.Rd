@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{get_template_schaefer}
 \alias{get_template_schaefer}
-\title{Get Schaefer Parcellation in Template Space}
+\title{Get Schaefer Parcellation in Template Space (DEPRECATED)}
 \usage{
 get_template_schaefer(
   name = "MNI152NLin2009cAsym",
@@ -27,5 +27,11 @@ get_template_schaefer(
 A NeuroVol object containing the parcellation
 }
 \description{
+\\strong{DEPRECATED}: Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
+
 Retrieves Schaefer cortical parcellation mapped to a specified template space.
 }
+\seealso{
+The new \code{\link{get_template}}
+}
+\keyword{internal}

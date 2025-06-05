@@ -1,28 +1,51 @@
 Package: neuroatlas
-Title: useful atlases/parcellations for neuroimaging analysis
-Version: 0.0.0.9000
+Title: Neuroimaging Atlases and Parcellations
+Version: 0.1.0
 Authors@R: 
     person(given = "Bradley",
            family = "Buchsbaum",
            role = c("aut", "cre"),
-           email = "brad.buchsbaum@gmail.com")
-Description: Provides access to several neuroimaging atlases and parcellations
-License: What license it uses
+           email = "brad.buchsbaum@gmail.com",
+           comment = c(ORCID = "0000-0000-0000-0000"))
+Description: Provides a unified interface to access and work with various 
+    neuroimaging atlases and parcellations including Schaefer, Glasser, 
+    FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow 
+    for standardized template access and supports visualization through 
+    the ggseg ecosystem.
+License: MIT + file LICENSE
+URL: https://github.com/bbuchsbaum/neuroatlas
+BugReports: https://github.com/bbuchsbaum/neuroatlas/issues
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 RoxygenNote: 7.3.2.9000
 Imports:
-  rflann,
+  assertthat,
+  cli,
+  crayon,
   downloader,
-  reticulate,
   dplyr,
-  geojsonsf,
+  ggiraph,
+  ggplot2,
   ggseg,
   ggsegGlasser,
   ggsegSchaefer,
+  lifecycle,
+  magrittr,
+  memoise,
+  methods,
+  neuroim2,
+  neurosurf,
+  reticulate,
+  rflann,
+  scales,
   scico,
-  ggiraph,
-  neurosurf
+  sf,
+  stringr,
+  tibble,
+  tidyr,
+  tools,
+  utils
 Remotes: 
   YeeJeremy/rflann,
   bbuchsbaum/neuroim2,
@@ -30,8 +53,15 @@ Remotes:
   bbuchsbaum/ggseg,
   ggseg/ggsegGlasser,
   ggseg/ggsegSchaefer
+Depends:
+  R (>= 3.5.0)
 Suggests:
-  geojsonio,
   echarts4r,
-  geojsonsf
+  geojsonio,
+  geojsonsf,
+  knitr,
+  rmarkdown,
+  testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
   

@@ -18,12 +18,13 @@ Loads the Olsen medial temporal lobe atlas and optionally resamples it to a
 different space.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load in native space
 mtl <- get_olsen_mtl()
 
-# Load and resample to a different space
-mtl_resampled <- get_olsen_mtl(outspace = my_space)
+# Load and resample to MNI152NLin2009cAsym space (requires neuroim2)
+# space <- neuroim2::read_template_space("MNI152NLin2009cAsym")
+# mtl_resampled <- get_olsen_mtl(outspace = space)
 }
 
 }

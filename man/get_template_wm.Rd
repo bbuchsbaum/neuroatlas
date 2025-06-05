@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{get_template_wm}
 \alias{get_template_wm}
-\title{Get White Matter Probability Map}
+\title{Get White Matter Probability Map (DEPRECATED)}
 \usage{
 get_template_wm(
   name = "MNI152NLin2009cAsym",
@@ -21,5 +21,11 @@ get_template_wm(
 A NeuroVol object containing the white matter probability map
 }
 \description{
+\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
+
 Convenience function to get white matter probability map.
 }
+\seealso{
+The new \code{\link{get_template}}
+}
+\keyword{internal}

@@ -12,3 +12,4 @@ A character vector of available template names
 \description{
 Returns a list of all available templates in the Templateflow repository.
 }
+\keyword{internal}

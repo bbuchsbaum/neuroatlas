@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{get_template_brainmask}
 \alias{get_template_brainmask}
-\title{Get Brain Mask from Template}
+\title{Get Brain Mask from Template (DEPRECATED)}
 \usage{
 get_template_brainmask(
   name = "MNI152NLin2009cAsym",
@@ -21,5 +21,11 @@ get_template_brainmask(
 A NeuroVol object containing the binary brain mask
 }
 \description{
+\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "mask", ...)} instead.
+
 Convenience function to retrieve a binary brain mask for a specified template.
 }
+\seealso{
+The new \code{\link{get_template}}
+}
+\keyword{internal}

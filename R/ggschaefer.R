@@ -1,3 +1,6 @@
+# Global variables to avoid R CMD check NOTEs
+utils::globalVariables(c("hemi", "orig_label", "hemi.x", "hemi.y"))
+
 #' Get ggseg-Compatible Schaefer Atlas
 #'
 #' @description
@@ -29,7 +32,8 @@ get_ggseg_atlas <- function(atlas) {
   # Check for valid inputs
   if ((atlas_num[1] %in% seq(100, 1000, 100)) && (atlas_num[2] %in% c(7, 17))) {
     atlas_string <- paste0("schaefer", atlas_num[2], "_", atlas_num[1])
-    return(get(atlas_string))
+    # Use :: operator to access the object from ggsegSchaefer
+    return(eval(parse(text = paste0("ggsegSchaefer::", atlas_string))))
   } else {
     stop("Invalid atlas name. Must be Schaefer atlas with 7 or 17 networks and 100-1000 parcels.")
   }
@@ -48,10 +52,10 @@ get_ggseg_atlas <- function(atlas) {
 #' @param pos Logical. If TRUE, uses raw values; if FALSE, uses absolute values
 #'   for thresholding. Default: FALSE
 #'
-#' @return A ggseg brain atlas object with mapped values
+#' @return A tibble with mapped values suitable for ggseg visualization
 #'
 #' @importFrom assertthat assert_that
-#' @importFrom dplyr mutate left_join filter
+#' @importFrom dplyr mutate left_join filter .data select coalesce
 #' @importFrom tibble as_tibble
 #' @importFrom ggseg as_brain_atlas
 #' @export
@@ -63,22 +67,42 @@ map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
   
   ggatl <- get_ggseg_atlas(atlas)
   
+  # Create a mapping between our labels and ggseg labels
+  # Our labels are like "LH_Vis_1", ggseg labels are like "lh_7Networks_LH_Vis_1"
+  networks_str <- if (grepl("7networks", atlas$name, ignore.case = TRUE)) "7Networks_" else "17Networks_"
+  
   ret <- tibble(
     statistic = vals,
-    label = atlas$orig_labels,
+    orig_label = atlas$orig_labels,
     hemi = atlas$hemi
-  )
+  ) %>%
+    mutate(
+      # Convert our labels to match ggseg format
+      ggseg_label = paste0(
+        ifelse(hemi == "left", "lh_", "rh_"),
+        networks_str,
+        orig_label
+      )
+    )
   
-  rboth <- ggatl %>%
-    as_tibble() %>%
-    mutate(label = substr(label, 15, nchar(label))) %>%
-    left_join(ret) %>%
-    filter(!is.na(statistic)) %>%
-    mutate(statistic = ifelse(
-      fun(statistic) <= thresh[1] | fun(statistic) > thresh[2],
-      statistic, NA
-    )) %>%
-    ggseg::as_brain_atlas()
+  # Join with ggseg atlas data
+  rboth <- ggatl$data %>%
+    left_join(ret, by = c("label" = "ggseg_label")) %>%
+    mutate(
+      # Preserve original hemi column from ggseg data
+      hemi = coalesce(.data$hemi.x, .data$hemi.y),
+      statistic = ifelse(
+        is.na(.data$statistic) | 
+        fun(.data$statistic) <= thresh[1] | 
+        fun(.data$statistic) > thresh[2],
+        NA_real_, 
+        .data$statistic
+      )
+    ) %>%
+    select(-orig_label, -hemi.x, -hemi.y)  # Remove temporary columns
+  
+  # Return the tibble instead of the brain atlas object
+  return(rboth)
 }
 
 #' Create Interactive Schaefer Atlas Visualization
@@ -125,7 +149,11 @@ map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
 #' @export
 ggseg_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE,
                           palette="Spectral", interactive=TRUE, lim=range(vals)) {
-  gatl <- map_to_schaefer(atlas, vals, thresh, pos)
+  mapped_data <- map_to_schaefer(atlas, vals, thresh, pos)
+  
+  # Get the ggseg atlas and update its data
+  gatl <- get_ggseg_atlas(atlas)
+  gatl$data <- mapped_data
   
   ggobj <- ggseg::ggseg(
     atlas = gatl,
@@ -133,7 +161,7 @@ ggseg_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE,
     colour = "gray",
     interactive = FALSE,
     guide = TRUE,
-    mapping = aes(fill = statistic, tooltip = region, data_id = label)
+    mapping = aes(fill = .data$statistic, tooltip = .data$region, data_id = .data$label)
   ) +
     scale_fill_distiller(
       palette = palette,

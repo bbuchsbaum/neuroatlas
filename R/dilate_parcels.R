@@ -37,18 +37,15 @@
 #' # Load an atlas
 #' atlas <- get_aseg_atlas()
 #'
-#' # Create a brain mask
-#' mask <- create_brain_mask(atlas)
-#'
-#' # Dilate parcels by 4 voxels
-#' dilated <- dilate_atlas(atlas, mask, radius = 4)
+#' # Use TemplateFlow brain mask
+#' dilated <- dilate_atlas(atlas, "MNI152NLin2009cAsym", radius = 4)
 #'
 #' # More conservative dilation with fewer neighbors
-#' dilated_conservative <- dilate_atlas(atlas, mask, radius = 2, maxn = 20)
+#' dilated_conservative <- dilate_atlas(atlas, "MNI152NLin2009cAsym", radius = 2, maxn = 20)
 #' }
 #'
 #' @seealso
-#' \code{\link{create_brain_mask}} for creating appropriate masks
+#' \code{\link{get_template_brainmask}} for creating appropriate masks from TemplateFlow
 #'
 #' @references
 #' The algorithm uses the FLANN library for efficient nearest neighbor searches:
@@ -79,7 +76,7 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
             # Ensure .resolve_template_input is accessible. If in same package, neuroatlas::: might not be needed
             # but for clarity during dev or if it's not exported, using it.
             # Assuming .resolve_template_input is available in the package's namespace.
-            neuroatlas:::.resolve_template_input(resolved_mask_arg, target_type = "NeuroVol")
+            .resolve_template_input(resolved_mask_arg, target_type = "NeuroVol")
         }, error = function(e) {
             query_str <- paste(names(resolved_mask_arg), sapply(resolved_mask_arg, function(x) if(is.list(x)) "<list>" else as.character(x)), sep="=", collapse=", ")
             stop(paste0("Failed to resolve 'mask' (", query_str, ") to a NeuroVol via TemplateFlow: ", conditionMessage(e)))
@@ -96,9 +93,21 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     assertthat::assert_that(maxn > 0,
                             msg = "`maxn` must be positive")
 
-    # Convert the atlas volume to a dense array
-    atlas_vol <- .get_atlas_volume(atlas)
-    atlas2 <- neuroim2::as.dense(atlas_vol)
+    # Convert the atlas to a dense array
+    # Convert ClusteredNeuroVol to regular NeuroVol
+    atlas2 <- if (inherits(atlas$atlas, "ClusteredNeuroVol")) {
+      # ClusteredNeuroVol needs special handling
+      # Get the mask and clusters
+      mask_indices <- which(atlas$atlas@mask)
+      
+      # Create a dense volume
+      dense_array <- array(0, dim = dim(atlas$atlas))
+      dense_array[mask_indices] <- atlas$atlas@clusters
+      
+      neuroim2::NeuroVol(dense_array, space = neuroim2::space(atlas$atlas))
+    } else {
+      atlas$atlas
+    }
 
     # Identify the indices of labeled voxels and mask voxels
     atlas_idx <- which(atlas2 > 0)
@@ -172,21 +181,43 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     # Assign chosen labels
     atlas2[new_lin_idx] <- out_df[, 4]
 
-    # Check that we haven't introduced any labels not present in label_map
+    # Get label_map if available
+    label_map <- if (inherits(atlas$atlas, "ClusteredNeuroVol") && !is.null(atlas$atlas@label_map)) {
+        atlas$atlas@label_map
+    } else {
+        # Create a default label map from the atlas IDs
+        lm <- as.list(atlas$ids)
+        names(lm) <- as.character(atlas$ids)
+        lm
+    }
+    
+    # Check that we haven't introduced any labels not present in original atlas
     unique_labels <- unique(atlas2[atlas2 != 0])
-    missing_labels <- setdiff(unique_labels, unlist(atlas_vol@label_map))
+    original_labels <- if (!is.null(atlas$ids)) {
+        atlas$ids
+    } else if (inherits(atlas$atlas, "ClusteredNeuroVol")) {
+        # For ClusteredNeuroVol, get unique cluster values
+        unique(atlas$atlas@clusters)
+    } else {
+        # For regular NeuroVol
+        unique(atlas$atlas[atlas$atlas != 0])
+    }
+    missing_labels <- setdiff(unique_labels, original_labels)
     if (length(missing_labels) > 0) {
         stop(sprintf(
-            "Found labels in dilated atlas that are not in label_map: %s",
+            "Found labels in dilated atlas that are not in original: %s",
             paste(missing_labels, collapse = ", ")
         ))
     }
 
     # Create the new dilated ClusteredNeuroVol
+    # First create a LogicalNeuroVol mask
+    mask_vol <- neuroim2::LogicalNeuroVol(atlas2 != 0, space = neuroim2::space(atlas2))
+    
     dilated_vol <- neuroim2::ClusteredNeuroVol(
-        mask    = as.logical(atlas2),
+        mask    = mask_vol,
         clusters = atlas2[atlas2 != 0],
-        label_map = atlas_vol@label_map
+        label_map = label_map
     )
 
     # Now return an atlas object (with the same fields/classes as the input).

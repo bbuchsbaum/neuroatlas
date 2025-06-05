@@ -1,5 +1,5 @@
 #' Extract a region of interest (ROI) from an atlas
-#' 
+#'
 #' @description
 #' Extracts a specific region of interest from an atlas object based on label, ID,
 #' and hemisphere information.
@@ -20,12 +20,12 @@
 #' roi <- get_roi(atlas, label = "Hippocampus")
 #' }
 #' @export
-get_roi <- function(x, label, id, hemi) {
+get_roi <- function(x, label=NULL, id=NULL, hemi=NULL) {
   UseMethod("get_roi")
 }
 
 #' Map values to an atlas
-#' 
+#'
 #' @description
 #' Maps a set of values to regions/parcels in an atlas object. This can be used
 #' to visualize data (like statistics or measurements) across atlas regions.
@@ -68,6 +68,27 @@ map_atlas <- function(x, vals, thresh, ...) {
 #'
 #' @return A \code{tibble} with one column per ROI. For \code{NeuroVec} inputs a
 #'   \code{time} column indexes each volume.
+#'
+#' @examples
+#' \dontrun{
+#' # Load an atlas
+#' atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
+#'
+#' # Create example data (random values in brain space)
+#' brain_data <- neuroim2::NeuroVol(rnorm(prod(dim(atlas$atlas))),
+#'                                  space = space(atlas$atlas))
+#'
+#' # Compute mean values within each atlas region
+#' region_means <- reduce_atlas(atlas, brain_data, mean)
+#'
+#' # Compute standard deviation within each region
+#' region_sds <- reduce_atlas(atlas, brain_data, sd, na.rm = TRUE)
+#' }
+#'
+#' @seealso
+#' \code{\link{map_atlas}} for mapping values to atlas regions,
+#' \code{\link{get_roi}} for extracting specific regions
+#'
 #' @export
 reduce_atlas <- function(atlas, data_vol, stat_func, ...) {
   UseMethod("reduce_atlas")

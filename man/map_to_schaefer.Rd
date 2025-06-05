@@ -18,7 +18,7 @@ Values outside this range will be set to NA. Default: c(0,0)}
 for thresholding. Default: FALSE}
 }
 \value{
-A ggseg brain atlas object with mapped values
+A tibble with mapped values suitable for ggseg visualization
 }
 \description{
 Converts values associated with atlas regions into a format suitable for

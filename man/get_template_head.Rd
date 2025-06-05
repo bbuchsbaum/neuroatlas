@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{get_template_head}
 \alias{get_template_head}
-\title{Get Template Head Image}
+\title{Get Template Head Image (DEPRECATED)}
 \usage{
 get_template_head(
   name = "MNI152NLin2009cAsym",
@@ -21,5 +21,11 @@ get_template_head(
 A NeuroVol object containing the head template
 }
 \description{
+\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "head", ...)} instead.
+
 Convenience function to get the full head (non-brain-extracted) template.
 }
+\seealso{
+The new \code{\link{get_template}}
+}
+\keyword{internal}

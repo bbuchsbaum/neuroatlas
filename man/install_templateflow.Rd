@@ -7,18 +7,22 @@
 install_templateflow(method = "auto", conda = "auto")
 }
 \arguments{
-\item{method}{Installation method passed to \code{reticulate::py_install}.}
-\item{conda}{Path to a conda executable or \code{"auto"}.}
+\item{method}{Installation method passed to
+\code{reticulate::py_install}. Defaults to \code{"auto"}.}
+
+\item{conda}{Path to a conda executable or \code{"auto"} to let
+\code{reticulate} locate one.}
 }
 \value{
-Invisible \code{NULL} indicating success
+Invisible \code{NULL} indicating success.
 }
 \description{
-Installs the Python packages \pkg{scipy} and \pkg{templateflow} using \code{reticulate::py_install}.
+Installs the Python packages `scipy` and `templateflow` via
+\code{reticulate::py_install}. Use this helper if the Templateflow
+resources are required for fetching templates.
 }
 \examples{
 \donttest{
 install_templateflow()
 }
 }
-

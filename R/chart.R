@@ -38,7 +38,7 @@
 #' plot_glasser(vals, value_col = "intensity")
 #' }
 #'
-#' @importFrom dplyr filter inner_join group_by summarize left_join rename mutate
+#' @importFrom dplyr filter inner_join group_by summarize left_join rename mutate .data
 #' @importFrom tidyr pivot_longer
 #' @importFrom sf st_as_sf st_multipolygon st_sfc st_sf st_bbox st_geometry
 #' @import ggseg
@@ -51,8 +51,7 @@ plot_glasser <- function(vals=NULL, value_col = "value", position = "dispersed")
   if (length(missing_packages) > 0) {
     stop("The following packages are required but not installed: ", paste(missing_packages, collapse = ", "))
   }
-  library(geojsonio)
-  library(echarts4r)
+  # No library() calls needed - will use :: notation
 
   # Get the ggseg Glasser atlas data
   ggseg_data <- ggsegGlasser::glasser$data
@@ -87,10 +86,10 @@ plot_glasser <- function(vals=NULL, value_col = "value", position = "dispersed")
     dplyr::rename(value = !!value_col)
 
   # Create the four views
-  g1 <- geojsonio::geojson_json(dplyr::filter(plot_data, hemi == "left" & side == "lateral"))
-  g2 <- geojsonio::geojson_json(dplyr::filter(plot_data, hemi == "right" & side == "lateral"))
-  g3 <- geojsonio::geojson_json(dplyr::filter(plot_data, hemi == "left" & side == "medial"))
-  g4 <- geojsonio::geojson_json(dplyr::filter(plot_data, hemi == "right" & side == "medial"))
+  g1 <- geojsonio::geojson_json(dplyr::filter(plot_data, .data$hemi == "left" & .data$side == "lateral"))
+  g2 <- geojsonio::geojson_json(dplyr::filter(plot_data, .data$hemi == "right" & .data$side == "lateral"))
+  g3 <- geojsonio::geojson_json(dplyr::filter(plot_data, .data$hemi == "left" & .data$side == "medial"))
+  g4 <- geojsonio::geojson_json(dplyr::filter(plot_data, .data$hemi == "right" & .data$side == "medial"))
 
   # Create the four charts
   chart1 <- get_chart(g1, plot_data, "value", "lat", TRUE)
@@ -109,7 +108,7 @@ plot_glasser <- function(vals=NULL, value_col = "value", position = "dispersed")
 #' @noRd
 get_chart <- function(geo, data, var, name, show = TRUE) {
   data %>%
-    echarts4r::e_charts(label) %>%
+    echarts4r::e_charts(.data$label) %>%
     echarts4r::e_map_register(name, geo) %>%
     echarts4r::e_map_(var, map = name, nameProperty = "label") %>%
     echarts4r::e_visual_map_(var,

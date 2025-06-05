@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{get_template_csf}
 \alias{get_template_csf}
-\title{Get CSF Probability Map}
+\title{Get CSF Probability Map (DEPRECATED)}
 \usage{
 get_template_csf(
   name = "MNI152NLin2009cAsym",
@@ -21,5 +21,11 @@ get_template_csf(
 A NeuroVol object containing the CSF probability map
 }
 \description{
+\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
+
 Convenience function to get CSF probability map.
 }
+\seealso{
+The new \code{\link{get_template}}
+}
+\keyword{internal}

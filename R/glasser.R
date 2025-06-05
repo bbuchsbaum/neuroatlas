@@ -50,6 +50,8 @@
 #'
 #' @importFrom neuroim2 read_vol ClusteredNeuroVol
 #' @importFrom downloader download
+#' @importFrom utils read.table
+#' @importFrom grDevices col2rgb rainbow
 #' @export
 get_glasser_atlas <- function(outspace=NULL) {
   # Download and read atlas volume
@@ -103,15 +105,7 @@ get_glasser_atlas <- function(outspace=NULL) {
   ret
 }
 
-#' Map Values to Glasser Atlas
-#'
-#' @rdname map_atlas-methods
-#' @inheritParams map_atlas
-#' @param pos Logical. If TRUE, uses raw values; if FALSE, uses absolute values
-#'   for thresholding
-#' @describeIn map_atlas Map values to a Glasser atlas object.
-#' @return A ggseg brain atlas object with mapped values
-#'
+#' @rdname map_atlas
 #' @import ggsegGlasser
 #' @importFrom ggiraph geom_polygon_interactive
 #' @importFrom dplyr left_join mutate
@@ -128,10 +122,10 @@ map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
   
   rboth <- ggsegGlasser::glasser %>%
     as_tibble() %>%
-    left_join(ret) %>%
-    mutate(statistic=ifelse(fun(statistic) <= thresh[1] | 
-                           fun(statistic) > thresh[2], 
-                           statistic, NA)) %>%
+    left_join(ret, by = c("region", "label", "hemi")) %>%
+    mutate(statistic=ifelse(fun(.data$statistic) <= thresh[1] | 
+                           fun(.data$statistic) > thresh[2], 
+                           .data$statistic, NA)) %>%
     as_brain_atlas()
   
   rboth
@@ -157,7 +151,6 @@ map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
 #' @param lim Numeric vector of length 2 for color scale limits. If NULL, will be
 #'   set to range of vals
 #' @param ... Additional arguments passed to methods
-#' @describeIn plot Visualization for Glasser atlas objects.
 #' @return A ggiraph interactive plot object
 #'
 #' @importFrom tibble tibble
@@ -186,9 +179,9 @@ plot.glasser <- function(x, y, vals=NULL, thresh=c(0,0), pos=FALSE,
               colour=colour, 
               interactive=FALSE, 
               guide=guide,
-              mapping=aes(fill=statistic, 
-                         tooltip=region,
-                         data_id=label)) + 
+              mapping=aes(fill=.data$statistic, 
+                         tooltip=.data$region,
+                         data_id=.data$label)) + 
     scale_fill_scico(palette=palette,
                      limits=lim,
                      direction=-1,
@@ -206,15 +199,7 @@ plot.glasser <- function(x, y, vals=NULL, thresh=c(0,0), pos=FALSE,
                          only_shiny=FALSE)))
 }
 
-#' Print Method for Glasser Atlas Objects
-#'
-#' @description
-#' Displays a formatted summary of a Glasser atlas object, including region counts,
-#' hemisphere distribution, and basic metadata.
 #' @rdname print-methods
-#' @param x A Glasser atlas object
-#' @param ... Additional arguments passed to print methods
-#' @describeIn print Print summary for Glasser atlas objects.
 #' @importFrom crayon bold green blue red white yellow
 #' @importFrom cli rule symbol
 #' @export
@@ -236,7 +221,7 @@ print.glasser <- function(x, ...) {
   dims <- dim(x$atlas)
   cat(crayon::yellow(cli::symbol$info), " ",
       crayon::bold("Dimensions: "), 
-      crayon::white(paste0(dims[1], " × ", dims[2], " × ", dims[3])), "\n\n", sep="")
+      crayon::white(paste0(dims[1], " x ", dims[2], " x ", dims[3])), "\n\n", sep="")
   
   # Region counts
   total_regions <- length(x$ids)
@@ -246,11 +231,11 @@ print.glasser <- function(x, ...) {
   cat(crayon::green(cli::symbol$circle_filled), " ",
       crayon::bold("Region Summary:"), "\n", sep="")
   
-  cat(crayon::blue("├─"), " Total Regions:      ", 
+  cat(crayon::blue("|-"), " Total Regions:      ", 
       crayon::white(total_regions), "\n", sep="")
-  cat(crayon::blue("├─"), " Left Hemisphere:    ", 
+  cat(crayon::blue("|-"), " Left Hemisphere:    ", 
       crayon::white(left_regions), "\n", sep="")
-  cat(crayon::blue("└─"), " Right Hemisphere:   ", 
+  cat(crayon::blue("\\-"), " Right Hemisphere:   ", 
       crayon::white(right_regions), "\n\n", sep="")
   
   # Sample regions
@@ -261,9 +246,9 @@ print.glasser <- function(x, ...) {
   left_examples <- head(x$labels[x$hemi == "left"], 3)
   right_examples <- head(x$labels[x$hemi == "right"], 3)
   
-  cat(crayon::blue("├─"), " Left:  ", 
+  cat(crayon::blue("|-"), " Left:  ", 
       crayon::white(paste(left_examples, collapse=", ")), "...\n", sep="")
-  cat(crayon::blue("└─"), " Right: ", 
+  cat(crayon::blue("\\-"), " Right: ", 
       crayon::white(paste(right_examples, collapse=", ")), "...\n", sep="")
   
   # Footer

@@ -69,14 +69,19 @@ resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
                          msg="'min_neighbors' must be >= 2")
 
   # Store original labels for validation
-  orig_labels <- sort(unique(as.vector(vol[vol != 0])))
+  vol_data <- if (inherits(vol, "NeuroVol")) {
+    vol[,,]
+  } else {
+    as.vector(vol)
+  }
+  orig_labels <- sort(unique(as.vector(vol_data[vol_data != 0])))
 
   # Initial resampling
   vol <- neuroim2::resample(vol, outspace, interpolation=interp)
   vol2 <- vol
 
   if (smooth) {
-    ds <- spacing(vol)
+    ds <- neuroim2::spacing(vol)
     mask <- as.logical(vol != 0)
 
     # Set radius if not provided
@@ -140,7 +145,7 @@ load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
   vol <- if (use_cache) {
     pname <- paste0(get_cache_dir(), "/", fname)
     if (file.exists(pname)) {
-      read_vol(pname)
+      neuroim2::read_vol(pname)
     }
   }
 
@@ -148,8 +153,8 @@ load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
     path <- paste0(schaefer_path$rpath, fname)
     des <- paste0(tempdir(), "/", fname)
     ret <- downloader::download(path, des)
-    vol <- read_vol(des)
-    write_vol(vol, paste0(get_cache_dir(), "/", fname))
+    vol <- neuroim2::read_vol(des)
+    neuroim2::write_vol(vol, paste0(get_cache_dir(), "/", fname))
   }
 
   vol
@@ -233,6 +238,8 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' @param smooth Logical. Whether to smooth parcel boundaries after resampling.
 #'   Default: FALSE
 #' @param use_cache Logical. Whether to cache downloaded files. Default: TRUE
+#' @param ... Additional arguments (currently unused, included for consistency 
+#'   with convenience functions)
 #'
 #' @return A list with classes c("schaefer", "volatlas", "atlas") containing:
 #' \describe{
@@ -298,18 +305,22 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' @importFrom neuroim2 read_vol ClusteredNeuroVol write_vol
 #' @importFrom downloader download
 #' @importFrom assertthat assert_that
+#' @importFrom utils read.table
 #'
 #' @export
-get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
+get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","700","800","900","1000"),
                               networks=c("7","17"), resolution=c("1","2"),
                               outspace=NULL, smooth=FALSE, use_cache=TRUE) {
 
-  parcels <- match.arg(as.character(parcels))
-  networks <- match.arg(as.character(networks))
-  resolution <- match.arg(as.character(resolution))
+  parcels <- match.arg(as.character(parcels), 
+                      choices = c("100","200","300","400","500","600","700","800","900","1000"))
+  networks <- match.arg(as.character(networks), 
+                       choices = c("7","17"))
+  resolution <- match.arg(as.character(resolution), 
+                         choices = c("1","2"))
 
   # Resolve outspace if it's not NULL and not already a NeuroSpace (T6.1.4)
-  if (!is.null(outspace) && !neuroim2::is.NeuroSpace(outspace)) {
+  if (!is.null(outspace) && !methods::is(outspace, "NeuroSpace")) {
     message("Attempting to resolve 'outspace' argument via TemplateFlow...")
     # We need .resolve_template_input to be available. 
     # Assuming it's exported from neuroatlas or accessible.
@@ -317,14 +328,14 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
     # For now, assuming it becomes an exported utility or is otherwise accessible.
     # If this file is part of the same package, direct call might work if NAMESPACE handles it.
     resolved_outspace <- tryCatch({
-      neuroatlas:::.resolve_template_input(outspace, target_type = "NeuroSpace")
+      .resolve_template_input(outspace, target_type = "NeuroSpace")
     }, error = function(e) {
       stop("Failed to resolve 'outspace' via TemplateFlow: ", conditionMessage(e),
            "\n'outspace' must be a NeuroSpace object, a TemplateFlow space ID string, or a list of get_template() arguments.")
       return(NULL) # Should be caught by stop
     })
     
-    if (is.null(resolved_outspace) || !neuroim2::is.NeuroSpace(resolved_outspace)) {
+    if (is.null(resolved_outspace) || !methods::is(resolved_outspace, "NeuroSpace")) {
         stop("Resolution of 'outspace' did not result in a valid NeuroSpace object.")
     }
     outspace <- resolved_outspace # Replace original outspace with the resolved NeuroSpace
@@ -413,6 +424,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","80
 #'
 #' @importFrom neurosurf read_freesurfer_annot
 #' @importFrom downloader download
+#' @importFrom utils data
 #' @export
 get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
                                   networks=c("7","17"), surf=c("inflated", "white", "pial"),
@@ -426,7 +438,8 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   surf <- match.arg(surf)
   #resolution <- match.arg(resolution)
 
-  data(fsaverage)
+  fsaverage <- NULL  # To avoid R CMD check NOTE
+  utils::data("fsaverage", envir = environment())
 
   get_hemi <- function(hemi) {
 
@@ -439,7 +452,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     ret <- downloader::download(path, des)
 
     geom <- paste0(hemi, "_", surf)
-    annot <- neurosurf::read_freesurfer_annot(des, fsaverage[[geom]])
+    annot <- suppressWarnings(neurosurf::read_freesurfer_annot(des, fsaverage[[geom]]))
 
     nrois <- as.integer(parcels)
 
@@ -453,6 +466,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
       annot@labels <- annot@labels[-1]
     }
 
+    class(annot) <- c(class(annot), "surf_atlas")
     annot
 
   }
@@ -569,6 +583,20 @@ sy_600_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cac
 
 #' @rdname get_schaefer_atlas
 #' @export
+sy_700_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "700", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_700_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "700", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
 sy_800_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
   get_schaefer_atlas(parcels = "800", networks = "7", resolution = resolution,
                      outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
@@ -578,6 +606,20 @@ sy_800_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cach
 #' @export
 sy_800_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
   get_schaefer_atlas(parcels = "800", networks = "17", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_900_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "900", networks = "7", resolution = resolution,
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+}
+
+#' @rdname get_schaefer_atlas
+#' @export
+sy_900_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+  get_schaefer_atlas(parcels = "900", networks = "17", resolution = resolution,
                      outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
 }
 

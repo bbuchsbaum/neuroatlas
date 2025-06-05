@@ -14,8 +14,12 @@
 \alias{sy_500_17}
 \alias{sy_600_7}
 \alias{sy_600_17}
+\alias{sy_700_7}
+\alias{sy_700_17}
 \alias{sy_800_7}
 \alias{sy_800_17}
+\alias{sy_900_7}
+\alias{sy_900_17}
 \alias{sy_1000_7}
 \alias{sy_1000_17}
 \title{Load Schaefer Brain Parcellation Atlas}
@@ -24,7 +28,7 @@
 }
 \usage{
 get_schaefer_atlas(
-  parcels = c("100", "200", "300", "400", "500", "600", "800", "1000"),
+  parcels = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"),
   networks = c("7", "17"),
   resolution = c("1", "2"),
   outspace = NULL,
@@ -128,6 +132,22 @@ sy_600_17(
   ...
 )
 
+sy_700_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_700_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
 sy_800_7(
   resolution = "2",
   outspace = NULL,
@@ -137,6 +157,22 @@ sy_800_7(
 )
 
 sy_800_17(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_900_7(
+  resolution = "2",
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE,
+  ...
+)
+
+sy_900_17(
   resolution = "2",
   outspace = NULL,
   smooth = FALSE,
@@ -176,6 +212,9 @@ Options: "1", "2"}
 Default: FALSE}
 
 \item{use_cache}{Logical. Whether to cache downloaded files. Default: TRUE}
+
+\item{...}{Additional arguments (currently unused, included for consistency 
+with convenience functions)}
 }
 \value{
 A list with classes c("schaefer", "volatlas", "atlas") containing:
@@ -194,38 +233,6 @@ A list with classes c("schaefer", "volatlas", "atlas") containing:
 Retrieves and loads the Schaefer brain parcellation atlas, which provides a
 data-driven parcellation of the cerebral cortex based on both local gradient
 and global similarity approaches.
-
-Shorthand for Schaefer atlas with 100 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 100 parcels and 17 networks.
-
-Shorthand for Schaefer atlas with 200 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 200 parcels and 17 networks.
-
-Shorthand for Schaefer atlas with 300 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 300 parcels and 17 networks.
-
-Shorthand for Schaefer atlas with 400 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 400 parcels and 17 networks.
-
-Shorthand for Schaefer atlas with 500 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 500 parcels and 17 networks.
-
-Shorthand for Schaefer atlas with 600 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 600 parcels and 17 networks.
-
-Shorthand for Schaefer atlas with 800 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 800 parcels and 17 networks.
-
-Shorthand for Schaefer atlas with 1000 parcels and 7 networks.
-
-Shorthand for Schaefer atlas with 1000 parcels and 17 networks.
 }
 \details{
 The Schaefer atlas offers multiple resolutions of cortical parcellation

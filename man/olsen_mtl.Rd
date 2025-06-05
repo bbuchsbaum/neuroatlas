@@ -39,7 +39,7 @@ resolution. It includes bilateral parcellation of:
 }
 }
 \examples{
-\dontrun{
+\donttest{
 # Load the atlas data
 data(olsen_mtl)
 

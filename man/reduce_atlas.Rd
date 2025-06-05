@@ -29,3 +29,24 @@ indexes each volume.
 Applies a summary function to data within each ROI defined by an atlas.
 This is an S3 generic function.
 }
+\examples{
+\dontrun{
+# Load an atlas
+atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
+
+# Create example data (random values in brain space)
+brain_data <- neuroim2::NeuroVol(rnorm(prod(dim(atlas$atlas))), 
+                                 space = space(atlas$atlas))
+
+# Compute mean values within each atlas region
+region_means <- reduce_atlas(atlas, brain_data, mean)
+
+# Compute standard deviation within each region
+region_sds <- reduce_atlas(atlas, brain_data, sd, na.rm = TRUE)
+}
+
+}
+\seealso{
+\code{\link{map_atlas}} for mapping values to atlas regions,
+\code{\link{get_roi}} for extracting specific regions
+}

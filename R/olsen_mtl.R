@@ -61,16 +61,19 @@
 #' # Load in native space
 #' mtl <- get_olsen_mtl()
 #'
-#' # Load and resample to a different space
-#' mtl_resampled <- get_olsen_mtl(outspace = my_space)
+#' # Load and resample to MNI152NLin2009cAsym space (requires neuroim2)
+#' # space <- neuroim2::read_template_space("MNI152NLin2009cAsym")
+#' # mtl_resampled <- get_olsen_mtl(outspace = space)
 #' }
 #'
 #' @seealso
 #' \code{\link{get_hipp_atlas}} for hippocampus-specific parcellation
 #'
+#' @importFrom utils data
 #' @export
 get_olsen_mtl <- function(outspace=NULL) {
-  data(olsen_mtl)
+  olsen_mtl <- NULL  # To avoid R CMD check NOTE
+  utils::data("olsen_mtl", envir = environment())
   if (is.null(outspace)) {
     olsen_mtl
   } else {
@@ -117,14 +120,16 @@ get_olsen_mtl <- function(outspace=NULL) {
 #' }
 #'
 #' @importFrom neuroim2 index_to_coord
+#' @importFrom grDevices col2rgb rainbow
 #' @export
 get_hipp_atlas <- function(outspace=NULL, apsections=1) {
+  olsen_mtl <- NULL  # To avoid R CMD check NOTE
   # Load and potentially resample base atlas
   x <- if (is.null(outspace)) {
-    data(olsen_mtl)
+    utils::data("olsen_mtl", envir = environment())
     olsen_mtl
   } else {
-    data(olsen_mtl)
+    utils::data("olsen_mtl", envir = environment())
     atres <- resample(olsen_mtl$atlas, outspace)
     tmp <- olsen_mtl
     tmp$atlas <- atres

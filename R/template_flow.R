@@ -1,19 +1,17 @@
 # New TemplateFlow Core Interface (WIP - Ticket 1)
 
 #' @importFrom tools R_user_dir
-#' @importFrom reticulate import py_available py_module_available py_has_attr py_get_attr py_list_attributes py_capture_error py_to_r is_py_object
+#' @importFrom reticulate import py_available py_module_available py_has_attr py_get_attr py_list_attributes py_to_r is_py_object
 #' @importFrom memoise memoise
 #' @importFrom lifecycle deprecate_warn
 #' @importFrom utils modifyList head askYesNo
 
 # Environment and Cache Setup ----
 
-#' TemplateFlow API Handle and Configuration
-#'
-#' This object acts as a gateway to the Python TemplateFlow API and manages
-#' neuroatlas-specific configurations like caching.
-#'
-#' @keywords internal
+# TemplateFlow API Handle and Configuration
+#
+# This object acts as a gateway to the Python TemplateFlow API and manages
+# neuroatlas-specific configurations like caching.
 .tflow_env <- new.env(parent = emptyenv())
 
 #' Get or Create neuroatlas Cache Directory
@@ -95,19 +93,62 @@
 
   if (is.null(.tflow_env$api) || force_reinit) {
     if (!reticulate::py_available(initialize = TRUE)) {
-      stop("Python is not available. \"reticulate\" needs Python to access TemplateFlow.")
+      stop("Python is not available. The 'reticulate' package needs Python to access TemplateFlow.\n",
+           "Please ensure Python is installed on your system.\n",
+           "You can check Python availability with: reticulate::py_available()")
     }
     if (!reticulate::py_module_available("templateflow")) {
-      stop("Python module 'templateflow' is not installed. Please install it, e.g., via: \n           reticulate::py_install('templateflow')")
+      stop("Python module 'templateflow' is not installed.\n",
+           "To install it, run: neuroatlas::install_templateflow()\n",
+           "Or manually: reticulate::py_install('templateflow')")
     }
     tryCatch({
       .tflow_env$py_api <- reticulate::import("templateflow.api", convert = TRUE)
     }, error = function(e) {
-      stop("Failed to import templateflow.api: ", e$message)
+      stop("Failed to import templateflow.api: ", e$message, "\n",
+           "This may be due to network issues or corrupted installation.\n",
+           "Try reinstalling with: neuroatlas::install_templateflow()")
     })
   }
   
   invisible(NULL)
+}
+
+#' Check TemplateFlow Connectivity
+#'
+#' Internal function to test if TemplateFlow API is accessible and functioning.
+#' This helps distinguish between network issues and other problems.
+#'
+#' @return Logical. TRUE if TemplateFlow API is accessible, FALSE otherwise.
+#' @keywords internal
+.check_templateflow_connectivity <- function() {
+  # First check if API is initialized
+  if (is.null(.tflow_env$py_api)) {
+    tryCatch({
+      .init_templateflow_api()
+    }, error = function(e) {
+      return(FALSE)
+    })
+  }
+  
+  # If still no API, return FALSE
+  if (is.null(.tflow_env$py_api)) {
+    return(FALSE)
+  }
+  
+  # Try a simple API call to check connectivity
+  tryCatch({
+    # Try to get the list of templates - this requires network access
+    templates <- .tflow_env$py_api$templates()
+    # If we got here, connectivity is good
+    return(TRUE)
+  }, error = function(e) {
+    # Check if it's a network-related error
+    if (grepl("(URLError|ConnectionError|timeout|network|internet)", e$message, ignore.case = TRUE)) {
+      message("TemplateFlow appears to be unreachable. Check your internet connection.")
+    }
+    return(FALSE)
+  })
 }
 
 # Memoised TemplateFlow Path Fetching ----
@@ -127,20 +168,18 @@
   py_result_path_obj <- NULL
   
   # Capture Python errors from the API call
-  py_error <- reticulate::py_capture_error({
-    py_result_path_obj <- do.call(tf_api_obj$get, query_params_list)
-  })
-
-  if (!is.null(py_error)) {
+  py_result_path_obj <- tryCatch({
+    do.call(tf_api_obj$get, query_params_list)
+  }, error = function(e) {
     stop(structure(
-      list(message = paste0("TemplateFlow API error: ", py_error$message,
+      list(message = paste0("TemplateFlow API error: ", conditionMessage(e),
                             "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
            call = NULL,
            query_args = query_params_list,
-           python_error = py_error),
+           python_error = e),
       class = c("templateflow_api_error", "error", "condition")
     ))
-  }
+  })
 
   if (is.null(py_result_path_obj)) {
     stop(structure(
@@ -449,7 +488,7 @@ names.templateflow <- function(x) {
 #'   If all parameters are scalar (or vectors of length 1), a single \code{neuroim2::NeuroVol} object
 #'   or a file path string is returned directly (depending on \code{path_only}).
 #'
-#' @importFrom reticulate py_capture_error py_get_attr
+#' @importFrom reticulate py_get_attr
 #' @importFrom neuroim2 NeuroVol
 #' @export
 #' @examples
@@ -815,13 +854,13 @@ get_template <- function(space = "MNI152NLin2009cAsym",
 #' @keywords internal
 as_neurovol <- memoise::memoise(.as_neurovol_unmemoised)
 
-#' Access Templateflow Brain Templates (DEPRECATED)
+#' Access Templateflow Brain Templates (DEPRECATED - Legacy Signature)
 #'
 #' @description
-#' [DEPRECATED] This function signature is deprecated. Please use the new 
-#' \code{\link{get_template}} function (defined earlier in this file) which offers 
-#' a more comprehensive and R-native interface. The new function handles common 
-#' variants and modalities more directly.
+#' \\strong{DEPRECATED}: This function signature is deprecated. Please use the new 
+#' \code{\link{get_template}} function which offers a more comprehensive 
+#' and R-native interface. The new function handles common variants and 
+#' modalities more directly.
 #'
 #' @param name Character string specifying template name. Default: "MNI152NLin2009cAsym"
 #' @param desc Character string describing template variant. Default: "brain"
@@ -833,14 +872,14 @@ as_neurovol <- memoise::memoise(.as_neurovol_unmemoised)
 #'
 #' @return A NeuroVol object containing the requested template
 #'
-#' @seealso The new \code{\link{get_template}} (defined with an updated signature).
+#' @seealso The new \code{\link{get_template}} with updated signature.
 #' @md
-#' @deprecate new="get_template" msg="This specific signature of get_template() is deprecated. Please use the newer get_template() function (defined with parameters like `space`, `variant`, `modality`) for a more streamlined interface."
 #' @keywords internal
 #' @export
-get_template <- function(name="MNI152NLin2009cAsym", desc="brain", resolution=1, 
-                        label=NULL, atlas=NULL, suffix="T1w", 
-                        extension=".nii.gz") {
+#' @rdname get_template_legacy
+get_template_legacy <- function(name="MNI152NLin2009cAsym", desc="brain", resolution=1, 
+                               label=NULL, atlas=NULL, suffix="T1w", 
+                               extension=".nii.gz") {
   # T8.1.3: Add lifecycle deprecation warning
   lifecycle::deprecate_warn(
     when = "0.10.0", # Replace with actual version when this is released
@@ -878,7 +917,7 @@ get_template <- function(name="MNI152NLin2009cAsym", desc="brain", resolution=1,
 #' Get Brain Mask from Template (DEPRECATED)
 #'
 #' @description
-#' [DEPRECATED] Please use \code{\link{get_template}(variant = "mask", ...)} instead.
+#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "mask", ...)} instead.
 #'
 #' Convenience function to retrieve a binary brain mask for a specified template.
 #'
@@ -888,7 +927,6 @@ get_template <- function(name="MNI152NLin2009cAsym", desc="brain", resolution=1,
 #' @return A NeuroVol object containing the binary brain mask
 #' @seealso The new \code{\link{get_template}}
 #' @md
-#' @deprecate new="get_template" msg="get_template_brainmask() is deprecated. Use get_template(variant = \"mask\") instead."
 #' @keywords internal
 #' @export
 get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1, 
@@ -905,7 +943,7 @@ get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get Tissue Probability Map from Template (DEPRECATED)
 #'
 #' @description
-#' [DEPRECATED] Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
+#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
 #'
 #' Retrieves probability maps for different tissue types (GM, WM, CSF).
 #'
@@ -914,7 +952,6 @@ get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @return A NeuroVol object containing the probability map
 #' @seealso The new \code{\link{get_template}}
 #' @md
-#' @deprecate new="get_template" msg="get_template_probseg() is deprecated. Use get_template(variant = \"probseg\", label = <tissue>) instead."
 #' @keywords internal
 #' @export
 get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM", 
@@ -931,7 +968,7 @@ get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
 #' Get Schaefer Parcellation in Template Space (DEPRECATED)
 #'
 #' @description
-#' [DEPRECATED] Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
+#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
 #'
 #' Retrieves Schaefer cortical parcellation mapped to a specified template space.
 #'
@@ -941,7 +978,6 @@ get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
 #' @return A NeuroVol object containing the parcellation
 #' @seealso The new \code{\link{get_template}}
 #' @md
-#' @deprecate new="get_template" msg="get_template_schaefer() is deprecated. Use get_template(atlas = \"Schaefer2018\", desc = <parcelsNetworks>, suffix = \"dseg\") instead."
 #' @keywords internal
 #' @export
 get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
@@ -963,7 +999,6 @@ get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
 #'
 #' @return A character vector of available template names
 #' @export
-#' @deprecate fun="templates" new="tflow_spaces" msg="The `templates()` function is deprecated. Please use `tflow_spaces()` instead for a more consistent naming scheme."
 #' @keywords internal
 templates <- function() {
   lifecycle::deprecate_warn(
@@ -985,7 +1020,7 @@ templates <- function() {
 #' Get Template Head Image (DEPRECATED)
 #'
 #' @description
-#' [DEPRECATED] Please use \code{\link{get_template}(variant = "head", ...)} instead.
+#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "head", ...)} instead.
 #'
 #' Convenience function to get the full head (non-brain-extracted) template.
 #'
@@ -993,7 +1028,6 @@ templates <- function() {
 #' @return A NeuroVol object containing the head template
 #' @seealso The new \code{\link{get_template}}
 #' @md
-#' @deprecate new="get_template" msg="get_template_head() is deprecated. Use get_template(variant = \"head\") instead."
 #' @keywords internal
 #' @export
 get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1, 
@@ -1010,7 +1044,7 @@ get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get CSF Probability Map (DEPRECATED)
 #'
 #' @description
-#' [DEPRECATED] Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
+#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
 #'
 #' Convenience function to get CSF probability map.
 #'
@@ -1018,7 +1052,6 @@ get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @return A NeuroVol object containing the CSF probability map
 #' @seealso The new \code{\link{get_template}}
 #' @md
-#' @deprecate new="get_template" msg="get_template_csf() is deprecated. Use get_template(variant = \"probseg\", label = \"CSF\") instead."
 #' @keywords internal
 #' @export
 get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1, 
@@ -1035,7 +1068,7 @@ get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get Gray Matter Probability Map (DEPRECATED)
 #'
 #' @description
-#' [DEPRECATED] Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
+#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
 #'
 #' Convenience function to get gray matter probability map.
 #'
@@ -1043,7 +1076,6 @@ get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @return A NeuroVol object containing the gray matter probability map
 #' @seealso The new \code{\link{get_template}}
 #' @md
-#' @deprecate new="get_template" msg="get_template_gm() is deprecated. Use get_template(variant = \"probseg\", label = \"GM\") instead."
 #' @keywords internal
 #' @export
 get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1, 
@@ -1060,7 +1092,7 @@ get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get White Matter Probability Map (DEPRECATED)
 #'
 #' @description
-#' [DEPRECATED] Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
+#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
 #'
 #' Convenience function to get white matter probability map.
 #'
@@ -1068,7 +1100,6 @@ get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @return A NeuroVol object containing the white matter probability map
 #' @seealso The new \code{\link{get_template}}
 #' @md
-#' @deprecate new="get_template" msg="get_template_wm() is deprecated. Use get_template(variant = \"probseg\", label = \"WM\") instead."
 #' @keywords internal
 #' @export
 get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1, 
@@ -1505,7 +1536,7 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 #'   a `NeuroVol` is obtained, its space is extracted via `neuroim2::space()`. 
 #'   Returns `NULL` or stops on error if resolution fails.
 #' @keywords internal
-#' @importFrom neuroim2 is.NeuroVol is.NeuroSpace space
+#' @importFrom neuroim2 space
 .resolve_template_input <- function(input, target_type = "NeuroVol", api_handle = NULL) {
   if (!target_type %in% c("NeuroVol", "NeuroSpace")) {
     stop("'target_type' must be either 'NeuroVol' or 'NeuroSpace'.")
@@ -1513,9 +1544,9 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 
   resolved_vol <- NULL
 
-  if (neuroim2::is.NeuroVol(input)) {
+  if (inherits(input, "NeuroVol")) {
     resolved_vol <- input
-  } else if (neuroim2::is.NeuroSpace(input)) {
+  } else if (inherits(input, "NeuroSpace")) {
     if (target_type == "NeuroSpace") {
       return(input) # Already correct type
     } else { # target_type == "NeuroVol"
@@ -1551,7 +1582,7 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
     stop("Failed to obtain a NeuroVol from the provided input.")
   }
   
-  if (!neuroim2::is.NeuroVol(resolved_vol)){
+  if (!inherits(resolved_vol, "NeuroVol")){
       stop("Resolution of input did not result in a NeuroVol object as expected.")
   }
 

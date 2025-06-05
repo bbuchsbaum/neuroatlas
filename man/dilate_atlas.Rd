@@ -10,7 +10,10 @@ dilate_atlas(atlas, mask, radius = 4, maxn = 50)
 \item{atlas}{An object of class "atlas" containing the parcellation to be dilated}
 
 \item{mask}{A binary mask (NeuroVol object) specifying valid voxels for dilation.
-Dilation will only occur within non-zero mask values.}
+Dilation will only occur within non-zero mask values.
+Can also be a character string representing a TemplateFlow space ID (e.g., "MNI152NLin2009cAsym"),
+in which case the corresponding standard brain mask will be fetched from TemplateFlow.
+Alternatively, can be a list of arguments to pass to `neuroatlas::get_template` to fetch a specific mask.}
 
 \item{radius}{Numeric. The maximum distance (in voxels) to search for neighboring
 parcels when dilating. Default: 4}
@@ -45,14 +48,11 @@ neighbor searches in 3D space.
 # Load an atlas
 atlas <- get_aseg_atlas()
 
-# Create a brain mask
-mask <- create_brain_mask(atlas)
-
-# Dilate parcels by 4 voxels
-dilated <- dilate_atlas(atlas, mask, radius = 4)
+# Use TemplateFlow brain mask
+dilated <- dilate_atlas(atlas, "MNI152NLin2009cAsym", radius = 4)
 
 # More conservative dilation with fewer neighbors
-dilated_conservative <- dilate_atlas(atlas, mask, radius = 2, maxn = 20)
+dilated_conservative <- dilate_atlas(atlas, "MNI152NLin2009cAsym", radius = 2, maxn = 20)
 }
 
 }
@@ -63,5 +63,5 @@ dimensional data. IEEE Transactions on Pattern Analysis and Machine Intelligence
 36(11), 2227-2240.
 }
 \seealso{
-\code{\link{create_brain_mask}} for creating appropriate masks
+\code{\link{get_template_brainmask}} for creating appropriate masks from TemplateFlow
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{get_template_probseg}
 \alias{get_template_probseg}
-\title{Get Tissue Probability Map from Template}
+\title{Get Tissue Probability Map from Template (DEPRECATED)}
 \usage{
 get_template_probseg(
   name = "MNI152NLin2009cAsym",
@@ -14,7 +14,7 @@ get_template_probseg(
 \arguments{
 \item{name}{Character string specifying template name. Default: "MNI152NLin2009cAsym"}
 
-\item{label}{Character string specifying tissue type ("GM", "WM", or "CSF")}
+\item{label}{Character string specifying tissue type ("GM", "WM", or "CSF"). Default: "GM"}
 
 \item{resolution}{Numeric resolution in mm. Default: 1}
 
@@ -24,5 +24,11 @@ get_template_probseg(
 A NeuroVol object containing the probability map
 }
 \description{
+\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
+
 Retrieves probability maps for different tissue types (GM, WM, CSF).
 }
+\seealso{
+The new \code{\link{get_template}}
+}
+\keyword{internal}

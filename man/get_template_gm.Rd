@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{get_template_gm}
 \alias{get_template_gm}
-\title{Get Gray Matter Probability Map}
+\title{Get Gray Matter Probability Map (DEPRECATED)}
 \usage{
 get_template_gm(
   name = "MNI152NLin2009cAsym",
@@ -21,5 +21,11 @@ get_template_gm(
 A NeuroVol object containing the gray matter probability map
 }
 \description{
+\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
+
 Convenience function to get gray matter probability map.
 }
+\seealso{
+The new \code{\link{get_template}}
+}
+\keyword{internal}
