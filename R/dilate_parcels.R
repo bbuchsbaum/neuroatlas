@@ -96,8 +96,9 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     assertthat::assert_that(maxn > 0,
                             msg = "`maxn` must be positive")
 
-    # Convert the atlas to a dense array
-    atlas2 <- neuroim2::as.dense(atlas$atlas)
+    # Convert the atlas volume to a dense array
+    atlas_vol <- .get_atlas_volume(atlas)
+    atlas2 <- neuroim2::as.dense(atlas_vol)
 
     # Identify the indices of labeled voxels and mask voxels
     atlas_idx <- which(atlas2 > 0)
@@ -173,7 +174,7 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
 
     # Check that we haven't introduced any labels not present in label_map
     unique_labels <- unique(atlas2[atlas2 != 0])
-    missing_labels <- setdiff(unique_labels, unlist(atlas$atlas@label_map))
+    missing_labels <- setdiff(unique_labels, unlist(atlas_vol@label_map))
     if (length(missing_labels) > 0) {
         stop(sprintf(
             "Found labels in dilated atlas that are not in label_map: %s",
@@ -185,7 +186,7 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     dilated_vol <- neuroim2::ClusteredNeuroVol(
         mask    = as.logical(atlas2),
         clusters = atlas2[atlas2 != 0],
-        label_map = atlas$atlas@label_map
+        label_map = atlas_vol@label_map
     )
 
     # Now return an atlas object (with the same fields/classes as the input).
