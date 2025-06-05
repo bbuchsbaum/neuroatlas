@@ -235,6 +235,11 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
     stop("Could not determine the ROI definition volume from the input 'atlas' object. Expected a NeuroVol in element 'atlas$atlas' or 'atlas$data'.")
   }
 
+  # --- Ensure data_vol and ROI definition share dimensions ---
+  if (!all(dim(data_vol) == dim(roi_definition_vol))) {
+    stop("The dimensions of 'data_vol' and the ROI definition volume do not match.")
+  }
+
   # --- Extract data using neuroim2::extract_roi_data ---
   extracted_values <- neuroim2::extract_roi_data(data_vol, roi_definition_vol, fun = stat_func, ...)
 
