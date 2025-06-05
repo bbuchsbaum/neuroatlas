@@ -5,35 +5,35 @@
 print.atlas <- function(x, ...) {
   # Header
   cat(cli::rule(left = crayon::bold("Atlas Summary"), col = "cyan", width = 60), "\n\n")
-  
+
   # Basic info
-  cat(crayon::blue(cli::symbol$pointer), " ", 
+  cat(crayon::blue(cli::symbol$pointer), " ",
       crayon::bold("Name:   "), crayon::white(x$name), "\n", sep="")
-  
+
   # Volume info
   dims <- dim(x$atlas)
   cat(crayon::blue(cli::symbol$pointer), " ",
-      crayon::bold("Dimensions: "), 
+      crayon::bold("Dimensions: "),
       crayon::white(paste0(dims[1], " x ", dims[2], " x ", dims[3])), "\n", sep="")
-  
+
   # Region counts
   cat(crayon::blue(cli::symbol$pointer), " ",
-      crayon::bold("Regions: "), 
+      crayon::bold("Regions: "),
       crayon::green(length(x$ids)), "\n", sep="")
-  
+
   # Hemisphere breakdown
   left_count <- sum(x$hemi == "left", na.rm=TRUE)
   right_count <- sum(x$hemi == "right", na.rm=TRUE)
   bilateral_count <- sum(is.na(x$hemi))
-  
+
   cat("\n", crayon::bold("Structure Distribution:"), "\n", sep="")
-  cat(crayon::red("|-"), " Left hemisphere:     ", 
+  cat(crayon::red("|-"), " Left hemisphere:     ",
       crayon::white(left_count), "\n", sep="")
-  cat(crayon::red("|-"), " Right hemisphere:    ", 
+  cat(crayon::red("|-"), " Right hemisphere:    ",
       crayon::white(right_count), "\n", sep="")
-  cat(crayon::red("\\-"), " Bilateral/Midline:   ", 
+  cat(crayon::red("\\-"), " Bilateral/Midline:   ",
       crayon::white(bilateral_count), "\n", sep="")
-  
+
   # Footer
   cat("\n", cli::rule(col = "cyan", width = 60), "\n", sep="")
 }
@@ -136,15 +136,15 @@ merge_atlases <- function(atlas1, atlas2) {
   # Handle different atlas types
   if (inherits(atlas1$atlas, "ClusteredNeuroVol")) {
     # For ClusteredNeuroVol, we need to reconstruct the full volume
-    atlmerged <- neuroim2::NeuroVol(array(0, dim=dim(atlas1$atlas)), 
+    atlmerged <- neuroim2::NeuroVol(array(0, dim=dim(atlas1$atlas)),
                                     space=neuroim2::space(atlas1$atlas))
     # Fill in the cluster values
     atlmerged[atlas1$atlas != 0] <- atlas1$atlas[atlas1$atlas != 0]
   } else {
-    atlmerged <- neuroim2::NeuroVol(as.numeric(as.vector(atlas1$atlas)), 
+    atlmerged <- neuroim2::NeuroVol(as.numeric(as.vector(atlas1$atlas)),
                                     space=neuroim2::space(atlas1$atlas))
   }
-  
+
   # Create mapping for atlas2 values
   # We need to map each unique value in atlas2 to a new value that doesn't conflict with atlas1
   atl2 <- atlas2$atlas
@@ -160,19 +160,19 @@ merge_atlases <- function(atlas1, atlas2) {
     as.vector(atl2)
   }
   atl2_vals <- sort(unique(as.vector(atl2_data[atl2_data != 0])))
-  
+
   # Create a remapping - shift all atlas2 values to come after atlas1's max ID
   max_atlas1_id <- max(atlas1$ids)
   remap <- list()
   shifted_ids <- atlas2$ids  # Start with original IDs
-  
+
   # Create mapping for each unique value in atlas2
   for (i in seq_along(atl2_vals)) {
     old_val <- atl2_vals[i]
     new_val <- max_atlas1_id + i
     remap[[as.character(old_val)]] <- new_val
   }
-  
+
   # Update shifted_ids based on the remapping
   for (i in seq_along(atlas2$ids)) {
     old_id <- atlas2$ids[i]
@@ -180,7 +180,7 @@ merge_atlases <- function(atlas1, atlas2) {
       shifted_ids[i] <- remap[[as.character(old_id)]]
     }
   }
-  
+
   # Apply the remapping to atlas2
   atl2_remapped <- atl2
   if (inherits(atl2_remapped, "NeuroVol")) {
@@ -200,7 +200,7 @@ merge_atlases <- function(atlas1, atlas2) {
       atl2_remapped[atl2_remapped == as.numeric(old_val)] <- remap[[old_val]]
     }
   }
-  
+
   # Merge the remapped atlas2 into atlmerged
   if (inherits(atlmerged, "NeuroVol") && inherits(atl2_remapped, "NeuroVol")) {
     # Extract data, modify, and recreate
@@ -213,7 +213,7 @@ merge_atlases <- function(atlas1, atlas2) {
     # For regular arrays
     atlmerged[atl2_remapped != 0] <- atl2_remapped[atl2_remapped != 0]
   }
-  
+
   # Get unique cluster values from the merged atlas
   if (inherits(atlmerged, "NeuroVol")) {
     atlmerged_data <- atlmerged[,,]
@@ -221,26 +221,26 @@ merge_atlases <- function(atlas1, atlas2) {
   } else {
     unique_clusters <- sort(unique(atlmerged[atlmerged != 0]))
   }
-  
+
   # Create a LogicalNeuroVol mask from the merged atlas
   mask <- neuroim2::LogicalNeuroVol(atlmerged != 0, space=neuroim2::space(atlmerged))
-  
+
   # Get unique cluster values from the merged atlas (excluding 0)
   cluster_values <- atlmerged[atlmerged != 0]
   unique_clusters <- sort(unique(as.vector(cluster_values)))
-  
+
   # Skip label_map since it causes issues with duplicate labels
   # The atlas object already maintains the mapping between IDs and labels
   atlmerged <- neuroim2::ClusteredNeuroVol(mask=mask,
                                            clusters=cluster_values)
-                                           
-  
+
+
 
   ret <- list(
     name=paste0(atlas1$name,"::", atlas2$name),
     atlas=atlmerged,
     cmap=rbind(atlas1$cmap, atlas2$cmap),
-    ids=c(atlas1$ids, shifted_ids),
+    ids=c(atlas1$ids, atlas2$ids + max(atlas1$ids)),
     labels=c(atlas1$labels, atlas2$labels),
     orig_labels=c(atlas1$orig_labels, atlas2$orig_labels),
     hemi=c(atlas1$hemi, atlas2$hemi)
@@ -258,7 +258,7 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
   if (!is.null(label) && !is.null(id)) {
     stop("must supply one of 'id' or 'label' but not both")
   }
-  
+
   if (is.null(label) && is.null(id)) {
     stop("must supply either 'id' or 'label'")
   }
@@ -312,7 +312,12 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
   # --- Determine ROI definition volume from 'atlas' ---
   roi_definition_vol <- .get_atlas_volume(atlas)
 
-  # --- Ensure data_vol and ROI definition share spatial dimensions ---
+  # --- Ensure data_vol and ROI definition share dimensions ---
+  if (!all(dim(data_vol) == dim(roi_definition_vol))) {
+    stop("The dimensions of 'data_vol' and the ROI definition volume do not match.")
+  }
+
+  # Check that dimensions match
   atlas_dims <- dim(roi_definition_vol)[1:3]
   data_dims <- dim(data_vol)[1:3]
   if (!all(atlas_dims == data_dims)) {
@@ -330,6 +335,7 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
   roi_labels <- sort(unique(as.vector(roi_vol_data)))
   roi_labels <- roi_labels[roi_labels != 0]
 
+  # Extract values for each ROI
   if (inherits(data_vol, "NeuroVol")) {
     # 3D data -> single row with one column per ROI
     data_vol_data <- data_vol[,,]
@@ -351,10 +357,13 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
 
     for (i in seq_along(roi_labels)) {
       label <- roi_labels[i]
-      mask <- roi_vol_data == label
-      for (t in seq_len(nvol)) {
-        vol_t <- data_vol[,,, t]
-        roi_data <- vol_t[mask]
+      mask <- as.logical(roi_vol_data == label)
+
+      # Extract time series for this ROI
+      for (t in 1:nvol) {
+        vol_t <- data_vol[,,,t]
+        # Convert mask to array indices for subsetting
+        roi_data <- vol_t[which(mask)]
         if (length(roi_data) > 0) {
           extracted_values[t, i] <- stat_func(roi_data, ...)
         } else {
