@@ -312,16 +312,11 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
   # --- Determine ROI definition volume from 'atlas' ---
   roi_definition_vol <- .get_atlas_volume(atlas)
 
-  # --- Ensure data_vol and ROI definition share dimensions ---
-  if (!all(dim(data_vol) == dim(roi_definition_vol))) {
-    stop("The dimensions of 'data_vol' and the ROI definition volume do not match.")
-  }
-  
-  # Check that dimensions match
+  # --- Ensure data_vol and ROI definition share spatial dimensions ---
   atlas_dims <- dim(roi_definition_vol)[1:3]
   data_dims <- dim(data_vol)[1:3]
   if (!all(atlas_dims == data_dims)) {
-    stop("Dimensions of atlas (", paste(atlas_dims, collapse="x"), 
+    stop("Dimensions of atlas (", paste(atlas_dims, collapse="x"),
          ") do not match dimensions of data volume (", paste(data_dims, collapse="x"), ")")
   }
 
@@ -377,32 +372,35 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
     stop("data_vol must be a NeuroVol or NeuroVec object")
   }
 
-  label_names <- NULL
+  id_to_label <- NULL
   if (!is.null(atlas$orig_labels)) {
-    label_names <- atlas$orig_labels
+    id_to_label <- setNames(as.character(atlas$orig_labels), atlas$ids)
   } else if (!is.null(atlas$labels)) {
-    label_names <- atlas$labels
+    id_to_label <- setNames(as.character(atlas$labels), atlas$ids)
   }
 
-  if (!is.null(label_names)) {
-    if (is.vector(extracted_values)) {
-      names(extracted_values) <- label_names
-    } else if (is.matrix(extracted_values)) {
-      colnames(extracted_values) <- label_names
-    }
+  region_labels <- NULL
+  if (!is.null(id_to_label)) {
+    region_labels <- id_to_label[as.character(roi_labels)]
   }
 
   # --- Convert to tibble ---
   if (is.vector(extracted_values)) {
-    # For 3D data, return a tibble with region_id and value columns
+    # For 3D data, return a tibble with region id/label and value columns
     result_tibble <- tibble::tibble(
-      region_id = as.numeric(names(extracted_values)),
+      region_id = roi_labels,
       value = as.numeric(extracted_values)
     )
+    if (!is.null(region_labels)) {
+      result_tibble <- tibble::add_column(result_tibble, label = region_labels, .after = "region_id")
+    }
   } else if (is.matrix(extracted_values)) {
     # For 4D data, return a tibble with time as rows and regions as columns
-    # Add column names before converting to tibble
-    colnames(extracted_values) <- paste0("V", 1:ncol(extracted_values))
+    if (!is.null(region_labels)) {
+      colnames(extracted_values) <- region_labels
+    } else {
+      colnames(extracted_values) <- as.character(roi_labels)
+    }
     result_tibble <- tibble::as_tibble(extracted_values)
     result_tibble <- tibble::add_column(result_tibble, time = 1:nrow(result_tibble), .before = TRUE)
   } else {
