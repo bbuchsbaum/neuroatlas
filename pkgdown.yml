@@ -4,7 +4,4 @@ pkgdown_sha: ~
 articles:
   neuroatlas-overview: neuroatlas-overview.html
   working-with-templateflow: working-with-templateflow.html
-last_built: 2025-06-06T02:34Z
-urls:
-  reference: https://bbuchsbaum.github.io/neuroatlas/reference
-  article: https://bbuchsbaum.github.io/neuroatlas/articles
+last_built: 2025-06-06T02:45Z
