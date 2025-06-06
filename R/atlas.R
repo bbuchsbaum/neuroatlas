@@ -299,7 +299,7 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
 #'
 #' @export
 #' @method reduce_atlas atlas
-reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
+reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
 
   # --- Input Validation ---
   if (!methods::is(data_vol, "NeuroVol") && !methods::is(data_vol, "NeuroVec")) {
@@ -398,12 +398,41 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ...) {
     }
   }
 
+  # --- Determine output format ---
+  if (is.null(format)) {
+    # Default: long for NeuroVol, wide for NeuroVec
+    format <- if (inherits(data_vol, "NeuroVol")) "long" else "wide"
+  }
+  
+  format <- match.arg(format, c("wide", "long"))
+  
   # --- Convert to tibble ---
-  if (nrow(extracted_values) == 1) {
-    result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
+  if (format == "wide") {
+    # Wide format (current behavior)
+    if (nrow(extracted_values) == 1) {
+      result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
+    } else {
+      result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
+      result_tibble <- tibble::add_column(result_tibble, time = seq_len(nrow(result_tibble)), .before = TRUE)
+    }
   } else {
-    result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
-    result_tibble <- tibble::add_column(result_tibble, time = seq_len(nrow(result_tibble)), .before = TRUE)
+    # Long format
+    if (nrow(extracted_values) == 1) {
+      # NeuroVol: region, value
+      result_tibble <- tibble::tibble(
+        region = colnames(extracted_values),
+        value = as.numeric(extracted_values[1, ])
+      )
+    } else {
+      # NeuroVec: time, region, value
+      long_data <- expand.grid(
+        time = seq_len(nrow(extracted_values)),
+        region = colnames(extracted_values),
+        stringsAsFactors = FALSE
+      )
+      long_data$value <- as.numeric(t(extracted_values))
+      result_tibble <- tibble::as_tibble(long_data)
+    }
   }
 
   return(result_tibble)

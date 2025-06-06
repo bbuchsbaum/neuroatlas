@@ -65,9 +65,15 @@ map_atlas <- function(x, vals, thresh, ...) {
 #' @param stat_func The function to apply to the data within each ROI (e.g., \code{mean},
 #'   \code{sd}, \code{sum}).
 #' @param ... Additional arguments passed to \code{stat_func}.
+#' @param format Character string specifying output format: "wide" or "long". 
+#'   If NULL (default), uses "long" for NeuroVol and "wide" for NeuroVec.
 #'
-#' @return A \code{tibble} with one column per ROI. For \code{NeuroVec} inputs a
-#'   \code{time} column indexes each volume.
+#' @return A \code{tibble} with format depending on the \code{format} parameter:
+#'   \itemize{
+#'     \item \code{"wide"}: Regions as columns. For NeuroVec, rows are time points.
+#'     \item \code{"long"}: Columns are \code{region} and \code{value} (NeuroVol) or 
+#'           \code{time}, \code{region}, and \code{value} (NeuroVec).
+#'   }
 #'
 #' @examples
 #' \dontrun{
@@ -90,6 +96,6 @@ map_atlas <- function(x, vals, thresh, ...) {
 #' \code{\link{get_roi}} for extracting specific regions
 #'
 #' @export
-reduce_atlas <- function(atlas, data_vol, stat_func, ...) {
+reduce_atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
   UseMethod("reduce_atlas")
 }

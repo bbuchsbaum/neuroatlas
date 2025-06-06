@@ -44,13 +44,22 @@ reference:
   contents:
   - create_templateflow
   - get_template
-  - get_volume_template
   - get_surface_template
   - tflow_spaces
   - tflow_files
   - install_templateflow
   - starts_with("get_template_")
   - templates
+  - clear_templateflow_cache
+  - show_templateflow_cache_path
+
+- title: "TemplateFlow S3 Methods"
+  desc: "S3 methods for templateflow objects"
+  contents:
+  - print.templateflow
+  - "$.templateflow"
+  - "[[.templateflow"
+  - names.templateflow
 
 - title: "S3 Methods"
   desc: "S3 methods for atlas objects"

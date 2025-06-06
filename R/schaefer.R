@@ -238,7 +238,7 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' @param smooth Logical. Whether to smooth parcel boundaries after resampling.
 #'   Default: FALSE
 #' @param use_cache Logical. Whether to cache downloaded files. Default: TRUE
-#' @param ... Additional arguments (currently unused, included for consistency 
+#' @param ... Additional arguments (currently unused, included for consistency
 #'   with convenience functions)
 #'
 #' @return A list with classes c("schaefer", "volatlas", "atlas") containing:
@@ -312,17 +312,17 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
                               networks=c("7","17"), resolution=c("1","2"),
                               outspace=NULL, smooth=FALSE, use_cache=TRUE) {
 
-  parcels <- match.arg(as.character(parcels), 
+  parcels <- match.arg(as.character(parcels),
                       choices = c("100","200","300","400","500","600","700","800","900","1000"))
-  networks <- match.arg(as.character(networks), 
+  networks <- match.arg(as.character(networks),
                        choices = c("7","17"))
-  resolution <- match.arg(as.character(resolution), 
+  resolution <- match.arg(as.character(resolution),
                          choices = c("1","2"))
 
   # Resolve outspace if it's not NULL and not already a NeuroSpace (T6.1.4)
   if (!is.null(outspace) && !methods::is(outspace, "NeuroSpace")) {
     message("Attempting to resolve 'outspace' argument via TemplateFlow...")
-    # We need .resolve_template_input to be available. 
+    # We need .resolve_template_input to be available.
     # Assuming it's exported from neuroatlas or accessible.
     # If it's internal, this call would need neuroatlas:::.resolve_template_input
     # For now, assuming it becomes an exported utility or is otherwise accessible.
@@ -334,7 +334,7 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
            "\n'outspace' must be a NeuroSpace object, a TemplateFlow space ID string, or a list of get_template() arguments.")
       return(NULL) # Should be caught by stop
     })
-    
+
     if (is.null(resolved_outspace) || !methods::is(resolved_outspace, "NeuroSpace")) {
         stop("Resolution of 'outspace' did not result in a valid NeuroSpace object.")
     }
@@ -466,7 +466,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
       annot@labels <- annot@labels[-1]
     }
 
-    class(annot) <- c(class(annot), "surf_atlas")
+    #class(annot) <- c(class(annot), "surf_atlas")
     annot
 
   }

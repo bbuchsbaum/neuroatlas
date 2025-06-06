@@ -145,12 +145,22 @@ test_that("network-specific functionality works correctly in Schaefer atlases", 
     space = neuroim2::space(atlas_7net$atlas)
   )
   
-  reduced <- reduce_atlas(atlas_7net, test_data, mean)
+  # Use wide format to maintain backward compatibility with this test
+  reduced <- reduce_atlas(atlas_7net, test_data, mean, format = "wide")
+  
+  # Convert wide format to long format for network summary
+  # Get the values from the reduced tibble (one row, many columns)
+  region_values <- as.numeric(reduced[1, ])
+  
+  # The column names in reduced correspond to atlas orig_labels
+  # We need to match them to get the corresponding network assignments
+  col_indices <- match(colnames(reduced), atlas_7net$orig_labels)
+  region_networks <- atlas_7net$network[col_indices]
   
   # Create network summary
   network_means <- tapply(
-    reduced$value,
-    atlas_7net$network[match(reduced$region_id, atlas_7net$ids)],
+    region_values,
+    region_networks,
     mean,
     na.rm = TRUE
   )
