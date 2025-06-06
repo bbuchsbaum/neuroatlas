@@ -1,5 +1,6 @@
 Package: neuroatlas
 Title: Neuroimaging Atlases and Parcellations
+Language: en-GB
 Version: 0.1.0
 Authors@R: 
     person(given = "Bradley",
