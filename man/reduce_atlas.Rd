@@ -20,11 +20,17 @@ row per time point.}
 \code{sd}, \code{sum}).}
 
 \item{...}{Additional arguments passed to \code{stat_func}.}
-\item{format}{Output format, either \code{"wide"} or \code{"long"}.}
+
+\item{format}{Character string specifying output format: "wide" or "long". 
+If NULL (default), uses "long" for NeuroVol and "wide" for NeuroVec.}
 }
 \value{
-A \code{tibble} with one column per ROI. For \code{NeuroVec} inputs a
-  \code{time} column indexes each volume.
+A \code{tibble} with format depending on the \code{format} parameter:
+  \itemize{
+    \item \code{"wide"}: Regions as columns. For NeuroVec, rows are time points.
+    \item \code{"long"}: Columns are \code{region} and \code{value} (NeuroVol) or 
+          \code{time}, \code{region}, and \code{value} (NeuroVec).
+  }
 }
 \description{
 Applies a summary function to data within each ROI defined by an atlas.

@@ -16,7 +16,7 @@ A character string representing the path to the cache directory.
 \description{
 Returns a path to a neuroatlas-specific cache directory. If the directory
 (or a specified subdirectory) doesn't exist, it will be created.
-This function uses `tools::R_user_dir` to ensure a user-specific, 
+This function uses `tools::R_user_dir` to ensure a user-specific,
 OS-appropriate cache location.
 }
 \keyword{internal}

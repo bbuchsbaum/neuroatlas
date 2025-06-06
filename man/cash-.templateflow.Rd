@@ -15,19 +15,19 @@
 The attribute or method from the Python TemplateFlow API object.
 }
 \description{
-Allows R-native access (via \code{$}) to attributes and methods of the 
+Allows R-native access (via \code{$}) to attributes and methods of the
 underlying Python TemplateFlow API object.
 }
 \examples{
 \dontrun{
   # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) && 
+  if (reticulate::py_available(initialize = TRUE) &&
       reticulate::py_module_available("templateflow")) {
     tf <- create_templateflow()
     # Example: Access the 'get' method (it's a Python function)
-    # print(tf$get) 
+    # print(tf$get)
     # Example: List available templates (calls tf$api$templates())
-    # print(tf$templates()) 
+    # print(tf$templates())
   } else {
     message("Python or templateflow module not available. Skipping example.")
   }

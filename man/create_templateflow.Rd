@@ -9,7 +9,7 @@ create_templateflow(cache_dir = NULL, verbosity = 0, default_template = NULL)
 \arguments{
 \item{cache_dir}{Optional. Path to a directory for caching TemplateFlow downloads.
 If NULL (default), uses a neuroatlas-specific cache directory obtained
-via \code{.neuroatlas_cache_dir("templateflow")}. 
+via \code{.neuroatlas_cache_dir("templateflow")}.
 This will also set the \code{TEMPLATEFLOW_HOME} environment variable for the Python session.}
 
 \item{verbosity}{Optional. An integer for verbosity level (not yet implemented).}
@@ -31,7 +31,7 @@ a gateway to the TemplateFlow Python API and manages configurations.
 \examples{
 \dontrun{
   # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) && 
+  if (reticulate::py_available(initialize = TRUE) &&
       reticulate::py_module_available("templateflow")) {
     tf <- create_templateflow()
     print(tf)

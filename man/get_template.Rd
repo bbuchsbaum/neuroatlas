@@ -73,7 +73,7 @@ Actual R-level path memoisation is now active.}
 `create_templateflow()`. If `NULL` (default), a default instance is created internally.}
 
 \item{...}{Additional arguments passed directly to the Python `templateflow.api.get()` method
-(e.g., `raise_on_empty = TRUE`). This allows specifying any valid TemplateFlow query 
+(e.g., `raise_on_empty = TRUE`). This allows specifying any valid TemplateFlow query
 entity not explicitly listed as a parameter (e.g., `hemi`, `den`).}
 
 \item{template_id}{The main TemplateFlow template identifier for the surface
@@ -118,15 +118,15 @@ The function performs several pre-flight checks:
 
 Caching behavior:
   - This function uses `memoise` to cache the resolved file paths from TemplateFlow at the R level for the current session.
-  - The underlying Python TemplateFlow library also maintains its own disk cache, typically configured via the 
+  - The underlying Python TemplateFlow library also maintains its own disk cache, typically configured via the
     `TEMPLATEFLOW_HOME` environment variable (which this package helps manage).
 }
 \examples{
 \dontrun{
   # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) && 
+  if (reticulate::py_available(initialize = TRUE) &&
       reticulate::py_module_available("templateflow")) {
-    
+
     # Get default MNI T1w brain template (scalar call)
     mni_brain <- get_template()
     print(mni_brain)
@@ -147,9 +147,9 @@ Caching behavior:
     # print(mni_probsegs$GM)
 
     # Path only example with vectorization
-    # mni_mask_paths <- get_template(space = "MNI152NLin2009cAsym", 
-    #                              variant = "mask", 
-    #                              resolution = c(1,2), 
+    # mni_mask_paths <- get_template(space = "MNI152NLin2009cAsym",
+    #                              variant = "mask",
+    #                              resolution = c(1,2),
     #                              path_only = TRUE)
     # print(mni_mask_paths)
 

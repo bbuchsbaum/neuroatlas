@@ -59,6 +59,7 @@ Access standardized neuroimaging templates:
 Useful links:
 \itemize{
   \item \url{https://github.com/bbuchsbaum/neuroatlas}
+  \item \url{https://bbuchsbaum.github.io/neuroatlas/}
   \item Report bugs at \url{https://github.com/bbuchsbaum/neuroatlas/issues}
 }
 

@@ -213,7 +213,7 @@ Default: FALSE}
 
 \item{use_cache}{Logical. Whether to cache downloaded files. Default: TRUE}
 
-\item{...}{Additional arguments (currently unused, included for consistency 
+\item{...}{Additional arguments (currently unused, included for consistency
 with convenience functions)}
 }
 \value{

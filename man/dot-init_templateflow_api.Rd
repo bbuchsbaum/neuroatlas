@@ -19,7 +19,7 @@ Invisibly returns the TemplateFlow S3 object.
 \description{
 Establishes connection to the Python TemplateFlow API via reticulate.
 Stores the API handle and cache path in an internal environment.
-It also sets the TEMPLATEFLOW_HOME environment variable to ensure the 
+It also sets the TEMPLATEFLOW_HOME environment variable to ensure the
 Python library uses the neuroatlas-managed cache directory.
 }
 \keyword{internal}

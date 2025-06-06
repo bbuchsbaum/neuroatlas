@@ -19,10 +19,10 @@ Python TemplateFlow API object.
 \examples{
 \dontrun{
   # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) && 
+  if (reticulate::py_available(initialize = TRUE) &&
       reticulate::py_module_available("templateflow")) {
     tf <- create_templateflow()
-    # print(names(tf)) 
+    # print(names(tf))
   } else {
     message("Python or templateflow module not available. Skipping example.")
   }
