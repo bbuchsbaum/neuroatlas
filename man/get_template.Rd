@@ -48,7 +48,7 @@ This is used to infer \code{suffix} if not explicitly provided.}
 fsaverage variants (e.g., "06" for fsaverage6, which is `tpl-fsaverage_res-06...`).
 Passed as `resolution` to `get_template`.}
 
-\item{cohort}{Character string. Optional cohort identifier (e.g., \code{" अधोक्षज"}).}
+\item{cohort}{Character string. Optional cohort identifier (e.g., \code{"adhokshaj"}).}
 
 \item{desc}{Character string. Specific TemplateFlow \code{desc} field. If provided, this overrides
 any \code{desc} inferred from \code{variant}.}

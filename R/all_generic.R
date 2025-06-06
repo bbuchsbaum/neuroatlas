@@ -95,6 +95,8 @@ map_atlas <- function(x, vals, thresh, ...) {
 #' \code{\link{map_atlas}} for mapping values to atlas regions,
 #' \code{\link{get_roi}} for extracting specific regions
 #'
+#' @importFrom stats setNames
+#'
 #' @export
 reduce_atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
   UseMethod("reduce_atlas")

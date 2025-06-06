@@ -468,7 +468,7 @@ names.templateflow <- function(x) {
 #'   Supported: \code{"T1w"} (default), \code{"T2w"}, \code{"mask"} (often used with \code{variant="mask"}).
 #'   This is used to infer \code{suffix} if not explicitly provided.
 #' @param resolution Numeric or character. The resolution of the template in mm (e.g., \code{1}, \code{2}, \code{"1"}, \code{"01"}). Default: \code{1}.
-#' @param cohort Character string. Optional cohort identifier (e.g., \code{" अधोक्षज"}).
+#' @param cohort Character string. Optional cohort identifier (e.g., \code{"adhokshaj"}).
 #' @param desc Character string. Specific TemplateFlow \code{desc} field. If provided, this overrides
 #'   any \code{desc} inferred from \code{variant}.
 #' @param label Character string. Specific TemplateFlow \code{label} field (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"} for \code{variant="probseg"} or \code{variant="dseg"}).
