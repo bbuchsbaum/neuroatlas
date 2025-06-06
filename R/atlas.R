@@ -297,6 +297,8 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
 #' time point is summarised separately and a \code{time} column is added to the
 #' tibble.
 #'
+#' @importFrom stats setNames
+#'
 #' @export
 #' @method reduce_atlas atlas
 reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {

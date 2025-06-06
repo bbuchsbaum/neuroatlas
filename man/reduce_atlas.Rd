@@ -5,9 +5,9 @@
 \alias{reduce_atlas.atlas}
 \title{Reduce a NeuroVol or NeuroVec by an Atlas}
 \usage{
-reduce_atlas(atlas, data_vol, stat_func, ...)
+reduce_atlas(atlas, data_vol, stat_func, ..., format = NULL)
 
-\method{reduce_atlas}{atlas}(atlas, data_vol, stat_func, ...)
+\method{reduce_atlas}{atlas}(atlas, data_vol, stat_func, ..., format = NULL)
 }
 \arguments{
 \item{atlas}{An atlas object or another object for which a method is defined.}
@@ -20,6 +20,7 @@ row per time point.}
 \code{sd}, \code{sum}).}
 
 \item{...}{Additional arguments passed to \code{stat_func}.}
+\item{format}{Output format, either \code{"wide"} or \code{"long"}.}
 }
 \value{
 A \code{tibble} with one column per ROI. For \code{NeuroVec} inputs a

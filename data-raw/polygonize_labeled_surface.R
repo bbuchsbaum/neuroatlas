@@ -8,18 +8,18 @@ library(rgl)
 library(here)
 library(tidyverse)
 
-setwd(paste0(here::here(), "/data-raw"))
+data_raw_dir <- here::here("data-raw")
 
 nparcels <- 600
 buffer_dist <- 1
 
-geometry_lh = neurosurf::read_surf("fsaverage6/lh.inflated")
-geometry_rh = neurosurf::read_surf("fsaverage6/rh.inflated")
+geometry_lh <- neurosurf::read_surf("fsaverage6/lh.inflated")
+geometry_rh <- neurosurf::read_surf("fsaverage6/rh.inflated")
 
-annot_lh=neurosurf::read_freesurfer_annot(
+annot_lh <- neurosurf::read_freesurfer_annot(
   paste0("Schaefer-yeo/lh.Schaefer2018_", nparcels, "Parcels_17Networks_order.annot"), geometry_lh)
 
-annot_rh=neurosurf::read_freesurfer_annot(
+annot_rh <- neurosurf::read_freesurfer_annot(
   paste0("Schaefer-yeo/rh.Schaefer2018_", nparcels, "Parcels_17Networks_order.annot"), geometry_rh)
 
 
