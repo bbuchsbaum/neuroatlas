@@ -4,25 +4,42 @@
 \alias{install_templateflow}
 \title{Install Templateflow Python package}
 \usage{
-install_templateflow(method = "auto", conda = "auto")
+install_templateflow(
+  method = "auto",
+  conda = "auto",
+  envname = NULL,
+  force_reinstall = FALSE
+)
 }
 \arguments{
-\item{method}{Installation method passed to
-\code{reticulate::py_install}. Defaults to \code{"auto"}.}
+\item{method}{Installation method. Options are "auto" (default), "virtualenv", or "conda".
+Using "virtualenv" is recommended for persistent installations.}
 
 \item{conda}{Path to a conda executable or \code{"auto"} to let
-\code{reticulate} locate one.}
+\code{reticulate} locate one. Only used if method = "conda".}
+
+\item{envname}{Name of the virtual environment. Defaults to "r-neuroatlas" for persistence.}
+
+\item{force_reinstall}{Logical. If TRUE, forces reinstallation even if packages exist.}
 }
 \value{
 Invisible \code{NULL} indicating success.
 }
 \description{
-Installs the Python packages `scipy` and `templateflow` via
-\code{reticulate::py_install}. Use this helper if the Templateflow
-resources are required for fetching templates.
+Installs the Python packages `scipy` and `templateflow` into a persistent
+virtual environment. This ensures the packages remain available across R sessions.
+}
+\details{
+This function creates a persistent Python environment specifically for neuroatlas,
+preventing the need to reinstall TemplateFlow in each R session. The environment
+is stored in a user-specific directory that persists across sessions.
 }
 \examples{
 \donttest{
+# Install with default settings (recommended)
 install_templateflow()
+
+# Force reinstallation
+install_templateflow(force_reinstall = TRUE)
 }
 }

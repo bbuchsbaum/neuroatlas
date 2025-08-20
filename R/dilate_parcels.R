@@ -14,15 +14,13 @@
 #'   \item Respects mask boundaries to prevent dilation into unwanted regions
 #' }
 #'
-#' The function uses a k-d tree implementation (via rflann) for efficient nearest
+#' The function uses a k-d tree implementation (via Rnanoflann) for efficient nearest
 #' neighbor searches in 3D space.
 #'
 #' @param atlas An object of class "atlas" containing the parcellation to be dilated
 #' @param mask A binary mask (NeuroVol object) specifying valid voxels for dilation.
-#'   Dilation will only occur within non-zero mask values.
-#'   Can also be a character string representing a TemplateFlow space ID (e.g., "MNI152NLin2009cAsym"),
-#'   in which case the corresponding standard brain mask will be fetched from TemplateFlow.
-#'   Alternatively, can be a list of arguments to pass to `neuroatlas::get_template` to fetch a specific mask.
+#'   Dilation will only occur within non-zero mask values. Typically a LogicalNeuroVol,
+#'   but can be any NeuroVol that will be converted to logical via as.logical().
 #' @param radius Numeric. The maximum distance (in voxels) to search for neighboring
 #'   parcels when dilating. Default: 4
 #' @param maxn Integer. Maximum number of neighboring voxels to consider when
@@ -37,57 +35,33 @@
 #' # Load an atlas
 #' atlas <- get_aseg_atlas()
 #'
-#' # Use TemplateFlow brain mask
-#' dilated <- dilate_atlas(atlas, "MNI152NLin2009cAsym", radius = 4)
+#' # Create or load a brain mask
+#' mask <- get_template_brainmask()
+#' 
+#' # Dilate the atlas within the mask
+#' dilated <- dilate_atlas(atlas, mask, radius = 4)
 #'
 #' # More conservative dilation with fewer neighbors
-#' dilated_conservative <- dilate_atlas(atlas, "MNI152NLin2009cAsym", radius = 2, maxn = 20)
+#' dilated_conservative <- dilate_atlas(atlas, mask, radius = 2, maxn = 20)
 #' }
 #'
 #' @seealso
 #' \code{\link{get_template_brainmask}} for creating appropriate masks from TemplateFlow
 #'
 #' @references
-#' The algorithm uses the FLANN library for efficient nearest neighbor searches:
-#' Muja, M., & Lowe, D. G. (2014). Scalable nearest neighbor algorithms for high
-#' dimensional data. IEEE Transactions on Pattern Analysis and Machine Intelligence,
-#' 36(11), 2227-2240.
+#' The algorithm uses efficient k-d tree based nearest neighbor searches for
+#' spatial queries in 3D voxel space.
 #'
 #' @importFrom assertthat assert_that
 #' @importFrom neuroim2 index_to_coord index_to_grid ClusteredNeuroVol
-#' @importFrom rflann RadiusSearch
+#' @importFrom Rnanoflann nn
 #' @export
 dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
-    # --- Resolve mask input --- 
-    if (!inherits(mask, "NeuroVol")) {
-        resolved_mask_arg <- NULL
-        if (is.character(mask) && length(mask) == 1) {
-            message("Interpreting 'mask' string \"", mask, "\" as a request for its standard brain mask from TemplateFlow.")
-            # Prepare args for get_template to fetch the brain mask for the given space ID
-            resolved_mask_arg <- list(space = mask, variant = "mask") 
-        } else if (is.list(mask)) {
-            message("Interpreting 'mask' list as TemplateFlow parameters.")
-            resolved_mask_arg <- mask
-        } else {
-            stop("`mask` must be a NeuroVol object, a TemplateFlow space ID string, or a list of TemplateFlow parameters for get_template.")
-        }
-
-        mask <- tryCatch({
-            # Ensure .resolve_template_input is accessible. If in same package, neuroatlas::: might not be needed
-            # but for clarity during dev or if it's not exported, using it.
-            # Assuming .resolve_template_input is available in the package's namespace.
-            .resolve_template_input(resolved_mask_arg, target_type = "NeuroVol")
-        }, error = function(e) {
-            query_str <- paste(names(resolved_mask_arg), sapply(resolved_mask_arg, function(x) if(is.list(x)) "<list>" else as.character(x)), sep="=", collapse=", ")
-            stop(paste0("Failed to resolve 'mask' (", query_str, ") to a NeuroVol via TemplateFlow: ", conditionMessage(e)))
-        })
-    }
-
     # Validate inputs
     assertthat::assert_that(inherits(atlas, "atlas"),
                             msg = "`atlas` arg must be an atlas")
-    assertthat::assert_that(inherits(mask, "NeuroVol"), # This now checks the resolved mask
-                            msg = "`mask` must be a NeuroVol object or a valid TemplateFlow specifier that resolves to one.")
+    assertthat::assert_that(inherits(mask, "NeuroVol"),
+                            msg = "`mask` must be a NeuroVol object")
     assertthat::assert_that(radius > 0,
                             msg = "`radius` must be positive")
     assertthat::assert_that(maxn > 0,
@@ -123,20 +97,74 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     cd_atlas <- neuroim2::index_to_coord(mask, atlas_idx)
     cd_diff <- neuroim2::index_to_coord(mask, diff_idx)
 
-    # Perform neighbor search for unlabeled (diff) voxels within the specified radius
-    ret <- rflann::RadiusSearch(cd_diff, cd_atlas, radius = radius, max_neighbour = maxn)
+    # Get voxel dimensions to scale radius appropriately
+    voxel_dims <- neuroim2::spacing(mask)
+    # Scale radius by the minimum voxel dimension to get appropriate search radius in mm
+    search_radius <- radius * min(voxel_dims)
 
-    # Indices of points that have any neighbors
-    qlen <- sapply(ret$indices, length)
-    valid_queries <- which(qlen > 0)
+    # For very large point sets, process in chunks to avoid memory issues
+    chunk_size <- 10000
+    n_diff <- nrow(cd_diff)
+    
+    if (n_diff > chunk_size) {
+        # Process in chunks
+        all_indices <- list()
+        all_distances <- list()
+        
+        for (start in seq(1, n_diff, by = chunk_size)) {
+            end <- min(start + chunk_size - 1, n_diff)
+            chunk_points <- cd_diff[start:end, , drop = FALSE]
+            
+            chunk_ret <- Rnanoflann::nn(data = cd_atlas, 
+                                       points = chunk_points, 
+                                       k = maxn,
+                                       search = "radius", 
+                                       radius = search_radius,
+                                       sorted = TRUE)
+            
+            all_indices[[length(all_indices) + 1]] <- chunk_ret$indices
+            all_distances[[length(all_distances) + 1]] <- chunk_ret$distances
+        }
+        
+        # Combine results
+        ret <- list(
+            indices = do.call(rbind, all_indices),
+            distances = do.call(rbind, all_distances)
+        )
+    } else {
+        # Process all at once for smaller datasets
+        ret <- Rnanoflann::nn(data = cd_atlas, 
+                              points = cd_diff, 
+                              k = maxn,
+                              search = "radius", 
+                              radius = search_radius,
+                              sorted = TRUE)
+    }
+
+    # The nn() function returns matrices, need to convert to list format
+    # ret$indices is a matrix where each row contains the indices of neighbors
+    # ret$distances is a matrix where each row contains the distances to neighbors
+    
+    # Convert to list format and filter out points with no neighbors
+    # In radius search, points with no neighbors have indices = 0
+    valid_queries <- which(ret$indices[,1] != 0)
+    
     if (length(valid_queries) == 0) {
         # No neighbors for unlabeled voxels, so no change
         return(atlas)
     }
 
-    # Filter neighbor sets to only those with valid neighbors
-    indset <- ret$indices[valid_queries]
-    dset   <- ret$distances[valid_queries]
+    # Convert matrix output to list format for compatibility with existing code
+    indset <- lapply(valid_queries, function(i) {
+        idx <- ret$indices[i,]
+        idx[idx != 0]  # Remove zeros (no neighbor indicators)
+    })
+    
+    dset <- lapply(valid_queries, function(i) {
+        idx <- ret$indices[i,]
+        dist <- ret$distances[i,]
+        dist[idx != 0]  # Keep only valid distances
+    })
 
     # Prepare output: list form, then we rbind later
     out_list <- vector("list", length(valid_queries))

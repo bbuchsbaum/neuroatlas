@@ -81,7 +81,7 @@ get_aseg_atlas <- function(outspace=NULL) {
     "Accumbens",
     "VentralDC")
 
-  hemi=c(rep("left", 4), NA, rep("left", 3), rep("right", 8))
+  hemi=c(rep("left", 4), NA, rep("left", 3), NA, rep("right", 8))
   cmap <- tibble::tribble(
     ~red, ~green, ~blue,
     0,   118, 14,

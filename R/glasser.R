@@ -106,12 +106,23 @@ get_glasser_atlas <- function(outspace=NULL) {
 }
 
 #' @rdname map_atlas
-#' @import ggsegGlasser
 #' @importFrom ggiraph geom_polygon_interactive
 #' @importFrom dplyr left_join mutate
 #' @importFrom tibble tibble
 #' @export
 map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
+  # Check if ggsegGlasser is available
+  if (!requireNamespace("ggsegGlasser", quietly = TRUE)) {
+    stop("Package 'ggsegGlasser' is required for this function but is not installed.\n",
+         "To install it, run:\n",
+         "  remotes::install_github('ggseg/ggsegGlasser')\n",
+         "or use the ggseg r-universe:\n",
+         "  options(repos = c(ggseg = 'https://ggseg.r-universe.dev',\n",
+         "                    CRAN = 'https://cloud.r-project.org'))\n",
+         "  install.packages('ggsegGlasser')",
+         call. = FALSE)
+  }
+  
   fun <- if (pos) identity else abs
   
   ids <- ifelse(x$hemi == "left", 
@@ -120,7 +131,10 @@ map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
   
   ret <- tibble(statistic=vals, region=x$labels, label=ids, hemi=x$hemi)
   
-  rboth <- ggsegGlasser::glasser %>%
+  # Get glasser atlas from ggsegGlasser
+  glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
+  
+  rboth <- glasser_atlas %>%
     as_tibble() %>%
     left_join(ret, by = c("region", "label", "hemi")) %>%
     mutate(statistic=ifelse(fun(.data$statistic) <= thresh[1] | 

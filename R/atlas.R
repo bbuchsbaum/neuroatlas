@@ -290,8 +290,8 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
 }
 
 #' @rdname reduce_atlas
-#' @inheritParams reduce_atlas
 #'
+#' @details
 #' When \code{data_vol} is a 3D \code{NeuroVol}, the returned tibble contains a
 #' single row with one column per ROI. If a 4D \code{NeuroVec} is supplied, each
 #' time point is summarised separately and a \code{time} column is added to the

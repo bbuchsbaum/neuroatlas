@@ -51,8 +51,8 @@ test_that("atlas resampling to TemplateFlow spaces maintains integrity", {
   tiny_space <- neuroim2::NeuroSpace(
     dim = c(10, 10, 10),  # Too small for meaningful atlas
     spacing = c(10, 10, 10),
-    origin = c(0, 0, 0),
-    axes = diag(3)
+    origin = c(0, 0, 0)
+    # axes parameter removed - will use default
   )
 
   atlas_tiny <- get_schaefer_atlas(parcels = "100", networks = "7",

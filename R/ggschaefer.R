@@ -1,5 +1,5 @@
 # Global variables to avoid R CMD check NOTEs
-utils::globalVariables(c("hemi", "orig_label", "hemi.x", "hemi.y"))
+utils::globalVariables(c("hemi", "orig_label", "hemi.x", "hemi.y", "x", "y", "group", "fill", "region", "label"))
 
 #' Get ggseg-Compatible Schaefer Atlas
 #'
@@ -22,18 +22,48 @@ utils::globalVariables(c("hemi", "orig_label", "hemi.x", "hemi.y"))
 #' atlases with 7 or 17 networks and 100-1000 parcels (in steps of 100).
 #'
 #' @importFrom stringr str_extract_all
-#' @import ggsegSchaefer
 #' @export
 get_ggseg_atlas <- function(atlas) {
-  # Extract numbers from the atlas name
+  # Check if ggsegSchaefer is available
+  if (!requireNamespace("ggsegSchaefer", quietly = TRUE)) {
+    stop("Package 'ggsegSchaefer' is required for this function but is not installed.\n",
+         "To install it, run:\n",
+         "  remotes::install_github('LCBC-UiO/ggsegSchaefer')\n",
+         "or use the ggseg r-universe:\n",
+         "  options(repos = c(ggseg = 'https://ggseg.r-universe.dev',\n",
+         "                    CRAN = 'https://cloud.r-project.org'))\n",
+         "  install.packages('ggsegSchaefer')",
+         call. = FALSE)
+  }
+  
+  # Extract numbers from the atlas name (e.g., "Schaefer-100-7networks")
   matches <- stringr::str_extract_all(atlas$name, "\\d+")
   atlas_num <- unlist(matches)
   
+  # Atlas name format is "Schaefer-{parcels}-{networks}networks"
+  # So atlas_num[1] is parcels, atlas_num[2] is networks
+  parcels <- as.numeric(atlas_num[1])
+  networks <- as.numeric(atlas_num[2])
+  
   # Check for valid inputs
-  if ((atlas_num[1] %in% seq(100, 1000, 100)) && (atlas_num[2] %in% c(7, 17))) {
-    atlas_string <- paste0("schaefer", atlas_num[2], "_", atlas_num[1])
+  if ((parcels %in% seq(100, 1000, 100)) && (networks %in% c(7, 17))) {
+    atlas_string <- paste0("schaefer", networks, "_", parcels)
     # Use :: operator to access the object from ggsegSchaefer
-    return(eval(parse(text = paste0("ggsegSchaefer::", atlas_string))))
+    atlas_obj <- tryCatch({
+      # Try multiple ways to access the object
+      if (exists(atlas_string, envir = asNamespace("ggsegSchaefer"))) {
+        get(atlas_string, envir = asNamespace("ggsegSchaefer"))
+      } else if (exists(atlas_string, envir = as.environment("package:ggsegSchaefer"))) {
+        get(atlas_string, envir = as.environment("package:ggsegSchaefer"))
+      } else {
+        # Try using :: operator directly
+        eval(parse(text = paste0("ggsegSchaefer::", atlas_string)))
+      }
+    }, error = function(e) {
+      stop("Failed to load atlas '", atlas_string, "' from ggsegSchaefer: ", e$message,
+           call. = FALSE)
+    })
+    return(atlas_obj)
   } else {
     stop("Invalid atlas name. Must be Schaefer atlas with 7 or 17 networks and 100-1000 parcels.")
   }
@@ -142,9 +172,9 @@ map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
 #' ggseg_schaefer(atlas, vals, thresh=c(-1, 1), interactive=FALSE)
 #' }
 #'
-#' @importFrom ggplot2 aes scale_fill_distiller
+#' @importFrom ggplot2 aes scale_fill_distiller ggplot theme_void coord_fixed
 #' @importFrom ggseg ggseg
-#' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection
+#' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection geom_polygon_interactive
 #' @importFrom scales squish
 #' @export
 ggseg_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE,
@@ -155,14 +185,54 @@ ggseg_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE,
   gatl <- get_ggseg_atlas(atlas)
   gatl$data <- mapped_data
   
-  ggobj <- ggseg::ggseg(
-    atlas = gatl,
-    position = "stacked",
-    colour = "gray",
-    interactive = FALSE,
-    guide = TRUE,
-    mapping = aes(fill = .data$statistic, tooltip = .data$region, data_id = .data$label)
-  ) +
+  # Check if we're using the forked version with interactive support
+  has_interactive_support <- tryCatch({
+    # Try to call ggseg with interactive parameter
+    args <- list(
+      atlas = gatl,
+      position = "stacked",
+      colour = "gray",
+      interactive = interactive,
+      guide = TRUE,
+      mapping = aes(fill = .data$statistic)
+    )
+    
+    # Add interactive aesthetics if using interactive mode
+    if (interactive) {
+      args$mapping <- aes(fill = .data$statistic, tooltip = .data$region, data_id = .data$label)
+    }
+    
+    ggobj <- do.call(ggseg::ggseg, args)
+    TRUE
+  }, error = function(e) {
+    # Fallback for CRAN version without interactive parameter
+    FALSE
+  })
+  
+  if (!has_interactive_support) {
+    # Use CRAN version of ggseg and handle interactivity ourselves
+    base_plot <- ggseg::ggseg(
+      atlas = gatl,
+      position = "stacked",
+      colour = "gray",
+      guide = TRUE,
+      mapping = aes(fill = .data$statistic)
+    )
+    
+    if (interactive) {
+      # Create interactive version manually
+      # We need to modify the ggplot object to use ggiraph geometries
+      ggobj <- .make_ggseg_interactive(base_plot, gatl$data)
+    } else {
+      ggobj <- base_plot
+    }
+  } else {
+    # Using forked version, ggobj is already created above
+    ggobj <- ggobj
+  }
+  
+  # Add color scale
+  ggobj <- ggobj +
     scale_fill_distiller(
       palette = palette,
       limits = lim,
@@ -170,7 +240,8 @@ ggseg_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE,
       oob = scales::squish
     )
   
-  if (interactive) {
+  # Return the plot (already interactive if forked version was used)
+  if (interactive && !has_interactive_support) {
     ggiraph::girafe(
       ggobj = ggobj,
       width_svg = 8,
@@ -191,4 +262,29 @@ ggseg_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE,
   } else {
     ggobj
   }
+}
+
+#' Convert ggseg plot to interactive
+#' @keywords internal
+#' @noRd
+#' @importFrom ggplot2 ggplot_build ggplot_gtable aes
+#' @importFrom ggiraph geom_polygon_interactive
+.make_ggseg_interactive <- function(plot, data) {
+  # This is a simplified approach - recreate the plot with interactive geoms
+  # Extract the plot data
+  plot_data <- ggplot_build(plot)$data[[1]]
+  
+  # Merge with original data to get labels
+  if ("group" %in% names(plot_data) && "group" %in% names(data)) {
+    plot_data <- merge(plot_data, data, by = "group", all.x = TRUE)
+  }
+  
+  # Create new interactive plot
+  ggplot(plot_data, aes(x = .data$x, y = .data$y, group = .data$group)) +
+    geom_polygon_interactive(
+      aes(fill = .data$fill, tooltip = .data$region, data_id = .data$label),
+      colour = "gray"
+    ) +
+    theme_void() +
+    coord_fixed()
 }

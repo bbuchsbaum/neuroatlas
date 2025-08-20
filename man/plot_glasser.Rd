@@ -33,14 +33,16 @@ views, arranged in a 2x2 grid.
 # Basic visualization with uniform coloring
 plot_glasser()
 
-# Create sample data
-vals <- data.frame(
-  label = ggsegGlasser::glasser$data$label,
-  value = rnorm(nrow(ggsegGlasser::glasser$data))
-)
-
-# Plot the data
-plot_glasser(vals)
+# Create sample data (requires ggsegGlasser package)
+if (requireNamespace("ggsegGlasser", quietly = TRUE)) {
+  glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
+  vals <- data.frame(
+    label = glasser_atlas$data$label,
+    value = rnorm(nrow(glasser_atlas$data))
+  )
+  # Plot the data
+  plot_glasser(vals)
+}
 
 # Using a different column name
 vals$intensity <- vals$value

@@ -45,6 +45,16 @@
 #' @return Invisibly returns the TemplateFlow S3 object.
 #' @keywords internal
 .init_templateflow_api <- function(cache_dir = NULL, force_reinit = FALSE) {
+  # Try to use persistent virtual environment if it exists
+  neuroatlas_env <- file.path(tools::R_user_dir("neuroatlas", "config"), "r-reticulate")
+  if (dir.exists(neuroatlas_env)) {
+    tryCatch({
+      reticulate::use_virtualenv(neuroatlas_env, required = FALSE)
+    }, error = function(e) {
+      # Continue with default Python if virtual environment fails
+    })
+  }
+  
   # Determine and set the cache directory first, as it influences TEMPLATEFLOW_HOME
   current_tf_home <- Sys.getenv("TEMPLATEFLOW_HOME")
   target_cache_dir <- ""
@@ -88,17 +98,31 @@
            "Please ensure Python is installed on your system.\n",
            "You can check Python availability with: reticulate::py_available()")
     }
+    
+    # Check if templateflow is available, with helpful error message
     if (!reticulate::py_module_available("templateflow")) {
-      stop("Python module 'templateflow' is not installed.\n",
-           "To install it, run: neuroatlas::install_templateflow()\n",
-           "Or manually: reticulate::py_install('templateflow')")
+      # Check if we're in an ephemeral environment
+      current_env <- tryCatch(reticulate::py_config()$virtualenv, error = function(e) NULL)
+      if (!is.null(current_env) && grepl("ephemeral", current_env)) {
+        stop("Python module 'templateflow' is not installed in the current ephemeral environment.\n",
+             "This is a temporary environment that doesn't persist between R sessions.\n\n",
+             "To fix this permanently, run: neuroatlas::install_templateflow()\n",
+             "This will create a persistent virtual environment for neuroatlas.\n\n",
+             "For a quick temporary fix in this session only, run:\n",
+             "  reticulate::py_install(c('scipy', 'templateflow'))")
+      } else {
+        stop("Python module 'templateflow' is not installed.\n",
+             "To install it, run: neuroatlas::install_templateflow()\n",
+             "This will create a persistent environment to avoid reinstalling each session.")
+      }
     }
+    
     tryCatch({
       .tflow_env$py_api <- reticulate::import("templateflow.api", convert = TRUE)
     }, error = function(e) {
       stop("Failed to import templateflow.api: ", e$message, "\n",
            "This may be due to network issues or corrupted installation.\n",
-           "Try reinstalling with: neuroatlas::install_templateflow()")
+           "Try reinstalling with: neuroatlas::install_templateflow(force_reinstall = TRUE)")
     })
   }
 
@@ -361,13 +385,16 @@ print.templateflow <- function(x, ...) {
 #'   }
 #' }
 `$.templateflow` <- function(x, name) {
+  # Direct access to underlying list structure to avoid recursion
+  base_list <- unclass(x)
+  
   # Special handling for 'api' to avoid infinite recursion
   if (name == "api") {
-    return(x[["api"]])
+    return(base_list[["api"]])
   }
   
-  # Use [[ to access api field to avoid recursion
-  api_obj <- x[["api"]]
+  # Get api object directly from base list
+  api_obj <- base_list[["api"]]
   if (is.null(api_obj)) {
     stop("TemplateFlow API handle is not initialized. Call create_templateflow() again.")
   }
@@ -404,13 +431,18 @@ print.templateflow <- function(x, ...) {
 #'   }
 #' }
 `[[.templateflow` <- function(x, name) {
-  # Direct access to list elements to avoid recursion
-  if (name %in% names(x)) {
-    return(x[[name, exact = TRUE]])
+  # Direct access to underlying list structure to avoid recursion
+  base_list <- unclass(x)
+  
+  # Try to get the element directly - no names() call
+  result <- try(base_list[[name]], silent = TRUE)
+  if (!inherits(result, "try-error")) {
+    # Return the result even if NULL (for "api" field access)
+    return(result)
   }
   
   # For API access, get the api object directly
-  api_obj <- x[["api", exact = TRUE]]
+  api_obj <- base_list[["api"]]
   if (is.null(api_obj)) {
     stop("TemplateFlow API handle is not initialized. Call create_templateflow() again.")
   }
@@ -445,8 +477,10 @@ print.templateflow <- function(x, ...) {
 #'   }
 #' }
 names.templateflow <- function(x) {
-  # Use [[ to access api field to avoid recursion
-  api_obj <- x[["api"]]
+  # Direct access to underlying list structure to avoid recursion
+  base_list <- unclass(x)
+  api_obj <- base_list[["api"]]
+  
   if (is.null(api_obj)) {
     stop("TemplateFlow API handle is not initialized. Call create_templateflow() again.")
   }
@@ -838,8 +872,8 @@ get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
                                   extension=".nii.gz") {
   lifecycle::deprecate_warn(
     when = "0.10.0",
-    what = "get_template_brainmask()",
-    with = "get_template(variant = \"mask\")"
+    what = "get_template_brainmask(name)",
+    with = "get_template()"
   )
   neuroatlas::get_template(space = name, variant = "mask", resolution = resolution,
                            extension = extension)
@@ -863,8 +897,8 @@ get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
                                 resolution=1, extension=".nii.gz") {
   lifecycle::deprecate_warn(
     when = "0.10.0",
-    what = "get_template_probseg()",
-    with = "get_template(variant = \"probseg\", label = ...)"
+    what = "get_template_probseg(name)",
+    with = "get_template()"
   )
   neuroatlas::get_template(space = name, variant = "probseg", label = label,
                            resolution = resolution, extension = extension)
@@ -889,8 +923,8 @@ get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
                                  parcels=400, networks=17, extension=".nii.gz") {
   lifecycle::deprecate_warn(
     when = "0.10.0",
-    what = "get_template_schaefer()",
-    with = "get_template(atlas = \"Schaefer2018\", ...)"
+    what = "get_template_schaefer(name)",
+    with = "get_template()"
   )
   desc_str <- paste0(parcels, "Parcels", networks, "Networks")
   neuroatlas::get_template(space = name, desc = desc_str, atlas = "Schaefer2018",
@@ -939,8 +973,8 @@ get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
                             extension=".nii.gz") {
   lifecycle::deprecate_warn(
     when = "0.10.0",
-    what = "get_template_head()",
-    with = "get_template(variant = \"head\")"
+    what = "get_template_head(name)",
+    with = "get_template()"
   )
   neuroatlas::get_template(space = name, variant = "head", resolution = resolution,
                            extension = extension)
@@ -963,8 +997,8 @@ get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
                             extension=".nii.gz") {
   lifecycle::deprecate_warn(
     when = "0.10.0",
-    what = "get_template_csf()",
-    with = "get_template(variant = \"probseg\", label = \"CSF\")"
+    what = "get_template_csf(name)",
+    with = "get_template()"
   )
   neuroatlas::get_template(space = name, variant = "probseg", label = "CSF",
                            resolution = resolution, extension = extension)
@@ -987,8 +1021,8 @@ get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
                            extension=".nii.gz") {
   lifecycle::deprecate_warn(
     when = "0.10.0",
-    what = "get_template_gm()",
-    with = "get_template(variant = \"probseg\", label = \"GM\")"
+    what = "get_template_gm(name)",
+    with = "get_template()"
   )
   neuroatlas::get_template(space = name, variant = "probseg", label = "GM",
                            resolution = resolution, extension = extension)
@@ -1011,8 +1045,8 @@ get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
                            extension=".nii.gz") {
   lifecycle::deprecate_warn(
     when = "0.10.0",
-    what = "get_template_wm()",
-    with = "get_template(variant = \"probseg\", label = \"WM\")"
+    what = "get_template_wm(name)",
+    with = "get_template()"
   )
   neuroatlas::get_template(space = name, variant = "probseg", label = "WM",
                            resolution = resolution, extension = extension)

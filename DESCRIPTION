@@ -24,8 +24,6 @@ Imports:
     ggiraph,
     ggplot2,
     ggseg,
-    ggsegGlasser,
-    ggsegSchaefer,
     lifecycle,
     magrittr,
     memoise,
@@ -33,7 +31,7 @@ Imports:
     neuroim2,
     neurosurf,
     reticulate,
-    rflann,
+    Rnanoflann,
     scales,
     scico,
     sf,
@@ -46,18 +44,17 @@ Suggests:
     echarts4r,
     geojsonio,
     geojsonsf,
+    ggsegGlasser,
+    ggsegSchaefer,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
 Remotes: 
-    bbuchsbaum/ggseg,
-    bbuchsbaum/neuroim2,
     bbuchsbaum/neurosurf,
     ggseg/ggsegGlasser,
-    ggseg/ggsegSchaefer,
-    YeeJeremy/rflann
+    ggseg/ggsegSchaefer
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB

@@ -24,14 +24,16 @@
 #' # Basic visualization with uniform coloring
 #' plot_glasser()
 #'
-#' # Create sample data
-#' vals <- data.frame(
-#'   label = ggsegGlasser::glasser$data$label,
-#'   value = rnorm(nrow(ggsegGlasser::glasser$data))
-#' )
-#'
-#' # Plot the data
-#' plot_glasser(vals)
+#' # Create sample data (requires ggsegGlasser package)
+#' if (requireNamespace("ggsegGlasser", quietly = TRUE)) {
+#'   glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
+#'   vals <- data.frame(
+#'     label = glasser_atlas$data$label,
+#'     value = rnorm(nrow(glasser_atlas$data))
+#'   )
+#'   # Plot the data
+#'   plot_glasser(vals)
+#' }
 #'
 #' # Using a different column name
 #' vals$intensity <- vals$value
@@ -42,19 +44,31 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom sf st_as_sf st_multipolygon st_sfc st_sf st_bbox st_geometry
 #' @import ggseg
-#' @import ggsegGlasser
 #' @export
 plot_glasser <- function(vals=NULL, value_col = "value", position = "dispersed") {
   # Check and load required packages
-  required_packages <- c("geojsonio", "echarts4r")
+  required_packages <- c("geojsonio", "echarts4r", "ggsegGlasser")
   missing_packages <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
   if (length(missing_packages) > 0) {
-    stop("The following packages are required but not installed: ", paste(missing_packages, collapse = ", "))
+    if ("ggsegGlasser" %in% missing_packages) {
+      stop("Package 'ggsegGlasser' is required for this function but is not installed.\n",
+           "To install it, run:\n",
+           "  remotes::install_github('ggseg/ggsegGlasser')\n",
+           "or use the ggseg r-universe:\n",
+           "  options(repos = c(ggseg = 'https://ggseg.r-universe.dev',\n",
+           "                    CRAN = 'https://cloud.r-project.org'))\n",
+           "  install.packages('ggsegGlasser')",
+           call. = FALSE)
+    } else {
+      stop("The following packages are required but not installed: ", 
+           paste(missing_packages, collapse = ", "))
+    }
   }
   # No library() calls needed - will use :: notation
 
   # Get the ggseg Glasser atlas data
-  ggseg_data <- ggsegGlasser::glasser$data
+  glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
+  ggseg_data <- glasser_atlas$data
 
   # Create default values if vals is NULL
   if (is.null(vals)) {
