@@ -7,7 +7,7 @@ views, arranged in a 2x2 grid."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="default" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
@@ -26,11 +26,6 @@ views, arranged in a 2x2 grid."></head><body>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-contributing" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Contributing</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-contributing"><li><a class="dropdown-item" href="../CONTRIBUTING.html">Contributing</a></li>
-    <li><a class="dropdown-item" href="../CODE_OF_CONDUCT.html">Code of conduct</a></li>
-  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/bbuchsbaum/neuroatlas/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -89,14 +84,16 @@ is supported (stacked layout is planned for future versions)</p></dd>
 <span class="r-in"><span><span class="co"># Basic visualization with uniform coloring</span></span></span>
 <span class="r-in"><span><span class="fu">plot_glasser</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create sample data</span></span></span>
-<span class="r-in"><span><span class="va">vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  label <span class="op">=</span> <span class="fu">ggsegGlasser</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/ggsegGlasser/man/glasser.html" class="external-link">glasser</a></span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">label</span>,</span></span>
-<span class="r-in"><span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">ggsegGlasser</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/ggsegGlasser/man/glasser.html" class="external-link">glasser</a></span><span class="op">$</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plot the data</span></span></span>
-<span class="r-in"><span><span class="fu">plot_glasser</span><span class="op">(</span><span class="va">vals</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Create sample data (requires ggsegGlasser package)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggsegGlasser"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">glasser_atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"glasser"</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-internal.html" class="external-link">asNamespace</a></span><span class="op">(</span><span class="st">"ggsegGlasser"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    label <span class="op">=</span> <span class="va">glasser_atlas</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">label</span>,</span></span>
+<span class="r-in"><span>    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">glasser_atlas</span><span class="op">$</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Plot the data</span></span></span>
+<span class="r-in"><span>  <span class="fu">plot_glasser</span><span class="op">(</span><span class="va">vals</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using a different column name</span></span></span>
 <span class="r-in"><span><span class="va">vals</span><span class="op">$</span><span class="va">intensity</span> <span class="op">&lt;-</span> <span class="va">vals</span><span class="op">$</span><span class="va">value</span></span></span>
