@@ -1,23 +1,44 @@
 ---
-title: "Working with TemplateFlow in neuroatlas"
-author: "neuroatlas Dev Team"
-date: "`r Sys.Date()`"
+title: Working with TemplateFlow in neuroatlas
+author: neuroatlas Dev Team
+date: '`r Sys.Date()`'
 output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Working with TemplateFlow in neuroatlas}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+vignette: |
+  %\VignetteIndexEntry{Working with TemplateFlow in neuroatlas} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+params:
+  family: red
+css: albers.css
+resource_files:
+- albers.css
+- albers.js
+includes:
+  in_header: |-
+    <script src="albers.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('palette-red'));</script>
+
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include = FALSE, eval = TRUE}
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   echo = TRUE,
-  eval = FALSE # Default to FALSE for most chunks to avoid downloads during vignette build
-               # We can selectively set eval = TRUE for specific chunks
+  eval = FALSE # Default to FALSE to avoid network-heavy calls during build
 )
-library(neuroatlas)
+
+# Load package and detect if TemplateFlow is available so we can
+# selectively evaluate a few chunks with real output when feasible.
+suppressWarnings(suppressMessages({
+  library(neuroatlas)
+}))
+
+templateflow_ok <- FALSE
+try({
+  templateflow_ok <- reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")
+}, silent = TRUE)
 ```
 
 ## Introduction
@@ -67,50 +88,124 @@ Before fetching files, you might want to see what's available.
 
 Use `tflow_spaces()` to get a list of all top-level template space identifiers:
 
-```{r list_templates, eval = FALSE}
+```{r list_templates, eval = templateflow_ok}
 # List all available template spaces
 all_templates <- tflow_spaces()
 print(head(all_templates))
 cat("Total templates available:", length(all_templates), "\n")
 ```
-Example output:
-```
-#> [1] "AMYGDALA" "ARA"      "BRODMANN" "CHARITE"  "Fischer344" "GS"
-#> Total templates available: 76
+(If nothing prints here during build, see the note below.)
+
+```{r list_templates_note, eval = !templateflow_ok}
+cat("TemplateFlow was not available during vignette build.\n")
+cat("Run the chunk locally to see your real template list.\n")
 ```
 
 You can also filter this list with a pattern (regular expression):
-```{r list_templates_pattern, eval = FALSE}
+```{r list_templates_pattern, eval = templateflow_ok}
 # Find all MNI templates
 mni_templates <- tflow_spaces(pattern = "MNI")
 print(mni_templates)
 ```
-Example output:
+```{r list_templates_pattern_note, eval = !templateflow_ok}
+cat("TemplateFlow was not available during vignette build.\n")
+cat("Run this chunk locally to see matching MNI spaces.\n")
 ```
-#> [1] "MNI152Lin"           "MNI152NLin2009cAsym" "MNI152NLin6Asym"    
-#> [4] "MNI152NLin6Sym"      "MNIInfant"           "MNIPediatricAsym"
-```
 
-### Listing Specific Files (Metadata Query)
+### Discovering Volumetric Templates
 
-To find specific files within a template space based on metadata (like suffix, resolution, description), use `tflow_files()`:
+Use `tflow_files()` to query available volumetric files within a template space:
 
-```{r list_metadata, eval = FALSE}
-# Find all T1w images for the 'MNI152NLin2009cAsym' space
+```{r discover_volumetric, eval = FALSE}
+# Find all T1w images for MNI space
 mni_t1w_files <- tflow_files(
   space = "MNI152NLin2009cAsym",
   query_args = list(suffix = "T1w")
 )
-print(head(mni_t1w_files))
+print(mni_t1w_files)
 
-# Find brain masks for 'MNI152NLin2009cAsym' at 1mm resolution
-mni_brain_masks <- tflow_files(
+# Find brain masks at specific resolution
+mni_masks <- tflow_files(
   space = "MNI152NLin2009cAsym",
   query_args = list(suffix = "mask", desc = "brain", resolution = "1")
 )
-print(mni_brain_masks)
+print(mni_masks)
+
+# Find tissue probability maps (GM, WM, CSF)
+mni_probseg <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(suffix = "probseg")
+)
+print(mni_probseg)
+
+# Find all files at 2mm resolution
+mni_2mm <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(resolution = "2")
+)
+print(mni_2mm)
+
+# Find atlas/parcellation files
+mni_atlases <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(suffix = "dseg")  # discrete segmentation
+)
+print(mni_atlases)
 ```
-This function returns a character vector of full paths to the files that TemplateFlow would download/has cached.
+
+Common volumetric query parameters:
+- `suffix`: "T1w", "T2w", "mask", "probseg", "dseg"
+- `desc`: "brain", "head", or specific descriptions
+- `resolution`: "1", "2", "01", "02" (template-dependent)
+- `label`: "GM", "WM", "CSF" (for probseg files)
+- `atlas`: atlas name (e.g., "Schaefer2018")
+
+This function returns a character vector of full paths to the files that TemplateFlow has cached (downloading them if needed).
+
+### Discovering Surface Templates
+
+TemplateFlow includes surface geometry files for templates like `fsLR` and `fsaverage`. Here's how to discover what's available:
+
+```{r discover_surfaces, eval = FALSE}
+# Find surface-related template spaces
+tflow_spaces(pattern = "fs")
+#> [1] "fsLR"      "fsaverage"
+
+# List available surface files for fsLR
+# Filter by hemisphere
+fslr_left <- tflow_files("fsLR", query_args = list(hemi = "L"))
+print(head(fslr_left))
+
+# Filter by surface type and density
+fslr_midthick <- tflow_files("fsLR", query_args = list(
+  suffix = "midthickness",
+  hemi = "L",
+  density = "32k"
+))
+print(fslr_midthick)
+
+# List fsaverage surfaces
+fsavg_pial <- tflow_files("fsaverage", query_args = list(
+  suffix = "pial",
+  hemi = "L"
+))
+print(fsavg_pial)
+```
+
+Common surface query parameters:
+- `hemi`: "L" or "R" for hemisphere
+- `density`: "32k", "164k", etc. (template-dependent)
+- `suffix`: surface type - "pial", "white", "midthickness", "inflated", "sphere"
+- `resolution`: "06" for fsaverage6, etc.
+
+## Troubleshooting
+
+If you encounter issues listing templates or fetching files:
+
+- Check Python and TemplateFlow availability: `neuroatlas::check_templateflow()`
+- Install or repair the Python environment: `neuroatlas::install_templateflow()`
+- Network hiccups can prevent metadata fetches; if resolutions cannot be retrieved, `neuroatlas` skips that check with a warning.
+- For Python-side errors, inspect `reticulate::py_last_error()` after a failure.
 
 ## Fetching Templates with `get_template()`
 
@@ -162,6 +257,31 @@ mni_brain_mask <- get_template(
   resolution = "1"
 )
 print(mni_brain_mask)
+```
+
+### Tissue Probability (GM/WM/CSF)
+
+For tissue probability maps, use `variant = "probseg"` and set `label` (e.g., `"GM"`, `"WM"`, `"CSF"`).
+Do not set `desc` for these — it’s determined by `suffix` + `label`.
+
+```{r get_probseg, eval = FALSE}
+# Gray matter probability map at 1mm
+mni_gm_prob <- get_template(
+  space = "MNI152NLin2009cAsym",
+  variant = "probseg",
+  label = "GM",
+  resolution = "1"
+)
+print(mni_gm_prob)
+
+# File path only
+gm_path <- get_template(
+  space = "MNI152NLin2009cAsym",
+  variant = "probseg",
+  label = "GM",
+  path_only = TRUE
+)
+print(gm_path)
 ```
 
 ### Getting File Paths Only
@@ -241,6 +361,67 @@ print(fslr_pial_L_path)
 Example output (path will vary):
 ```
 [1] "/Users/youruser/Library/Caches/org.R-project.R/R/neuroatlas/templateflow/tpl-fsLR/tpl-fsLR_den-32k_hemi-L_desc-pial_surf.gii"
+```
+
+## Downloading Templates to a Local Folder
+
+TemplateFlow automatically caches files when you query them. If you want to copy templates to a specific folder (e.g., for use with other tools or sharing), here are some approaches:
+
+### Copy from TemplateFlow cache
+
+```{r download_copy, eval = FALSE}
+# Get file paths (files are downloaded to cache automatically)
+files <- tflow_files("fsLR", query_args = list(hemi = "L", density = "32k"))
+
+# Copy to your folder
+dest_folder <- "~/my_surfaces"
+dir.create(dest_folder, showWarnings = FALSE, recursive = TRUE)
+file.copy(files, dest_folder)
+```
+
+### Download specific surfaces with `get_surface_template()`
+
+```{r download_surface, eval = FALSE}
+# Download and get path to a specific surface
+path <- get_surface_template("fsLR", "midthickness", hemi = "L", density = "32k")
+file.copy(path, "~/my_surfaces/")
+```
+### Bulk download helper
+
+For downloading multiple files at once:
+
+```{r download_bulk, eval = FALSE}
+download_templateflow_files <- function(space, query_args = list(), dest_folder) {
+  dir.create(dest_folder, recursive = TRUE, showWarnings = FALSE)
+
+  files <- tflow_files(space, query_args = query_args)
+
+  if (length(files) == 0) {
+    message("No files found")
+    return(invisible(character(0)))
+  }
+
+  # Copy files preserving names
+  dest_paths <- file.path(dest_folder, basename(files))
+  success <- file.copy(files, dest_paths, overwrite = TRUE)
+
+  message("Copied ", sum(success), " of ", length(files), " files to ", dest_folder)
+  invisible(dest_paths[success])
+}
+
+# Download all fsLR 32k left hemisphere surfaces
+download_templateflow_files(
+  "fsLR",
+  query_args = list(hemi = "L", density = "32k"),
+  dest_folder = "~/my_surfaces/fsLR"
+)
+
+# Download fsaverage pial surfaces (both hemispheres)
+download_templateflow_files(
+  "fsaverage",
+  query_args = list(suffix = "pial"),
+  dest_folder = "~/my_surfaces/fsaverage"
+)
 ```
 
 ## Caching Behavior

@@ -10,8 +10,9 @@ dilate_atlas(atlas, mask, radius = 4, maxn = 50)
 \item{atlas}{An object of class "atlas" containing the parcellation to be dilated}
 
 \item{mask}{A binary mask (NeuroVol object) specifying valid voxels for dilation.
-Dilation will only occur within non-zero mask values. Typically a LogicalNeuroVol,
-but can be any NeuroVol that will be converted to logical via as.logical().}
+Dilation will only occur within non-zero mask values. May also be a TemplateFlow
+space identifier (string) or list of `get_template()` arguments, which will be
+resolved to a NeuroVol via `.resolve_template_input()`.}
 
 \item{radius}{Numeric. The maximum distance (in voxels) to search for neighboring
 parcels when dilating. Default: 4}

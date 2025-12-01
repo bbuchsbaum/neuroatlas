@@ -42,9 +42,19 @@ test_that("reduce_atlas handles various data types and edge cases correctly", {
   result_custom <- reduce_atlas(atlas, test_data_3d, custom_func)
   expect_equal(call_count, 100)  # Should be called once per region
   
-  # Test 2: 4D time series data
-  # Skip NeuroVec tests due to creation issues
-  skip("NeuroVec creation issue - skipping 4D tests")
+  # Test 2: 4D time series data using NeuroVec
+  vol_list <- lapply(1:3, function(i) {
+    neuroim2::NeuroVol(
+      rnorm(prod(atlas_dims), mean = 5 + i),
+      space = atlas_space
+    )
+  })
+  vec4d <- neuroim2::NeuroVec(vol_list)
+
+  result_vec <- reduce_atlas(atlas, vec4d, mean)
+  expect_true(inherits(result_vec, "tbl_df"))
+  expect_equal(nrow(result_vec), 3)
+  expect_equal(ncol(result_vec), length(atlas$orig_labels) + 1)  # time + regions
   
   # Test 3: Edge cases and error conditions
   # Empty region handling - create data where one region might be empty

@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
+<url><loc>/AGENTS.html</loc></url>
 <url><loc>/CLAUDE.html</loc></url>
 <url><loc>/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>/CONTRIBUTING.html</loc></url>
@@ -8,15 +9,19 @@
 <url><loc>/LICENSE-text.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/articles/neuroatlas-overview.html</loc></url>
+<url><loc>/articles/surface-parcellations.html</loc></url>
+<url><loc>/articles/surface-templates.html</loc></url>
 <url><loc>/articles/working-with-templateflow.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/neuroatlas_cheatsheet_v3.html</loc></url>
 <url><loc>/news/index.html</loc></url>
 <url><loc>/reference/Schaefer17_200.html</loc></url>
 <url><loc>/reference/Schaefer17_400.html</loc></url>
 <url><loc>/reference/Schaefer17_600.html</loc></url>
 <url><loc>/reference/as_neurovol.html</loc></url>
 <url><loc>/reference/cash-.templateflow.html</loc></url>
+<url><loc>/reference/check_templateflow.html</loc></url>
 <url><loc>/reference/clear_templateflow_cache.html</loc></url>
 <url><loc>/reference/create_templateflow.html</loc></url>
 <url><loc>/reference/dilate_atlas.html</loc></url>
@@ -27,6 +32,9 @@
 <url><loc>/reference/dot-neuroatlas_cache_dir.html</loc></url>
 <url><loc>/reference/dot-perform_tf_get_and_convert_to_path.html</loc></url>
 <url><loc>/reference/dot-resolve_template_input.html</loc></url>
+<url><loc>/reference/dot-schaefer_fsaverage6_surf.html</loc></url>
+<url><loc>/reference/dot-schaefer_surface_space_mapping.html</loc></url>
+<url><loc>/reference/dot-schaefer_templateflow_surf.html</loc></url>
 <url><loc>/reference/fsaverage.html</loc></url>
 <url><loc>/reference/get_aseg_atlas.html</loc></url>
 <url><loc>/reference/get_ggseg_atlas.html</loc></url>
@@ -46,8 +54,10 @@
 <url><loc>/reference/get_template_schaefer.html</loc></url>
 <url><loc>/reference/get_template_wm.html</loc></url>
 <url><loc>/reference/ggseg_schaefer.html</loc></url>
+<url><loc>/reference/glasser_surf.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/install_templateflow.html</loc></url>
+<url><loc>/reference/load_surface_template.html</loc></url>
 <url><loc>/reference/map_atlas.html</loc></url>
 <url><loc>/reference/map_to_schaefer.html</loc></url>
 <url><loc>/reference/merge_atlases.html</loc></url>
@@ -60,6 +70,8 @@
 <url><loc>/reference/print.templateflow.html</loc></url>
 <url><loc>/reference/reduce_atlas.html</loc></url>
 <url><loc>/reference/resample.html</loc></url>
+<url><loc>/reference/schaefer_surf.html</loc></url>
+<url><loc>/reference/schaefer_surf_options.html</loc></url>
 <url><loc>/reference/show_templateflow_cache_path.html</loc></url>
 <url><loc>/reference/sub-sub-.templateflow.html</loc></url>
 <url><loc>/reference/templates.html</loc></url>

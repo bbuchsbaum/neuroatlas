@@ -1,15 +1,26 @@
 ---
-title: "Getting Started with neuroatlas"
-author: "neuroatlas Dev Team"
-date: "`r Sys.Date()`"
+title: Getting Started with neuroatlas
+author: neuroatlas Dev Team
+date: '`r Sys.Date()`'
 output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Getting Started with neuroatlas}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+vignette: '%\VignetteIndexEntry{Getting Started with neuroatlas} %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}'
+params:
+  family: red
+css: albers.css
+resource_files:
+- albers.css
+- albers.js
+includes:
+  in_header: |-
+    <script src="albers.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('palette-red'));</script>
+
 ---
 
 ```{r setup, include = FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -275,24 +286,43 @@ brain_mask <- get_template(
 dilated_custom <- dilate_atlas(cortical, mask = brain_mask, radius = 3)
 ```
 
+Note: When fetching masks from TemplateFlow, `variant = "mask"` resolves the correct
+combination of `desc` and `suffix` (typically `desc = "brain"`, `suffix = "mask"`),
+so you do not need to set `desc` explicitly.
+
 ## Surface-Based Atlases
 
-Work with surface-based versions of atlases:
+Work with surface-based versions of atlases using neurosurf `NeuroSurface`
+objects:
 
 ```{r surface_atlas}
-# Get Schaefer atlas on fsaverage6 surface
-surf_atlas <- get_schaefer_surfatlas(
-  parcels = "400",
-  networks = "17",
-  surf = "inflated"  # "inflated", "white", or "pial"
+# Get Schaefer atlas on fsaverage6 surface (mesh + labels)
+surf_atlas <- schaefer_surf(
+  parcels  = 400,
+  networks = 17,
+  space    = "fsaverage6",
+  surf     = "inflated"  # "inflated", "white", or "pial"
 )
 
-# Access hemisphere data
-lh_regions <- surf_atlas$lh_atlas
-rh_regions <- surf_atlas$rh_atlas
+# Access hemisphere meshes with vertex-wise labels
+lh_surface <- surf_atlas$lh_atlas
+rh_surface <- surf_atlas$rh_atlas
 
-# Surface atlases integrate with neurosurf package
-# for surface-based analyses
+# Surface atlases integrate with the neurosurf package
+# for downstream surface-based analyses and visualization
+```
+
+You can obtain a similar mesh-plus-label structure for the Glasser MMP1.0
+parcellation projected to fsaverage:
+
+```{r glasser_surface_atlas, eval=FALSE}
+glasser_surf_atlas <- glasser_surf(
+  space = "fsaverage",
+  surf  = "pial"
+)
+
+lh_glasser <- glasser_surf_atlas$lh_atlas
+rh_glasser <- glasser_surf_atlas$rh_atlas
 ```
 
 ## Common Workflows

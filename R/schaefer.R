@@ -52,9 +52,23 @@ getmode <- function(v) {
 #' @export
 resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
                     min_neighbors=3) {
+  # Allow ClusteredNeuroVol by converting to dense volume, then rebuild
+  is_cluster <- inherits(vol, "ClusteredNeuroVol")
+  orig_label_map <- NULL
+  if (is_cluster) {
+    orig_label_map <- vol@label_map
+    if (interp != 0) {
+      warning("ClusteredNeuroVol resampling forces nearest-neighbor interpolation to preserve labels.")
+    }
+    dense <- array(0, dim = dim(vol))
+    dense[vol@mask] <- vol@clusters
+    vol <- neuroim2::NeuroVol(dense, space = neuroim2::space(vol))
+    interp <- 0
+  }
+
   # Input validation
   assertthat::assert_that(inherits(vol, "NeuroVol"),
-                         msg="'vol' must be a NeuroVol object")
+                         msg="'vol' must be a NeuroVol or ClusteredNeuroVol object")
   assertthat::assert_that(inherits(outspace, "NeuroSpace"),
                          msg="'outspace' must be a NeuroSpace object")
   assertthat::assert_that(length(dim(outspace)) == 3,
@@ -69,11 +83,7 @@ resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
                          msg="'min_neighbors' must be >= 2")
 
   # Store original labels for validation
-  vol_data <- if (inherits(vol, "NeuroVol")) {
-    vol[,,]
-  } else {
-    as.vector(vol)
-  }
+  vol_data <- vol[,,]
   orig_labels <- sort(unique(as.vector(vol_data[vol_data != 0])))
 
   # Initial resampling
@@ -123,7 +133,25 @@ resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
     warning("Some original labels were lost during resampling")
   }
 
-  vol
+  if (!is_cluster) {
+    return(vol)
+  }
+
+  # Rebuild ClusteredNeuroVol with filtered label_map
+  label_map <- orig_label_map
+  if (!is.null(label_map)) {
+    keep <- vapply(label_map, function(x) any(x %in% final_labels), logical(1))
+    label_map <- label_map[keep]
+  } else {
+    label_map <- as.list(final_labels)
+    names(label_map) <- as.character(final_labels)
+  }
+
+  neuroim2::ClusteredNeuroVol(
+    as.logical(vol),
+    clusters = as.numeric(vol[vol != 0]),
+    label_map = label_map
+  )
 }
 
 #' Load Schaefer Atlas Volume
@@ -427,72 +455,342 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
 #' @importFrom utils data
 #' @export
 get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),
-                                  networks=c("7","17"), surf=c("inflated", "white", "pial"),
-                                  use_cache=TRUE) {
+                                   networks=c("7","17"),
+                                   surf=c("inflated", "white", "pial"),
+                                   use_cache=TRUE) {
+  # Backward-compatible wrapper that returns the Schaefer atlas on fsaverage6
+  # using the existing neurosurf-based geometry.
+  schaefer_surf(
+    parcels = parcels,
+    networks = networks,
+    space = "fsaverage6",
+    surf = surf,
+    use_cache = use_cache
+  )
+}
 
 
-  #https://github.com/ThomasYeoLab/CBIG/blob/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/lh.Schaefer2018_1000Parcels_17Networks_order.annot
+# Internal helpers for Schaefer surface spaces ---------------------------------
 
-  parcels <- match.arg(parcels)
-  networks <- match.arg(networks)
-  surf <- match.arg(surf)
-  #resolution <- match.arg(resolution)
+#' Map Schaefer surface space to CBIG and TemplateFlow identifiers
+#'
+#' @param space Character scalar, one of "fsaverage", "fsaverage5", "fsaverage6"
+#' @return A named list with fields `space`, `cbig_space`, `template_id`,
+#'   `tf_resolution`, and `tf_density`.
+#' @keywords internal
+.schaefer_surface_space_mapping <- function(space) {
+  space <- match.arg(space, c("fsaverage", "fsaverage5", "fsaverage6"))
+
+  if (space == "fsaverage") {
+    return(list(
+      space = "fsaverage",
+      cbig_space = "fsaverage",
+      template_id = "fsaverage",
+      tf_resolution = NULL,
+      tf_density = "164k"
+    ))
+  }
+
+  if (space == "fsaverage5") {
+    return(list(
+      space = "fsaverage5",
+      cbig_space = "fsaverage5",
+      template_id = "fsaverage",
+      tf_resolution = "05",
+      tf_density = "10k"
+    ))
+  }
+
+  # Default / current built-in geometry: fsaverage6
+  list(
+    space = "fsaverage6",
+    cbig_space = "fsaverage6",
+    template_id = "fsaverage",
+    tf_resolution = "06",
+    tf_density = "41k"
+  )
+}
+
+
+#' Schaefer surface atlas (fsaverage6 helper)
+#'
+#' This internal helper preserves the existing behaviour of
+#' \code{get_schaefer_surfatlas()}, using the packaged \code{fsaverage}
+#' (fsaverage6) geometry plus Schaefer .annot label files.
+#'
+#' @keywords internal
+.schaefer_fsaverage6_surf <- function(parcels, networks, surf, use_cache = TRUE) {
+  parcels <- match.arg(as.character(parcels),
+                       c("100","200","300","400","500","600","800","1000"))
+  networks <- match.arg(as.character(networks), c("7","17"))
+  surf <- match.arg(surf, c("inflated", "white", "pial"))
 
   fsaverage <- NULL  # To avoid R CMD check NOTE
   utils::data("fsaverage", envir = environment())
 
   get_hemi <- function(hemi) {
+    fname <- paste0(
+      hemi, ".",
+      "Schaefer2018_", parcels, "Parcels_",
+      networks, "Networks_order.annot"
+    )
 
-    fname <- paste0(hemi, ".", "Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.annot")
-
-    rpath <- "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/FreeSurfer5.3/fsaverage6/label/"
-    path <- paste0(rpath,fname)
+    rpath <- paste0(
+      "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/",
+      "stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/",
+      "Parcellations/FreeSurfer5.3/fsaverage6/label/"
+    )
+    path <- paste0(rpath, fname)
 
     des <- paste0(tempdir(), "/", fname)
-    ret <- downloader::download(path, des)
+    downloader::download(path, des)
 
-    geom <- paste0(hemi, "_", surf)
-    annot <- suppressWarnings(neurosurf::read_freesurfer_annot(des, fsaverage[[geom]]))
+    geom_name <- paste0(hemi, "_", surf)
+    annot <- suppressWarnings(
+      neurosurf::read_freesurfer_annot(des, fsaverage[[geom_name]])
+    )
 
     nrois <- as.integer(parcels)
 
     if (hemi == "rh") {
-      annot@data <- annot@data + nrois/2
+      annot@data <- annot@data + nrois / 2
       annot@data <- annot@data - 1
-      annot@data[annot@data == nrois/2] <- 0
+      annot@data[annot@data == nrois / 2] <- 0
       annot@labels <- annot@labels[-1]
     } else {
       annot@data <- annot@data - 1
       annot@labels <- annot@labels[-1]
     }
 
-    #class(annot) <- c(class(annot), "surf_atlas")
     annot
-
   }
 
-
-  ##rp <-  "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
-
-  labels <- schaefer_metainfo(parcels, networks, use_cache=use_cache)
-  #browser()
+  labels <- schaefer_metainfo(parcels, networks, use_cache = use_cache)
   lh_surf <- get_hemi("lh")
   rh_surf <- get_hemi("rh")
 
   ret <- list(
-    surf_type=surf,
+    surf_type = surf,
+    surface_space = "fsaverage6",
     lh_atlas = lh_surf,
     rh_atlas = rh_surf,
-    name=paste0("Schaefer-", parcels, "-", networks, "networks"),
-    cmap=labels[,3:5],
-    ids=1:nrow(labels),
-    labels=labels$name,
-    orig_labels=labels[,2],
-    network=labels$network,
-    hemi=labels$hemi)
+    name = paste0("Schaefer-", parcels, "-", networks, "networks"),
+    cmap = labels[, 3:5],
+    ids = seq_len(nrow(labels)),
+    labels = labels$name,
+    orig_labels = labels[, 2],
+    network = labels$network,
+    hemi = labels$hemi
+  )
 
   class(ret) <- c("schaefer", "surfatlas", "atlas")
   ret
+}
+
+
+#' Schaefer surface atlas (TemplateFlow-backed helper)
+#'
+#' This helper uses TemplateFlow for surface geometry and CBIG for Schaefer
+#' annotation (.annot) files. It is used for spaces other than fsaverage6.
+#'
+#' @keywords internal
+.schaefer_templateflow_surf <- function(parcels,
+                                        networks,
+                                        space,
+                                        surf,
+                                        use_cache = TRUE) {
+  mapping <- .schaefer_surface_space_mapping(space)
+
+  parcels <- match.arg(as.character(parcels),
+                       c("100","200","300","400","500","600","800","1000"))
+  networks <- match.arg(as.character(networks), c("7","17"))
+  surf <- match.arg(surf, c("inflated", "white", "pial"))
+
+  # Base URL for FreeSurfer5.3 Schaefer annotations
+  cbig_base <- paste0(
+    "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/",
+    "stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/",
+    "Parcellations/FreeSurfer5.3/"
+  )
+
+  get_hemi <- function(hemi) {
+    fname <- paste0(
+      hemi, ".",
+      "Schaefer2018_", parcels, "Parcels_",
+      networks, "Networks_order.annot"
+    )
+
+    rpath <- file.path(cbig_base, mapping$cbig_space, "label")
+    path <- file.path(rpath, fname)
+
+    des <- paste0(tempdir(), "/", fname)
+    downloader::download(path, des)
+
+    hemi_tf <- if (hemi == "lh") "L" else "R"
+
+    surf_path <- get_surface_template(
+      template_id = mapping$template_id,
+      surface_type = surf,
+      hemi = hemi_tf,
+      density = mapping$tf_density,
+      resolution = mapping$tf_resolution,
+      load_as_path = TRUE
+    )
+
+    geom <- neurosurf::read_surf_geometry(surf_path)
+
+    annot <- suppressWarnings(
+      neurosurf::read_freesurfer_annot(des, geom)
+    )
+
+    nrois <- as.integer(parcels)
+
+    if (hemi == "rh") {
+      annot@data <- annot@data + nrois / 2
+      annot@data <- annot@data - 1
+      annot@data[annot@data == nrois / 2] <- 0
+      annot@labels <- annot@labels[-1]
+    } else {
+      annot@data <- annot@data - 1
+      annot@labels <- annot@labels[-1]
+    }
+
+    annot
+  }
+
+  labels <- schaefer_metainfo(parcels, networks, use_cache = use_cache)
+  lh_surf <- get_hemi("lh")
+  rh_surf <- get_hemi("rh")
+
+  ret <- list(
+    surf_type = surf,
+    surface_space = mapping$space,
+    lh_atlas = lh_surf,
+    rh_atlas = rh_surf,
+    name = paste0("Schaefer-", parcels, "-", networks, "networks"),
+    cmap = labels[, 3:5],
+    ids = seq_len(nrow(labels)),
+    labels = labels$name,
+    orig_labels = labels[, 2],
+    network = labels$network,
+    hemi = labels$hemi
+  )
+
+  class(ret) <- c("schaefer", "surfatlas", "atlas")
+  ret
+}
+
+
+#' Schaefer Surface Atlas
+#'
+#' @description
+#' Load the Schaefer2018 cortical parcellation as a surface atlas, returning
+#' neurosurf \code{LabeledNeuroSurface} objects plus standard atlas metadata.
+#' By default this uses the packaged fsaverage6 geometry; other FreeSurfer
+#' surface spaces use TemplateFlow for mesh geometry.
+#'
+#' @param parcels Number of parcels. Can be numeric or character; valid values
+#'   are 100, 200, 300, 400, 500, 600, 800, 1000.
+#' @param networks Number of networks. Can be numeric or character; valid values
+#'   are 7 or 17.
+#' @param space Surface space / mesh template. One of
+#'   \code{"fsaverage6"} (default), \code{"fsaverage"}, or \code{"fsaverage5"}.
+#'   Currently only \code{"fsaverage6"} uses packaged geometry; other spaces
+#'   require a working TemplateFlow setup.
+#' @param surf Surface type. One of \code{"inflated"}, \code{"white"},
+#'   or \code{"pial"}.
+#' @param use_cache Logical. Passed to \code{\link{schaefer_metainfo}} for
+#'   label metadata caching.
+#'
+#' @return A list with classes \code{c("schaefer","surfatlas","atlas")}
+#'   containing:
+#'   \itemize{
+#'     \item \code{lh_atlas}, \code{rh_atlas}: \code{LabeledNeuroSurface}
+#'       objects for left and right hemispheres.
+#'     \item \code{surf_type}: requested surface type.
+#'     \item \code{surface_space}: Schaefer surface space (e.g. fsaverage6).
+#'     \item \code{ids}, \code{labels}, \code{orig_labels},
+#'       \code{network}, \code{hemi}, \code{cmap}: atlas metadata.
+#'   }
+#'
+#' @examples
+#' \dontrun{
+#' # Schaefer 200 parcels, 17 networks on fsaverage6 inflated surface
+#' atl <- schaefer_surf(parcels = 200, networks = 17,
+#'                      space = "fsaverage6", surf = "inflated")
+#' }
+#'
+#' @export
+schaefer_surf <- function(parcels = c(100, 200, 300, 400, 500, 600, 800, 1000),
+                          networks = c(7, 17),
+                          space = c("fsaverage6", "fsaverage", "fsaverage5"),
+                          surf = c("inflated", "white", "pial"),
+                          use_cache = TRUE) {
+  space <- match.arg(space)
+
+  # Coerce to character then match against allowed values so callers can pass
+  # either numeric or character arguments.
+  parcels <- match.arg(as.character(parcels),
+                       c("100","200","300","400","500","600","800","1000"))
+  networks <- match.arg(as.character(networks), c("7","17"))
+  surf <- match.arg(surf, c("inflated", "white", "pial"))
+
+  if (identical(space, "fsaverage6")) {
+    .schaefer_fsaverage6_surf(parcels, networks, surf, use_cache = use_cache)
+  } else {
+    .schaefer_templateflow_surf(
+      parcels = parcels,
+      networks = networks,
+      space = space,
+      surf = surf,
+      use_cache = use_cache
+    )
+  }
+}
+
+
+#' List supported Schaefer surface atlas variants
+#'
+#' @description
+#' Return a data frame enumerating the currently supported Schaefer surface
+#' atlas variants, including their CBIG and TemplateFlow identifiers.
+#'
+#' @return A data frame with columns:
+#'   \itemize{
+#'     \item \code{space}: Schaefer surface space (fsaverage, fsaverage5, fsaverage6).
+#'     \item \code{parcels}: Number of parcels.
+#'     \item \code{networks}: Number of networks.
+#'     \item \code{surf}: Surface type ("inflated", "white", "pial").
+#'     \item \code{cbig_space}: CBIG FreeSurfer5.3 subfolder.
+#'     \item \code{template_id}, \code{tf_resolution}, \code{tf_density}:
+#'       TemplateFlow identifiers used by \code{get_surface_template()}.
+#'   }
+#'
+#' @export
+schaefer_surf_options <- function() {
+  spaces <- c("fsaverage", "fsaverage5", "fsaverage6")
+  parcels <- c(100, 200, 300, 400, 500, 600, 800, 1000)
+  networks <- c(7, 17)
+  surfs <- c("inflated", "white", "pial")
+
+  opts <- expand.grid(
+    space = spaces,
+    parcels = parcels,
+    networks = networks,
+    surf = surfs,
+    stringsAsFactors = FALSE
+  )
+
+  mapping <- lapply(opts$space, .schaefer_surface_space_mapping)
+
+  opts$cbig_space <- vapply(mapping, function(m) m$cbig_space, character(1))
+  opts$template_id <- vapply(mapping, function(m) m$template_id, character(1))
+  opts$tf_resolution <- vapply(mapping, function(m) {
+    if (is.null(m$tf_resolution)) NA_character_ else m$tf_resolution
+  }, character(1))
+  opts$tf_density <- vapply(mapping, function(m) m$tf_density, character(1))
+
+  opts
 }
 
 
@@ -636,7 +934,5 @@ sy_1000_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_ca
   get_schaefer_atlas(parcels = "1000", networks = "17", resolution = resolution,
                      outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
 }
-
-
 
 

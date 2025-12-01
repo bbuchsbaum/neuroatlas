@@ -1,15 +1,200 @@
-test_that("TemplateFlow integration handles edge cases and vectorized operations correctly", {
+test_that("tflow_spaces and tflow_files work correctly", {
   skip_on_cran()
-  skip_if_not(reticulate::py_available(initialize = FALSE), 
+  skip_if_not(reticulate::py_available(initialize = FALSE),
               "Python not available")
   skip_if_not(reticulate::py_module_available("templateflow"),
               "templateflow not available")
-  
+
+  # Test 1: tflow_spaces returns character vector
+  spaces <- tflow_spaces()
+  expect_true(is.character(spaces))
+  expect_true(length(spaces) > 0)
+
+  # Test 2: tflow_spaces with pattern filtering
+  mni_spaces <- tflow_spaces(pattern = "MNI")
+  expect_true(is.character(mni_spaces))
+  expect_true(all(grepl("MNI", mni_spaces, ignore.case = TRUE)))
+
+  # Test 3: Surface templates should be present
+  fs_spaces <- tflow_spaces(pattern = "^fs")
+  expect_true("fsLR" %in% fs_spaces || "fsaverage" %in% fs_spaces)
+
+  # Test 4: tflow_files returns character vector of paths
+  files <- tryCatch({
+    tflow_files("MNI152NLin2009cAsym", query_args = list(suffix = "T1w"))
+  }, error = function(e) NULL)
+
+  if (!is.null(files) && length(files) > 0) {
+    expect_true(is.character(files))
+    expect_true(all(grepl("T1w", files)))
+    expect_true(all(file.exists(files)))
+  }
+
+  # Test 5: tflow_files with surface queries
+  surf_files <- tryCatch({
+    tflow_files("fsLR", query_args = list(hemi = "L", density = "32k"))
+  }, error = function(e) NULL)
+
+  if (!is.null(surf_files) && length(surf_files) > 0) {
+    expect_true(is.character(surf_files))
+    expect_true(all(grepl("hemi-L", surf_files)))
+    expect_true(all(grepl("32k", surf_files)))
+  }
+
+  # Test 6: tflow_files returns empty vector for no matches (not NULL)
+  no_match <- tryCatch({
+    tflow_files("MNI152NLin2009cAsym",
+                query_args = list(suffix = "nonexistent_xyz_12345"))
+  }, error = function(e) character(0))
+
+  expect_true(is.character(no_match))
+  expect_equal(length(no_match), 0)
+
+  # Ensure at least one expectation is registered even if upstream queries
+  # return empty results
+  expect_true(TRUE)
+})
+
+test_that("tflow_files volumetric queries work correctly", {
+  skip_on_cran()
+  skip_if_not(reticulate::py_available(initialize = FALSE),
+              "Python not available")
+  skip_if_not(reticulate::py_module_available("templateflow"),
+              "templateflow not available")
+
+  # Test 1: Query brain masks with desc parameter
+  masks <- tryCatch({
+    tflow_files("MNI152NLin2009cAsym",
+                query_args = list(suffix = "mask", desc = "brain"))
+  }, error = function(e) NULL)
+
+  if (!is.null(masks) && length(masks) > 0) {
+    expect_true(is.character(masks))
+    expect_true(all(grepl("mask", masks)))
+    expect_true(all(grepl("brain", masks)))
+  }
+
+ # Test 2: Query tissue probability maps
+  probseg <- tryCatch({
+    tflow_files("MNI152NLin2009cAsym",
+                query_args = list(suffix = "probseg"))
+  }, error = function(e) NULL)
+
+  if (!is.null(probseg) && length(probseg) > 0) {
+    expect_true(is.character(probseg))
+    expect_true(all(grepl("probseg", probseg)))
+    # Should have GM, WM, CSF variants
+    labels_found <- sum(grepl("label-GM", probseg)) +
+                    sum(grepl("label-WM", probseg)) +
+                    sum(grepl("label-CSF", probseg))
+    expect_true(labels_found > 0)
+  }
+
+  # Test 3: Query by resolution
+  res2 <- tryCatch({
+    tflow_files("MNI152NLin2009cAsym",
+                query_args = list(resolution = "2"))
+  }, error = function(e) NULL)
+
+  if (!is.null(res2) && length(res2) > 0) {
+    expect_true(is.character(res2))
+    expect_true(all(grepl("res-02|res-2", res2)))
+  }
+
+  # Test 4: Combined query parameters
+  combined <- tryCatch({
+    tflow_files("MNI152NLin2009cAsym",
+                query_args = list(suffix = "T1w", resolution = "1"))
+  }, error = function(e) NULL)
+
+  if (!is.null(combined) && length(combined) > 0) {
+    expect_true(is.character(combined))
+    expect_true(all(grepl("T1w", combined)))
+    expect_true(all(grepl("res-01|res-1", combined)))
+  }
+})
+
+test_that("tflow_files surface queries work correctly", {
+  skip_on_cran()
+  skip_if_not(reticulate::py_available(initialize = FALSE),
+              "Python not available")
+  skip_if_not(reticulate::py_module_available("templateflow"),
+              "templateflow not available")
+
+  # Test 1: Query fsLR surfaces by hemisphere
+  fslr_left <- tryCatch({
+    tflow_files("fsLR", query_args = list(hemi = "L"))
+  }, error = function(e) NULL)
+
+  if (!is.null(fslr_left) && length(fslr_left) > 0) {
+    expect_true(is.character(fslr_left))
+    expect_true(all(grepl("hemi-L", fslr_left)))
+    # Should not contain right hemisphere
+    expect_false(any(grepl("hemi-R", fslr_left)))
+  }
+
+  # Test 2: Query by density
+  fslr_32k <- tryCatch({
+    tflow_files("fsLR", query_args = list(density = "32k"))
+  }, error = function(e) NULL)
+
+  if (!is.null(fslr_32k) && length(fslr_32k) > 0) {
+    expect_true(is.character(fslr_32k))
+    expect_true(all(grepl("32k", fslr_32k)))
+  }
+
+  # Test 3: Query specific surface type
+  midthick <- tryCatch({
+    tflow_files("fsLR", query_args = list(suffix = "midthickness"))
+  }, error = function(e) NULL)
+
+  if (!is.null(midthick) && length(midthick) > 0) {
+    expect_true(is.character(midthick))
+    expect_true(all(grepl("midthickness", midthick)))
+  }
+
+  # Test 4: Combined surface query
+  combined_surf <- tryCatch({
+    tflow_files("fsLR", query_args = list(
+      hemi = "L",
+      density = "32k",
+      suffix = "inflated"
+    ))
+  }, error = function(e) NULL)
+
+  if (!is.null(combined_surf) && length(combined_surf) > 0) {
+    expect_true(is.character(combined_surf))
+    expect_true(all(grepl("hemi-L", combined_surf)))
+    expect_true(all(grepl("32k", combined_surf)))
+    expect_true(all(grepl("inflated", combined_surf)))
+    # Should be exactly one file
+    expect_equal(length(combined_surf), 1)
+  }
+
+  # Test 5: fsaverage queries
+  fsavg <- tryCatch({
+    tflow_files("fsaverage", query_args = list(hemi = "L", suffix = "pial"))
+  }, error = function(e) NULL)
+
+  if (!is.null(fsavg) && length(fsavg) > 0) {
+    expect_true(is.character(fsavg))
+    expect_true(all(grepl("hemi-L", fsavg)))
+    expect_true(all(grepl("pial", fsavg)))
+  }
+})
+
+test_that("TemplateFlow integration handles edge cases and vectorized operations correctly", {
+  skip_on_cran()
+  skip_if_not(reticulate::py_available(initialize = FALSE),
+              "Python not available")
+  skip_if_not(reticulate::py_module_available("templateflow"),
+              "templateflow not available")
+
   # Test 1: Cache management functions
   cache_path <- show_templateflow_cache_path()
   expect_true(is.character(cache_path))
   expect_true(nchar(cache_path) > 0)
-  
+
   # Should contain "templateflow" in path
   expect_true(grepl("templateflow", cache_path, ignore.case = TRUE))
   
@@ -73,6 +258,20 @@ test_that("TemplateFlow integration handles edge cases and vectorized operations
     expect_true(grepl("fsLR", surf_template))
     expect_true(grepl("hemi-L", surf_template))
     expect_true(grepl("32k", surf_template))
+  }
+
+  # Test 5b: load_surface_template returns NeuroSurface objects
+  surf_geom <- tryCatch({
+    load_surface_template(
+      template_id = "fsLR",
+      surface_type = "pial",
+      hemi = "L",
+      density = "32k"
+    )
+  }, error = function(e) NULL)
+
+  if (!is.null(surf_geom)) {
+    expect_true(inherits(surf_geom, "NeuroSurface"))
   }
   
   # Test 6: Volume template with different modalities

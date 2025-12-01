@@ -74,7 +74,7 @@ Actual R-level path memoisation is now active.}
 
 \item{...}{Additional arguments passed directly to the Python `templateflow.api.get()` method
 (e.g., `raise_on_empty = TRUE`). This allows specifying any valid TemplateFlow query
-entity not explicitly listed as a parameter (e.g., `hemi`, `den`).}
+entity not explicitly listed as a parameter (e.g., `hemi`, `density`).}
 
 \item{template_id}{The main TemplateFlow template identifier for the surface
 (e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to `get_template`.}
@@ -87,7 +87,8 @@ This is passed as the `desc` argument to `get_template`.}
 Passed as `hemi` to `get_template`.}
 
 \item{density}{(Optional) Character string specifying the surface density
-(e.g., "32k" for fsLR, "164k" for fsaverage). Passed as `den` to `get_template`.}
+(e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to TemplateFlow
+as `density`.}
 
 \item{load_as_path}{Logical, whether to return only the path to the file.
 Defaults to `TRUE` as `NeuroVol` objects are not typically used for surface geometry.
@@ -113,8 +114,9 @@ to the underlying Python \code{templateflow.api.get()} method.
 \details{
 The function performs several pre-flight checks:
   - Validates the existence of the specified `space` using `tf$api$templates()`.
-  - Validates the specified `resolution` against available resolutions for that `space` using `tf$api$resolutions()`.
-  - These checks issue warnings and may be skipped if the necessary metadata cannot be retrieved from TemplateFlow.
+  - Validates the specified `resolution` against available resolutions when metadata is available
+    (legacy `api$resolutions()` or `api$get_metadata()` fallback). The check is skipped silently
+    if resolution metadata cannot be retrieved.
 
 Caching behavior:
   - This function uses `memoise` to cache the resolved file paths from TemplateFlow at the R level for the current session.
@@ -163,7 +165,7 @@ Caching behavior:
   #                                        hemi = "L", density = "32k")
   # print(fslr_pial_L_path)
 
-  # Get the white surface for fsaverage6 (res="06", den="41k") right hemisphere
+  # Get the white surface for fsaverage6 (res="06", density="41k") right hemisphere
   # fsaverage6_white_R_path <- get_surface_template(template_id = "fsaverage",
   #                                               surface_type = "white",
   #                                               hemi = "R",

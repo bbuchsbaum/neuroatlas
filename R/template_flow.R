@@ -118,7 +118,9 @@
     }
     
     tryCatch({
-      .tflow_env$py_api <- reticulate::import("templateflow.api", convert = TRUE)
+      # Import without automatic conversion so downstream code can
+      # reliably inspect Python objects (e.g., pathlib.Path)
+      .tflow_env$py_api <- reticulate::import("templateflow.api", convert = FALSE)
     }, error = function(e) {
       stop("Failed to import templateflow.api: ", e$message, "\n",
            "This may be due to network issues or corrupted installation.\n",
@@ -206,20 +208,75 @@
     ))
   }
 
+  # If automatic conversion returned an R object, handle robustly
+  if (!reticulate::is_py_object(py_result_path_obj)) {
+    # Common cases: a character vector or list of character paths
+    if (is.character(py_result_path_obj)) {
+      if (length(py_result_path_obj) == 0) {
+        stop(structure(
+          list(message = paste0("TemplateFlow returned no paths for the query.",
+                                "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
+               call = NULL,
+               query_args = query_params_list),
+          class = c("templateflow_no_files_error", "error", "condition")
+        ))
+      }
+      if (length(py_result_path_obj) > 1) {
+        warning("TemplateFlow returned multiple files (", length(py_result_path_obj), ") for the query, using the first one: ", py_result_path_obj[[1]], call. = FALSE)
+      }
+      return(py_result_path_obj[[1]])
+    }
+    if (is.list(py_result_path_obj)) {
+      # Flatten any character elements and pick the first valid one
+      flat <- unlist(py_result_path_obj, recursive = TRUE, use.names = FALSE)
+      flat <- as.character(flat)
+      flat <- flat[!is.na(flat) & nzchar(flat)]
+      if (length(flat) == 0) {
+        stop(structure(
+          list(message = paste0("TemplateFlow returned a list but no usable path strings were found.",
+                                "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
+               call = NULL,
+               query_args = query_params_list),
+          class = c("templateflow_processing_error", "error", "condition")
+        ))
+      }
+      if (length(flat) > 1) {
+        warning("TemplateFlow returned multiple files (", length(flat), ") for the query, using the first one: ", flat[[1]], call. = FALSE)
+      }
+      return(flat[[1]])
+    }
+    # As a last resort, coerce to character
+    coerced <- tryCatch(as.character(py_result_path_obj), error = function(e) NULL)
+    if (!is.null(coerced) && length(coerced) >= 1 && nzchar(coerced[[1]])) {
+      return(coerced[[1]])
+    }
+    stop(structure(
+      list(message = paste0("TemplateFlow returned an unexpected R object that could not be interpreted as a path.",
+                            "\nClass: ", paste(class(py_result_path_obj), collapse=","),
+                            "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
+           call = NULL,
+           query_args = query_params_list),
+      class = c("templateflow_processing_error", "error", "condition")
+    ))
+  }
+
+  # Python object branch: handle list vs single Path-like object
   final_py_path_obj_to_convert <- NULL
-  # Check if the result is a Python list object
-  if (reticulate::is_py_object(py_result_path_obj) && inherits(py_result_path_obj, "python.builtin.list")) {
+  if (inherits(py_result_path_obj, "python.builtin.list")) {
     num_paths <- length(py_result_path_obj)
     if (num_paths > 1) {
-      first_path_str <- tryCatch(reticulate::py_to_r(py_result_path_obj[[1]]$as_posix()), error = function(e) "<unavailable>")
+      first_path_str <- tryCatch({
+        if (reticulate::py_has_attr(py_result_path_obj[[1]], "as_posix")) {
+          reticulate::py_to_r(py_result_path_obj[[1]]$as_posix())
+        } else {
+          reticulate::py_to_r(py_result_path_obj[[1]])
+        }
+      }, error = function(e) "<unavailable>")
       warning("TemplateFlow returned multiple files (", num_paths, ") for the query, using the first one: ", first_path_str, call. = FALSE)
       final_py_path_obj_to_convert <- py_result_path_obj[[1]]
     } else if (num_paths == 1) {
       final_py_path_obj_to_convert <- py_result_path_obj[[1]]
-    } else { # num_paths == 0
-      # This case should ideally be caught by `is.null(py_result_path_obj)` check earlier
-      # if TemplateFlow returns NULL for empty list, or an actual empty list.
-      # If it's an empty Python list, py_result_path_obj would not be NULL.
+    } else {
       stop(structure(
         list(message = paste0("TemplateFlow returned an empty list of files for the query.",
                               "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
@@ -228,33 +285,37 @@
         class = c("templateflow_no_files_error", "error", "condition")
       ))
     }
-  } else { # Not a Python list, assume it's a single Python Path object or similar
+  } else {
     final_py_path_obj_to_convert <- py_result_path_obj
   }
 
   if (is.null(final_py_path_obj_to_convert)) {
-     # Should not happen if logic above is correct, but as a safeguard:
-     stop(structure(
-        list(message = paste0("Failed to determine a single path from TemplateFlow's response.",
-                              "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
-             call = NULL,
-             query_args = query_params_list),
-        class = c("templateflow_processing_error", "error", "condition")
-      ))
+    stop(structure(
+      list(message = paste0("Failed to determine a single path from TemplateFlow's response.",
+                            "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
+           call = NULL,
+           query_args = query_params_list),
+      class = c("templateflow_processing_error", "error", "condition")
+    ))
   }
 
-  # Convert the Python Path object to an R string path
+  # Convert Python Path-like object to an R string path
   r_path_string <- tryCatch({
-    reticulate::py_to_r(final_py_path_obj_to_convert$as_posix())
+    if (reticulate::py_has_attr(final_py_path_obj_to_convert, "as_posix")) {
+      reticulate::py_to_r(final_py_path_obj_to_convert$as_posix())
+    } else {
+      # Fallback: try direct conversion
+      reticulate::py_to_r(final_py_path_obj_to_convert)
+    }
   }, error = function(e_conv) {
     stop(structure(
-        list(message = paste0("Failed to convert Python path object to R string: ", e_conv$message,
-                              "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
-             call = NULL,
-             query_args = query_params_list,
-             conversion_error = e_conv),
-        class = c("templateflow_conversion_error", "error", "condition")
-      ))
+      list(message = paste0("Failed to convert Python path object to R string: ", e_conv$message,
+                            "\nQuery args: ", paste(names(query_params_list), query_params_list, sep="=", collapse=", ")),
+           call = NULL,
+           query_args = query_params_list,
+           conversion_error = e_conv),
+      class = c("templateflow_conversion_error", "error", "condition")
+    ))
   })
 
   return(r_path_string)
@@ -503,8 +564,10 @@ names.templateflow <- function(x) {
 #'   This is used to infer \code{suffix} if not explicitly provided.
 #' @param resolution Numeric or character. The resolution of the template in mm (e.g., \code{1}, \code{2}, \code{"1"}, \code{"01"}). Default: \code{1}.
 #' @param cohort Character string. Optional cohort identifier (e.g., \code{"adhokshaj"}).
-#' @param desc Character string. Specific TemplateFlow \code{desc} field. If provided, this overrides
-#'   any \code{desc} inferred from \code{variant}.
+#' @param desc Character string. Specific TemplateFlow \code{desc} field. Defaults to \code{"brain"} for
+#'   volumetric templates and is automatically dropped for variants where \code{desc} is typically
+#'   unused (e.g., \code{probseg}, \code{dseg}, surface queries). If provided explicitly, this overrides
+#'   any inferred \code{desc}.
 #' @param label Character string. Specific TemplateFlow \code{label} field (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"} for \code{variant="probseg"} or \code{variant="dseg"}).
 #' @param atlas Character string. Specific TemplateFlow \code{atlas} field (e.g., \code{"Schaefer2018"}).
 #' @param suffix Character string. Specific TemplateFlow \code{suffix} field. If provided, this overrides
@@ -519,14 +582,15 @@ names.templateflow <- function(x) {
 #'   `create_templateflow()`. If `NULL` (default), a default instance is created internally.
 #' @param ... Additional arguments passed directly to the Python `templateflow.api.get()` method
 #'   (e.g., `raise_on_empty = TRUE`). This allows specifying any valid TemplateFlow query
-#'   entity not explicitly listed as a parameter (e.g., `hemi`, `den`).
+#'   entity not explicitly listed as a parameter (e.g., `hemi`, `density`).
 #'
 #' @details
 #' The function performs several pre-flight checks:
 #'   - Validates the existence of the specified `space` using `tf$api$templates()`.
-#'   - Validates the specified `resolution` against available resolutions for that `space` using `tf$api$resolutions()`.
-#'   - These checks issue warnings and may be skipped if the necessary metadata cannot be retrieved from TemplateFlow.
-#'
+#'   - Validates the specified `resolution` against available resolutions when metadata is available
+#'     (legacy `api$resolutions()` or `api$get_metadata()` fallback). The check is skipped silently
+#'     if resolution metadata cannot be retrieved.
+#' 
 #' Caching behavior:
 #'   - This function uses `memoise` to cache the resolved file paths from TemplateFlow at the R level for the current session.
 #'   - The underlying Python TemplateFlow library also maintains its own disk cache, typically configured via the
@@ -582,7 +646,7 @@ get_template <- function(space = "MNI152NLin2009cAsym",
                          modality = "T1w",
                          resolution = 1,
                          cohort = NULL,
-                         desc = NULL,
+                         desc = "brain",
                          label = NULL,
                          atlas = NULL,
                          suffix = NULL,
@@ -591,6 +655,8 @@ get_template <- function(space = "MNI152NLin2009cAsym",
                          use_cache = TRUE,
                          api_handle = NULL,
                          ...) {
+
+  desc_missing <- missing(desc)
 
   # --- Vectorized Argument Handling ---
   vectorizable_params <- list(
@@ -627,6 +693,7 @@ get_template <- function(space = "MNI152NLin2009cAsym",
         label = if (vec_param_name == "label") val else label[1],
         cohort = cohort,
         desc = desc,
+        desc_missing = desc_missing,
         atlas = atlas,
         suffix = suffix,
         extension = extension,
@@ -637,9 +704,6 @@ get_template <- function(space = "MNI152NLin2009cAsym",
 
       # Add extra arguments
       args <- c(args, extra_args)
-
-      # Remove NULLs
-      args <- Filter(Negate(is.null), args)
 
       # Call the scalar implementation
       do.call(.get_template_scalar, args)
@@ -658,6 +722,7 @@ get_template <- function(space = "MNI152NLin2009cAsym",
     label = label,
     cohort = cohort,
     desc = desc,
+    desc_missing = desc_missing,
     atlas = atlas,
     suffix = suffix,
     extension = extension,
@@ -672,7 +737,7 @@ get_template <- function(space = "MNI152NLin2009cAsym",
 .get_template_scalar <- function(space, variant, modality, resolution,
                                 label, cohort, desc, atlas, suffix,
                                 extension, path_only, use_cache,
-                                api_handle, ...) {
+                                api_handle, desc_missing = FALSE, ...) {
 
   # Get or validate API handle
   if (is.null(api_handle)) {
@@ -702,7 +767,8 @@ get_template <- function(space = "MNI152NLin2009cAsym",
     modality = modality,
     desc = desc,
     suffix = suffix,
-    label = label
+    label = label,
+    desc_missing = desc_missing
   )
 
   # Build query arguments
@@ -1063,7 +1129,8 @@ get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @param hemi Character string, "L" for left hemisphere or "R" for right hemisphere.
 #'        Passed as `hemi` to `get_template`.
 #' @param density (Optional) Character string specifying the surface density
-#'        (e.g., "32k" for fsLR, "164k" for fsaverage). Passed as `den` to `get_template`.
+#'        (e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to TemplateFlow
+#'        as `density`.
 #' @param resolution (Optional) Character string specifying the resolution, primarily for
 #'        fsaverage variants (e.g., "06" for fsaverage6, which is `tpl-fsaverage_res-06...`).
 #'        Passed as `resolution` to `get_template`.
@@ -1082,7 +1149,7 @@ get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #'   #                                        hemi = "L", density = "32k")
 #'   # print(fslr_pial_L_path)
 #'
-#'   # Get the white surface for fsaverage6 (res="06", den="41k") right hemisphere
+#'   # Get the white surface for fsaverage6 (res="06", density="41k") right hemisphere
 #'   # fsaverage6_white_R_path <- get_surface_template(template_id = "fsaverage",
 #'   #                                               surface_type = "white",
 #'   #                                               hemi = "R",
@@ -1106,7 +1173,7 @@ get_surface_template <- function(template_id, surface_type, hemi,
   }
 
   # Construct the call to the main get_template function
-  # We pass hemi, den (from density), and other ... args directly.
+  # We pass hemi, density, and other ... args directly.
   # resolution is also a direct pass-through for get_template.
   call_args <- list(
     space = template_id,
@@ -1114,13 +1181,12 @@ get_surface_template <- function(template_id, surface_type, hemi,
     suffix = "surf",        # Common suffix for surface geometry files
     extension = ".gii",     # Common extension for Gifti surface files
     resolution = resolution,
-    load_as_neurovol = !load_as_path,
     hemi = hemi
-    # den will be added from density if not NULL
+    # density will be added if not NULL
   )
 
   if (!is.null(density)) {
-    call_args$den <- density
+    call_args$density <- density
   }
 
   # Combine with other arguments from ...
@@ -1138,8 +1204,8 @@ get_surface_template <- function(template_id, surface_type, hemi,
     desc = surface_type,
     suffix = "surf",
     extension = ".gii",
-    load_as_neurovol = !load_as_path,
-    hemi = hemi
+    hemi = hemi,
+    path_only = load_as_path
   )
 
   # Add resolution if provided (it's a named param in get_template)
@@ -1147,10 +1213,10 @@ get_surface_template <- function(template_id, surface_type, hemi,
     base_call_args$resolution <- resolution
   }
 
-  # Add density as 'den' (this goes into ... of get_template)
+  # Add density as 'density' (TemplateFlow >=2 prefers 'density'; older 'den' is not accepted)
   additional_tf_params <- list()
   if (!is.null(density)) {
-    additional_tf_params$den <- density
+    additional_tf_params$density <- density
   }
 
   # Combine ... from this function call with our derived additional_tf_params
@@ -1170,22 +1236,31 @@ get_surface_template <- function(template_id, surface_type, hemi,
           # Here, we let ... override for things like 'den' but not core structure.
           # The most robust is just to pass all ... directly to get_template and let it manage.
           # The current structure of get_template is: named args, then ...
-          # So, `den` should be passed via `...` to get_surface_template and then to get_template.
+          # So, density can be passed via `...` to get_surface_template and then to get_template.
       }
   }
 
-  # Simpler: construct arguments for do.call ensuring 'den' and other ... are correctly passed
+  # Simpler: construct arguments for do.call ensuring density and other ... are correctly passed
+  # NOTE: For surface templates, the surface type (inflated, white, pial, etc.) is the SUFFIX,
+
+  # not a 'desc' entity. The extension is '.surf.gii'.
+  # e.g., fsLR inflated surface: tpl-fsLR_den-32k_hemi-L_inflated.surf.gii
+  #       - suffix = "inflated"
+  #       - extension = ".surf.gii"
   final_args_for_get_template <- list(
     space = template_id,
-    desc = surface_type,
-    suffix = "surf",
-    extension = ".gii",
-    resolution = resolution, # Explicitly pass, even if NULL, get_template handles it
-    load_as_neurovol = !load_as_path,
-    hemi = hemi
+    suffix = surface_type,      # Surface type IS the suffix (inflated, white, pial, midthickness, etc.)
+    extension = ".surf.gii",    # Full extension including .surf
+    hemi = hemi,
+    path_only = load_as_path
   )
+  # Only add resolution if explicitly provided (non-NULL)
+  # Note: we must use list() assignment to actually set NULL, since $<- removes the element
+  if (!is.null(resolution)) {
+    final_args_for_get_template$resolution <- resolution
+  }
   if (!is.null(density)) {
-    final_args_for_get_template$den <- density # Add 'den' if density is provided
+    final_args_for_get_template$density <- density
   }
 
   # Merge with any other ... arguments passed to get_surface_template
@@ -1194,7 +1269,85 @@ get_surface_template <- function(template_id, surface_type, hemi,
   # For new parameters from ..., they will be added.
   combined_args <- utils::modifyList(list(...), final_args_for_get_template)
 
+  # Explicitly pass NULL for parameters that get_template() has defaults for,
+  # but which should NOT be applied to surface templates.
+  # Note: we use list() assignment because $<- NULL removes the element from the list
+  #
+  # - resolution: get_template default is 1, but surfaces use density instead
+  # - variant: get_template default is "brain", which maps to desc="brain", but surfaces don't use desc
+  # - modality: get_template default is "T1w", but surfaces don't use modality
+  if (is.null(resolution)) {
+    combined_args["resolution"] <- list(NULL)
+  }
+  combined_args["variant"] <- list(NULL)
+  combined_args["modality"] <- list(NULL)
+  combined_args["desc"] <- list(NULL)
+
   do.call(get_template, combined_args)
+}
+
+#' Load a surface template as a neurosurf geometry
+#'
+#' Convenience wrapper around \code{\link{get_surface_template}} that
+#' downloads (via TemplateFlow) the requested surface geometry and returns it
+#' as a \code{neurosurf::SurfaceGeometry} object (or a left/right list).
+#'
+#' @param template_id Surface template identifier passed to TemplateFlow
+#'   (e.g., "fsaverage", "fsaverage6", "fsLR").
+#' @param surface_type Surface type (e.g., "white", "pial", "inflated",
+#'   "midthickness").
+#' @param hemi Hemisphere to load. One of "L", "R", or "both". If "both",
+#'   a named list with elements \code{L} and \code{R} is returned.
+#' @param density Optional surface density (TemplateFlow \code{density}
+#'   argument).
+#' @param resolution Optional resolution string (TemplateFlow \code{res}
+#'   argument), e.g., "06" for fsaverage6.
+#' @param ... Additional arguments forwarded to \code{\link{get_surface_template}},
+#'   such as alternative cache directories.
+#'
+#' @return A \code{neurosurf::SurfaceGeometry} object when \code{hemi} is "L"
+#'   or "R"; a named list of two \code{SurfaceGeometry} objects when
+#'   \code{hemi} is "both".
+#'
+#' @examples
+#' \dontrun{
+#'   # fsaverage6 pial surface as NeuroSurface
+#'   lh <- load_surface_template("fsaverage", "pial", hemi = "L",
+#'                               density = "41k", resolution = "06")
+#'
+#'   # Both hemispheres of fsLR 32k inflated surface
+#'   both <- load_surface_template("fsLR", "inflated", hemi = "both",
+#'                                 density = "32k")
+#' }
+#' @export
+load_surface_template <- function(template_id, surface_type,
+                                  hemi = c("L", "R", "both"),
+                                  density = NULL,
+                                  resolution = NULL,
+                                  ...) {
+  hemi <- match.arg(hemi)
+
+  fetch_one <- function(h) {
+    surf_path <- get_surface_template(
+      template_id = template_id,
+      surface_type = surface_type,
+      hemi = h,
+      density = density,
+      resolution = resolution,
+      ...,
+      load_as_path = TRUE
+    )
+
+    neurosurf::read_surf_geometry(surf_path)
+  }
+
+  if (identical(hemi, "both")) {
+    ret <- list(L = fetch_one("L"), R = fetch_one("R"))
+    class(ret) <- c("neuroatlas_surface_pair", "list")
+    return(ret)
+  }
+
+  fetch_one(hemi)
 }
 
 # Cache Management Functions ----
@@ -1408,7 +1561,7 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
   # Construct the full query for the Python API
   full_python_query <- query_args
   full_python_query$template <- space
-  full_python_query$raise_on_empty <- FALSE # Ensure it returns list, not error on empty
+  # Note: raise_on_empty is no longer supported in newer TemplateFlow versions
 
   # Ensure query args are sorted for potential future memoisation consistency if applied here
   if (length(full_python_query) > 0) {
@@ -1419,6 +1572,11 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
   tryCatch({
     py_path_list_obj <- do.call(tf[["api"]]$get, full_python_query)
   }, error = function(e) {
+    # Check if it's a "no files found" error vs actual API error
+    if (grepl("No files found", e$message, ignore.case = TRUE)) {
+      # This is expected when query returns no results - return empty
+      return(NULL)
+    }
     warning(paste0("TemplateFlow API error while listing metadata: ", e$message,
                    "\nQuery: template=", space, ", args=", paste(names(query_args), query_args, sep="=", collapse=", ")))
     return(NULL) # Return NULL on API error
@@ -1426,27 +1584,58 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 
   if (is.null(py_path_list_obj)) {
     # This can happen if the API call itself failed and returned NULL from tryCatch
-    return(NULL)
+    return(character(0))
   }
 
-  # Convert Python list of Path objects to R character vector of paths
-  r_paths <- character(0)
-  if (reticulate::is_py_object(py_path_list_obj) && inherits(py_path_list_obj, "python.builtin.list")) {
-    if (length(py_path_list_obj) > 0) {
-      r_paths <- sapply(py_path_list_obj, function(py_path) {
-        tryCatch(reticulate::py_to_r(py_path$as_posix()), error = function(e) NA_character_)
-      })
-      r_paths <- r_paths[!is.na(r_paths)] # Remove any that failed conversion
+
+  # Convert Python result to R character vector of paths
+  # Handle various return types from TemplateFlow API
+  r_paths <- tryCatch({
+    # First try: if it's already convertible to R (e.g., auto-converted list)
+    converted <- reticulate::py_to_r(py_path_list_obj)
+
+    if (is.character(converted)) {
+      # Direct character vector
+      converted
+    } else if (is.list(converted)) {
+      # List of paths - extract strings
+      paths <- vapply(converted, function(p) {
+        if (is.character(p)) {
+          p
+        } else if (reticulate::is_py_object(p) && reticulate::py_has_attr(p, "as_posix")) {
+          reticulate::py_to_r(p$as_posix())
+        } else {
+          as.character(p)
+        }
+      }, character(1))
+      paths[!is.na(paths) & nzchar(paths)]
+    } else {
+      # Single path object
+      if (reticulate::py_has_attr(py_path_list_obj, "as_posix")) {
+        reticulate::py_to_r(py_path_list_obj$as_posix())
+      } else {
+        as.character(converted)
+      }
     }
-    # If length is 0, r_paths remains character(0), which is correct for no matches
-  } else if (reticulate::is_py_object(py_path_list_obj)) {
-    # If TF returns a single Path object when only one file matches (even with raise_on_empty=F)
-    # This is unlikely given raise_on_empty=F usually ensures a list, but handle defensively.
-    single_path <- tryCatch(reticulate::py_to_r(py_path_list_obj$as_posix()), error = function(e) NA_character_)
-    if (!is.na(single_path)) r_paths <- single_path
-  }
-  # Else: py_path_list_obj might be something unexpected, r_paths remains empty.
-  # Or if TemplateFlow returns R NULL directly for no matches (unlikely with python object)
+  }, error = function(e) {
+    # Fallback: try to iterate if it's a Python iterable
+    tryCatch({
+      builtins <- reticulate::import_builtins()
+      py_list <- builtins$list(py_path_list_obj)
+      paths <- vapply(seq_along(py_list), function(i) {
+        p <- py_list[[i - 1]]
+        if (reticulate::py_has_attr(p, "as_posix")) {
+          reticulate::py_to_r(p$as_posix())
+        } else {
+          as.character(reticulate::py_to_r(p))
+        }
+      }, character(1))
+      paths[!is.na(paths) & nzchar(paths)]
+    }, error = function(e2) {
+      warning("Could not convert TemplateFlow result to paths: ", e$message)
+      character(0)
+    })
+  })
 
   return(r_paths)
 }
@@ -1552,26 +1741,74 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 
 # Helper: Validate resolution
 .validate_resolution <- function(tf, space, resolution) {
-  available <- tryCatch({
-    reticulate::py_to_r(tf[["api"]]$resolutions(space))
-  }, error = function(e) {
-    warning("Could not retrieve resolutions: ", e$message)
-    return(NULL)
-  })
-
-  if (!is.null(available)) {
-    res_char <- as.character(resolution)
-    res_padded <- sprintf("%02d", as.integer(resolution))
-
-    if (!(res_char %in% available || res_padded %in% available)) {
-      stop("Resolution '", resolution, "' not available for ", space, ". ",
-           "Available: ", paste(available, collapse = ", "))
-    }
+  # Try the legacy API first (templateflow.api$resolutions)
+  available <- NULL
+  if (reticulate::py_has_attr(tf[["api"]], "resolutions")) {
+    available <- tryCatch({
+      reticulate::py_to_r(tf[["api"]]$resolutions(space))
+    }, error = function(e) {
+      # Older/newer TemplateFlow API variants may not expose this helper
+      if (grepl("no attribute", e$message, ignore.case = TRUE) &&
+          grepl("resolutions", e$message, ignore.case = TRUE)) {
+        return(NULL)
+      }
+      warning("Could not retrieve resolutions via api$resolutions(): ", e$message)
+      NULL
+    })
   }
+
+  # Fallback to metadata-based discovery for newer TemplateFlow API versions
+  if (is.null(available) && reticulate::py_has_attr(tf[["api"]], "get_metadata")) {
+    available <- tryCatch({
+      meta <- reticulate::py_to_r(tf[["api"]]$get_metadata(space))
+      if (is.null(meta)) {
+        return(NULL)
+      }
+
+      # Common metadata keys storing resolution information
+      if (!is.null(meta$resolutions)) {
+        as.character(meta$resolutions)
+      } else if (!is.null(meta$res)) {
+        if (is.list(meta$res)) {
+          if (!is.null(names(meta$res)) && any(nzchar(names(meta$res)))) {
+            names(meta$res)
+          } else {
+            as.character(unlist(meta$res, use.names = FALSE))
+          }
+        } else {
+          as.character(meta$res)
+        }
+      } else {
+        NULL
+      }
+    }, error = function(e) {
+      if (grepl("no attribute", e$message, ignore.case = TRUE) &&
+          grepl("get_metadata", e$message, ignore.case = TRUE)) {
+        return(NULL)
+      }
+      warning("Could not retrieve resolutions via api$get_metadata(): ", e$message)
+      NULL
+    })
+  }
+
+  # If no metadata was found, quietly skip validation
+  if (is.null(available)) {
+    return(invisible(NULL))
+  }
+
+  res_char <- as.character(resolution)
+  res_padded <- sprintf("%02d", as.integer(resolution))
+
+  if (!(res_char %in% available || res_padded %in% available)) {
+    stop("Resolution '", resolution, "' not available for ", space, ". ",
+         "Available: ", paste(available, collapse = ", "))
+  }
+
+  invisible(TRUE)
 }
 
-# Helper: Infer template parameters
-.infer_template_params <- function(variant, modality, desc, suffix, label) {
+.infer_template_params <- function(variant, modality, desc, suffix, label,
+                                  desc_missing = FALSE) {
   # Variant to desc mapping
   desc_map <- c(
     brain = "brain",
@@ -1590,33 +1827,58 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
     dseg = "dseg"
   )
 
-  # Infer desc if not provided
+  surface_suffixes <- c("inflated", "white", "pial", "midthickness", "sphere")
+
+  # Track whether the user actually provided desc (non-NULL)
+  user_supplied_desc <- !desc_missing && !is.null(desc)
+
+  # Infer desc if not provided (or provided as NULL)
   final_desc <- desc
-  if (is.null(final_desc) && !is.null(variant)) {
-    final_desc <- desc_map[variant]
+  if (!user_supplied_desc) {
+    if (!is.null(variant) && variant %in% c("probseg", "dseg")) {
+      final_desc <- NULL
+    } else if (!is.null(variant) && variant %in% names(desc_map)) {
+      final_desc <- unname(desc_map[variant])
+    } else if (!is.null(suffix) &&
+               suffix %in% c("probseg", "dseg", "mask", surface_suffixes)) {
+      final_desc <- NULL
+    } else if (is.null(variant)) {
+      # Default volumetric desc when nothing else is specified
+      final_desc <- desc_map[["brain"]]
+    } else {
+      # Unknown variant and no suffix guidance; force explicit desc
+      final_desc <- NULL
+    }
   }
 
   # Infer suffix if not provided
   final_suffix <- suffix
   if (is.null(final_suffix)) {
-    if (!is.null(modality) && modality %in% names(suffix_map)) {
-      final_suffix <- suffix_map[modality]
-    } else if (!is.null(variant) && variant %in% names(suffix_map)) {
+    # Prefer variant-driven suffix when it implies a specific file type (probseg/dseg/mask)
+    if (!is.null(variant) && variant %in% names(suffix_map)) {
       final_suffix <- suffix_map[variant]
+    } else if (!is.null(modality) && modality %in% names(suffix_map)) {
+      final_suffix <- suffix_map[modality]
     }
   }
 
   # Validate we have required parameters
+  # For probseg/dseg/mask, desc is typically absent and not required.
+  # For surface files (inflated, white, pial, midthickness, sphere), desc is also not used.
   if (is.null(final_desc)) {
-    stop("Could not determine 'desc'. Provide explicitly or use a supported variant.")
+    if (!is.null(final_suffix) && final_suffix %in% c("probseg", "dseg", "mask", surface_suffixes)) {
+      # OK: these file types are fully determined by suffix (+ optional label for probseg/dseg)
+    } else {
+      stop("Could not determine 'desc'. Provide explicitly or use a supported variant.")
+    }
   }
   if (is.null(final_suffix)) {
     stop("Could not determine 'suffix'. Provide explicitly or use a supported variant/modality.")
   }
 
   # Warn about label usage
-  if (!is.null(label) && !(final_desc %in% c("probseg", "dseg"))) {
-    warning("'label' typically used with desc='probseg' or 'dseg', not '", final_desc, "'")
+  if (!is.null(label) && !(final_suffix %in% c("probseg", "dseg"))) {
+    warning("'label' typically used with suffix='probseg' or 'dseg', not '", final_suffix, "'")
   }
 
   return(list(desc = final_desc, suffix = final_suffix))

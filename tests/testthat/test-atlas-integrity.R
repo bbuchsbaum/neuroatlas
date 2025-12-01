@@ -50,7 +50,26 @@ test_that("atlas loading maintains data integrity and handles errors gracefully"
 })
 
 test_that("resampling preserves labels and handles edge cases correctly", {
-  skip("Skipping resampling test - neuroim2::resample doesn't support ClusteredNeuroVol properly")
+  skip_on_cran()
+
+  # Use Schaefer atlas and resample to ASEG space
+  atlas <- tryCatch({
+    get_schaefer_atlas(parcels = "100", networks = "7")
+  }, error = function(e) {
+    skip("Failed to download Schaefer atlas for resampling test")
+  })
+
+  target_space <- neuroim2::space(get_aseg_atlas()$atlas)
+  resampled <- resample(atlas$atlas, target_space)
+
+  expect_true(inherits(resampled, "ClusteredNeuroVol"))
+  expect_true(all(dim(resampled) == dim(target_space)))
+
+  # All labels should be subset of original; no new labels introduced
+  original_labels <- sort(unique(as.vector(atlas$atlas@clusters)))
+  new_labels <- sort(unique(as.vector(resampled@clusters)))
+  expect_true(all(new_labels %in% original_labels))
+  expect_gt(length(new_labels), 0)
 })
 
 test_that("merge_atlases handles ID conflicts and maintains referential integrity", {

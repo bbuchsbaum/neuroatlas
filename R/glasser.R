@@ -271,3 +271,182 @@ print.glasser <- function(x, ...) {
     right = "Use plot() for visualization",
     col = "cyan", width = 65), "\n", sep="")
 }
+
+
+# Glasser surface atlas --------------------------------------------------------
+
+#' Glasser Surface Atlas (fsaverage)
+#'
+#' @description
+#' Load the Glasser HCP-MMP1.0 cortical parcellation projected to the
+#' FreeSurfer \code{fsaverage} surface, as distributed by Kathryn Mills
+#' (see Figshare dataset "HCP-MMP1.0 projected on fsaverage").
+#' The result is a pair of neurosurf \code{LabeledNeuroSurface} objects plus
+#' atlas metadata.
+#'
+#' @details
+#' This function uses:
+#' \itemize{
+#'   \item fsaverage surface geometry from TemplateFlow via
+#'         \code{\link{get_surface_template}}
+#'   \item fsaverage \code{.annot} files from the Mills Figshare distribution
+#'         (\code{lh.HCP-MMP1.annot}, \code{rh.HCP-MMP1.annot})
+#' }
+#' Currently only the \code{"fsaverage"} surface space is supported.
+#'
+#' @param space Surface space / mesh template. Only \code{"fsaverage"} is
+#'   supported at present.
+#' @param surf Surface type. One of \code{"pial"}, \code{"white"},
+#'   \code{"inflated"}, or \code{"midthickness"}.
+#' @param use_cache Logical. Whether to cache downloaded annotation files in
+#'   the neuroatlas cache directory. Default: \code{TRUE}.
+#'
+#' @return A list with classes \code{c("glasser_surf","surfatlas","atlas")}
+#'   containing:
+#'   \itemize{
+#'     \item \code{lh_atlas}, \code{rh_atlas}: \code{LabeledNeuroSurface}
+#'       objects for left and right hemispheres.
+#'     \item \code{surf_type}: requested surface type.
+#'     \item \code{surface_space}: surface template space ("fsaverage").
+#'     \item \code{ids}, \code{labels}, \code{orig_labels},
+#'       \code{hemi}, \code{cmap}: atlas metadata.
+#'   }
+#'
+#' @examples
+#' \dontrun{
+#' # Glasser MMP1.0 on fsaverage pial surface
+#' atl <- glasser_surf(space = "fsaverage", surf = "pial")
+#' }
+#'
+#' @export
+glasser_surf <- function(space = "fsaverage",
+                         surf = c("pial", "white", "inflated", "midthickness"),
+                         use_cache = TRUE) {
+  space <- match.arg(space, c("fsaverage", "fsaverage5", "fsaverage6"))
+  surf <- match.arg(surf, c("pial", "white", "inflated", "midthickness"))
+
+  if (!identical(space, "fsaverage")) {
+    stop("Glasser surface atlas is currently only available in 'fsaverage' space.")
+  }
+
+  lh <- .glasser_fsaverage_surface_hemi("lh", surf, use_cache = use_cache)
+  rh <- .glasser_fsaverage_surface_hemi("rh", surf, use_cache = use_cache)
+
+  # Extract label information from hemispheres
+  lh_labels <- lh@labels
+  rh_labels <- rh@labels
+
+  labels <- c(lh_labels, rh_labels)
+  ids <- seq_along(labels)
+  hemi <- c(rep("left", length(lh_labels)), rep("right", length(rh_labels)))
+  orig_labels <- labels
+
+  # Build RGB colormap from hex colours
+  lh_cols <- lh@cols
+  rh_cols <- rh@cols
+  all_cols <- c(lh_cols, rh_cols)
+
+  rgb_mat <- t(grDevices::col2rgb(all_cols))
+  colnames(rgb_mat) <- c("red", "green", "blue")
+  cmap <- as.data.frame(rgb_mat)
+
+  ret <- list(
+    surf_type = surf,
+    surface_space = "fsaverage",
+    lh_atlas = lh,
+    rh_atlas = rh,
+    name = "Glasser-MMP1 fsaverage",
+    cmap = cmap,
+    ids = ids,
+    labels = labels,
+    orig_labels = orig_labels,
+    hemi = hemi
+  )
+
+  class(ret) <- c("glasser_surf", "surfatlas", "atlas")
+  ret
+}
+
+
+# Internal: Glasser Figshare annotation paths ----------------------------------
+
+#' @keywords internal
+.glasser_figshare_annot_path <- function(hemi, use_cache = TRUE) {
+  hemi <- match.arg(hemi, c("lh", "rh"))
+
+  cache_dir <- .neuroatlas_cache_dir("glasser")
+  fname <- if (hemi == "lh") "lh.HCP-MMP1.annot" else "rh.HCP-MMP1.annot"
+  fpath <- file.path(cache_dir, fname)
+
+  if (use_cache && file.exists(fpath)) {
+    return(fpath)
+  }
+
+  url <- if (hemi == "lh") {
+    "https://figshare.com/ndownloader/files/5528816"
+  } else {
+    "https://figshare.com/ndownloader/files/5528819"
+  }
+
+  tmp <- tempfile(fileext = ".annot")
+  downloader::download(url, tmp)
+
+  ok <- file.copy(tmp, fpath, overwrite = TRUE)
+  if (!ok) {
+    stop("Failed to cache Glasser annotation file at ", fpath)
+  }
+
+  fpath
+}
+
+
+# Internal: Glasser fsaverage surface loader -----------------------------------
+
+#' @keywords internal
+.glasser_fsaverage_surface_hemi <- function(hemi,
+                                            surf = c("pial", "white", "inflated", "midthickness"),
+                                            use_cache = TRUE) {
+  hemi <- match.arg(hemi, c("lh", "rh"))
+  surf <- match.arg(surf, c("pial", "white", "inflated", "midthickness"))
+
+  annot_path <- .glasser_figshare_annot_path(hemi, use_cache = use_cache)
+
+  hemi_tf <- if (hemi == "lh") "L" else "R"
+
+  surf_path <- tryCatch({
+    get_surface_template(
+      template_id = "fsaverage",
+      surface_type = surf,
+      hemi = hemi_tf,
+      density = "164k",
+      load_as_path = TRUE
+    )
+  }, error = function(e) {
+    NULL
+  })
+
+  geom <- if (!is.null(surf_path) && file.exists(surf_path)) {
+    neurosurf::read_surf_geometry(surf_path)
+  } else {
+    # Fallback to packaged fsaverage surfaces if TemplateFlow is unavailable
+    data("fsaverage", package = "neuroatlas", envir = environment())
+    fsavg_obj <- get("fsaverage", envir = environment())
+    surf_name <- paste0(hemi, "_", surf)
+    if (is.null(fsavg_obj[[surf_name]])) {
+      stop("Failed to load fsaverage surface geometry for hemisphere ", hemi, " (", surf, ")")
+    }
+    fsavg_obj[[surf_name]]
+  }
+
+  annot <- suppressWarnings(
+    neurosurf::read_freesurfer_annot(annot_path, geom)
+  )
+
+  # Basic sanity check: number of vertices should match
+  n_vertices <- ncol(geom@mesh$vb) - 1L
+  if (length(annot@data) != n_vertices) {
+    stop("Vertex mismatch between Glasser annotation and fsaverage surface for hemisphere ", hemi)
+  }
+
+  annot
+}

@@ -16,7 +16,6 @@ test_that("reduce_atlas computes summary statistics with default format", {
 
 test_that("reduce_atlas names columns for matrix output", {
   skip_on_cran()
-  skip("NeuroVec creation issue - skipping for now")
   
   atl <- get_aseg_atlas()
   # Create two volumes and concatenate them
@@ -24,7 +23,7 @@ test_that("reduce_atlas names columns for matrix output", {
                               space = neuroim2::space(atl$atlas))
   vol2 <- neuroim2::NeuroVol(array(rnorm(prod(dim(atl$atlas))), dim=dim(atl$atlas)),
                               space = neuroim2::space(atl$atlas))
-  vec <- neuroim2::concat(vol1, vol2, along=4)
+  vec <- neuroim2::NeuroVec(list(vol1, vol2))
   stats <- reduce_atlas(atl, vec, mean)
 
   expect_s3_class(stats, "tbl_df")
@@ -75,16 +74,18 @@ test_that("reduce_atlas supports wide format", {
 
 test_that("reduce_atlas supports long format for NeuroVec", {
   skip_on_cran()
-  skip("NeuroVec creation issue - skipping for now")
-  
   atl <- get_aseg_atlas()
-  # Would create NeuroVec here
-  # vec <- ...
-  # stats <- reduce_atlas(atl, vec, mean, format = "long")
+  vol_list <- lapply(1:3, function(i) {
+    neuroim2::NeuroVol(array(rnorm(prod(dim(atl$atlas))), dim=dim(atl$atlas)),
+                       space = neuroim2::space(atl$atlas))
+  })
+  vec <- neuroim2::NeuroVec(vol_list)
+  stats <- reduce_atlas(atl, vec, mean, format = "long")
   
-  # expect_s3_class(stats, "tbl_df")
-  # expect_equal(ncol(stats), 3)  # time, region, value
-  # expect_equal(colnames(stats), c("time", "region", "value"))
+  expect_s3_class(stats, "tbl_df")
+  expect_equal(ncol(stats), 3)  # time, region, value
+  expect_equal(colnames(stats), c("time", "region", "value"))
+  expect_equal(length(unique(stats$time)), 3)
 })
 
 # test_that("reduce_atlas works on surface atlas", {

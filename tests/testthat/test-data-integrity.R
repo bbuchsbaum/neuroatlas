@@ -144,7 +144,6 @@ test_that("Critical helper functions work correctly", {
 })
 
 test_that("Edge cases in atlas operations are handled correctly", {
-  skip("reduce_atlas method not yet implemented")
   skip_on_cran()
   
   # Test using existing loaded atlas instead of creating new spaces

@@ -19,8 +19,9 @@
 #'
 #' @param atlas An object of class "atlas" containing the parcellation to be dilated
 #' @param mask A binary mask (NeuroVol object) specifying valid voxels for dilation.
-#'   Dilation will only occur within non-zero mask values. Typically a LogicalNeuroVol,
-#'   but can be any NeuroVol that will be converted to logical via as.logical().
+#'   Dilation will only occur within non-zero mask values. May also be a TemplateFlow
+#'   space identifier (string) or list of `get_template()` arguments, which will be
+#'   resolved to a NeuroVol via `.resolve_template_input()`.
 #' @param radius Numeric. The maximum distance (in voxels) to search for neighboring
 #'   parcels when dilating. Default: 4
 #' @param maxn Integer. Maximum number of neighboring voxels to consider when
@@ -57,15 +58,20 @@
 #' @importFrom Rnanoflann nn
 #' @export
 dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
-    # Validate inputs
+    # Validate and resolve inputs
     assertthat::assert_that(inherits(atlas, "atlas"),
                             msg = "`atlas` arg must be an atlas")
-    assertthat::assert_that(inherits(mask, "NeuroVol"),
-                            msg = "`mask` must be a NeuroVol object")
     assertthat::assert_that(radius > 0,
                             msg = "`radius` must be positive")
     assertthat::assert_that(maxn > 0,
                             msg = "`maxn` must be positive")
+
+    # Allow TemplateFlow-style mask inputs (string/list) in addition to NeuroVol
+    if (!inherits(mask, "NeuroVol")) {
+      mask <- .resolve_template_input(mask, target_type = "NeuroVol")
+    }
+    assertthat::assert_that(inherits(mask, "NeuroVol"),
+                            msg = "`mask` must be a NeuroVol object or resolvable via .resolve_template_input()")
 
     # Convert the atlas to a dense array
     # Convert ClusteredNeuroVol to regular NeuroVol
@@ -83,6 +89,10 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
       atlas$atlas
     }
 
+    # Dimension sanity check to avoid misaligned dilation
+    assertthat::assert_that(all(dim(mask) == dim(atlas2)),
+                            msg = "`mask` and `atlas` must have matching dimensions for dilation")
+
     # Identify the indices of labeled voxels and mask voxels
     atlas_idx <- which(atlas2 > 0)
     mask_idx <- which(as.logical(mask))
@@ -93,121 +103,97 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
         return(atlas)
     }
 
-    # Convert linear indices to coordinates
-    cd_atlas <- neuroim2::index_to_coord(mask, atlas_idx)
-    cd_diff <- neuroim2::index_to_coord(mask, diff_idx)
-
-    # Get voxel dimensions to scale radius appropriately
-    voxel_dims <- neuroim2::spacing(mask)
-    # Scale radius by the minimum voxel dimension to get appropriate search radius in mm
-    search_radius <- radius * min(voxel_dims)
+    # Convert linear indices to voxel-grid coordinates (voxel units; avoids anisotropy issues)
+    grid_atlas <- neuroim2::index_to_grid(mask, atlas_idx)
+    grid_diff  <- neuroim2::index_to_grid(mask, diff_idx)
+    storage.mode(grid_atlas) <- "double"
+    storage.mode(grid_diff) <- "double"
+    search_radius <- radius  # already in voxel units
 
     # For very large point sets, process in chunks to avoid memory issues
     chunk_size <- 10000
-    n_diff <- nrow(cd_diff)
+    n_diff <- nrow(grid_diff)
     
-    if (n_diff > chunk_size) {
-        # Process in chunks
-        all_indices <- list()
-        all_distances <- list()
-        
-        for (start in seq(1, n_diff, by = chunk_size)) {
-            end <- min(start + chunk_size - 1, n_diff)
-            chunk_points <- cd_diff[start:end, , drop = FALSE]
-            
-            chunk_ret <- Rnanoflann::nn(data = cd_atlas, 
-                                       points = chunk_points, 
-                                       k = maxn,
-                                       search = "radius", 
-                                       radius = search_radius,
-                                       sorted = TRUE)
-            
-            all_indices[[length(all_indices) + 1]] <- chunk_ret$indices
-            all_distances[[length(all_distances) + 1]] <- chunk_ret$distances
-        }
-        
-        # Combine results
-        ret <- list(
-            indices = do.call(rbind, all_indices),
-            distances = do.call(rbind, all_distances)
+    # Prepare output containers
+    dims <- dim(atlas2)
+    new_idx_accum <- integer(n_diff)
+    new_label_accum <- integer(n_diff)
+    write_pos <- 0L
+
+    # Helper to process a chunk without retaining full neighbor matrices
+    process_chunk <- function(start, end) {
+        chunk_points <- grid_diff[start:end, , drop = FALSE]
+
+        chunk_ret <- Rnanoflann::nn(
+            data   = grid_atlas,
+            points = chunk_points,
+            k      = maxn,
+            search = "radius",
+            radius = search_radius,
+            sorted = TRUE
         )
-    } else {
-        # Process all at once for smaller datasets
-        ret <- Rnanoflann::nn(data = cd_atlas, 
-                              points = cd_diff, 
-                              k = maxn,
-                              search = "radius", 
-                              radius = search_radius,
-                              sorted = TRUE)
+
+        valid <- which(chunk_ret$indices[, 1] != 0)
+        if (length(valid) == 0) return(NULL)
+
+        # For each valid row, choose label by inverse-distance voting
+        chosen_labels <- integer(length(valid))
+        lin_indices   <- integer(length(valid))
+
+        for (j in seq_along(valid)) {
+            row_idx <- valid[j]
+            neighbors <- chunk_ret$indices[row_idx, ]
+            neighbors <- neighbors[neighbors != 0]
+
+            dists <- chunk_ret$distances[row_idx, ]
+            dists <- dists[seq_along(neighbors)]
+
+            neighbor_lin_idx <- atlas_idx[neighbors]
+            neighbor_labels  <- atlas2[neighbor_lin_idx]
+
+            weights <- 1 / (dists + .Machine$double.eps)
+            label_votes <- tapply(weights, neighbor_labels, sum)
+            chosen_labels[j] <- as.numeric(names(which.max(label_votes)))
+
+            g2 <- grid_diff[start + row_idx - 1, , drop = FALSE]
+            lin_indices[j] <- (g2[,3] - 1) * dims[1] * dims[2] + (g2[,2] - 1) * dims[1] + g2[,1]
+        }
+
+        list(idx = lin_indices, lbl = chosen_labels)
     }
 
-    # The nn() function returns matrices, need to convert to list format
-    # ret$indices is a matrix where each row contains the indices of neighbors
-    # ret$distances is a matrix where each row contains the distances to neighbors
-    
-    # Convert to list format and filter out points with no neighbors
-    # In radius search, points with no neighbors have indices = 0
-    valid_queries <- which(ret$indices[,1] != 0)
-    
-    if (length(valid_queries) == 0) {
-        # No neighbors for unlabeled voxels, so no change
+    if (n_diff > chunk_size) {
+        for (start in seq(1, n_diff, by = chunk_size)) {
+            end <- min(start + chunk_size - 1, n_diff)
+            chunk_res <- process_chunk(start, end)
+            if (!is.null(chunk_res)) {
+                len <- length(chunk_res$idx)
+                tgt <- (write_pos + 1L):(write_pos + len)
+                new_idx_accum[tgt]   <- chunk_res$idx
+                new_label_accum[tgt] <- chunk_res$lbl
+                write_pos <- write_pos + len
+            }
+        }
+    } else {
+        chunk_res <- process_chunk(1, n_diff)
+        if (!is.null(chunk_res)) {
+            len <- length(chunk_res$idx)
+            tgt <- (write_pos + 1L):(write_pos + len)
+            new_idx_accum[tgt]   <- chunk_res$idx
+            new_label_accum[tgt] <- chunk_res$lbl
+            write_pos <- write_pos + len
+        }
+    }
+
+    if (write_pos == 0L) {
         return(atlas)
     }
 
-    # Convert matrix output to list format for compatibility with existing code
-    indset <- lapply(valid_queries, function(i) {
-        idx <- ret$indices[i,]
-        idx[idx != 0]  # Remove zeros (no neighbor indicators)
-    })
-    
-    dset <- lapply(valid_queries, function(i) {
-        idx <- ret$indices[i,]
-        dist <- ret$distances[i,]
-        dist[idx != 0]  # Keep only valid distances
-    })
-
-    # Prepare output: list form, then we rbind later
-    out_list <- vector("list", length(valid_queries))
-
-    # Grid (x,y,z) for the labeled vs unlabeled sets
-    dims <- dim(atlas2)
-    grid_atlas <- neuroim2::index_to_grid(mask, atlas_idx)
-    grid_diff  <- neuroim2::index_to_grid(mask, diff_idx)
-
-    # For each unlabeled voxel that has neighbors
-    for (i in seq_along(valid_queries)) {
-        voxel_idx <- valid_queries[i]
-        neighbors <- indset[[i]]
-        distances <- dset[[i]]
-
-        # Grid coords of the unlabeled voxel we're filling
-        g2 <- grid_diff[voxel_idx, , drop = FALSE]
-
-        # The neighbor indices are indices into cd_atlas, which map back to atlas_idx
-        neighbor_lin_idx <- atlas_idx[neighbors]
-        neighbor_labels  <- atlas2[neighbor_lin_idx]
-
-        # Weight by inverse distance
-        weights <- 1 / (distances + .Machine$double.eps)
-        label_votes <- tapply(weights, neighbor_labels, sum)
-        chosen_label <- as.numeric(names(which.max(label_votes)))
-
-        # Store (x, y, z, chosen_label)
-        out_list[[i]] <- cbind(g2, chosen_label)
-    }
-
-    # Combine rows
-    out_df <- do.call(rbind, out_list)
-
-    # Convert (x,y,z) back to linear indices
-    sub2ind <- function(sz, xyz) {
-        # xyz is Nx3
-        (xyz[,3] - 1) * sz[1] * sz[2] + (xyz[,2] - 1) * sz[1] + xyz[,1]
-    }
-    new_lin_idx <- sub2ind(dims, out_df[, 1:3, drop = FALSE])
+    new_idx_accum <- new_idx_accum[seq_len(write_pos)]
+    new_label_accum <- new_label_accum[seq_len(write_pos)]
 
     # Assign chosen labels
-    atlas2[new_lin_idx] <- out_df[, 4]
+    atlas2[new_idx_accum] <- new_label_accum
 
     # Get label_map if available
     label_map <- if (inherits(atlas$atlas, "ClusteredNeuroVol") && !is.null(atlas$atlas@label_map)) {

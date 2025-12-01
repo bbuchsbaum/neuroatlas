@@ -88,6 +88,86 @@ test_that("surface atlas functions maintain hemisphere integrity and handle all 
                "'arg' should be one of")
 })
 
+test_that("schaefer_surf matches wrapper and handles numeric inputs", {
+  skip_on_cran()
+  
+  # Use fsaverage6 so we do not require TemplateFlow in this test
+  atl_numeric <- tryCatch({
+    schaefer_surf(parcels = 200, networks = 7,
+                  space = "fsaverage6", surf = "inflated")
+  }, error = function(e) {
+    skip("Failed to load Schaefer surface atlas with numeric inputs")
+  })
+  
+  expect_true(inherits(atl_numeric, "surfatlas"))
+  expect_equal(atl_numeric$surface_space, "fsaverage6")
+  expect_true(inherits(atl_numeric$lh_atlas, "LabeledNeuroSurface"))
+  expect_true(inherits(atl_numeric$rh_atlas, "LabeledNeuroSurface"))
+  
+  # Wrapper should return the same structure when using character inputs
+  atl_wrapper <- get_schaefer_surfatlas(parcels = "200", networks = "7", surf = "inflated")
+  expect_true(inherits(atl_wrapper, "surfatlas"))
+  
+  # Basic metadata should agree
+  expect_equal(atl_numeric$ids, atl_wrapper$ids)
+  expect_equal(atl_numeric$labels, atl_wrapper$labels)
+  expect_equal(atl_numeric$orig_labels, atl_wrapper$orig_labels)
+  expect_equal(atl_numeric$network, atl_wrapper$network)
+  expect_equal(atl_numeric$hemi, atl_wrapper$hemi)
+})
+
+test_that("schaefer_surf_options reports sensible combinations", {
+  opts <- schaefer_surf_options()
+  
+  # Basic structure
+  expect_true(is.data.frame(opts))
+  expect_true(all(c("space", "parcels", "networks", "surf",
+                    "cbig_space", "template_id",
+                    "tf_resolution", "tf_density") %in% names(opts)))
+  
+  # Known spaces and surface types
+  expect_true(all(unique(opts$space) %in% c("fsaverage", "fsaverage5", "fsaverage6")))
+  expect_true(all(unique(opts$surf) %in% c("inflated", "white", "pial")))
+  
+  # Check one known row: fsaverage6 / 200 / 7 / inflated
+  row_idx <- which(opts$space == "fsaverage6" &
+                     opts$parcels == 200 &
+                     opts$networks == 7 &
+                     opts$surf == "inflated")
+  expect_true(length(row_idx) == 1)
+  expect_equal(opts$cbig_space[row_idx], "fsaverage6")
+  expect_equal(opts$template_id[row_idx], "fsaverage")
+})
+
+test_that("glasser_surf returns valid fsaverage surface atlas", {
+  skip_on_cran()
+  
+  glas <- tryCatch({
+    glasser_surf(space = "fsaverage", surf = "pial")
+  }, error = function(e) {
+    skip("Failed to load Glasser surface atlas")
+  })
+  
+  expect_true(inherits(glas, "surfatlas"))
+  expect_equal(glas$surface_space, "fsaverage")
+  expect_true(inherits(glas$lh_atlas, "LabeledNeuroSurface"))
+  expect_true(inherits(glas$rh_atlas, "LabeledNeuroSurface"))
+  
+  # Basic region metadata consistency
+  expect_equal(length(glas$ids), length(glas$labels))
+  expect_equal(length(glas$ids), length(glas$orig_labels))
+  expect_equal(length(glas$ids), nrow(glas$cmap))
+  
+  # Hemispheres should both be represented
+  expect_true(all(c("left", "right") %in% unique(glas$hemi)))
+})
+
+test_that("glasser_surf rejects unsupported spaces", {
+  skip_on_cran()
+  expect_error(glasser_surf(space = "fsaverage5"),
+               "only available in 'fsaverage' space")
+})
+
 test_that("network-specific functionality works correctly in Schaefer atlases", {
   skip_on_cran()
   
@@ -221,10 +301,6 @@ test_that("color map handling works correctly across atlas operations", {
     
     # Ensure same space
     if (!all(dim(atlas1$atlas) == dim(atlas2$atlas))) {
-      # Skip if resampling would fail (e.g., ClusteredNeuroVol)
-      if (inherits(atlas2$atlas, "ClusteredNeuroVol")) {
-        skip("Cannot resample ClusteredNeuroVol")
-      }
       atlas2 <- list(
         name = atlas2$name,
         atlas = resample(atlas2$atlas, neuroim2::space(atlas1$atlas)),

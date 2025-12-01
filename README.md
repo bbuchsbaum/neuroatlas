@@ -1,70 +1,108 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# neuroatlas <img src="man/figures/logo.png" align="right" height="139" alt="" />
+
 <!-- badges: start -->
 
-[![Project Status: Concept – Minimal or no implementation has been done
-yet, or the repository is only intended to be a limited example, demo,
-or
-proof-of-concept.](https://www.repostatus.org/badges/latest/concept.svg)](https://www.repostatus.org/#concept)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![License](https://img.shields.io/badge/license-GPL--3-blue.svg?style=flat)](https://www.gnu.org/licenses/gpl-3.0.html)
-[![Release](https://img.shields.io/github/release/inbo/neuroatlas.svg)](https://github.com/inbo/neuroatlas/releases)
-![GitHub](https://img.shields.io/github/license/inbo/neuroatlas) [![R
-build
-status](https://github.com/inbo/neuroatlas/workflows/check%20package%20on%20main/badge.svg)](https://github.com/inbo/neuroatlas/actions)
-![r-universe
-name](https://inbo.r-universe.dev/badges/:name?color=c04384)
-![r-universe package](https://inbo.r-universe.dev/badges/neuroatlas)
-[![Codecov test
-coverage](https://codecov.io/gh/inbo/neuroatlas/branch/main/graph/badge.svg)](https://app.codecov.io/gh/inbo/neuroatlas?branch=main)
-![GitHub code size in
-bytes](https://img.shields.io/github/languages/code-size/inbo/neuroatlas.svg)
-![GitHub repo
-size](https://img.shields.io/github/repo-size/inbo/neuroatlas.svg)
+[![R-CMD-check](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml)
+[![License:
+MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-# neuroatlas
+**neuroatlas** provides a unified interface for working with
+neuroimaging atlases and parcellations in R. Whether you’re conducting
+ROI-based analyses, visualizing brain data, or integrating different
+parcellation schemes, neuroatlas streamlines these tasks with
+consistent, user-friendly functions.
 
-The goal of neuroatlas is to …
+## Features
+
+- **Multiple Atlas Support**: Access Schaefer (100-1000 parcels),
+  Glasser (360 regions), FreeSurfer ASEG, and Olsen MTL atlases
+- **Flexible Resampling**: Transform atlases to different spaces and
+  resolutions
+- **ROI Analysis**: Extract and analyze specific regions of interest
+  with `get_roi()`, `map_atlas()`, and `reduce_atlas()`
+- **Surface & Volume**: Work with both volumetric and surface-based
+  parcellations
+- **TemplateFlow Integration**: Access standardized templates via the
+  Python TemplateFlow API
+- **Visualization**: Integration with the ggseg ecosystem for brain
+  visualization
 
 ## Installation
 
-You can install the development version from
-[GitHub](https://github.com/) with:
+You can install the development version from GitHub:
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("inbo/neuroatlas")
+# install.packages("pak")
+pak::pak("bbuchsbaum/neuroatlas")
 ```
 
-## Example
+### TemplateFlow Setup
 
-This is a basic example which shows you how to solve a common problem:
+For TemplateFlow functionality, you’ll need Python with the templateflow
+package:
+
+``` r
+# After installing neuroatlas:
+neuroatlas::install_templateflow()
+```
+
+## Quick Start
 
 ``` r
 library(neuroatlas)
-## basic example code
+
+# Get a Schaefer atlas (200 parcels, 7 networks)
+schaefer <- get_schaefer_atlas(parcels = 200, networks = 7)
+print(schaefer)
+
+# Extract specific ROIs
+roi <- get_roi(schaefer, "DefaultA")
+
+# Get Glasser atlas
+glasser <- get_glasser_atlas()
+
+# Access templates via TemplateFlow
+mni_brain <- get_template("MNI152NLin2009cAsym", variant = "brain")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+## Available Atlases
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+| Atlas | Function | Description |
+|----|----|----|
+| Schaefer | `get_schaefer_atlas()` | Cortical parcellations (100-1000 regions, 7 or 17 networks) |
+| Glasser | `get_glasser_atlas()` | 360-region multi-modal cortical parcellation |
+| ASEG | `get_aseg_atlas()` | FreeSurfer subcortical segmentation |
+| Olsen MTL | `get_olsen_mtl()` | Medial temporal lobe atlas with hippocampal subfields |
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+## Documentation
 
-You can also embed plots, for example:
+- [Getting
+  Started](https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.html) -
+  Introduction and basic usage
+- [Working with
+  TemplateFlow](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html) -
+  Template access and management
+- [Surface
+  Parcellations](https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html) -
+  Surface-based atlas operations
+- [Function
+  Reference](https://bbuchsbaum.github.io/neuroatlas/reference/index.html) -
+  Complete API documentation
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+## Related Packages
+
+- [neuroim2](https://github.com/bbuchsbaum/neuroim2) - Core neuroimaging
+  data structures
+- [neurosurf](https://github.com/bbuchsbaum/neurosurf) - Surface-based
+  operations
+- [ggseg](https://github.com/ggseg/ggseg) - Brain visualization
+
+## License
+
+MIT © Bradley Buchsbaum
