@@ -69,6 +69,12 @@ get_ggseg_atlas <- function(atlas) {
   }
 }
 
+#' @rdname map_atlas
+#' @export
+map_atlas.schaefer <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
+  map_to_schaefer(x, vals, thresh = thresh, pos = pos)
+}
+
 #' Map Values to Schaefer Atlas Format
 #'
 #' @description

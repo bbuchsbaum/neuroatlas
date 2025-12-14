@@ -191,6 +191,24 @@ get_subcortical_atlas <- function(name,
     template_atlas = spec$atlas
   )
 
+  # Build roi_metadata tibble
+  n <- length(ids)
+  color_r <- color_g <- color_b <- rep(NA_integer_, n)
+  if (!is.null(cmap) && nrow(cmap) >= n) {
+    color_r <- as.integer(cmap[[1]][seq_len(n)])
+    color_g <- as.integer(cmap[[2]][seq_len(n)])
+    color_b <- as.integer(cmap[[3]][seq_len(n)])
+  }
+  ret$roi_metadata <- tibble::tibble(
+    id = ids,
+    label = labels,
+    label_full = labels,
+    hemi = hemi,
+    color_r = color_r,
+    color_g = color_g,
+    color_b = color_b
+  )
+
   class(ret) <- c("subcortical", "atlas")
   ret
 }

@@ -71,6 +71,33 @@ glasser <- get_glasser_atlas()
 mni_brain <- get_template("MNI152NLin2009cAsym", variant = "brain")
 ```
 
+## Palette demos
+
+`neuroatlas` now includes perceptually-optimised palettes for atlas
+ROIs. For instance, you can generate a slice-aware palette for the
+Schaefer 200×7 atlas and feed it directly into `ggseg`:
+
+``` r
+library(neuroatlas)
+library(dplyr)
+library(ggseg)
+
+schaefer <- get_schaefer_atlas(parcels = 200, networks = 7)
+meta <- roi_metadata(schaefer)
+
+pal <- roi_colors_maximin_view(
+  meta,
+  hemi_col = "hemi",
+  network_col = "network",
+  pair_col = "pair_id",
+  seed = 1
+)
+
+ggseg_schaefer(parcels = 200, networks = 7) +
+  geom_sf(aes(fill = pal$color[match(label, pal$roi)])) +
+  scale_fill_identity()
+```
+
 ## Available Atlases
 
 | Atlas | Function | Description |

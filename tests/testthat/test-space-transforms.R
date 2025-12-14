@@ -68,7 +68,8 @@ test_that("atlas resampling to TemplateFlow spaces maintains integrity", {
                                   outspace = tiny_space)
 
   # Should complete but likely lose many regions
-  unique_regions <- length(unique(as.vector(atlas_tiny$atlas[atlas_tiny$atlas != 0])))
+  # Use the stored ids which reflect actual regions after resampling
+  unique_regions <- length(atlas_tiny$ids)
   expect_true(unique_regions < 100)  # Some regions will be lost
 })
 

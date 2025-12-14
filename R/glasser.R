@@ -90,17 +90,30 @@ get_glasser_atlas <- function(outspace=NULL) {
                                     clusters=vol[vol!=0], 
                                     label_map=label_map)
   
+  n <- nrow(labels)
+
   # Return atlas object
   ret <- list(
     name="Glasser360",
     atlas=vol,
     cmap=cols,
-    ids=1:nrow(labels),
+    ids=1:n,
     labels=region,
     orig_labels=orig_labels,
     hemi=hemi,
     network=NULL)
-  
+
+  # Build roi_metadata tibble
+  ret$roi_metadata <- tibble::tibble(
+    id = ret$ids,
+    label = ret$labels,
+    label_full = ret$orig_labels,
+    hemi = ret$hemi,
+    color_r = as.integer(cols$red),
+    color_g = as.integer(cols$green),
+    color_b = as.integer(cols$blue)
+  )
+
   class(ret) <- c("glasser", "atlas")
   ret
 }
@@ -111,17 +124,7 @@ get_glasser_atlas <- function(outspace=NULL) {
 #' @importFrom tibble tibble
 #' @export
 map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
-  # Check if ggsegGlasser is available
-  if (!requireNamespace("ggsegGlasser", quietly = TRUE)) {
-    stop("Package 'ggsegGlasser' is required for this function but is not installed.\n",
-         "To install it, run:\n",
-         "  remotes::install_github('ggseg/ggsegGlasser')\n",
-         "or use the ggseg r-universe:\n",
-         "  options(repos = c(ggseg = 'https://ggseg.r-universe.dev',\n",
-         "                    CRAN = 'https://cloud.r-project.org'))\n",
-         "  install.packages('ggsegGlasser')",
-         call. = FALSE)
-  }
+  .assert_ggseg_glasser()
   
   fun <- if (pos) identity else abs
   
@@ -143,6 +146,12 @@ map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
     as_brain_atlas()
   
   rboth
+}
+
+.assert_ggseg_glasser <- function() {
+  if (!requireNamespace("ggsegGlasser", quietly = TRUE)) {
+    stop("Package 'ggsegGlasser' is required for mapping Glasser atlases.", call. = FALSE)
+  }
 }
 
 #' Plot Glasser Atlas
@@ -361,6 +370,17 @@ glasser_surf <- function(space = "fsaverage",
     labels = labels,
     orig_labels = orig_labels,
     hemi = hemi
+  )
+
+  # Build roi_metadata tibble
+  ret$roi_metadata <- tibble::tibble(
+    id = ret$ids,
+    label = ret$labels,
+    label_full = ret$orig_labels,
+    hemi = ret$hemi,
+    color_r = as.integer(cmap$red),
+    color_g = as.integer(cmap$green),
+    color_b = as.integer(cmap$blue)
   )
 
   class(ret) <- c("glasser_surf", "surfatlas", "atlas")

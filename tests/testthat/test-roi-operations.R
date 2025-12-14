@@ -96,21 +96,25 @@ test_that("reduce_atlas handles various data types and edge cases correctly", {
   
   # Test with NA handling
   na_data <- test_data_3d
-  # For ClusteredNeuroVol, we need to find where region 1 is
+  # Get the first region's ID and label
+  first_id <- atlas$ids[1]
+  first_label <- atlas$orig_labels[1]
+
+  # For ClusteredNeuroVol, we need to find where the first region is
   if (inherits(atlas$atlas, "ClusteredNeuroVol")) {
-    # Get dense representation to find region 1
+    # Get dense representation to find the first region
     atlas_dense <- neuroim2::as.dense(atlas$atlas)
-    # Create a copy of the data and set NA where region 1 is
+    # Create a copy of the data and set NA where first region is
     na_data_vals <- na_data[,,]
-    na_data_vals[atlas_dense == 1] <- NA
+    na_data_vals[atlas_dense == first_id] <- NA
     na_data <- neuroim2::NeuroVol(na_data_vals, space = neuroim2::space(na_data))
   } else {
-    na_data[atlas$atlas == 1] <- NA
+    na_data[atlas$atlas == first_id] <- NA
   }
-  
+
   result_na <- reduce_atlas(atlas, na_data, mean, na.rm = TRUE)
-  # Find the row for region 1 in long format
-  region_1_row <- which(result_na$region == "1")
+  # Find the row for the first region in long format (using orig_labels)
+  region_1_row <- which(result_na$region == first_label)
   expect_true(is.na(result_na$value[region_1_row]))
   
   # Other regions should have valid values
@@ -269,4 +273,35 @@ test_that("map_atlas correctly maps values and applies thresholds", {
   
   # Skip Glasser test as it requires ggsegGlasser
   # Test with Glasser atlas would go here but requires optional dependency
+})
+
+test_that("map_atlas dispatches schaefer method without falling back to atlas", {
+  dummy_atlas <- structure(list(name = "schaefer_dummy"),
+                           class = c("schaefer", "atlas"))
+  vals <- 1:3
+  
+  mock_result <- with_mocked_bindings(
+    map_to_schaefer = function(atlas, vals, thresh = c(0, 0), pos = FALSE) {
+      list(atlas = atlas, vals = vals, thresh = thresh, pos = pos)
+    },
+    map_atlas(dummy_atlas, vals = vals, thresh = c(1, 2), pos = TRUE)
+  )
+  
+  expect_identical(mock_result$atlas, dummy_atlas)
+  expect_identical(mock_result$vals, vals)
+  expect_identical(mock_result$thresh, c(1, 2))
+  expect_true(mock_result$pos)
+})
+
+test_that("map_atlas.glasser errors cleanly when ggsegGlasser is missing", {
+  dummy_atlas <- structure(list(labels = "V1", hemi = "left", label = "V1"),
+                           class = c("glasser", "atlas"))
+  
+  expect_error(
+    with_mocked_bindings(
+      .assert_ggseg_glasser = function() stop("ggsegGlasser missing", call. = FALSE),
+      map_atlas(dummy_atlas, vals = 1)
+    ),
+    "ggsegGlasser"
+  )
 })

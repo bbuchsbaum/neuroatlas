@@ -11,7 +11,7 @@ get_template(
   modality = "T1w",
   resolution = 1,
   cohort = NULL,
-  desc = NULL,
+  desc = "brain",
   label = NULL,
   atlas = NULL,
   suffix = NULL,
@@ -50,8 +50,10 @@ Passed as `resolution` to `get_template`.}
 
 \item{cohort}{Character string. Optional cohort identifier (e.g., \code{"adhokshaj"}).}
 
-\item{desc}{Character string. Specific TemplateFlow \code{desc} field. If provided, this overrides
-any \code{desc} inferred from \code{variant}.}
+\item{desc}{Character string. Specific TemplateFlow \code{desc} field. Defaults to \code{"brain"} for
+volumetric templates and is automatically dropped for variants where \code{desc} is typically
+unused (e.g., \code{probseg}, \code{dseg}, surface queries). If provided explicitly, this overrides
+any inferred \code{desc}.}
 
 \item{label}{Character string. Specific TemplateFlow \code{label} field (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"} for \code{variant="probseg"} or \code{variant="dseg"}).}
 

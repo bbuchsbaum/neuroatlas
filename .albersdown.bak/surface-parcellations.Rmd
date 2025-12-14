@@ -1,0 +1,170 @@
+---
+title: Surface Parcellations with neurosurf
+author: neuroatlas Dev Team
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Surface Parcellations with neurosurf}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+params:
+  family: red
+css: albers.css
+resource_files:
+- albers.css
+- albers.js
+includes:
+  in_header: |-
+    <script src="albers.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('palette-red'));</script>
+
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE,
+  eval = FALSE  # keep builds fast / offline
+)
+
+suppressWarnings(suppressMessages(library(neuroatlas)))
+
+templateflow_ok <- FALSE
+try({
+  templateflow_ok <- reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")
+}, silent = TRUE)
+```
+
+## What this vignette covers
+
+This guide focuses on loading **surface parcellations** as actual meshes
+(`neurosurf::LabeledNeuroSurface`)—not ggseg flats. We cover:
+
+- Schaefer on fsaverage6 (packaged geometry)
+- Schaefer on fsaverage5/fsaverage (via TemplateFlow, when available)
+- Glasser MMP1.0 (via TemplateFlow, when available)
+- What files are fetched, what the `data` slot contains, and how labels map.
+- Minimal patterns to attach your own per-vertex values.
+
+## Schaefer surface atlases
+
+```{r schaefer-main}
+# 200 parcels, 7 networks, fsaverage6 inflated (packaged geometry, no TF needed)
+atl <- schaefer_surf(
+  parcels  = 200,
+  networks = 7,
+  space    = "fsaverage6",
+  surf     = "inflated"
+)
+```
+
+Returned structure:
+
+- `atl$lh_atlas`, `atl$rh_atlas`: `LabeledNeuroSurface` objects.
+- `slot(..., "data")`: integer parcel IDs per vertex.
+- `atl$labels` / `atl$orig_labels`: name lookups; `atl$network`: network per ID.
+
+### Using TemplateFlow spaces (when available)
+
+Note: TemplateFlow surface support requires the `fsaverage` template to be available
+in your TemplateFlow installation. As of this writing, surface templates may have
+limited availability. Use `fsaverage6` (above) for reliable access to Schaefer atlases.
+
+```{r schaefer-tf, eval=FALSE}
+# fsaverage5 white surface; uses TemplateFlow geometry (if available)
+atl_tf <- schaefer_surf(
+  parcels  = 400,
+  networks = 17,
+  space    = "fsaverage5",
+  surf     = "white"
+)
+```
+
+If TemplateFlow surfaces are available, this uses the same labels/data layout as above.
+
+### Attaching your own values
+
+```{r schaefer-map, eval=FALSE}
+vals <- rnorm(length(atl$ids))        # one value per parcel
+mapped <- map_atlas(atl, vals)        # returns LabeledNeuroSurface per hemi with data filled
+```
+
+`map_atlas()` writes your parcel values into the `data` slot of each
+hemisphere surface.
+
+## Glasser MMP1.0 surface atlas (when available)
+
+Note: Like Schaefer TemplateFlow surfaces, Glasser surface support requires the
+`fsaverage` template in TemplateFlow. Check availability before using.
+
+```{r glasser, eval=FALSE}
+# Requires fsaverage template in TemplateFlow
+glas <- glasser_surf(space = "fsaverage", surf = "pial")
+
+slot(glas$lh_atlas, "data")[1:5]  # parcel IDs
+glas$labels[1:5]                  # names for those IDs
+```
+
+If available, geometry comes from TemplateFlow (fsaverage pial/white/inflated/midthickness);
+labels come from the HCP-MMP1.0 fsaverage annotations published on Figshare as
+the "HCP-MMP1_0 projected on fsaverage" dataset (ID 3498446; DOI:
+10.6084/m9.figshare.3498446).
+The `data` vector length equals the vertex count of the mesh; each entry is
+the parcel ID at that vertex.
+
+## What’s in the `data` slot?
+
+- Schaefer / Glasser surface atlases: integer parcel IDs per vertex.
+- If you construct a `NeuroSurface` yourself (e.g., from `load_surface_template()`),
+  you supply the per-vertex numeric values.
+
+## Saving / reusing
+
+```{r save}
+saveRDS(atl, "schaefer200_7_fs6_inflated.rds")
+# reload later
+atl2 <- readRDS("schaefer200_7_fs6_inflated.rds")
+```
+
+### Sanity check: parcel surface renders
+
+We snapshot a labeled Schaefer surface to verify geometry+labels load.
+Runs only when TemplateFlow is available (for non-packaged spaces).
+
+```{r snapshot-parc, eval=templateflow_ok, cache=TRUE}
+dir.create("figures", showWarnings = FALSE)
+png_path <- file.path("figures", "schaefer200_fs6_L_inflated.png")
+
+atl <- schaefer_surf(
+  parcels  = 200,
+  networks = 7,
+  space    = "fsaverage6",  # packaged geometry (no TF), keeps it fast
+  surf     = "inflated"
+)
+
+geom_l <- neurosurf::geometry(atl$lh_atlas)
+neurosurf::snapshot_surface(geom_l, file = png_path)
+png_path
+```
+
+```{r snapshot-parc-show, echo=FALSE, eval=templateflow_ok, fig.alt="Schaefer 200x7 fsaverage6 inflated left hemisphere labeled surface"}
+knitr::include_graphics(file.path("figures", "schaefer200_fs6_L_inflated.png"))
+```
+
+If the image renders, the parcellated surface is displayable.
+
+## Common workflows
+
+- **Vertex-wise stats:** build your own `NeuroSurface` from `load_surface_template()`
+  and write stats into `data`.
+- **Parcel summaries:** use volumetric data with `reduce_atlas()` or
+  surface atlases with `map_atlas()` to project parcel statistics back onto
+  the mesh for visualization.
+
+## Notes on dependencies
+
+- fsaverage6 geometry is bundled; other spaces require TemplateFlow.
+- Chunk `eval = FALSE` by default; set to `TRUE` locally with network and TemplateFlow.

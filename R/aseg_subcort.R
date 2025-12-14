@@ -112,6 +112,17 @@ get_aseg_atlas <- function(outspace=NULL) {
     hemi=hemi,
     network=NULL)
 
+  # Build roi_metadata tibble
+  ret$roi_metadata <- tibble::tibble(
+    id = ret$ids,
+    label = ret$labels,
+    label_full = ret$orig_labels,
+    hemi = ret$hemi,
+    color_r = as.integer(cmap$red),
+    color_g = as.integer(cmap$green),
+    color_b = as.integer(cmap$blue)
+  )
+
   class(ret) <- c("aseg", "atlas")
   ret
 }

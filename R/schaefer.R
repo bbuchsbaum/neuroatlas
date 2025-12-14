@@ -377,24 +377,48 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
     vol <- resample(vol, outspace, smooth)
   }
 
-
-
   labels <- schaefer_metainfo(parcels, networks, use_cache)
-  cids <- 1:nrow(labels)
-  label_map <- as.list(cids)
+
+  # After resampling, some regions may be lost - filter to only existing regions
+  actual_ids <- sort(unique(as.vector(vol[vol != 0])))
+  if (length(actual_ids) == 0) {
+    stop("No atlas regions remain after resampling to the target space")
+  }
+
+  # Filter labels to only include regions that exist in the (possibly resampled) volume
+  keep_idx <- which(seq_len(nrow(labels)) %in% actual_ids)
+  labels <- labels[keep_idx, , drop = FALSE]
+
+  # Build label_map for existing regions only
+  label_map <- as.list(actual_ids)
   names(label_map) <- labels$name
 
   vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters=vol[vol!=0], label_map=label_map)
 
+  cmap_df <- labels[, 3:5]
+  n <- nrow(labels)
+
   ret <- list(
     name=paste0("Schaefer-", parcels, "-", networks, "networks"),
     atlas=vol,
-    cmap=labels[,3:5],
-    ids=1:nrow(labels),
+    cmap=cmap_df,
+    ids=actual_ids,
     labels=labels$name,
     orig_labels=labels[,2],
     network=labels$network,
     hemi=labels$hemi)
+
+  # Build roi_metadata tibble
+  ret$roi_metadata <- tibble::tibble(
+    id = ret$ids,
+    label = ret$labels,
+    label_full = ret$orig_labels,
+    hemi = ret$hemi,
+    network = ret$network,
+    color_r = as.integer(cmap_df[[1]]),
+    color_g = as.integer(cmap_df[[2]]),
+    color_b = as.integer(cmap_df[[3]])
+  )
 
   class(ret) <- c("schaefer", "volatlas", "atlas")
   ret
@@ -569,18 +593,33 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   lh_surf <- get_hemi("lh")
   rh_surf <- get_hemi("rh")
 
+  cmap_df <- labels[, 3:5]
+  n <- nrow(labels)
+
   ret <- list(
     surf_type = surf,
     surface_space = "fsaverage6",
     lh_atlas = lh_surf,
     rh_atlas = rh_surf,
     name = paste0("Schaefer-", parcels, "-", networks, "networks"),
-    cmap = labels[, 3:5],
-    ids = seq_len(nrow(labels)),
+    cmap = cmap_df,
+    ids = seq_len(n),
     labels = labels$name,
     orig_labels = labels[, 2],
     network = labels$network,
     hemi = labels$hemi
+  )
+
+  # Build roi_metadata tibble
+  ret$roi_metadata <- tibble::tibble(
+    id = ret$ids,
+    label = ret$labels,
+    label_full = ret$orig_labels,
+    hemi = ret$hemi,
+    network = ret$network,
+    color_r = as.integer(cmap_df[[1]]),
+    color_g = as.integer(cmap_df[[2]]),
+    color_b = as.integer(cmap_df[[3]])
   )
 
   class(ret) <- c("schaefer", "surfatlas", "atlas")
@@ -662,18 +701,33 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   lh_surf <- get_hemi("lh")
   rh_surf <- get_hemi("rh")
 
+  cmap_df <- labels[, 3:5]
+  n <- nrow(labels)
+
   ret <- list(
     surf_type = surf,
     surface_space = mapping$space,
     lh_atlas = lh_surf,
     rh_atlas = rh_surf,
     name = paste0("Schaefer-", parcels, "-", networks, "networks"),
-    cmap = labels[, 3:5],
-    ids = seq_len(nrow(labels)),
+    cmap = cmap_df,
+    ids = seq_len(n),
     labels = labels$name,
     orig_labels = labels[, 2],
     network = labels$network,
     hemi = labels$hemi
+  )
+
+  # Build roi_metadata tibble
+  ret$roi_metadata <- tibble::tibble(
+    id = ret$ids,
+    label = ret$labels,
+    label_full = ret$orig_labels,
+    hemi = ret$hemi,
+    network = ret$network,
+    color_r = as.integer(cmap_df[[1]]),
+    color_g = as.integer(cmap_df[[2]]),
+    color_b = as.integer(cmap_df[[3]])
   )
 
   class(ret) <- c("schaefer", "surfatlas", "atlas")

@@ -3,17 +3,6 @@
 #'   otherwise the absolute values are used.
 #' @export
 map_atlas.atlas <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
-  if (inherits(x, "schaefer")) {
-    # Check if ggsegSchaefer is available before calling map_to_schaefer
-    if (!requireNamespace("ggsegSchaefer", quietly = TRUE)) {
-      stop("Package 'ggsegSchaefer' is required for mapping Schaefer atlases but is not installed.\n",
-           "To install it, run:\n",
-           "  remotes::install_github('LCBC-UiO/ggsegSchaefer')",
-           call. = FALSE)
-    }
-    return(map_to_schaefer(x, vals, thresh = thresh, pos = pos))
-  }
-
   stopifnot(length(vals) == length(x$orig_labels))
   fun <- if (pos) identity else abs
   

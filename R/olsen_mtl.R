@@ -74,7 +74,8 @@
 get_olsen_mtl <- function(outspace=NULL) {
   olsen_mtl <- NULL  # To avoid R CMD check NOTE
   utils::data("olsen_mtl", envir = environment())
-  if (is.null(outspace)) {
+
+  ret <- if (is.null(outspace)) {
     olsen_mtl
   } else {
     atres <- resample(olsen_mtl$atlas, outspace)
@@ -82,6 +83,28 @@ get_olsen_mtl <- function(outspace=NULL) {
     tmp$atlas <- atres
     tmp
   }
+
+  # Build roi_metadata if not present (backwards compatibility with saved data)
+  if (is.null(ret$roi_metadata)) {
+    n <- length(ret$ids)
+    color_r <- color_g <- color_b <- rep(NA_integer_, n)
+    if (!is.null(ret$cmap) && nrow(ret$cmap) >= n) {
+      color_r <- as.integer(ret$cmap[seq_len(n), 1])
+      color_g <- as.integer(ret$cmap[seq_len(n), 2])
+      color_b <- as.integer(ret$cmap[seq_len(n), 3])
+    }
+    ret$roi_metadata <- tibble::tibble(
+      id = ret$ids,
+      label = ret$labels,
+      label_full = if (!is.null(ret$orig_labels)) ret$orig_labels else ret$labels,
+      hemi = ret$hemi,
+      color_r = color_r,
+      color_g = color_g,
+      color_b = color_b
+    )
+  }
+
+  ret
 }
 
 #' Extract Hippocampal Parcellation
@@ -157,18 +180,33 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
   }
 
   # Create return object
+  n <- apsections * 2
+  cmap_mat <- t(col2rgb(rainbow(n)))
+
   ret <- list(
     name = "hippocampus",
     atlas = atlas,
-    ids = seq(1, apsections*2),
+    ids = seq(1, n),
     labels = c(paste0("hippocampus_", seq(1,apsections)),
               paste0("hippocampus_", seq(1,apsections))),
     hemi = c(rep("left", apsections), rep("right", apsections)),
-    cmap = t(col2rgb(rainbow(apsections*2))),
+    cmap = cmap_mat,
     network = NULL
   )
 
   ret$orig_labels <- paste0(ret$hemi, "_", ret$labels)
+
+  # Build roi_metadata tibble
+  ret$roi_metadata <- tibble::tibble(
+    id = ret$ids,
+    label = ret$labels,
+    label_full = ret$orig_labels,
+    hemi = ret$hemi,
+    color_r = as.integer(cmap_mat[, 1]),
+    color_g = as.integer(cmap_mat[, 2]),
+    color_b = as.integer(cmap_mat[, 3])
+  )
+
   class(ret) <- c("hippocampus", "atlas")
   ret
 }

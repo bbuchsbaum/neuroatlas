@@ -212,13 +212,35 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
     stop("must supply either 'id' or 'label'")
   }
 
+  # Apply hemisphere filter if specified
+  valid_idx <- seq_along(x$ids)
+  if (!is.null(hemi)) {
+    hemi <- match.arg(hemi, c("left", "right"), several.ok = TRUE)
+    valid_idx <- which(x$hemi %in% hemi)
+    if (length(valid_idx) == 0) {
+      stop("no ROIs found for hemisphere: ", paste(hemi, collapse = ", "))
+    }
+  }
+
   if (!is.null(label)) {
     ret <- lapply(label, function(l) {
-      id <- x$ids[which(x$labels == l)]
-      if (length(id) == 0) {
-        stop(paste0("label '", l, "' not found in atlas"))
+      # Find matching labels, filtered by hemisphere if specified
+      match_idx <- which(x$labels == l)
+      if (!is.null(hemi)) {
+        match_idx <- intersect(match_idx, valid_idx)
       }
-      rind <- which(x$atlas %in% id)
+
+      if (length(match_idx) == 0) {
+        if (!is.null(hemi)) {
+          stop(paste0("label '", l, "' not found in atlas for hemisphere: ",
+                      paste(hemi, collapse = ", ")))
+        } else {
+          stop(paste0("label '", l, "' not found in atlas"))
+        }
+      }
+
+      roi_ids <- x$ids[match_idx]
+      rind <- which(x$atlas %in% roi_ids)
       neuroim2::ROIVol(neuroim2::space(x$atlas),
                        coords = neuroim2::index_to_grid(x$atlas, rind),
                        data=x$atlas[rind])
@@ -227,6 +249,16 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
     names(ret) <- label
     ret
   } else {
+    # Filter IDs by hemisphere if specified
+    if (!is.null(hemi)) {
+      valid_ids <- x$ids[valid_idx]
+      invalid_ids <- setdiff(id, valid_ids)
+      if (length(invalid_ids) > 0) {
+        stop("IDs not found in specified hemisphere(s): ",
+             paste(invalid_ids, collapse = ", "))
+      }
+    }
+
     ret <- lapply(id, function(i) {
       rind <- which(x$atlas %in% i)
       neuroim2::ROIVol(neuroim2::space(x$atlas),
