@@ -41,7 +41,7 @@ Apply an affine transformation to convert 3D coordinates from one
 neuroimaging coordinate space to another.
 }
 \details{
-The transformation is applied as: \code{p' = M \%*\% [p; 1]} where M is
+The transformation is applied as: \code{p_new = M \%*\% [p; 1]} where M is
 the 4x4 affine matrix and p is each 3D point in homogeneous coordinates.
 }
 \examples{

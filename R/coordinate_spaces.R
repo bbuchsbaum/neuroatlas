@@ -220,7 +220,7 @@ to <- toupper(to)
 #' @return Transformed coordinates in the same format as the input.
 #'
 #' @details
-#' The transformation is applied as: \code{p' = M \%*\% [p; 1]} where M is
+#' The transformation is applied as: \code{p_new = M \%*\% [p; 1]} where M is
 #' the 4x4 affine matrix and p is each 3D point in homogeneous coordinates.
 #'
 #' @seealso \code{\link{get_space_transform}}, \code{\link{MNI305_to_MNI152}}
