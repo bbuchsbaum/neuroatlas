@@ -101,3 +101,25 @@ map_atlas <- function(x, vals, thresh, ...) {
 reduce_atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
   UseMethod("reduce_atlas")
 }
+
+#' Reduce a NeuroVec by an Atlas to a ClusteredNeuroVec
+#'
+#' Averages (or otherwise summarises) a 4D image within each atlas parcel,
+#' returning a \code{\link[neuroim2]{ClusteredNeuroVec}} whose voxels share one
+#' time-series per region.
+#'
+#' @param atlas An atlas object.
+#' @param data_vol A \code{NeuroVec} (4D) with the data to be summarised.
+#' @param mask A \code{NeuroVol} or \code{LogicalNeuroVol} brain mask.
+#'   Non-zero values are treated as TRUE.
+#' @param ... Additional arguments passed to methods.
+#'
+#' @return A \code{\link[neuroim2]{ClusteredNeuroVec}}.
+#'
+#' @seealso \code{\link{reduce_atlas}} for a tibble-based summary,
+#'   \code{\link{dilate_atlas}} for expanding parcels into a mask.
+#'
+#' @export
+reduce_atlas_vec <- function(atlas, data_vol, mask, ...) {
+  UseMethod("reduce_atlas_vec")
+}
