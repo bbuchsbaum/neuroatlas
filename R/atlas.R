@@ -270,6 +270,51 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
   }
 }
 
+#' @rdname sub_atlas
+#' @export
+#' @method sub_atlas atlas
+sub_atlas.atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, ...) {
+  if (is.null(ids) && is.null(labels) && is.null(hemi)) {
+    stop("at least one of 'ids', 'labels', or 'hemi' must be supplied")
+  }
+
+  # Start with all indices
+  keep <- rep(TRUE, length(x$ids))
+
+  # Filter by IDs
+
+  if (!is.null(ids)) {
+    ids <- as.integer(ids)
+    bad <- setdiff(ids, x$ids)
+    if (length(bad) > 0) {
+      stop("region ids not found in atlas: ", paste(bad, collapse = ", "))
+    }
+    keep <- keep & (x$ids %in% ids)
+  }
+
+  # Filter by labels
+  if (!is.null(labels)) {
+    bad <- setdiff(labels, x$labels)
+    if (length(bad) > 0) {
+      stop("labels not found in atlas: ", paste(bad, collapse = ", "))
+    }
+    keep <- keep & (x$labels %in% labels)
+  }
+
+  # Filter by hemisphere
+  if (!is.null(hemi)) {
+    hemi <- match.arg(hemi, c("left", "right"), several.ok = TRUE)
+    keep <- keep & (x$hemi %in% hemi)
+  }
+
+  keep_ids <- x$ids[keep]
+  if (length(keep_ids) == 0) {
+    stop("selection resulted in no matching regions")
+  }
+
+  .subset_atlas(x, keep_ids)
+}
+
 #' @rdname reduce_atlas
 #'
 #' @details

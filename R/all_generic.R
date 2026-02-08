@@ -123,3 +123,52 @@ reduce_atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
 reduce_atlas_vec <- function(atlas, data_vol, mask, ...) {
   UseMethod("reduce_atlas_vec")
 }
+
+#' Select a Subset of Atlas Regions
+#'
+#' Return a new atlas containing only the requested regions. Regions can be
+#' identified by integer ID (matching \code{x$ids}), by label (matching
+#' \code{x$labels}), or by hemisphere. When multiple selection criteria are
+#' given they are intersected.
+#'
+#' This is the atlas-level analogue of
+#' \code{\link[neuroim2]{sub_clusters}} for
+#' \code{\link[neuroim2]{ClusteredNeuroVol}} objects.
+#'
+#' @param x An atlas object.
+#' @param ids Integer or numeric vector of region IDs to retain (matched
+#'   against \code{x$ids}).
+#' @param labels Character vector of region labels to retain (matched against
+#'   \code{x$labels}).
+#' @param hemi Character vector of hemispheres to retain
+#'   (\code{"left"} and/or \code{"right"}).
+#' @param ... Additional arguments passed to methods.
+#'
+#' @return An atlas object of the same class as \code{x} containing only the
+#'   selected regions. Voxels (or vertices) not belonging to the selected
+#'   regions are excluded.
+#'
+#' @examples
+#' \dontrun{
+#' atlas <- get_aseg_atlas()
+#'
+#' # By ID
+#' sub <- sub_atlas(atlas, ids = c(10, 11, 12))
+#'
+#' # By label
+#' sub2 <- sub_atlas(atlas, labels = c("Thalamus", "Caudate"))
+#'
+#' # By hemisphere
+#' left <- sub_atlas(atlas, hemi = "left")
+#'
+#' # Combined: left-hemisphere regions matching specific labels
+#' sub3 <- sub_atlas(atlas, labels = c("Thalamus", "Caudate"), hemi = "left")
+#' }
+#'
+#' @seealso \code{\link{filter_atlas}} for tidy-eval filtering by metadata
+#'   columns, \code{\link{get_roi}} for extracting ROI volumes
+#'
+#' @export
+sub_atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, ...) {
+  UseMethod("sub_atlas")
+}
