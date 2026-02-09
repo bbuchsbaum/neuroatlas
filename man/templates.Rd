@@ -12,4 +12,13 @@ A character vector of available template names
 \description{
 Returns a list of all available templates in the Templateflow repository.
 }
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch({available <- templates(); head(available)},
+    error = function(e) NULL)
+}
+}
+}
 \keyword{internal}

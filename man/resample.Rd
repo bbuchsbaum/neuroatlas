@@ -46,3 +46,14 @@ The resampling process:
   \item Preserves zeros in the mask (background)
 }
 }
+\examples{
+\donttest{
+atlas <- get_aseg_atlas()
+vol <- atlas$atlas
+new_space <- neuroim2::NeuroSpace(
+  dim = dim(vol), spacing = neuroim2::spacing(vol)
+)
+resampled <- resample(vol, new_space)
+}
+
+}

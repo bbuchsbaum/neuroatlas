@@ -67,3 +67,15 @@ Constructs a sparse, symmetric edge list describing which ROIs are likely
 to collide visually across common slice views. The resulting tibble records
 the ROI indices, names, and a normalised conflict weight in \[0, 1\].
 }
+\examples{
+\donttest{
+rois <- data.frame(
+  roi = 1:6,
+  x = c(10, 12, 50, 52, 10, 50),
+  y = c(20, 22, 20, 22, 60, 60),
+  z = c(30, 32, 30, 32, 30, 30)
+)
+edges <- build_conflict_edges(rois, xyz_cols = c("x", "y", "z"))
+}
+
+}

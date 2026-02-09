@@ -27,9 +27,17 @@ get_template_schaefer(
 A NeuroVol object containing the parcellation
 }
 \description{
-\\strong{DEPRECATED}: Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
 
 Retrieves Schaefer cortical parcellation mapped to a specified template space.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_schaefer(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}}

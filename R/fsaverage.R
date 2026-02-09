@@ -1,6 +1,15 @@
 #' Surface geometry for the fsaverage6 atlas
 #'
-#' a list including left and right hemispheres for the orig, white, inflated, and pial surfaces.
+#' A list including left and right hemispheres for the orig, white, inflated, and pial surfaces.
+#'
+#' @format A named list with elements \code{lh} and \code{rh}, each containing
+#'   surface geometry objects for orig, white, inflated, and pial surfaces.
+#'
+#' @examples
+#' \donttest{
+#' data(fsaverage)
+#' names(fsaverage)
+#' }
 #'
 #' @docType data
 #' @keywords datasets

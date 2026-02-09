@@ -21,9 +21,17 @@ get_template_head(
 A NeuroVol object containing the head template
 }
 \description{
-\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "head", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "head", ...)} instead.
 
 Convenience function to get the full head (non-brain-extracted) template.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_head(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}}

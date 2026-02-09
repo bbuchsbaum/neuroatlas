@@ -47,6 +47,16 @@ getmode <- function(v) {
 #'
 #' @return A resampled NeuroVol object in the new space
 #'
+#' @examples
+#' \donttest{
+#' atlas <- get_aseg_atlas()
+#' vol <- atlas$atlas
+#' new_space <- neuroim2::NeuroSpace(
+#'   dim = dim(vol), spacing = neuroim2::spacing(vol)
+#' )
+#' resampled <- resample(vol, new_space)
+#' }
+#'
 #' @importFrom assertthat assert_that
 #' @importFrom neuroim2 resample searchlight_coords spacing
 #' @export
@@ -502,6 +512,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 #' @return A named list with fields `space`, `cbig_space`, `template_id`,
 #'   `tf_resolution`, and `tf_density`.
 #' @keywords internal
+#' @noRd
 .schaefer_surface_space_mapping <- function(space) {
   space <- match.arg(space, c("fsaverage", "fsaverage5", "fsaverage6"))
 
@@ -543,6 +554,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 #' (fsaverage6) geometry plus Schaefer .annot label files.
 #'
 #' @keywords internal
+#' @noRd
 .schaefer_fsaverage6_surf <- function(parcels, networks, surf, use_cache = TRUE) {
   parcels <- match.arg(as.character(parcels),
                        c("100","200","300","400","500","600","800","1000"))
@@ -633,6 +645,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 #' annotation (.annot) files. It is used for spaces other than fsaverage6.
 #'
 #' @keywords internal
+#' @noRd
 .schaefer_templateflow_surf <- function(parcels,
                                         networks,
                                         space,
@@ -753,7 +766,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 #'   require a working TemplateFlow setup.
 #' @param surf Surface type. One of \code{"inflated"}, \code{"white"},
 #'   or \code{"pial"}.
-#' @param use_cache Logical. Passed to \code{\link{schaefer_metainfo}} for
+#' @param use_cache Logical. Passed to \code{schaefer_metainfo()} for
 #'   label metadata caching.
 #'
 #' @return A list with classes \code{c("schaefer","surfatlas","atlas")}
@@ -819,6 +832,10 @@ schaefer_surf <- function(parcels = c(100, 200, 300, 400, 500, 600, 800, 1000),
 #'     \item \code{template_id}, \code{tf_resolution}, \code{tf_density}:
 #'       TemplateFlow identifiers used by \code{get_surface_template()}.
 #'   }
+#'
+#' @examples
+#' opts <- schaefer_surf_options()
+#' head(opts)
 #'
 #' @export
 schaefer_surf_options <- function() {

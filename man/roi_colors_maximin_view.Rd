@@ -73,3 +73,13 @@ Assign perceptually separated colours by penalising conflicts between ROIs
 that are likely to appear together in axial/coronal/sagittal views. This is a
 strong default for general slice and surface visualisation.
 }
+\examples{
+\donttest{
+rois <- data.frame(
+  roi = 1:10,
+  x = runif(10, 0, 90), y = runif(10, 0, 100), z = runif(10, 0, 80)
+)
+pal <- roi_colors_maximin_view(rois, xyz_cols = c("x", "y", "z"))
+}
+
+}

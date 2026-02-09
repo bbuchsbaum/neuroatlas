@@ -21,9 +21,17 @@ get_template_gm(
 A NeuroVol object containing the gray matter probability map
 }
 \description{
-\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
 
 Convenience function to get gray matter probability map.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_gm(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}}

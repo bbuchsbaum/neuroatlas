@@ -136,6 +136,18 @@ adjust_by_hemi <- function(hex, hemi, amount = 0.08) {
 #'   modify the weights before returning.
 #'
 #' @return Tibble with columns `from_idx`, `to_idx`, `from`, `to`, and `w`.
+#'
+#' @examples
+#' \donttest{
+#' rois <- data.frame(
+#'   roi = 1:6,
+#'   x = c(10, 12, 50, 52, 10, 50),
+#'   y = c(20, 22, 20, 22, 60, 60),
+#'   z = c(30, 32, 30, 32, 30, 30)
+#' )
+#' edges <- build_conflict_edges(rois, xyz_cols = c("x", "y", "z"))
+#' }
+#'
 #' @export
 build_conflict_edges <- function(rois,
                                  id_col = "roi",
@@ -420,6 +432,11 @@ make_candidate_pool <- function(n,
 #' @param start_hue Starting hue in degrees.
 #'
 #' @return Named numeric vector of anchor hues.
+#'
+#' @examples
+#' hues <- network_anchor_hues(c("Visual", "Default", "DorsalAttn"))
+#' hues
+#'
 #' @export
 network_anchor_hues <- function(network_levels,
                                 scheme = c("even", "triadic", "tetradic", "complementary"),
@@ -532,6 +549,16 @@ make_network_candidates <- function(network_levels,
 #'   [build_conflict_edges()].
 #'
 #' @return Tibble with ROI IDs and assigned colours.
+#'
+#' @examples
+#' \donttest{
+#' rois <- data.frame(
+#'   roi = 1:10,
+#'   x = runif(10, 0, 90), y = runif(10, 0, 100), z = runif(10, 0, 80)
+#' )
+#' pal <- roi_colors_maximin_view(rois, xyz_cols = c("x", "y", "z"))
+#' }
+#'
 #' @export
 roi_colors_maximin_view <- function(rois,
                                     id_col = "roi",
@@ -659,10 +686,22 @@ roi_colors_maximin_view <- function(rois,
 #'
 #' @inheritParams roi_colors_maximin_view
 #' @param scheme Hue spacing scheme passed to [network_anchor_hues()].
+#' @param start_hue Starting hue in degrees (0--360).
 #' @param hue_width Half-width (degrees) of the analogous band around each
 #'   anchor hue.
 #'
 #' @return Tibble with ROI IDs and hex colours.
+#'
+#' @examples
+#' \donttest{
+#' rois <- data.frame(
+#'   roi = 1:10, network = rep(c("Vis", "DMN"), 5),
+#'   x = runif(10, 0, 90), y = runif(10, 0, 100), z = runif(10, 0, 80)
+#' )
+#' pal <- roi_colors_network_harmony(rois, xyz_cols = c("x","y","z"),
+#'                                    network_col = "network")
+#' }
+#'
 #' @export
 roi_colors_network_harmony <- function(rois,
                                        id_col = "roi",
@@ -756,6 +795,18 @@ roi_colors_network_harmony <- function(rois,
 #' @param L_R Lightness for right hemisphere ROIs.
 #'
 #' @return Tibble with ROI IDs and colours.
+#'
+#' @examples
+#' \donttest{
+#' rois <- data.frame(
+#'   roi = 1:10, network = rep(c("Vis", "DMN"), 5),
+#'   hemi = rep(c("left", "right"), 5),
+#'   x = runif(10), y = runif(10), z = runif(10)
+#' )
+#' pal <- roi_colors_rule_hcl(rois, network_col = "network",
+#'                             hemi_col = "hemi", xyz_cols = c("x","y","z"))
+#' }
+#'
 #' @export
 roi_colors_rule_hcl <- function(rois,
                                 id_col = "roi",
@@ -828,6 +879,17 @@ roi_colors_rule_hcl <- function(rois,
 #' @inheritParams roi_colors_maximin_view
 #'
 #' @return Tibble with ROI IDs and colours.
+#'
+#' @examples
+#' \donttest{
+#' rois <- data.frame(
+#'   roi = 1:10, network = rep(c("Vis", "DMN"), 5),
+#'   x = runif(10), y = runif(10), z = runif(10)
+#' )
+#' pal <- roi_colors_embedding(rois, feature_cols = c("x","y","z"),
+#'                              method = "pca")
+#' }
+#'
 #' @export
 roi_colors_embedding <- function(rois,
                                  id_col = "roi",

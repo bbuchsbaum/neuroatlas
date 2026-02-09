@@ -323,6 +323,7 @@
 
 #' Memoised version of .perform_tf_get_and_convert_to_path
 #' @keywords internal
+#' @noRd
 .memoised_fetch_templateflow_path <- memoise::memoise(.perform_tf_get_and_convert_to_path)
 
 
@@ -380,6 +381,15 @@ create_templateflow <- function(cache_dir = NULL, verbosity = 0, default_templat
 #'
 #' @param x An object of class \code{templateflow}.
 #' @param ... Additional arguments (unused).
+#' @return The input object \code{x}, returned invisibly.
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch({tf <- create_templateflow(); print(tf)},
+#'     error = function(e) NULL)
+#' }
+#' }
 #' @export
 print.templateflow <- function(x, ...) {
   cat("<neuroatlas TemplateFlow Interface>\n")
@@ -857,12 +867,13 @@ get_template <- function(space = "MNI152NLin2009cAsym",
 #' Memoised version of .as_neurovol_unmemoised
 #' This is the function that should be called by get_template
 #' @keywords internal
+#' @noRd
 as_neurovol <- memoise::memoise(.as_neurovol_unmemoised)
 
 #' Access Templateflow Brain Templates (DEPRECATED - Legacy Signature)
 #'
 #' @description
-#' \\strong{DEPRECATED}: This function signature is deprecated. Please use the new
+#' **DEPRECATED:** This function signature is deprecated. Please use the new
 #' \code{\link{get_template}} function which offers a more comprehensive
 #' and R-native interface. The new function handles common variants and
 #' modalities more directly.
@@ -880,6 +891,13 @@ as_neurovol <- memoise::memoise(.as_neurovol_unmemoised)
 #' @seealso The new \code{\link{get_template}} with updated signature.
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_legacy(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 #' @rdname get_template_legacy
 get_template_legacy <- function(name="MNI152NLin2009cAsym", desc="brain", resolution=1,
@@ -922,7 +940,7 @@ get_template_legacy <- function(name="MNI152NLin2009cAsym", desc="brain", resolu
 #' Get Brain Mask from Template (DEPRECATED)
 #'
 #' @description
-#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "mask", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "mask", ...)} instead.
 #'
 #' Convenience function to retrieve a binary brain mask for a specified template.
 #'
@@ -933,6 +951,13 @@ get_template_legacy <- function(name="MNI152NLin2009cAsym", desc="brain", resolu
 #' @seealso The new \code{\link{get_template}}
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_brainmask(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
                                   extension=".nii.gz") {
@@ -948,7 +973,7 @@ get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get Tissue Probability Map from Template (DEPRECATED)
 #'
 #' @description
-#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
 #'
 #' Retrieves probability maps for different tissue types (GM, WM, CSF).
 #'
@@ -958,6 +983,13 @@ get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @seealso The new \code{\link{get_template}}
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_probseg(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
                                 resolution=1, extension=".nii.gz") {
@@ -973,7 +1005,7 @@ get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
 #' Get Schaefer Parcellation in Template Space (DEPRECATED)
 #'
 #' @description
-#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
 #'
 #' Retrieves Schaefer cortical parcellation mapped to a specified template space.
 #'
@@ -984,6 +1016,13 @@ get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
 #' @seealso The new \code{\link{get_template}}
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_schaefer(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
                                  parcels=400, networks=17, extension=".nii.gz") {
@@ -1003,6 +1042,14 @@ get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Returns a list of all available templates in the Templateflow repository.
 #'
 #' @return A character vector of available template names
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch({available <- templates(); head(available)},
+#'     error = function(e) NULL)
+#' }
+#' }
 #' @export
 #' @keywords internal
 templates <- function() {
@@ -1025,7 +1072,7 @@ templates <- function() {
 #' Get Template Head Image (DEPRECATED)
 #'
 #' @description
-#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "head", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "head", ...)} instead.
 #'
 #' Convenience function to get the full head (non-brain-extracted) template.
 #'
@@ -1034,6 +1081,13 @@ templates <- function() {
 #' @seealso The new \code{\link{get_template}}
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_head(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
                             extension=".nii.gz") {
@@ -1049,7 +1103,7 @@ get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get CSF Probability Map (DEPRECATED)
 #'
 #' @description
-#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
 #'
 #' Convenience function to get CSF probability map.
 #'
@@ -1058,6 +1112,13 @@ get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @seealso The new \code{\link{get_template}}
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_csf(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
                             extension=".nii.gz") {
@@ -1073,7 +1134,7 @@ get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get Gray Matter Probability Map (DEPRECATED)
 #'
 #' @description
-#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
 #'
 #' Convenience function to get gray matter probability map.
 #'
@@ -1082,6 +1143,13 @@ get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @seealso The new \code{\link{get_template}}
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_gm(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
                            extension=".nii.gz") {
@@ -1097,7 +1165,7 @@ get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' Get White Matter Probability Map (DEPRECATED)
 #'
 #' @description
-#' \\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
 #'
 #' Convenience function to get white matter probability map.
 #'
@@ -1106,6 +1174,13 @@ get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @seealso The new \code{\link{get_template}}
 #' @md
 #' @keywords internal
+#' @examples
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
+#'     reticulate::py_module_available("templateflow")) {
+#'   tryCatch(result <- get_template_wm(), error = function(e) NULL)
+#' }
+#' }
 #' @export
 get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
                            extension=".nii.gz") {

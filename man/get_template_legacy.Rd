@@ -33,10 +33,18 @@ get_template_legacy(
 A NeuroVol object containing the requested template
 }
 \description{
-\\strong{DEPRECATED}: This function signature is deprecated. Please use the new
+\strong{DEPRECATED:} This function signature is deprecated. Please use the new
 \code{\link{get_template}} function which offers a more comprehensive
 and R-native interface. The new function handles common variants and
 modalities more directly.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_legacy(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}} with updated signature.

@@ -26,6 +26,10 @@
 #' 4. Pauli W.M. et al. (2018) Scientific Data, CIT168 subcortex.
 #' 5. Glasser M.F. et al. (2013) Neuroimage, HCP subcortical structures.
 #'
+#' @examples
+#' opts <- subcortical_atlas_options()
+#' opts
+#'
 #' @export
 subcortical_atlas_options <- function() {
   .subcortical_specs()[, c("id", "atlas", "label", "default_space",

@@ -24,3 +24,8 @@ Named numeric vector of anchor hues.
 \description{
 Assign harmonic anchor hues to networks
 }
+\examples{
+hues <- network_anchor_hues(c("Visual", "Default", "DorsalAttn"))
+hues
+
+}

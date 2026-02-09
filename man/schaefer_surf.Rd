@@ -27,7 +27,7 @@ require a working TemplateFlow setup.}
 \item{surf}{Surface type. One of \code{"inflated"}, \code{"white"},
 or \code{"pial"}.}
 
-\item{use_cache}{Logical. Passed to \code{\link{schaefer_metainfo}} for
+\item{use_cache}{Logical. Passed to \code{schaefer_metainfo()} for
 label metadata caching.}
 }
 \value{

@@ -41,3 +41,14 @@ Tibble with ROI IDs and colours.
 Project ROI features to two dimensions (UMAP or PCA) and map polar angle to
 hue, yielding palettes that look globally structured.
 }
+\examples{
+\donttest{
+rois <- data.frame(
+  roi = 1:10, network = rep(c("Vis", "DMN"), 5),
+  x = runif(10), y = runif(10), z = runif(10)
+)
+pal <- roi_colors_embedding(rois, feature_cols = c("x","y","z"),
+                             method = "pca")
+}
+
+}

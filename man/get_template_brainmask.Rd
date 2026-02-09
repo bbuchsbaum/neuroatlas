@@ -21,9 +21,17 @@ get_template_brainmask(
 A NeuroVol object containing the binary brain mask
 }
 \description{
-\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "mask", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "mask", ...)} instead.
 
 Convenience function to retrieve a binary brain mask for a specified template.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_brainmask(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}}

@@ -11,6 +11,18 @@
 
 \item{...}{Additional arguments (unused).}
 }
+\value{
+The input object \code{x}, returned invisibly.
+}
 \description{
 Provides a brief summary of the TemplateFlow interface object.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch({tf <- create_templateflow(); print(tf)},
+    error = function(e) NULL)
+}
+}
 }

@@ -21,9 +21,17 @@ get_template_wm(
 A NeuroVol object containing the white matter probability map
 }
 \description{
-\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
 
 Convenience function to get white matter probability map.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_wm(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}}

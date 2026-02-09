@@ -47,6 +47,8 @@ adjustment.}
 
 \item{scheme}{Hue spacing scheme passed to [network_anchor_hues()].}
 
+\item{start_hue}{Starting hue in degrees (0--360).}
+
 \item{hue_width}{Half-width (degrees) of the analogous band around each
 anchor hue.}
 
@@ -74,4 +76,15 @@ Tibble with ROI IDs and hex colours.
 \description{
 Assign colours so that networks share analogous hue families while still
 maximising spatial separation between neighbouring ROIs.
+}
+\examples{
+\donttest{
+rois <- data.frame(
+  roi = 1:10, network = rep(c("Vis", "DMN"), 5),
+  x = runif(10, 0, 90), y = runif(10, 0, 100), z = runif(10, 0, 80)
+)
+pal <- roi_colors_network_harmony(rois, xyz_cols = c("x","y","z"),
+                                   network_col = "network")
+}
+
 }

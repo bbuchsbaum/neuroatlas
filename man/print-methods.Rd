@@ -24,3 +24,8 @@ The object is returned invisibly
 \description{
 Print methods for various atlas objects in the neuroatlas package
 }
+\examples{
+atlas <- get_aseg_atlas()
+print(atlas)
+
+}

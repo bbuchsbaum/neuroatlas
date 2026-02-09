@@ -24,9 +24,17 @@ get_template_probseg(
 A NeuroVol object containing the probability map
 }
 \description{
-\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
 
 Retrieves probability maps for different tissue types (GM, WM, CSF).
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_probseg(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}}

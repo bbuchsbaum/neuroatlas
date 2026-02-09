@@ -26,6 +26,11 @@ CIT168 subcortex, and HCP hippocampus/amygdala). Each row includes the
 TemplateFlow atlas identifier, supported template spaces, and default
 resolution/desc parameters used to fetch the data.
 }
+\examples{
+opts <- subcortical_atlas_options()
+opts
+
+}
 \references{
 1. AtlasPack resource for harmonized atlases:
    \url{https://github.com/PennLINC/AtlasPack}

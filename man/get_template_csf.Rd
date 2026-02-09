@@ -21,9 +21,17 @@ get_template_csf(
 A NeuroVol object containing the CSF probability map
 }
 \description{
-\\strong{DEPRECATED}: Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
 
 Convenience function to get CSF probability map.
+}
+\examples{
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
+    reticulate::py_module_available("templateflow")) {
+  tryCatch(result <- get_template_csf(), error = function(e) NULL)
+}
+}
 }
 \seealso{
 The new \code{\link{get_template}}

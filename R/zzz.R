@@ -1,4 +1,5 @@
 #' @import reticulate
+#' @importFrom rlang :=
 .onLoad <- function(libname, pkgname) {
   # Set the RETICULATE_PYTHON_ENV environment variable to use a persistent environment
   # This prevents reticulate from creating ephemeral environments each session
@@ -14,6 +15,12 @@
   neuroatlas_env <- file.path(tools::R_user_dir("neuroatlas", "config"), "r-reticulate")
   first_time_file <- file.path(tools::R_user_dir("neuroatlas", "config"), ".first_time_complete")
   
+}
+
+.onAttach <- function(libname, pkgname) {
+  neuroatlas_env <- file.path(tools::R_user_dir("neuroatlas", "config"), "r-reticulate")
+  first_time_file <- file.path(tools::R_user_dir("neuroatlas", "config"), ".first_time_complete")
+
   if (!file.exists(first_time_file) && !dir.exists(neuroatlas_env)) {
     packageStartupMessage(
       "\nWelcome to neuroatlas!\n",

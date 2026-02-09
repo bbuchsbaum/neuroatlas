@@ -22,3 +22,8 @@ A data frame with columns:
 Return a data frame enumerating the currently supported Schaefer surface
 atlas variants, including their CBIG and TemplateFlow identifiers.
 }
+\examples{
+opts <- schaefer_surf_options()
+head(opts)
+
+}

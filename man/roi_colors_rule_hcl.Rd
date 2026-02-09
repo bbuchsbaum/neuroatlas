@@ -34,6 +34,8 @@ adjustment.}
 
 \item{scheme}{Hue spacing scheme passed to [network_anchor_hues()].}
 
+\item{start_hue}{Starting hue in degrees (0--360).}
+
 \item{hue_width}{Half-width (degrees) of within-network hue modulation.}
 
 \item{C}{Fixed chroma.}
@@ -48,4 +50,16 @@ Tibble with ROI IDs and colours.
 \description{
 Generates a fast, reproducible palette that combines harmonic network hues
 with anterior-posterior gradients and hemisphere luminance differences.
+}
+\examples{
+\donttest{
+rois <- data.frame(
+  roi = 1:10, network = rep(c("Vis", "DMN"), 5),
+  hemi = rep(c("left", "right"), 5),
+  x = runif(10), y = runif(10), z = runif(10)
+)
+pal <- roi_colors_rule_hcl(rois, network_col = "network",
+                            hemi_col = "hemi", xyz_cols = c("x","y","z"))
+}
+
 }
