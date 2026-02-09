@@ -22,7 +22,8 @@ labels is important."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
     <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
     <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
@@ -105,6 +106,20 @@ Default: 3</p></dd>
 <li><p>Preserves zeros in the mask (background)</p></li>
 </ul></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_aseg_atlas.html">get_aseg_atlas</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vol</span> <span class="op">&lt;-</span> <span class="va">atlas</span><span class="op">$</span><span class="va">atlas</span></span></span>
+<span class="r-in"><span><span class="va">new_space</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroSpace.html" class="external-link">NeuroSpace</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">vol</span><span class="op">)</span>, spacing <span class="op">=</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/spacing-methods.html" class="external-link">spacing</a></span><span class="op">(</span><span class="va">vol</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">resampled</span> <span class="op">&lt;-</span> <span class="fu">resample</span><span class="op">(</span><span class="va">vol</span>, <span class="va">new_space</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Some original labels were lost during resampling</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

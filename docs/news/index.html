@@ -18,7 +18,8 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
     <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
     <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
@@ -40,6 +41,11 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9000" id="neuroatlas-0109000">neuroatlas 0.1.0.9000<a class="anchor" aria-label="anchor" href="#neuroatlas-0109000"></a></h2>
+<ul><li>Fixed white gaps (“shards”) in <code><a href="../reference/plot_brain.html">plot_brain()</a></code> surface rendering caused by inconsistent triangle winding in some meshes.</li>
+<li>Added <code>silhouette*</code> and <code>network_border*</code> options to <code><a href="../reference/plot_brain.html">plot_brain()</a></code> for improved boundary styling (silhouette outline and between-network borders).</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="neuroatlas-010">neuroatlas 0.1.0<a class="anchor" aria-label="anchor" href="#neuroatlas-010"></a></h2>
 <ul><li>Initial CRAN submission</li>
 <li>Added support for multiple neuroimaging atlases:
@@ -53,7 +59,8 @@
 <li>Implemented atlas operations: ROI extraction, data reduction, resampling</li>
 <li>Added comprehensive vignettes and documentation</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

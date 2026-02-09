@@ -22,7 +22,8 @@ to the underlying Python templateflow.api.get() method."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
     <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
     <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
@@ -58,7 +59,7 @@ to the underlying Python <code>templateflow.api.get()</code> method.</p>
 <span>  modality <span class="op">=</span> <span class="st">"T1w"</span>,</span>
 <span>  resolution <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  desc <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  desc <span class="op">=</span> <span class="st">"brain"</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  atlas <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -112,8 +113,10 @@ Passed as `resolution` to `get_template`.</p></dd>
 
 
 <dt id="arg-desc">desc<a class="anchor" aria-label="anchor" href="#arg-desc"></a></dt>
-<dd><p>Character string. Specific TemplateFlow <code>desc</code> field. If provided, this overrides
-any <code>desc</code> inferred from <code>variant</code>.</p></dd>
+<dd><p>Character string. Specific TemplateFlow <code>desc</code> field. Defaults to <code>"brain"</code> for
+volumetric templates and is automatically dropped for variants where <code>desc</code> is typically
+unused (e.g., <code>probseg</code>, <code>dseg</code>, surface queries). If provided explicitly, this overrides
+any inferred <code>desc</code>.</p></dd>
 
 
 <dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
@@ -199,8 +202,9 @@ If `FALSE`, attempts to load using `as_neurovol` (via `get_template`).</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function performs several pre-flight checks:
   - Validates the existence of the specified `space` using `tf$api$templates()`.
-  - Validates the specified `resolution` against available resolutions for that `space` using `tf$api$resolutions()`.
-  - These checks issue warnings and may be skipped if the necessary metadata cannot be retrieved from TemplateFlow.</p>
+  - Validates the specified `resolution` against available resolutions when metadata is available
+    (legacy `api$resolutions()` or `api$get_metadata()` fallback). The check is skipped silently
+    if resolution metadata cannot be retrieved.</p>
 <p>Caching behavior:
   - This function uses `memoise` to cache the resolved file paths from TemplateFlow at the R level for the current session.
   - The underlying Python TemplateFlow library also maintains its own disk cache, typically configured via the

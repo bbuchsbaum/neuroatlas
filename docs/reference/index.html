@@ -18,7 +18,8 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
     <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
     <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
@@ -50,24 +51,31 @@
 
       <dl><dt>
 
-          <code><a href="Schaefer17_200.html">Schaefer17_200</a></code>
+          <code><a href="MNI152_to_MNI305.html">MNI152_to_MNI305</a></code>
 
         </dt>
-        <dd>Schaefer Atlas with 17 Networks and 200 Parcels</dd>
+        <dd>MNI152 to MNI305 Affine Transform Matrix</dd>
 
         <dt>
 
-          <code><a href="Schaefer17_400.html">Schaefer17_400</a></code>
+          <code><a href="MNI305_to_MNI152.html">MNI305_to_MNI152</a></code>
 
         </dt>
-        <dd>Schaefer Atlas with 17 Networks and 400 Parcels</dd>
+        <dd>MNI305 to MNI152 Affine Transform Matrix</dd>
 
         <dt>
 
-          <code><a href="Schaefer17_600.html">Schaefer17_600</a></code>
+          <code><a href="atlas_roi_colors.html">atlas_roi_colors()</a></code>
 
         </dt>
-        <dd>Schaefer Atlas with 17 Networks and 600 Parcels</dd>
+        <dd>Assign optimal colours to atlas regions</dd>
+
+        <dt>
+
+          <code><a href="build_conflict_edges.html">build_conflict_edges()</a></code>
+
+        </dt>
+        <dd>Build slice-aware conflict edges between ROIs</dd>
 
         <dt>
 
@@ -92,6 +100,20 @@
 
         <dt>
 
+          <code><a href="coord_spaces.html">coord_spaces</a></code>
+
+        </dt>
+        <dd>Standard Coordinate Space Identifiers</dd>
+
+        <dt>
+
+          <code><a href="coordinate_spaces.html">coordinate_spaces</a></code>
+
+        </dt>
+        <dd>Coordinate Space Transforms for Neuroimaging Templates</dd>
+
+        <dt>
+
           <code><a href="create_templateflow.html">create_templateflow()</a></code>
 
         </dt>
@@ -103,6 +125,13 @@
 
         </dt>
         <dd>Dilate Atlas Parcellation Boundaries</dd>
+
+        <dt>
+
+          <code><a href="filter_atlas.html">filter_atlas()</a></code>
+
+        </dt>
+        <dd>Filter Atlas by ROI Attributes</dd>
 
         <dt>
 
@@ -169,6 +198,27 @@
 
         <dt>
 
+          <code><a href="get_space_transform.html">get_space_transform()</a></code>
+
+        </dt>
+        <dd>Get Transform Matrix Between Coordinate Spaces</dd>
+
+        <dt>
+
+          <code><a href="get_subcortical_atlas.html">get_subcortical_atlas()</a></code>
+
+        </dt>
+        <dd>Load harmonized subcortical atlases via TemplateFlow</dd>
+
+        <dt>
+
+          <code><a href="get_surface_coordinate_space.html">get_surface_coordinate_space()</a></code>
+
+        </dt>
+        <dd>Get Coordinate Space for a Surface Template</dd>
+
+        <dt>
+
           <code><a href="get_template.html">get_template()</a></code> <code><a href="get_template.html">get_surface_template()</a></code>
 
         </dt>
@@ -232,6 +282,20 @@
 
         <dt>
 
+          <code><a href="needs_transform.html">needs_transform()</a></code>
+
+        </dt>
+        <dd>Check if Transform is Needed Between Spaces</dd>
+
+        <dt>
+
+          <code><a href="network_anchor_hues.html">network_anchor_hues()</a></code>
+
+        </dt>
+        <dd>Assign harmonic anchor hues to networks</dd>
+
+        <dt>
+
           <code><a href="olsen_mtl.html">olsen_mtl</a></code>
 
         </dt>
@@ -239,10 +303,17 @@
 
         <dt>
 
-          <code><a href="plot-methods.html">plot(<i>&lt;atlas&gt;</i>)</a></code> <code><a href="plot-methods.html">plot(<i>&lt;glasser&gt;</i>)</a></code>
+          <code><a href="plot-methods.html">plot(<i>&lt;atlas&gt;</i>)</a></code> <code><a href="plot-methods.html">plot(<i>&lt;glasser&gt;</i>)</a></code> <code><a href="plot-methods.html">plot(<i>&lt;surfatlas&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot Glasser Atlas</dd>
+
+        <dt>
+
+          <code><a href="plot_brain.html">plot_brain()</a></code>
+
+        </dt>
+        <dd>Plot Brain Surface Atlas</dd>
 
         <dt>
 
@@ -274,10 +345,59 @@
 
         <dt>
 
+          <code><a href="reduce_atlas_vec.html">reduce_atlas_vec()</a></code>
+
+        </dt>
+        <dd>Reduce a NeuroVec by an Atlas to a ClusteredNeuroVec</dd>
+
+        <dt>
+
           <code><a href="resample.html">resample()</a></code>
 
         </dt>
         <dd>Resample Volume to New Space</dd>
+
+        <dt>
+
+          <code><a href="roi_attributes.html">roi_attributes()</a></code>
+
+        </dt>
+        <dd>List Available ROI Attributes</dd>
+
+        <dt>
+
+          <code><a href="roi_colors_embedding.html">roi_colors_embedding()</a></code>
+
+        </dt>
+        <dd>Embedding-based palette with smooth gradients</dd>
+
+        <dt>
+
+          <code><a href="roi_colors_maximin_view.html">roi_colors_maximin_view()</a></code>
+
+        </dt>
+        <dd>Slice-aware maximin palette for ROIs</dd>
+
+        <dt>
+
+          <code><a href="roi_colors_network_harmony.html">roi_colors_network_harmony()</a></code>
+
+        </dt>
+        <dd>Network-harmonic palette with neighbour separation</dd>
+
+        <dt>
+
+          <code><a href="roi_colors_rule_hcl.html">roi_colors_rule_hcl()</a></code>
+
+        </dt>
+        <dd>Deterministic HCL palette with harmonic variation</dd>
+
+        <dt>
+
+          <code><a href="roi_metadata.html">roi_metadata()</a></code>
+
+        </dt>
+        <dd>ROI Metadata Functions</dd>
 
         <dt>
 
@@ -309,6 +429,20 @@
 
         <dt>
 
+          <code><a href="sub_atlas.html">sub_atlas()</a></code>
+
+        </dt>
+        <dd>Select a Subset of Atlas Regions</dd>
+
+        <dt>
+
+          <code><a href="subcortical_atlas_options.html">subcortical_atlas_options()</a></code>
+
+        </dt>
+        <dd>Subcortical Atlas Options (TemplateFlow-backed)</dd>
+
+        <dt>
+
           <code><a href="tflow_files.html">tflow_files()</a></code>
 
         </dt>
@@ -320,6 +454,20 @@
 
         </dt>
         <dd>List Available TemplateFlow Template Spaces</dd>
+
+        <dt>
+
+          <code><a href="transform_coords.html">transform_coords()</a></code>
+
+        </dt>
+        <dd>Transform Coordinates Between Spaces</dd>
+
+        <dt>
+
+          <code><a href="transform_vertices_to_volume.html">transform_vertices_to_volume()</a></code>
+
+        </dt>
+        <dd>Transform Surface Vertices to Volume Space</dd>
       </dl></div>
   </main></div>
 

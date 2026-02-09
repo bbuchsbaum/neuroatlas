@@ -1,0 +1,199 @@
+# Surface Templates: Geometry vs. Data
+
+## Why this vignette
+
+Surface work in `neuroatlas` uses two key pieces:
+
+- **Geometry** (mesh and topology): stored as a
+  [`neurosurf::SurfaceGeometry`](https://rdrr.io/pkg/neurosurf/man/SurfaceGeometry.html).
+- **Per-vertex data** (numbers or labels): stored as the `data` slot of
+  a
+  [`neurosurf::NeuroSurface`](https://rdrr.io/pkg/neurosurf/man/NeuroSurface.html)
+  (one value per vertex).
+
+This vignette shows how to fetch surface *geometry* from TemplateFlow,
+what each helper returns, and how to attach data when you need a full
+`NeuroSurface`.
+
+## Quick reference
+
+- [`get_surface_template()`](../reference/get_template.md) → character
+  path to a `.surf.gii` file (one hemi). No mesh loaded yet.
+- [`load_surface_template()`](../reference/load_surface_template.md) →
+  `SurfaceGeometry` (mesh + graph + hemi), still **no per-vertex data**.
+  Can return L/R or both as a list.
+- Atlas helpers (e.g.,
+  [`schaefer_surf()`](../reference/schaefer_surf.md),
+  [`glasser_surf()`](../reference/glasser_surf.md)) →
+  `LabeledNeuroSurface` with integer labels in `data` and a mesh in
+  `geometry`.
+- Packaged fsaverage6 meshes live in `data/fsaverage.rda` and are used
+  automatically by `schaefer_surf(..., space = "fsaverage6")`.
+
+## Fetching geometry only
+
+Note: [`load_surface_template()`](../reference/load_surface_template.md)
+requires TemplateFlow. The `fsaverage` template may have limited
+availability for surface files. Check
+[`tflow_spaces()`](../reference/tflow_spaces.md) for available
+templates.
+
+``` r
+# fsaverage6 pial surface, left hemi (requires TemplateFlow)
+geom_l <- load_surface_template(
+  template_id = "fsaverage",
+  surface_type = "pial",
+  hemi = "L",
+  density = "41k",
+  resolution = "06"
+)
+geom_l
+```
+
+`geom_l` is a `SurfaceGeometry` with:
+
+- `mesh`:
+  [`rgl::mesh3d`](https://dmurdoch.github.io/rgl/dev/reference/mesh3d.html)
+  containing vertices (`vb`) and faces (`it`).
+- `graph`: `igraph` adjacency of the mesh.
+- `hemi`: `"left"` or `"right"`.
+
+No per-vertex values are present yet.
+
+### Both hemispheres at once
+
+``` r
+# fsLR is more commonly available in TemplateFlow than fsaverage
+geoms <- load_surface_template(
+  "fsLR", "inflated", hemi = "both", density = "32k"
+)
+str(geoms, max.level = 1)
+```
+
+Returns a named list with `L` and `R` `SurfaceGeometry` objects if the
+template is available in TemplateFlow.
+
+## Attaching per-vertex data
+
+To get a full `NeuroSurface`, supply data explicitly:
+
+``` r
+geom_l <- load_surface_template("fsaverage", "pial", hemi = "L",
+                                density = "41k", resolution = "06")
+
+# Example: all zeros (same length as vertices)
+vals <- rep(0, length(neurosurf::nodes(geom_l)))
+
+surf_l <- neurosurf::NeuroSurface(
+  geometry = geom_l,
+  indices  = neurosurf::nodes(geom_l),
+  data     = vals
+)
+```
+
+`surf_l@data` now holds one value per vertex; you can replace `vals`
+with cortical thickness, activation, etc.
+
+## Getting labeled surfaces (parcellations)
+
+If you want labels already attached, use the atlas helpers; they combine
+geometry with per-vertex label IDs:
+
+``` r
+atl <- schaefer_surf(parcels = 200, networks = 7,
+                     space = "fsaverage6", surf = "inflated")
+
+class(atl$lh_atlas)
+#> "LabeledNeuroSurface" "NeuroSurface" ...
+
+head(slot(atl$lh_atlas, "data"))
+# integer labels per vertex
+```
+
+`slot(atl$lh_atlas, "data")` holds parcel IDs; metadata in `atl$labels`
+maps those IDs to names.
+
+## When TemplateFlow is required
+
+- Any call that specifies `template_id`/`space` not packaged (e.g.,
+  fsaverage, fsaverage5/6, fsLR) needs TemplateFlow plus network access
+  on first use.
+- fsaverage6 geometry is bundled; set `space = "fsaverage6"` in
+  [`schaefer_surf()`](../reference/schaefer_surf.md) to avoid
+  TemplateFlow.
+
+## Common patterns
+
+- Get a mesh path only (no R object): `get_surface_template(...)`.
+- Get a mesh object: `load_surface_template(...)`.
+- Get mesh + labels: [`schaefer_surf()`](../reference/schaefer_surf.md)
+  / [`glasser_surf()`](../reference/glasser_surf.md).
+- Add your own values: wrap the geometry with `NeuroSurface(...)`.
+
+## Sanity check: surface renders
+
+We generate a small snapshot to prove the geometry loads and is
+displayable. This chunk only runs when TemplateFlow is available; the
+PNG is written to `figures/` and then shown below.
+
+``` r
+dir.create("figures", showWarnings = FALSE)
+png_path <- file.path("figures", "fslr32k_inflated_L.png")
+geom_l <- load_surface_template(
+  "fsLR",
+  "inflated",
+  hemi = "L",
+  density = "32k"
+)
+neurosurf::snapshot_surface(geom_l, file = png_path)
+png_path
+```
+
+If the image renders, the template fetched correctly.
+
+## Template roster & snapshots
+
+Below are the surface templates we currently target in code/tests.
+Densities are TemplateFlow defaults; surface types are those exposed by
+[`get_surface_template()`](../reference/get_template.md) (and used by
+our atlas helpers).
+
+| template_id | density/res | surface types | packaged? |
+|----|----|----|----|
+| fsaverage | 164k | white, pial, inflated, midthickness, sphere | TF |
+| fsaverage6 | 41k (`res-06`) | white, pial, inflated | **yes** (bundled) |
+| fsaverage5 | 10k (`res-05`) | white, pial, inflated | TF |
+| fsLR | 32k | white, pial, inflated, midthickness, sphere | TF |
+
+### Batch snapshot script (run locally)
+
+To create a thumbnail per template/hemisphere/type for quick QA:
+
+``` r
+templates <- list(
+  list(id = "fsaverage",  den = "164k", res = NULL, types = c("pial", "inflated")),
+  list(id = "fsaverage6", den = "41k",  res = "06",  types = c("pial", "inflated")),
+  list(id = "fsaverage5", den = "10k",  res = "05",  types = c("pial")),
+  list(id = "fsLR",       den = "32k",  res = NULL,  types = c("pial", "inflated"))
+)
+
+for (tpl in templates) {
+  for (stype in tpl$types) {
+    geom_l <- load_surface_template(
+      template_id = tpl$id,
+      surface_type = stype,
+      hemi = "L",
+      density = tpl$den,
+      resolution = tpl$res
+    )
+    fname <- sprintf("%s_%s_L.png", tpl$id, stype)
+    neurosurf::snapshot_surface(geom_l, file = fname)
+  }
+}
+```
+
+Enable and run locally to generate PNGs you can embed or eyeball to
+verify each template is present and renderable.
+
+That’s it—use geometry-only helpers when you want maximal control, and
+atlas helpers when you want labeled surfaces out of the box.

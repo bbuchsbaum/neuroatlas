@@ -34,7 +34,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+<li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
     <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
     <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
@@ -64,7 +65,7 @@
                         <h4 data-toc-skip class="author">neuroatlas Dev
 Team</h4>
             
-            <h4 data-toc-skip class="date">2025-11-28</h4>
+            <h4 data-toc-skip class="date">2026-02-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/vignettes/working-with-templateflow.Rmd" class="external-link"><code>vignettes/working-with-templateflow.Rmd</code></a></small>
       <div class="d-none name"><code>working-with-templateflow.Rmd</code></div>
@@ -505,7 +506,7 @@ caching: 1. <strong>R-level Memoisation</strong>:
 <code><a href="../reference/get_template.html">get_template()</a></code> memoises the <em>file paths</em> it
 resolves. If you request the same template with identical parameters
 multiple times in an R session, the path is retrieved from this memory
-cache. If <code>path_only=FALSE</code>, <code><a href="../reference/as_neurovol.html">as_neurovol()</a></code>
+cache. If <code>path_only=FALSE</code>, <code>as_neurovol()</code>
 (which loads the NIfTI file) is also memoised, so the
 <code>NeuroVol</code> object itself is cached in memory for the session
 if the same path is read again. 2. <strong>Python Disk Cache</strong>:

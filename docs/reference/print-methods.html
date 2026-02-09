@@ -18,7 +18,8 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
     <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
     <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
@@ -73,6 +74,25 @@
     <p>The object is returned invisibly</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_aseg_atlas.html">get_aseg_atlas</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">--</span> <span style="color: #00BBBB; font-weight: bold;">Atlas Summary</span> <span style="color: #00BBBB;">-------------------------------------------</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&gt;</span> <span style="font-weight: bold;">Name:   </span><span style="color: #BBBBBB;">ASEG</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&gt;</span> <span style="font-weight: bold;">Dimensions: </span><span style="color: #BBBBBB;">193 x 229 x 193</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&gt;</span> <span style="font-weight: bold;">Regions: </span><span style="color: #00BB00;">17</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Structure Distribution:</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">|-</span> Left hemisphere:     <span style="color: #BBBBBB;">7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">|-</span> Right hemisphere:    <span style="color: #BBBBBB;">8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">\-</span> Bilateral/Midline:   <span style="color: #BBBBBB;">2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">------------------------------------------------------------</span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -20,7 +20,8 @@ to visualize data (like statistics or measurements) across atlas regions."></hea
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
     <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
     <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
@@ -38,7 +39,7 @@ to visualize data (like statistics or measurements) across atlas regions."></hea
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Map values to an atlas</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/all_generic.R" class="external-link"><code>R/all_generic.R</code></a>, <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/atlas_methods.R" class="external-link"><code>R/atlas_methods.R</code></a>, <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/glasser.R" class="external-link"><code>R/glasser.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/all_generic.R" class="external-link"><code>R/all_generic.R</code></a>, <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/atlas_methods.R" class="external-link"><code>R/atlas_methods.R</code></a>, <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/ggschaefer.R" class="external-link"><code>R/ggschaefer.R</code></a>, and 1 more</small>
       <div class="d-none name"><code>map_atlas.Rd</code></div>
     </div>
 
@@ -52,10 +53,13 @@ to visualize data (like statistics or measurements) across atlas regions.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">map_atlas</span><span class="op">(</span><span class="va">x</span>, <span class="va">vals</span>, <span class="va">thresh</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'atlas'</span></span>
-<span><span class="fu">map_atlas</span><span class="op">(</span><span class="va">x</span>, <span class="va">vals</span>, thresh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, pos <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">map_atlas</span><span class="op">(</span><span class="va">x</span>, <span class="va">vals</span>, thresh <span class="op">=</span> <span class="cn">NULL</span>, pos <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'schaefer'</span></span>
+<span><span class="fu">map_atlas</span><span class="op">(</span><span class="va">x</span>, <span class="va">vals</span>, thresh <span class="op">=</span> <span class="cn">NULL</span>, pos <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'glasser'</span></span>
-<span><span class="fu">map_atlas</span><span class="op">(</span><span class="va">x</span>, <span class="va">vals</span>, thresh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, pos <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">map_atlas</span><span class="op">(</span><span class="va">x</span>, <span class="va">vals</span>, thresh <span class="op">=</span> <span class="cn">NULL</span>, pos <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
