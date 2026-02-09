@@ -1,38 +1,83 @@
-# Repository Guidelines
+<!-- Generated: 2026-02-08 | Updated: 2026-02-08 -->
 
-## Project Structure & Module Organization
-- Core package code (atlas loaders, helpers, plotting) lives in `R/`.
-- Tests are under `tests/testthat/` in files named `test-*.R` that mirror topics in `R/`.
-- Function documentation is generated from roxygen comments in `R/` and stored in `man/`.
-- Long-form docs and tutorials live in `vignettes/`; packaged data live in `data/`, with raw sources and scripts in `data-raw/`.
-- The pkgdown site is configured via `_pkgdown.yml` and built into `docs/` using content from `pkgdown/`.
+# neuroatlas
 
-## Build, Test, and Development Commands
-- Install development dependencies: run `devtools::install_dev_deps()` in an R session.
-- Load the package for interactive work: `devtools::load_all()`.
-- Run the test suite: `devtools::test()` or `testthat::test_local("tests/testthat")`.
-- Full package check (mirrors CI): `devtools::check()`; run this before significant PRs.
-- Optional checklist/CRAN-style review: `checklist::check_pkg()` when the `checklist` package is available.
-- Build the documentation website locally: `pkgdown::build_site()`.
+## Purpose
+R package providing a unified framework for neuroimaging atlases and parcellations. Wraps volumetric and surface-based brain atlases (Schaefer, Glasser, FreeSurfer ASEG, Olsen MTL) in a consistent S3 class system with generics for ROI extraction, data reduction, region subsetting, and visualization.
 
-## Coding Style & Naming Conventions
-- Follow tidyverse-style conventions: 2-space indentation, no tabs, and a soft 80-character line width.
-- Use `snake_case` for functions and objects; use `UpperCamelCase` for S3/S4 classes and key data types.
-- Keep one main topic per file (e.g., `atlas.R`, `schaefer.R`); prefer descriptive, lowercase file names.
-- Document all exported functions and classes with roxygen2 (`#'`) and regenerate docs with `devtools::document()`.
+## Key Files
 
-## Testing Guidelines
-- Tests use `testthat` (edition 3) in `tests/testthat/` (see e.g. `test-dilation.R`, `test-space-transforms.R`).
-- Name tests after the feature or behaviour they cover and keep them small and focused.
-- Use `skip_on_cran()` or similar skips for network-dependent, slow, or TemplateFlow-related tests.
-- CI tracks coverage via Codecov; avoid reducing overall coverage and add tests with every feature or bug fix.
+| File | Description |
+|------|-------------|
+| `DESCRIPTION` | Package metadata, version, and dependency declarations |
+| `NAMESPACE` | Auto-generated exports/imports (managed by roxygen2 — never edit manually) |
+| `CLAUDE.md` | Development instructions for Claude Code |
+| `_pkgdown.yml` | pkgdown site configuration |
+| `README.Rmd` | Package README source (renders to README.md) |
+| `NEWS.md` | Changelog |
 
-## Commit & Pull Request Guidelines
-- Write concise, present-tense commit messages (e.g., “Add Schaefer atlas loader”, “Fix template flow paths”).
-- Group related changes together and avoid mixing refactors with behavioural changes in the same commit.
-- Before opening a PR, ensure `devtools::check()` and `devtools::test()` pass; run `lintr::lint_package()` if available.
-- PR descriptions should state motivation, key changes, how they were tested, and link issues (e.g., `Fixes #12`); add screenshots or rendered links for documentation and plotting changes when useful.
+## Subdirectories
 
-## Agent-Specific Notes
-- Automated tools and LLM-based agents should make minimal, well-scoped changes and keep them consistent with existing patterns.
-- Avoid introducing new dependencies, configuration files, or architectural styles without prior discussion in an issue or PR.
+| Directory | Purpose |
+|-----------|---------|
+| `R/` | All R source code — S3 classes, generics, methods (see `R/AGENTS.md`) |
+| `tests/testthat/` | testthat test suite (see `tests/testthat/AGENTS.md`) |
+| `data/` | Precomputed `.rda` datasets bundled with the package |
+| `data-raw/` | Scripts and raw files used to generate `data/` contents |
+| `inst/extdata/` | NIfTI atlas volumes shipped with the package |
+| `vignettes/` | Package vignettes and tutorials |
+| `man/` | Auto-generated roxygen2 documentation (do not edit) |
+| `docs/` | Auto-generated pkgdown website (do not edit) |
+
+## For AI Agents
+
+### Working In This Directory
+- Follow tidyverse style: 2-space indentation, no tabs, ~80 char lines, `snake_case` functions
+- Use `UpperCamelCase` for S3/S4 classes
+- All exports require roxygen2 documentation; run `devtools::document()` after changes
+- Use `assertthat` for input validation
+- Check optional packages with `requireNamespace()` before use
+- The NAMESPACE file is auto-generated — never edit it manually
+- Make minimal, well-scoped changes consistent with existing patterns
+- Avoid introducing new dependencies or architectural styles without discussion
+
+### Testing Requirements
+- Run `devtools::test()` for the full suite, or `testthat::test_file()` for individual files
+- Tests must `devtools::load_all()` first (or use `devtools::test()` which does this)
+- Use `skip_on_cran()` for network-dependent or slow tests
+- Use `make_toy_*()` helpers for synthetic data — avoid requiring atlas downloads in unit tests
+- Add tests with every feature or bug fix
+
+### Build and Check
+- `devtools::check()` or `R CMD check --as-cran` for CRAN compliance
+- No non-ASCII characters in code or data
+- Examples must run in < 5 seconds (use `\dontrun{}` or `\donttest{}` for slow ones)
+- CI tracks coverage via Codecov
+
+### Commit Guidelines
+- Concise, present-tense commit messages (e.g., "Add Schaefer atlas loader")
+- Group related changes; don't mix refactors with behavioral changes
+- Ensure `devtools::check()` and `devtools::test()` pass before committing
+
+### Key Architecture
+- All atlases are S3 lists inheriting from `"atlas"` with fields: `$atlas`, `$ids`, `$labels`, `$orig_labels`, `$hemi`, `$name`, `$cmap`
+- `$atlas` is either a `ClusteredNeuroVol` or plain `NeuroVol` from neuroim2
+- Surface atlases add `"surfatlas"` class and `$lh_atlas`/`$rh_atlas` fields
+- Cluster IDs must be contiguous 1:K when constructing `ClusteredNeuroVec` objects
+- `.subset_atlas()` is the internal workhorse for subsetting; `sub_atlas()` and `filter_atlas()` are public wrappers
+
+## Dependencies
+
+### Internal (sibling packages)
+- `neuroim2` — Core neuroimaging data structures (NeuroVol, NeuroSpace, ClusteredNeuroVol, ClusteredNeuroVec)
+- `neurosurf` — Surface-based operations and FreeSurfer annotation reading
+
+### External
+- `reticulate` — Python bridge for TemplateFlow
+- `ggseg` / `ggsegSchaefer` / `ggsegGlasser` — Brain visualization
+- `tibble`, `dplyr`, `tidyr` — Data wrangling
+- `rlang` — Tidy evaluation (used in `filter_atlas`)
+- `assertthat` — Input validation
+- `memoise` — Function memoization for cached atlas loading
+
+<!-- MANUAL: -->

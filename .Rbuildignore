@@ -7,6 +7,7 @@
 ^README\.Rmd$
 ^\.Rproj\.user$
 ^\.claude$
+^AGENTS\.md$
 ^\.github$
 ^\.httr-oauth$
 ^\.zenodo\.json$
@@ -24,3 +25,7 @@
 ^repomix-output\.txt$
 ^repomix-output\.xml$
 ^templateflow\.md$
+^\.omc$
+^README\.html$
+^neuroatlas_cheatsheet_v3\.md$
+^vignettes/.*_cache$
