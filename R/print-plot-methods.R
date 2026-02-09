@@ -91,3 +91,17 @@ print.schaefer <- function(x, ...) {
   
   invisible(x)
 }
+
+#' @rdname plot-methods
+#' @details
+#' \code{plot.surfatlas} renders a cortical surface projection via
+#' \code{\link{plot_brain}()}.
+#' @param views Character vector of views to render for surface atlases.
+#'   Any combination of \code{"lateral"}, \code{"medial"}, \code{"dorsal"},
+#'   \code{"ventral"}. Default: \code{c("lateral", "medial")}.
+#' @export
+plot.surfatlas <- function(x, y, vals = NULL,
+                           views = c("lateral", "medial"),
+                           ...) {
+  plot_brain(x, vals = vals, views = views, ...)
+}

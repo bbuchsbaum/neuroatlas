@@ -1,3 +1,10 @@
+# neuroatlas 0.1.0.9000
+
+* Fixed white gaps ("shards") in `plot_brain()` surface rendering caused by
+  inconsistent triangle winding in some meshes.
+* Added `silhouette*` and `network_border*` options to `plot_brain()` for
+  improved boundary styling (silhouette outline and between-network borders).
+
 # neuroatlas 0.1.0
 
 * Initial CRAN submission
