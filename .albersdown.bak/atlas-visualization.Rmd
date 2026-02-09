@@ -1,0 +1,146 @@
+---
+title: "Atlas Visualization with Optimal Colours"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Atlas Visualization with Optimal Colours}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 4,
+  eval = FALSE
+)
+```
+
+## Introduction
+
+Every atlas in neuroatlas can be visualised with a single call to `plot()`.
+Behind the scenes, `plot.atlas()` renders coloured parcels as volumetric
+slices using **neuroim2**'s `plot_montage()` and `plot_ortho()`, with
+colours assigned automatically by the **roi_colors** system.
+
+```{r load}
+library(neuroatlas)
+```
+
+## Quick Start
+
+```{r quick-montage}
+atlas <- get_aseg_atlas()
+plot(atlas)
+```
+
+The default view is a multi-slice **montage** (axial slices) with colours
+chosen by the `rule_hcl` algorithm --- a fast, deterministic palette that
+uses network hues and hemisphere luminance differences.
+
+For a three-plane **orthogonal** view:
+
+```{r quick-ortho}
+plot(atlas, view = "ortho")
+```
+
+## Colour Algorithms
+
+neuroatlas ships four colour algorithms, each suited to different use cases.
+Pass the `method` argument to `plot()` to switch between them.
+
+### rule_hcl (default)
+
+Deterministic and fast. Assigns hues per network with anterior-posterior
+gradients and hemisphere luminance offsets.
+
+```{r rule-hcl}
+plot(atlas, method = "rule_hcl", nslices = 8)
+```
+
+### maximin_view
+
+Optimises perceptual separation between spatially neighbouring ROIs across
+slice views. Best for publication figures where adjacent parcels must be
+easily distinguished.
+
+```{r maximin}
+plot(atlas, method = "maximin_view", nslices = 8)
+```
+
+### network_harmony
+
+Network-aware: ROIs in the same network share analogous hue families while
+still maximising local separation. Requires the atlas to have a `$network`
+field (e.g. Schaefer atlases).
+
+```{r network-harmony, eval = FALSE}
+# Requires a Schaefer atlas with network metadata
+schaefer <- get_schaefer_atlas(parcels = "200", networks = "7")
+plot(schaefer, method = "network_harmony", nslices = 8)
+```
+
+### embedding
+
+Projects ROI features to 2D (PCA or UMAP) and maps polar angle to hue,
+yielding globally structured gradients.
+
+```{r embedding}
+plot(atlas, method = "embedding", nslices = 8)
+```
+
+## Custom Colours
+
+You can supply your own colours as a named character vector (names are
+region IDs) or as a tibble from `atlas_roi_colors()`.
+
+### Named vector
+
+```{r custom-named}
+atlas <- get_aseg_atlas()
+my_cols <- setNames(rainbow(length(atlas$ids)), atlas$ids)
+plot(atlas, colors = my_cols, nslices = 6)
+```
+
+### Pre-computed tibble
+
+```{r custom-tibble}
+color_tbl <- atlas_roi_colors(atlas, method = "maximin_view")
+head(color_tbl)
+plot(atlas, colors = color_tbl, nslices = 6)
+```
+
+## Programmatic Colour Access
+
+The `atlas_roi_colors()` function is the bridge between atlas objects and the
+`roi_colors_*()` family. It extracts ROI centroids, builds a metadata tibble,
+and dispatches to the requested algorithm.
+
+```{r programmatic}
+atlas <- get_aseg_atlas()
+cols <- atlas_roi_colors(atlas, method = "rule_hcl")
+cols
+```
+
+This tibble can be joined with other atlas metadata for downstream analyses.
+
+## Controlling Slice Count
+
+Use `nslices` to control how many slices appear in the montage:
+
+```{r nslices}
+plot(atlas, nslices = 4)
+plot(atlas, nslices = 16)
+```
+
+## Existing Visualisation Tools
+
+For flatmap-style cortical visualisations (not volumetric), neuroatlas also
+provides:
+
+- `ggseg_schaefer()` --- ggseg-based Schaefer flatmaps
+- `plot_glasser()` --- Glasser atlas flatmaps
+
+These are complementary to `plot()` and remain available as standalone
+functions.

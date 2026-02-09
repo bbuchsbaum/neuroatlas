@@ -9,6 +9,7 @@
 *.shx
 *.xls*
 *_files
+*_cache
 .DS_Store
 .RData
 .Renviron
@@ -32,6 +33,10 @@ debug_olsen_labels.R
 debug_schaefer_labels.R
 debug_sparse.R
 debug_surf_atlas.R
+.omc
+*.Rcheck
+*.tar.gz
+Rplots.pdf
 docs
 libs
 output

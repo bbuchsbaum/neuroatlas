@@ -14,12 +14,11 @@ resource_files:
 includes:
   in_header: |-
     <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('palette-red'));</script>
+    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
 
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
 if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -161,7 +160,7 @@ We generate a small snapshot to prove the geometry loads and is
 displayable. This chunk only runs when TemplateFlow is available; the PNG
 is written to `figures/` and then shown below.
 
-```{r snapshot, eval=templateflow_ok, cache=TRUE}
+```{r snapshot, eval=FALSE, cache=TRUE}
 dir.create("figures", showWarnings = FALSE)
 png_path <- file.path("figures", "fslr32k_inflated_L.png")
 geom_l <- load_surface_template(
@@ -174,7 +173,7 @@ neurosurf::snapshot_surface(geom_l, file = png_path)
 png_path
 ```
 
-```{r snapshot-show, echo=FALSE, eval=templateflow_ok, fig.alt="fsLR 32k inflated left hemisphere surface snapshot"}
+```{r snapshot-show, echo=FALSE, eval=FALSE, fig.alt="fsLR 32k inflated left hemisphere surface snapshot"}
 knitr::include_graphics(file.path("figures", "fslr32k_inflated_L.png"))
 ```
 
