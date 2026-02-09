@@ -10,11 +10,11 @@
 \usage{
 map_atlas(x, vals, thresh, ...)
 
-\method{map_atlas}{atlas}(x, vals, thresh = c(0, 0), pos = FALSE, ...)
+\method{map_atlas}{atlas}(x, vals, thresh = NULL, pos = FALSE, ...)
 
-\method{map_atlas}{schaefer}(x, vals, thresh = c(0, 0), pos = FALSE, ...)
+\method{map_atlas}{schaefer}(x, vals, thresh = NULL, pos = FALSE, ...)
 
-\method{map_atlas}{glasser}(x, vals, thresh = c(0, 0), pos = FALSE, ...)
+\method{map_atlas}{glasser}(x, vals, thresh = NULL, pos = FALSE, ...)
 }
 \arguments{
 \item{x}{An atlas object to map values onto}

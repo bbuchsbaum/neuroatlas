@@ -7,7 +7,7 @@
 ggseg_schaefer(
   atlas,
   vals,
-  thresh = c(0, 0),
+  thresh = NULL,
   pos = FALSE,
   palette = "Spectral",
   interactive = TRUE,
@@ -20,7 +20,9 @@ ggseg_schaefer(
 \item{vals}{Numeric vector of values to visualize on the atlas}
 
 \item{thresh}{Numeric vector of length 2 specifying (min, max) thresholds.
-Values outside this range will be set to NA. Default: c(0,0)}
+Only values where \code{thresh[1] < abs(val) <= thresh[2]} are kept;
+the rest become \code{NA}.
+\code{NULL} (default) means no thresholding — all values are kept.}
 
 \item{pos}{Logical. If TRUE, uses raw values; if FALSE, uses absolute values
 for thresholding. Default: FALSE}
@@ -54,7 +56,7 @@ vals <- rnorm(100)
 ggseg_schaefer(atlas, vals)
 
 # Create static plot with custom thresholds
-ggseg_schaefer(atlas, vals, thresh=c(-1, 1), interactive=FALSE)
+ggseg_schaefer(atlas, vals, thresh=c(0.5, 2), interactive=FALSE)
 }
 
 }

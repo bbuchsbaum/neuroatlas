@@ -42,14 +42,18 @@ Imports:
     tools,
     utils
 Suggests:
+    albersdown,
     echarts4r,
+    FNN,
     geojsonio,
     geojsonsf,
     ggsegGlasser,
     ggsegSchaefer,
     knitr,
+    patchwork,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    uwot
 VignetteBuilder: 
     knitr
 Remotes: 

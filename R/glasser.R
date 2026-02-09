@@ -123,29 +123,38 @@ get_glasser_atlas <- function(outspace=NULL) {
 #' @importFrom dplyr left_join mutate
 #' @importFrom tibble tibble
 #' @export
-map_atlas.glasser <- function(x, vals, thresh=c(0,0), pos=FALSE, ...) {
+map_atlas.glasser <- function(x, vals, thresh=NULL, pos=FALSE, ...) {
   .assert_ggseg_glasser()
-  
+
   fun <- if (pos) identity else abs
-  
-  ids <- ifelse(x$hemi == "left", 
-                paste0("lh_L_", x$label), 
+
+  ids <- ifelse(x$hemi == "left",
+                paste0("lh_L_", x$label),
                 paste0("rh_R_", x$label))
-  
+
   ret <- tibble(statistic=vals, region=x$labels, label=ids, hemi=x$hemi)
-  
+
   # Get glasser atlas from ggsegGlasser
   glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
-  
+
   rboth <- glasser_atlas %>%
     as_tibble() %>%
-    left_join(ret, by = c("region", "label", "hemi")) %>%
-    mutate(statistic=ifelse(fun(.data$statistic) <= thresh[1] | 
-                           fun(.data$statistic) > thresh[2], 
-                           .data$statistic, NA)) %>%
-    as_brain_atlas()
-  
-  rboth
+    left_join(ret, by = c("region", "label", "hemi"))
+
+  # Apply optional thresholding
+  if (!is.null(thresh)) {
+    stopifnot(is.numeric(thresh), length(thresh) == 2)
+    rboth <- rboth %>%
+      mutate(statistic = ifelse(
+        is.na(.data$statistic) |
+        fun(.data$statistic) <= thresh[1] |
+        fun(.data$statistic) > thresh[2],
+        NA_real_,
+        .data$statistic
+      ))
+  }
+
+  rboth %>% as_brain_atlas()
 }
 
 .assert_ggseg_glasser <- function() {

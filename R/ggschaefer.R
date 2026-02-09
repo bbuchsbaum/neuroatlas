@@ -21,6 +21,14 @@ utils::globalVariables(c("hemi", "orig_label", "hemi.x", "hemi.y", "x", "y", "gr
 #' and returns the corresponding ggseg-compatible atlas object. Supports Schaefer
 #' atlases with 7 or 17 networks and 100-1000 parcels (in steps of 100).
 #'
+#' @examples
+#' \donttest{
+#' if (requireNamespace("ggsegSchaefer", quietly = TRUE)) {
+#'   atlas <- get_aseg_atlas()
+#'   # Only works with Schaefer atlases
+#' }
+#' }
+#'
 #' @importFrom stringr str_extract_all
 #' @export
 get_ggseg_atlas <- function(atlas) {
@@ -71,7 +79,7 @@ get_ggseg_atlas <- function(atlas) {
 
 #' @rdname map_atlas
 #' @export
-map_atlas.schaefer <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
+map_atlas.schaefer <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
   map_to_schaefer(x, vals, thresh = thresh, pos = pos)
 }
 
@@ -83,62 +91,83 @@ map_atlas.schaefer <- function(x, vals, thresh = c(0, 0), pos = FALSE, ...) {
 #'
 #' @param atlas An atlas object containing Schaefer parcellation information
 #' @param vals Numeric vector of values to map to atlas regions
-#' @param thresh Numeric vector of length 2 specifying (min, max) thresholds.
-#'   Values outside this range will be set to NA. Default: c(0,0)
+#' @param thresh Numeric vector of length 2 specifying (min, max) thresholds
+#'   for the absolute value (or raw value when \code{pos = TRUE}).
+#'   Only values where \code{thresh[1] < abs(val) <= thresh[2]} are kept;
+#'   the rest become \code{NA}.
+#'   \code{NULL} (default) means no thresholding — all values are kept.
 #' @param pos Logical. If TRUE, uses raw values; if FALSE, uses absolute values
 #'   for thresholding. Default: FALSE
 #'
 #' @return A tibble with mapped values suitable for ggseg visualization
+#'
+#' @examples
+#' \donttest{
+#' if (requireNamespace("ggsegSchaefer", quietly = TRUE)) {
+#'   data(Schaefer17_200)
+#'   vals <- rnorm(length(Schaefer17_200$ids))
+#'   mapped <- map_to_schaefer(Schaefer17_200, vals)
+#' }
+#' }
 #'
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr mutate left_join filter .data select coalesce
 #' @importFrom tibble as_tibble
 #' @importFrom ggseg as_brain_atlas
 #' @export
-map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
+map_to_schaefer <- function(atlas, vals, thresh=NULL, pos=FALSE) {
   assert_that(length(vals) == length(atlas$orig_labels),
               msg="Length of vals must match number of atlas regions")
-  
+
   fun <- if (pos) identity else abs
-  
+
   ggatl <- get_ggseg_atlas(atlas)
-  
-  # Create a mapping between our labels and ggseg labels
-  # Our labels are like "LH_Vis_1", ggseg labels are like "lh_7Networks_LH_Vis_1"
-  networks_str <- if (grepl("7networks", atlas$name, ignore.case = TRUE)) "7Networks_" else "17Networks_"
-  
+
+  # Detect network count — check "17" before "7" to avoid substring match
+  networks_str <- if (grepl("17networks", atlas$name, ignore.case = TRUE)) {
+    "17Networks_"
+  } else {
+    "7Networks_"
+  }
+
   ret <- tibble(
     statistic = vals,
     orig_label = atlas$orig_labels,
     hemi = atlas$hemi
   ) %>%
     mutate(
-      # Convert our labels to match ggseg format
       ggseg_label = paste0(
         ifelse(hemi == "left", "lh_", "rh_"),
         networks_str,
         orig_label
       )
     )
-  
+
   # Join with ggseg atlas data
   rboth <- ggatl$data %>%
     left_join(ret, by = c("label" = "ggseg_label")) %>%
     mutate(
-      # Preserve original hemi column from ggseg data
-      hemi = coalesce(.data$hemi.x, .data$hemi.y),
-      statistic = ifelse(
-        is.na(.data$statistic) | 
-        fun(.data$statistic) <= thresh[1] | 
-        fun(.data$statistic) > thresh[2],
-        NA_real_, 
-        .data$statistic
-      )
+      hemi = coalesce(.data$hemi.x, .data$hemi.y)
     ) %>%
-    select(-orig_label, -hemi.x, -hemi.y)  # Remove temporary columns
-  
-  # Return the tibble instead of the brain atlas object
-  return(rboth)
+    select(-orig_label, -hemi.x, -hemi.y)
+
+  # Apply optional thresholding
+  if (!is.null(thresh)) {
+    assert_that(is.numeric(thresh) && length(thresh) == 2,
+                msg = "thresh must be a numeric vector of length 2 or NULL")
+    rboth <- rboth %>%
+      mutate(
+        statistic = ifelse(
+          is.na(.data$statistic) |
+          fun(.data$statistic) <= thresh[1] |
+          fun(.data$statistic) > thresh[2],
+          NA_real_,
+          .data$statistic
+        )
+      )
+  }
+
+  rboth
 }
 
 #' Create Interactive Schaefer Atlas Visualization
@@ -150,7 +179,9 @@ map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
 #' @param atlas An atlas object containing Schaefer parcellation information
 #' @param vals Numeric vector of values to visualize on the atlas
 #' @param thresh Numeric vector of length 2 specifying (min, max) thresholds.
-#'   Values outside this range will be set to NA. Default: c(0,0)
+#'   Only values where \code{thresh[1] < abs(val) <= thresh[2]} are kept;
+#'   the rest become \code{NA}.
+#'   \code{NULL} (default) means no thresholding — all values are kept.
 #' @param pos Logical. If TRUE, uses raw values; if FALSE, uses absolute values
 #'   for thresholding. Default: FALSE
 #' @param palette Character string specifying the color palette to use.
@@ -175,7 +206,7 @@ map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
 #' ggseg_schaefer(atlas, vals)
 #'
 #' # Create static plot with custom thresholds
-#' ggseg_schaefer(atlas, vals, thresh=c(-1, 1), interactive=FALSE)
+#' ggseg_schaefer(atlas, vals, thresh=c(0.5, 2), interactive=FALSE)
 #' }
 #'
 #' @importFrom ggplot2 aes scale_fill_distiller ggplot theme_void coord_fixed
@@ -183,11 +214,11 @@ map_to_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE) {
 #' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection geom_polygon_interactive
 #' @importFrom scales squish
 #' @export
-ggseg_schaefer <- function(atlas, vals, thresh=c(0,0), pos=FALSE,
+ggseg_schaefer <- function(atlas, vals, thresh=NULL, pos=FALSE,
                           palette="Spectral", interactive=TRUE, lim=range(vals)) {
   mapped_data <- map_to_schaefer(atlas, vals, thresh, pos)
-  
-  # Get the ggseg atlas and update its data
+
+  # Reuse the ggseg atlas skeleton and replace its data with mapped values
   gatl <- get_ggseg_atlas(atlas)
   gatl$data <- mapped_data
   

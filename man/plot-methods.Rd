@@ -7,7 +7,15 @@
 \alias{plot-methods}
 \title{Plot Glasser Atlas}
 \usage{
-\method{plot}{atlas}(x, y, ...)
+\method{plot}{atlas}(
+  x,
+  y,
+  view = c("montage", "ortho"),
+  method = "rule_hcl",
+  colors = NULL,
+  nslices = 12L,
+  ...
+)
 
 \method{plot}{glasser}(
   x,
@@ -28,7 +36,21 @@
 
 \item{y}{Ignored (required for S3 consistency)}
 
-\item{...}{Additional arguments passed to specific plot implementations}
+\item{view}{Character; \code{"montage"} (default) for a multi-slice montage
+or \code{"ortho"} for three orthogonal planes.}
+
+\item{method}{Colour algorithm passed to \code{\link{atlas_roi_colors}()}.
+One of \code{"rule_hcl"} (default), \code{"network_harmony"},
+\code{"maximin_view"}, or \code{"embedding"}.}
+
+\item{colors}{Optional pre-computed colour specification: a tibble from
+\code{\link{atlas_roi_colors}()}, or a named character vector of hex
+colours keyed by region ID.}
+
+\item{nslices}{Number of slices for montage view (default 12).}
+
+\item{...}{Additional arguments passed to \code{neuroim2::plot_montage()} or
+\code{neuroim2::plot_ortho()}.}
 
 \item{vals}{Numeric vector of values to visualize. If NULL (default), all regions
 will be assigned a value of 1, creating a uniform visualization}
@@ -51,11 +73,28 @@ set to range of vals}
 \value{
 A ggiraph interactive plot object
 
-A plot object (specific type depends on the atlas)
+For \code{view = "montage"}, a \code{ggplot2} object (invisibly).
+  For \code{view = "ortho"}, a \code{patchwork} composite (if available) or a
+  list of three \code{ggplot2} objects.
 }
 \description{
 Creates an interactive visualization of the Glasser atlas with mapped values
 using ggseg and ggiraph.
 
-Plot methods for various atlas objects in the neuroatlas package
+Volumetric slice visualisation for any atlas object. By default renders a
+multi-slice montage with each parcel coloured by the
+\code{\link{atlas_roi_colors}()} system. An orthogonal three-plane view is
+also available.
+}
+\examples{
+\donttest{
+atlas <- get_aseg_atlas()
+plot(atlas)
+plot(atlas, view = "ortho")
+plot(atlas, method = "maximin_view", nslices = 6)
+}
+
+}
+\seealso{
+\code{\link{atlas_roi_colors}}, \code{\link{ggseg_schaefer}}
 }
