@@ -19,44 +19,29 @@ ggseg_schaefer(
 
 \item{vals}{Numeric vector of values to visualize on the atlas}
 
-\item{thresh}{Numeric vector of length 2 specifying (min, max) thresholds.
-Only values where \code{thresh[1] < abs(val) <= thresh[2]} are kept;
-the rest become \code{NA}.
-\code{NULL} (default) means no thresholding — all values are kept.}
+\item{thresh}{Numeric vector of length 2 specifying (min, max) thresholds.}
 
-\item{pos}{Logical. If TRUE, uses raw values; if FALSE, uses absolute values
-for thresholding. Default: FALSE}
+\item{pos}{Logical. If TRUE, uses raw values for thresholding.}
 
-\item{palette}{Character string specifying the color palette to use.
-Default: "Spectral"}
+\item{palette}{Character string specifying the color palette. Default: "Spectral"}
 
-\item{interactive}{Logical. If TRUE, creates an interactive plot with tooltips.
-Default: TRUE}
+\item{interactive}{Logical. If TRUE, creates an interactive plot. Default: TRUE}
 
-\item{lim}{Numeric vector of length 2 specifying the range for color mapping.
-Default: range(vals)}
+\item{lim}{Numeric vector of length 2 specifying the range for color mapping.}
 }
 \value{
-A ggplot2 object (if interactive=FALSE) or a ggiraph object
-  (if interactive=TRUE) showing the visualization
+A ggplot2 or ggiraph object.
 }
 \description{
-Creates an interactive visualization of the Schaefer atlas using ggseg,
-with optional value mapping and customizable appearance.
+`r lifecycle::badge("deprecated")`
+
+This function has been deprecated in favour of \code{\link{plot_brain}()}.
+Use \code{plot_brain(schaefer_surf(...))} for interactive cortical surface
+visualisation.
 }
 \examples{
 \dontrun{
-# Load Schaefer atlas
-atlas <- get_schaefer_atlas("7networks", 100)
-
-# Create random values for visualization
-vals <- rnorm(100)
-
-# Create interactive plot
-ggseg_schaefer(atlas, vals)
-
-# Create static plot with custom thresholds
-ggseg_schaefer(atlas, vals, thresh=c(0.5, 2), interactive=FALSE)
+# Deprecated — use plot_brain(schaefer_surf(200, 17), vals = ...) instead
 }
 
 }

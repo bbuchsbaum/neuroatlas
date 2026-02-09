@@ -7,8 +7,8 @@ Authors@R:
 Description: Provides a unified interface to access and work with various
     neuroimaging atlases and parcellations including Schaefer, Glasser,
     FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow
-    for standardized template access and supports visualization through
-    the ggseg ecosystem.
+    for standardized template access and supports interactive brain surface
+    visualisation via triangle-mesh rendering with 'ggplot2' and 'ggiraph'.
 License: MIT + file LICENSE
 URL: https://github.com/bbuchsbaum/neuroatlas,
     https://bbuchsbaum.github.io/neuroatlas/
@@ -23,7 +23,6 @@ Imports:
     dplyr,
     ggiraph,
     ggplot2,
-    ggseg,
     lifecycle,
     magrittr,
     memoise,
@@ -35,7 +34,6 @@ Imports:
     Rnanoflann,
     scales,
     scico,
-    sf,
     stringr,
     tibble,
     tidyr,
@@ -47,19 +45,19 @@ Suggests:
     FNN,
     geojsonio,
     geojsonsf,
+    ggseg,
     ggsegGlasser,
     ggsegSchaefer,
     knitr,
     patchwork,
     rmarkdown,
+    sf,
     testthat (>= 3.0.0),
     uwot
-VignetteBuilder: 
+VignetteBuilder:
     knitr
-Remotes: 
-    bbuchsbaum/neurosurf,
-    ggseg/ggsegGlasser,
-    ggseg/ggsegSchaefer
+Remotes:
+    bbuchsbaum/neurosurf
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB

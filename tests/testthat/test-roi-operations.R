@@ -275,33 +275,29 @@ test_that("map_atlas correctly maps values and applies thresholds", {
   # Test with Glasser atlas would go here but requires optional dependency
 })
 
-test_that("map_atlas dispatches schaefer method without falling back to atlas", {
-  dummy_atlas <- structure(list(name = "schaefer_dummy"),
-                           class = c("schaefer", "atlas"))
-  vals <- 1:3
-  
-  mock_result <- with_mocked_bindings(
-    map_to_schaefer = function(atlas, vals, thresh = c(0, 0), pos = FALSE) {
-      list(atlas = atlas, vals = vals, thresh = thresh, pos = pos)
-    },
-    map_atlas(dummy_atlas, vals = vals, thresh = c(1, 2), pos = TRUE)
+test_that("map_atlas.schaefer delegates to map_atlas.atlas", {
+  dummy_atlas <- structure(
+    list(name = "schaefer_dummy", orig_labels = c("a", "b", "c"),
+         labels = c("a", "b", "c"), hemi = c("left", "left", "right"),
+         ids = 1:3),
+    class = c("schaefer", "atlas")
   )
-  
-  expect_identical(mock_result$atlas, dummy_atlas)
-  expect_identical(mock_result$vals, vals)
-  expect_identical(mock_result$thresh, c(1, 2))
-  expect_true(mock_result$pos)
+  vals <- c(10, 20, 30)
+
+  result <- map_atlas(dummy_atlas, vals = vals)
+  expect_s3_class(result, "tbl_df")
+  expect_equal(result$statistic, vals)
+  expect_equal(result$label, c("a", "b", "c"))
 })
 
-test_that("map_atlas.glasser errors cleanly when ggsegGlasser is missing", {
-  dummy_atlas <- structure(list(labels = "V1", hemi = "left", label = "V1"),
-                           class = c("glasser", "atlas"))
-  
-  expect_error(
-    with_mocked_bindings(
-      .assert_ggseg_glasser = function() stop("ggsegGlasser missing", call. = FALSE),
-      map_atlas(dummy_atlas, vals = 1)
-    ),
-    "ggsegGlasser"
+test_that("map_atlas.glasser delegates to map_atlas.atlas", {
+  dummy_atlas <- structure(
+    list(labels = "V1", orig_labels = "L_V1", hemi = "left", ids = 1L),
+    class = c("glasser", "atlas")
   )
+
+  result <- map_atlas(dummy_atlas, vals = 42)
+  expect_s3_class(result, "tbl_df")
+  expect_equal(result$statistic, 42)
+  expect_equal(result$label, "L_V1")
 })

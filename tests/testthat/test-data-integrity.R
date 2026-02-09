@@ -1,42 +1,10 @@
 test_that("Pre-loaded datasets have correct structure and integrity", {
   skip_on_cran()
   
-  # Test 1: Check Schaefer pre-loaded datasets
-  # These are ggseg atlas objects, not neuroatlas atlas objects
-  schaefer_datasets <- c("Schaefer17_200", "Schaefer17_400", "Schaefer17_600")
-  
-  for (dataset_name in schaefer_datasets) {
-    # Load the dataset
-    data(list = dataset_name, envir = environment())
-    dataset <- get(dataset_name)
-    
-    # Extract expected parcels from name
-    parcels <- as.numeric(sub("Schaefer17_", "", dataset_name))
-    
-    # Verify it's a ggseg atlas
-    expect_true(inherits(dataset, "ggseg_atlas"))
-    expect_true(inherits(dataset, "data.frame"))
-    
-    # Should have regions - note the actual count may vary from simple 2x formula
-    # due to exclusion of medial wall regions in ggseg format
-    # Schaefer17_600 has 580 rows (missing some medial regions)
-    expect_true(nrow(dataset) >= parcels * 0.95)  # Allow 5% fewer regions
-    
-    # Check for required ggseg columns
-    expect_true("area" %in% names(dataset))
-    expect_true("hemi" %in% names(dataset))
-    expect_true("label" %in% names(dataset))
-    
-    # Check hemisphere distribution
-    hemi_counts <- table(dataset$hemi)
-    expect_true("left" %in% names(hemi_counts))
-    expect_true("right" %in% names(hemi_counts))
-    
-    # Should have geometry data
-    expect_true("side" %in% names(dataset))
-    expect_true("ggseg" %in% names(dataset))
-  }
-  
+  # Test 1: Schaefer ggseg data objects removed in v0.2.0
+  # (Schaefer17_200, Schaefer17_400, Schaefer17_600 were ggseg_atlas objects
+  # replaced by plot_brain() renderer)
+
   # Test 2: Check fsaverage dataset
   data("fsaverage", envir = environment())
   

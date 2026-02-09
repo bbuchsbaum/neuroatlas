@@ -9,44 +9,30 @@ plot_glasser(vals = NULL, value_col = "value", position = "dispersed")
 \arguments{
 \item{vals}{A data frame containing values to plot, must include columns:
 \itemize{
-  \item label: character, matching ggseg Glasser atlas labels (e.g., "lh_L_V1")
+  \item label: character, matching ggseg Glasser atlas labels
   \item value: numeric, values to visualize for each region
 }
 If NULL (default), all regions will be assigned a value of 1}
 
-\item{value_col}{Character string specifying the name of the column in vals containing
-the values to plot. Defaults to "value"}
+\item{value_col}{Character string specifying the name of the column in vals
+containing the values to plot. Defaults to "value"}
 
-\item{position}{Character string specifying layout type. Currently only "dispersed"
-is supported (stacked layout is planned for future versions)}
+\item{position}{Character string specifying layout type.}
 }
 \value{
-An echarts4r visualization object containing the 2x2 grid of brain views
+An echarts4r visualization object or an error if dependencies are
+  unavailable.
 }
 \description{
-Creates an interactive visualization of values mapped onto the Glasser atlas
-using echarts4r. The visualization shows both hemispheres in lateral and medial
-views, arranged in a 2x2 grid.
+`r lifecycle::badge("deprecated")`
+
+This function has been deprecated. Use
+\code{plot_brain(glasser_surf(), vals = ...)} instead for interactive
+cortical surface visualisation.
 }
 \examples{
 \dontrun{
-# Basic visualization with uniform coloring
-plot_glasser()
-
-# Create sample data (requires ggsegGlasser package)
-if (requireNamespace("ggsegGlasser", quietly = TRUE)) {
-  glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
-  vals <- data.frame(
-    label = glasser_atlas$data$label,
-    value = rnorm(nrow(glasser_atlas$data))
-  )
-  # Plot the data
-  plot_glasser(vals)
-}
-
-# Using a different column name
-vals$intensity <- vals$value
-plot_glasser(vals, value_col = "intensity")
+# Deprecated — use plot_brain(glasser_surf(), vals = ...) instead
 }
 
 }

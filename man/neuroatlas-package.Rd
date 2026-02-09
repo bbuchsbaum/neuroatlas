@@ -6,13 +6,14 @@
 \alias{neuroatlas}
 \title{neuroatlas: Neuroimaging Atlases and Parcellations}
 \description{
-Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports visualization through the ggseg ecosystem.
+Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with 'ggplot2' and 'ggiraph'.
 
-The neuroatlas package provides a unified interface to access and work with 
-various neuroimaging atlases and parcellations. It includes support for 
-cortical atlases (Schaefer, Glasser), subcortical segmentations (FreeSurfer ASEG), 
-and specialized atlases (Olsen MTL). The package integrates with TemplateFlow 
-for standardized template access and supports visualization through the ggseg ecosystem.
+The neuroatlas package provides a unified interface to access and work with
+various neuroimaging atlases and parcellations. It includes support for
+cortical atlases (Schaefer, Glasser), subcortical segmentations (FreeSurfer ASEG),
+and specialized atlases (Olsen MTL). The package integrates with TemplateFlow
+for standardized template access and supports interactive brain surface
+visualisation via triangle-mesh rendering.
 }
 \section{Main Functions}{
 
@@ -38,10 +39,10 @@ for standardized template access and supports visualization through the ggseg ec
 
 \section{Visualization}{
 
-The package integrates with ggseg for brain visualization:
 \describe{
-  \item{\code{\link{plot.atlas}}}{Plot atlas objects}
-  \item{\code{\link{ggseg_schaefer}}}{Visualize Schaefer parcellations with ggseg}
+  \item{\code{\link{plot_brain}}}{Interactive cortical surface rendering}
+  \item{\code{\link{plot.atlas}}}{Plot volumetric atlas objects}
+  \item{\code{\link{atlas_roi_colors}}}{Optimal ROI colour assignment}
 }
 }
 

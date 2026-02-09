@@ -5,6 +5,7 @@
 \alias{plot.atlas}
 \alias{plot.glasser}
 \alias{plot-methods}
+\alias{plot.surfatlas}
 \title{Plot Glasser Atlas}
 \usage{
 \method{plot}{atlas}(
@@ -23,13 +24,12 @@
   vals = NULL,
   thresh = c(0, 0),
   pos = FALSE,
-  position = "stacked",
-  colour = "gray",
-  guide = TRUE,
   palette = "cork",
   lim = NULL,
   ...
 )
+
+\method{plot}{surfatlas}(x, y, vals = NULL, views = c("lateral", "medial"), ...)
 }
 \arguments{
 \item{x}{An atlas object (atlas, glasser, schaefer, etc.)}
@@ -59,32 +59,35 @@ will be assigned a value of 1, creating a uniform visualization}
 
 \item{pos}{Logical. If TRUE, uses raw values for thresholding}
 
-\item{position}{Character. Layout type ("stacked" or "dispersed")}
-
-\item{colour}{Character. Border color for regions}
-
-\item{guide}{Logical. Whether to show color guide}
-
 \item{palette}{Character. Name of scico color palette}
 
 \item{lim}{Numeric vector of length 2 for color scale limits. If NULL, will be
 set to range of vals}
+
+\item{views}{Character vector of views to render for surface atlases.
+Any combination of \code{"lateral"}, \code{"medial"}, \code{"dorsal"},
+\code{"ventral"}. Default: \code{c("lateral", "medial")}.}
 }
 \value{
-A ggiraph interactive plot object
+A ggplot2 or ggiraph object
 
 For \code{view = "montage"}, a \code{ggplot2} object (invisibly).
   For \code{view = "ortho"}, a \code{patchwork} composite (if available) or a
   list of three \code{ggplot2} objects.
 }
 \description{
-Creates an interactive visualization of the Glasser atlas with mapped values
-using ggseg and ggiraph.
+Visualise a Glasser atlas object. For surface atlases (\code{glasser_surf}),
+renders via \code{\link{plot_brain}()}. For volumetric Glasser atlases,
+falls back to the base \code{\link{plot.atlas}()} method.
 
 Volumetric slice visualisation for any atlas object. By default renders a
 multi-slice montage with each parcel coloured by the
 \code{\link{atlas_roi_colors}()} system. An orthogonal three-plane view is
 also available.
+}
+\details{
+\code{plot.surfatlas} renders a cortical surface projection via
+\code{\link{plot_brain}()}.
 }
 \examples{
 \donttest{

@@ -119,55 +119,20 @@ get_glasser_atlas <- function(outspace=NULL) {
 }
 
 #' @rdname map_atlas
-#' @importFrom ggiraph geom_polygon_interactive
 #' @importFrom dplyr left_join mutate
 #' @importFrom tibble tibble
 #' @export
-map_atlas.glasser <- function(x, vals, thresh=NULL, pos=FALSE, ...) {
-  .assert_ggseg_glasser()
-
-  fun <- if (pos) identity else abs
-
-  ids <- ifelse(x$hemi == "left",
-                paste0("lh_L_", x$label),
-                paste0("rh_R_", x$label))
-
-  ret <- tibble(statistic=vals, region=x$labels, label=ids, hemi=x$hemi)
-
-  # Get glasser atlas from ggsegGlasser
-  glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
-
-  rboth <- glasser_atlas %>%
-    as_tibble() %>%
-    left_join(ret, by = c("region", "label", "hemi"))
-
-  # Apply optional thresholding
-  if (!is.null(thresh)) {
-    stopifnot(is.numeric(thresh), length(thresh) == 2)
-    rboth <- rboth %>%
-      mutate(statistic = ifelse(
-        is.na(.data$statistic) |
-        fun(.data$statistic) <= thresh[1] |
-        fun(.data$statistic) > thresh[2],
-        NA_real_,
-        .data$statistic
-      ))
-  }
-
-  rboth %>% as_brain_atlas()
-}
-
-.assert_ggseg_glasser <- function() {
-  if (!requireNamespace("ggsegGlasser", quietly = TRUE)) {
-    stop("Package 'ggsegGlasser' is required for mapping Glasser atlases.", call. = FALSE)
-  }
+map_atlas.glasser <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
+  # Delegate to the base atlas method (no ggseg dependency)
+  map_atlas.atlas(x, vals, thresh = thresh, pos = pos, ...)
 }
 
 #' Plot Glasser Atlas
 #'
 #' @description
-#' Creates an interactive visualization of the Glasser atlas with mapped values
-#' using ggseg and ggiraph.
+#' Visualise a Glasser atlas object. For surface atlases (\code{glasser_surf}),
+#' renders via \code{\link{plot_brain}()}. For volumetric Glasser atlases,
+#' falls back to the base \code{\link{plot.atlas}()} method.
 #'
 #' @param x A Glasser atlas object
 #' @param y Ignored (required for compatibility with generic plot method)
@@ -176,14 +141,11 @@ map_atlas.glasser <- function(x, vals, thresh=NULL, pos=FALSE, ...) {
 #' @param thresh Numeric vector of length 2 for thresholding values
 #' @param pos Logical. If TRUE, uses raw values for thresholding
 #' @rdname plot-methods
-#' @param position Character. Layout type ("stacked" or "dispersed")
-#' @param colour Character. Border color for regions
-#' @param guide Logical. Whether to show color guide
 #' @param palette Character. Name of scico color palette
 #' @param lim Numeric vector of length 2 for color scale limits. If NULL, will be
 #'   set to range of vals
 #' @param ... Additional arguments passed to methods
-#' @return A ggiraph interactive plot object
+#' @return A ggplot2 or ggiraph object
 #'
 #' @importFrom tibble tibble
 #' @importFrom magrittr %>%
@@ -191,44 +153,15 @@ map_atlas.glasser <- function(x, vals, thresh=NULL, pos=FALSE, ...) {
 #' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection
 #' @importFrom ggplot2 aes
 #' @importFrom scico scale_fill_scico
-#' @import scico
 #' @export
-plot.glasser <- function(x, y, vals=NULL, thresh=c(0,0), pos=FALSE, 
-                        position="stacked", colour="gray", guide=TRUE,
-                        palette="cork", lim=NULL, ...) {
-  if (is.null(vals)) {
-    vals <- rep(1, length(x$labels))
+plot.glasser <- function(x, y, vals = NULL, thresh = c(0, 0), pos = FALSE,
+                         palette = "cork", lim = NULL, ...) {
+  if (inherits(x, "surfatlas")) {
+    plot_brain(x, vals = vals, palette = palette, lim = lim, ...)
+  } else {
+    # Volumetric glasser — use base atlas plot method
+    plot.atlas(x, y, ...)
   }
-  
-  if (is.null(lim)) {
-    lim <- range(vals)
-  }
-  
-  gatl <- map_atlas(x, vals, thresh=thresh, pos=pos)
-  
-  gg <- ggseg(atlas=gatl, 
-              position=position, 
-              colour=colour, 
-              interactive=FALSE, 
-              guide=guide,
-              mapping=aes(fill=.data$statistic, 
-                         tooltip=.data$region,
-                         data_id=.data$label)) + 
-    scale_fill_scico(palette=palette,
-                     limits=lim,
-                     direction=-1,
-                     oob=scales::squish)
-  
-  girafe(ggobj=gg,
-         width_svg=8, 
-         height_svg=6, 
-         options=list(
-           opts_tooltip(opacity=.7,
-                       css="font-family: Arial, Helvetica, sans-serif;"),
-           opts_hover(css="fill:yellow;"),
-           opts_selection(css="fill:red;", 
-                         type="single", 
-                         only_shiny=FALSE)))
 }
 
 #' @rdname print-methods

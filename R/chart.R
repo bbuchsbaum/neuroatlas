@@ -2,69 +2,49 @@
 #' Plot Glasser Atlas Values
 #'
 #' @description
-#' Creates an interactive visualization of values mapped onto the Glasser atlas
-#' using echarts4r. The visualization shows both hemispheres in lateral and medial
-#' views, arranged in a 2x2 grid.
+#' `r lifecycle::badge("deprecated")`
+#'
+#' This function has been deprecated. Use
+#' \code{plot_brain(glasser_surf(), vals = ...)} instead for interactive
+#' cortical surface visualisation.
 #'
 #' @param vals A data frame containing values to plot, must include columns:
 #'   \itemize{
-#'     \item label: character, matching ggseg Glasser atlas labels (e.g., "lh_L_V1")
+#'     \item label: character, matching ggseg Glasser atlas labels
 #'     \item value: numeric, values to visualize for each region
 #'   }
 #'   If NULL (default), all regions will be assigned a value of 1
-#' @param value_col Character string specifying the name of the column in vals containing
-#'   the values to plot. Defaults to "value"
-#' @param position Character string specifying layout type. Currently only "dispersed"
-#'   is supported (stacked layout is planned for future versions)
+#' @param value_col Character string specifying the name of the column in vals
+#'   containing the values to plot. Defaults to "value"
+#' @param position Character string specifying layout type.
 #'
-#' @return An echarts4r visualization object containing the 2x2 grid of brain views
+#' @return An echarts4r visualization object or an error if dependencies are
+#'   unavailable.
 #'
 #' @examples
 #' \dontrun{
-#' # Basic visualization with uniform coloring
-#' plot_glasser()
-#'
-#' # Create sample data (requires ggsegGlasser package)
-#' if (requireNamespace("ggsegGlasser", quietly = TRUE)) {
-#'   glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
-#'   vals <- data.frame(
-#'     label = glasser_atlas$data$label,
-#'     value = rnorm(nrow(glasser_atlas$data))
-#'   )
-#'   # Plot the data
-#'   plot_glasser(vals)
-#' }
-#'
-#' # Using a different column name
-#' vals$intensity <- vals$value
-#' plot_glasser(vals, value_col = "intensity")
+#' # Deprecated — use plot_brain(glasser_surf(), vals = ...) instead
 #' }
 #'
 #' @importFrom dplyr filter inner_join group_by summarize left_join rename mutate .data
 #' @importFrom tidyr pivot_longer
-#' @importFrom sf st_as_sf st_multipolygon st_sfc st_sf st_bbox st_geometry
-#' @import ggseg
 #' @export
-plot_glasser <- function(vals=NULL, value_col = "value", position = "dispersed") {
+plot_glasser <- function(vals = NULL, value_col = "value", position = "dispersed") {
+  lifecycle::deprecate_warn(
+    "0.2.0", "plot_glasser()",
+    "plot_brain()",
+    details = "Use plot_brain(glasser_surf(), vals = ...) instead."
+  )
+
   # Check and load required packages
-  required_packages <- c("geojsonio", "echarts4r", "ggsegGlasser")
+  required_packages <- c("geojsonio", "echarts4r", "ggsegGlasser", "sf", "ggseg")
   missing_packages <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
   if (length(missing_packages) > 0) {
-    if ("ggsegGlasser" %in% missing_packages) {
-      stop("Package 'ggsegGlasser' is required for this function but is not installed.\n",
-           "To install it, run:\n",
-           "  remotes::install_github('ggseg/ggsegGlasser')\n",
-           "or use the ggseg r-universe:\n",
-           "  options(repos = c(ggseg = 'https://ggseg.r-universe.dev',\n",
-           "                    CRAN = 'https://cloud.r-project.org'))\n",
-           "  install.packages('ggsegGlasser')",
-           call. = FALSE)
-    } else {
-      stop("The following packages are required but not installed: ", 
-           paste(missing_packages, collapse = ", "))
-    }
+    stop("The following packages are required for this deprecated function but are not installed: ",
+         paste(missing_packages, collapse = ", "), "\n",
+         "Consider using plot_brain(glasser_surf(), vals = ...) instead.",
+         call. = FALSE)
   }
-  # No library() calls needed - will use :: notation
 
   # Get the ggseg Glasser atlas data
   glasser_atlas <- get("glasser", envir = asNamespace("ggsegGlasser"))
@@ -135,4 +115,3 @@ get_chart <- function(geo, data, var, name, show = TRUE) {
     echarts4r::e_theme("dark") %>%
     echarts4r::e_group("4charts")
 }
-

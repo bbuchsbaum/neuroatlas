@@ -7,22 +7,23 @@
 get_ggseg_atlas(atlas)
 }
 \arguments{
-\item{atlas}{An atlas object containing Schaefer parcellation information.
-The name should follow the format "schaeferN_M" where:
-\itemize{
-  \item N is the number of networks (7 or 17)
-  \item M is the number of parcels (100 to 1000 in steps of 100)
-}}
+\item{atlas}{An atlas object containing Schaefer parcellation information.}
 }
 \value{
-A ggseg brain atlas object for visualization
+A ggseg brain atlas object for visualization (if ggsegSchaefer is
+  installed).
 }
 \description{
-Retrieves the appropriate Schaefer atlas data structure compatible with ggseg
-visualization based on the atlas name parameters.
+`r lifecycle::badge("deprecated")`
+
+This function has been deprecated in favour of the native
+\code{\link{plot_brain}()} renderer.
+Use \code{schaefer_surf()} to obtain a surface atlas and
+\code{plot_brain()} for visualisation.
 }
-\details{
-The function extracts the network count and parcel count from the atlas name
-and returns the corresponding ggseg-compatible atlas object. Supports Schaefer
-atlases with 7 or 17 networks and 100-1000 parcels (in steps of 100).
+\examples{
+\donttest{
+# Deprecated — use plot_brain(schaefer_surf(200, 17)) instead
+}
+
 }

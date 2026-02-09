@@ -11,29 +11,23 @@ map_to_schaefer(atlas, vals, thresh = NULL, pos = FALSE)
 
 \item{vals}{Numeric vector of values to map to atlas regions}
 
-\item{thresh}{Numeric vector of length 2 specifying (min, max) thresholds
-for the absolute value (or raw value when \code{pos = TRUE}).
-Only values where \code{thresh[1] < abs(val) <= thresh[2]} are kept;
-the rest become \code{NA}.
-\code{NULL} (default) means no thresholding — all values are kept.}
+\item{thresh}{Numeric vector of length 2 specifying (min, max) thresholds.}
 
 \item{pos}{Logical. If TRUE, uses raw values; if FALSE, uses absolute values
 for thresholding. Default: FALSE}
 }
 \value{
-A tibble with mapped values suitable for ggseg visualization
+A tibble with mapped values.
 }
 \description{
-Converts values associated with atlas regions into a format suitable for
-visualization with the Schaefer atlas in ggseg.
+`r lifecycle::badge("deprecated")`
+
+This function has been deprecated. Use \code{\link{map_atlas}()} directly
+or \code{\link{plot_brain}()} for visualisation.
 }
 \examples{
 \donttest{
-if (requireNamespace("ggsegSchaefer", quietly = TRUE)) {
-  data(Schaefer17_200)
-  vals <- rnorm(length(Schaefer17_200$ids))
-  mapped <- map_to_schaefer(Schaefer17_200, vals)
-}
+# Deprecated — use map_atlas() or plot_brain() instead
 }
 
 }
