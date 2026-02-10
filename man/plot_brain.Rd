@@ -17,6 +17,7 @@ plot_brain(
   interactive = TRUE,
   ncol = 2L,
   border = TRUE,
+  border_geom = c("path", "segment"),
   border_color = "grey30",
   border_size = 0.15,
   border_lineend = "round",
@@ -27,6 +28,11 @@ plot_brain(
   network_border = FALSE,
   network_border_color = border_color,
   network_border_size = border_size * 2,
+  shading = FALSE,
+  shading_strength = 0.22,
+  shading_gamma = 1,
+  shading_color = "black",
+  fill_alpha = 1,
   outline = FALSE,
   bg = "white",
   ...
@@ -76,17 +82,23 @@ returns a static \code{ggplot2} object.}
 boundaries (edges between different parcels). Gives a clean ggseg-like
 appearance.}
 
+\item{border_geom}{Boundary rendering method. \code{"path"} (default) chains
+boundary edges into longer paths for smoother lines; \code{"segment"} draws
+each boundary edge independently.}
+
 \item{border_color}{Colour for parcel boundary lines. Default:
 \code{"grey30"}.}
 
 \item{border_size}{Line width for parcel boundaries. Default: \code{0.15}.}
 
-\item{border_lineend}{Line end style for boundary segments (passed to
-\code{\link[ggplot2]{geom_segment}}). One of \code{"butt"},
+\item{border_lineend}{Line end style for boundary lines (passed to
+\code{\link[ggplot2]{geom_path}} / \code{\link[ggplot2]{geom_segment}}).
+One of \code{"butt"},
 \code{"round"}, \code{"square"}. Default: \code{"round"}.}
 
-\item{border_linejoin}{Line join style for boundary segments (passed to
-\code{\link[ggplot2]{geom_segment}}). One of \code{"round"},
+\item{border_linejoin}{Line join style for boundary lines (passed to
+\code{\link[ggplot2]{geom_path}} / \code{\link[ggplot2]{geom_segment}}).
+One of \code{"round"},
 \code{"mitre"}, \code{"bevel"}. Default: \code{"round"}.}
 
 \item{silhouette}{Logical. If \code{TRUE}, draw the mesh silhouette (edges
@@ -108,6 +120,21 @@ different networks (requires \code{surfatlas$network}). Default:
 
 \item{network_border_size}{Line width for network boundary lines. Default:
 \code{border_size * 2}.}
+
+\item{shading}{Logical. If \code{TRUE}, overlay a subtle normal-based shading
+layer to enhance depth cues (recommended for static figures).}
+
+\item{shading_strength}{Numeric in \code{[0, 1]}. Maximum opacity of the
+shading overlay. Default: \code{0.22}.}
+
+\item{shading_gamma}{Positive numeric scalar controlling the shadow falloff.
+Higher values concentrate shadows in more oblique regions. Default:
+\code{1}.}
+
+\item{shading_color}{Colour of the shading overlay. Default: \code{"black"}.}
+
+\item{fill_alpha}{Numeric in \code{[0, 1]}. Opacity of parcel fills.
+Lower values can help the shading read more clearly. Default: \code{1}.}
 
 \item{outline}{Logical. If \code{TRUE}, draw every triangle edge (mesh
 wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}
@@ -143,6 +170,8 @@ plot_brain(
   network_border = TRUE,
   network_border_color = "grey10",
   network_border_size = 0.5,
+  shading = TRUE,
+  fill_alpha = 0.98,
   bg = "#f7f7f7"
 )
 }

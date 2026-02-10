@@ -4,6 +4,9 @@
   inconsistent triangle winding in some meshes.
 * Added `silhouette*` and `network_border*` options to `plot_brain()` for
   improved boundary styling (silhouette outline and between-network borders).
+* Improved `plot_brain()` aesthetics with smoother boundary rendering
+  (`border_geom = "path"`) and an optional normal-based shading overlay
+  (`shading*`, `fill_alpha`).
 
 # neuroatlas 0.1.0
 

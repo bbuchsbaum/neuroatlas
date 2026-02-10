@@ -1,7 +1,8 @@
 # Global variables to avoid R CMD check NOTEs
 utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
                          "view", "tooltip", "data_id", "fill_color",
-                         "fill_value", "xend", "yend", "poly_id"))
+                         "fill_value", "xend", "yend", "poly_id", "edge_type",
+                         "path_id", "v1", "v2", "alpha", "shade"))
 
 #' Compute face normals for a triangle mesh
 #'
@@ -130,6 +131,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
     b_min <- sm[boundary_pair_idx]
     b_max <- sx[boundary_pair_idx]
     out[[length(out) + 1L]] <- tibble::tibble(
+      v1 = b_min,
+      v2 = b_max,
       x = proj_xy[b_min, 1],
       y = proj_xy[b_min, 2],
       xend = proj_xy[b_max, 1],
@@ -142,6 +145,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
     b_min <- sm[mesh_boundary_idx]
     b_max <- sx[mesh_boundary_idx]
     out[[length(out) + 1L]] <- tibble::tibble(
+      v1 = b_min,
+      v2 = b_max,
       x = proj_xy[b_min, 1],
       y = proj_xy[b_min, 2],
       xend = proj_xy[b_max, 1],
@@ -150,6 +155,166 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
     )
   }
 
+  dplyr::bind_rows(out)
+}
+
+#' Chain boundary edges into ordered vertex paths
+#'
+#' Converts undirected boundary edges into maximal paths between junctions
+#' (vertices with degree != 2), plus closed cycles when no such junctions exist.
+#' Intended for smoother rendering than drawing many disjoint segments.
+#'
+#' @param edges Tibble from [.compute_boundary_edges()] with columns
+#'   \code{panel}, \code{edge_type}, \code{v1}, \code{v2}, \code{x}, \code{y},
+#'   \code{xend}, \code{yend}.
+#' @return Tibble with columns \code{x, y, path_id, vertex_order, edge_type, panel},
+#'   or \code{NULL} if no paths can be formed.
+#' @keywords internal
+#' @noRd
+.boundary_edges_to_paths <- function(edges) {
+  needed <- c("panel", "edge_type", "v1", "v2", "x", "y", "xend", "yend")
+  if (is.null(edges) || nrow(edges) == 0) return(NULL)
+  if (!all(needed %in% names(edges))) return(NULL)
+
+  edges <- edges[!is.na(edges$v1) & !is.na(edges$v2), , drop = FALSE]
+  if (nrow(edges) == 0) return(NULL)
+
+  split_groups <- split(
+    seq_len(nrow(edges)),
+    interaction(edges$panel, edges$edge_type, drop = TRUE)
+  )
+
+  out <- list()
+  path_id_global <- 0L
+
+  for (idx in split_groups) {
+    sub <- edges[idx, , drop = FALSE]
+    if (nrow(sub) == 0) next
+
+    # Build vertex -> coordinate map (panel-local)
+    v_all <- c(sub$v1, sub$v2)
+    x_all <- c(sub$x, sub$xend)
+    y_all <- c(sub$y, sub$yend)
+    v_key <- as.character(v_all)
+
+    first_idx <- !duplicated(v_key)
+    vx <- stats::setNames(x_all[first_idx], v_key[first_idx])
+    vy <- stats::setNames(y_all[first_idx], v_key[first_idx])
+
+    uniq_v <- sort(unique(v_all))
+    n_v <- length(uniq_v)
+    v_map <- stats::setNames(seq_len(n_v), as.character(uniq_v))
+
+    a <- unname(v_map[as.character(sub$v1)])
+    b <- unname(v_map[as.character(sub$v2)])
+    n_e <- length(a)
+
+    # Degree and incidence lists (on compact vertex indices)
+    deg <- tabulate(c(a, b), nbins = n_v)
+    inc <- vector("list", n_v)
+    for (i in seq_len(n_e)) {
+      inc[[a[i]]] <- c(inc[[a[i]]], i)
+      inc[[b[i]]] <- c(inc[[b[i]]], i)
+    }
+
+    visited <- rep(FALSE, n_e)
+
+    other_vertex <- function(edge_i, v_i) {
+      if (a[edge_i] == v_i) b[edge_i] else a[edge_i]
+    }
+
+    walk_trail <- function(start_v, start_edge) {
+      v_seq <- start_v
+      cur_v <- start_v
+      cur_e <- start_edge
+
+      repeat {
+        visited[cur_e] <<- TRUE
+        nxt_v <- other_vertex(cur_e, cur_v)
+        v_seq <- c(v_seq, nxt_v)
+
+        if (deg[nxt_v] != 2) break
+
+        cand <- inc[[nxt_v]]
+        cand <- cand[!visited[cand]]
+        if (length(cand) == 0) break
+
+        cur_v <- nxt_v
+        cur_e <- cand[1]
+      }
+
+      v_seq
+    }
+
+    walk_cycle <- function(start_edge) {
+      start_v <- a[start_edge]
+      v_seq <- start_v
+      cur_v <- start_v
+      cur_e <- start_edge
+
+      repeat {
+        visited[cur_e] <<- TRUE
+        nxt_v <- other_vertex(cur_e, cur_v)
+        v_seq <- c(v_seq, nxt_v)
+
+        if (nxt_v == start_v) break
+
+        cand <- inc[[nxt_v]]
+        cand <- cand[!visited[cand]]
+        if (length(cand) == 0) break
+
+        cur_v <- nxt_v
+        cur_e <- cand[1]
+      }
+
+      v_seq
+    }
+
+    # Start trails from junction/end vertices (deg != 2)
+    special <- which(deg != 2 & deg > 0)
+    if (length(special) > 0) {
+      for (sv in special) {
+        for (e in inc[[sv]]) {
+          if (visited[e]) next
+          v_seq <- walk_trail(sv, e)
+
+          path_id_global <- path_id_global + 1L
+          orig_v <- uniq_v[v_seq]
+          v_chr <- as.character(orig_v)
+
+          out[[length(out) + 1L]] <- tibble::tibble(
+            x = unname(vx[v_chr]),
+            y = unname(vy[v_chr]),
+            path_id = path_id_global,
+            vertex_order = seq_along(orig_v),
+            edge_type = sub$edge_type[[1]],
+            panel = sub$panel[[1]]
+          )
+        }
+      }
+    }
+
+    # Remaining edges form cycles (all deg == 2)
+    while (any(!visited)) {
+      start_edge <- which(!visited)[1]
+      v_seq <- walk_cycle(start_edge)
+
+      path_id_global <- path_id_global + 1L
+      orig_v <- uniq_v[v_seq]
+      v_chr <- as.character(orig_v)
+
+      out[[length(out) + 1L]] <- tibble::tibble(
+        x = unname(vx[v_chr]),
+        y = unname(vy[v_chr]),
+        path_id = path_id_global,
+        vertex_order = seq_along(orig_v),
+        edge_type = sub$edge_type[[1]],
+        panel = sub$panel[[1]]
+      )
+    }
+  }
+
+  if (length(out) == 0) return(NULL)
   dplyr::bind_rows(out)
 }
 
@@ -510,6 +675,7 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       # Build 3-row-per-face tibble
       vis_faces <- faces[visible, , drop = FALSE]
       vis_parcel <- fparcel[visible]
+      vis_shade <- dots[visible]
 
       x_coords <- c(proj$xy[vis_faces[, 1], 1],
                      proj$xy[vis_faces[, 2], 1],
@@ -530,6 +696,7 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
         face_id = rep(fids, 3),
         vertex_order = rep(1:3, each = n_vis),
         parcel_id = rep(vis_parcel, 3),
+        shade = rep(vis_shade, 3),
         hemi = h,
         view = v,
         panel = panel_label,
@@ -597,14 +764,19 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @param border Logical. If \code{TRUE} (default), draw thin lines at parcel
 #'   boundaries (edges between different parcels). Gives a clean ggseg-like
 #'   appearance.
+#' @param border_geom Boundary rendering method. \code{"path"} (default) chains
+#'   boundary edges into longer paths for smoother lines; \code{"segment"} draws
+#'   each boundary edge independently.
 #' @param border_color Colour for parcel boundary lines. Default:
 #'   \code{"grey30"}.
 #' @param border_size Line width for parcel boundaries. Default: \code{0.15}.
-#' @param border_lineend Line end style for boundary segments (passed to
-#'   \code{\link[ggplot2]{geom_segment}}). One of \code{"butt"},
+#' @param border_lineend Line end style for boundary lines (passed to
+#'   \code{\link[ggplot2]{geom_path}} / \code{\link[ggplot2]{geom_segment}}).
+#'   One of \code{"butt"},
 #'   \code{"round"}, \code{"square"}. Default: \code{"round"}.
-#' @param border_linejoin Line join style for boundary segments (passed to
-#'   \code{\link[ggplot2]{geom_segment}}). One of \code{"round"},
+#' @param border_linejoin Line join style for boundary lines (passed to
+#'   \code{\link[ggplot2]{geom_path}} / \code{\link[ggplot2]{geom_segment}}).
+#'   One of \code{"round"},
 #'   \code{"mitre"}, \code{"bevel"}. Default: \code{"round"}.
 #' @param silhouette Logical. If \code{TRUE}, draw the mesh silhouette (edges
 #'   between visible and culled faces) as a separate boundary layer. Defaults
@@ -620,6 +792,16 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #'   \code{border_color}.
 #' @param network_border_size Line width for network boundary lines. Default:
 #'   \code{border_size * 2}.
+#' @param shading Logical. If \code{TRUE}, overlay a subtle normal-based shading
+#'   layer to enhance depth cues (recommended for static figures).
+#' @param shading_strength Numeric in \code{[0, 1]}. Maximum opacity of the
+#'   shading overlay. Default: \code{0.22}.
+#' @param shading_gamma Positive numeric scalar controlling the shadow falloff.
+#'   Higher values concentrate shadows in more oblique regions. Default:
+#'   \code{1}.
+#' @param shading_color Colour of the shading overlay. Default: \code{"black"}.
+#' @param fill_alpha Numeric in \code{[0, 1]}. Opacity of parcel fills.
+#'   Lower values can help the shading read more clearly. Default: \code{1}.
 #' @param outline Logical. If \code{TRUE}, draw every triangle edge (mesh
 #'   wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.
 #' @param bg Character: background colour for the plot. Default: \code{"white"}.
@@ -646,6 +828,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #'   network_border = TRUE,
 #'   network_border_color = "grey10",
 #'   network_border_size = 0.5,
+#'   shading = TRUE,
+#'   fill_alpha = 0.98,
 #'   bg = "#f7f7f7"
 #' )
 #' }
@@ -674,6 +858,7 @@ plot_brain <- function(surfatlas,
                        interactive = TRUE,
                        ncol = 2L,
                        border = TRUE,
+                       border_geom = c("path", "segment"),
                        border_color = "grey30",
                        border_size = 0.15,
                        border_lineend = "round",
@@ -684,6 +869,11 @@ plot_brain <- function(surfatlas,
                        network_border = FALSE,
                        network_border_color = border_color,
                        network_border_size = border_size * 2,
+                       shading = FALSE,
+                       shading_strength = 0.22,
+                       shading_gamma = 1,
+                       shading_color = "black",
+                       fill_alpha = 1,
                        outline = FALSE,
                        bg = "white",
                        ...) {
@@ -697,8 +887,24 @@ plot_brain <- function(surfatlas,
   views <- match.arg(views, c("lateral", "medial", "dorsal", "ventral"),
                      several.ok = TRUE)
   hemis <- match.arg(hemis, c("left", "right"), several.ok = TRUE)
+  border_geom <- match.arg(border_geom)
   border_lineend <- match.arg(border_lineend, c("butt", "round", "square"))
   border_linejoin <- match.arg(border_linejoin, c("round", "mitre", "bevel"))
+
+  if (!is.numeric(fill_alpha) || length(fill_alpha) != 1 ||
+      is.na(fill_alpha) || fill_alpha < 0 || fill_alpha > 1) {
+    stop("'fill_alpha' must be a numeric scalar in [0, 1].", call. = FALSE)
+  }
+
+  if (!is.numeric(shading_strength) || length(shading_strength) != 1 ||
+      is.na(shading_strength) || shading_strength < 0 || shading_strength > 1) {
+    stop("'shading_strength' must be a numeric scalar in [0, 1].", call. = FALSE)
+  }
+
+  if (!is.numeric(shading_gamma) || length(shading_gamma) != 1 ||
+      is.na(shading_gamma) || shading_gamma <= 0) {
+    stop("'shading_gamma' must be a positive numeric scalar.", call. = FALSE)
+  }
 
   if (!is.null(vals)) {
     if (length(vals) != length(surfatlas$ids)) {
@@ -816,7 +1022,7 @@ plot_brain <- function(surfatlas,
                        ggplot2::aes(x = x, y = y, group = .data[[group_col]]))
 
   # Build fixed geom params — only include colour when outline is on
-  geom_params <- list(linewidth = poly_lwd)
+  geom_params <- list(linewidth = poly_lwd, alpha = fill_alpha)
   if (outline) geom_params$colour <- "grey40"
 
   # Choose fill column
@@ -863,54 +1069,156 @@ plot_brain <- function(surfatlas,
     p <- p + ggplot2::scale_colour_identity()
   }
 
+  # Optional shading overlay (static polygons; uses triangle mesh data)
+  if (isTRUE(shading) && !is.null(shading_strength) && shading_strength > 0) {
+    if (!outline) {
+      shade_build <- .build_brain_polygon_data_memo(surfatlas, views, surface)
+      shade_data <- shade_build$polygons
+      shade_data <- shade_data[shade_data$hemi %in% hemis, , drop = FALSE]
+      shade_data <- shade_data[shade_data$panel %in% levels(poly_data$panel), ,
+                               drop = FALSE]
+    } else {
+      shade_data <- poly_data
+    }
+
+    if (!is.null(shade_data) && nrow(shade_data) > 0 &&
+        "shade" %in% names(shade_data)) {
+      shade_data$panel <- factor(shade_data$panel,
+                                 levels = levels(poly_data$panel))
+
+      shade_data$alpha <- shading_strength *
+        (pmax(0, 1 - shade_data$shade) ^ shading_gamma)
+
+      p <- p +
+        ggplot2::geom_polygon(
+          data = shade_data,
+          ggplot2::aes(x = x, y = y, group = face_id, alpha = alpha),
+          fill = shading_color,
+          colour = NA,
+          inherit.aes = FALSE
+        ) +
+        ggplot2::scale_alpha_identity(guide = "none")
+    }
+  }
+
   # Add parcel boundary lines (non-interactive, unaffected by hover dimming)
   if (!is.null(boundary_data) && nrow(boundary_data) > 0) {
     boundary_data$panel <- factor(boundary_data$panel,
                                   levels = levels(poly_data$panel))
 
+    boundary_paths <- NULL
+    if (border_geom == "path") {
+      boundary_paths <- .boundary_edges_to_paths(boundary_data)
+      if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
+        boundary_paths$panel <- factor(boundary_paths$panel,
+                                       levels = levels(poly_data$panel))
+      }
+    }
+
     if (border) {
-      border_data <- boundary_data[boundary_data$edge_type %in% c("parcel", "network"), ,
-                                   drop = FALSE]
-      if (nrow(border_data) > 0) {
-        p <- p + ggplot2::geom_segment(
-          data = border_data,
-          ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-          colour = border_color,
-          linewidth = border_size,
-          lineend = border_lineend,
-          linejoin = border_linejoin,
-          inherit.aes = FALSE
-        )
+      if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
+        border_data <- boundary_paths[boundary_paths$edge_type %in%
+                                        c("parcel", "network"), ,
+                                      drop = FALSE]
+        if (nrow(border_data) > 0) {
+          border_data <- border_data[order(border_data$path_id,
+                                           border_data$vertex_order), ,
+                                     drop = FALSE]
+          p <- p + ggplot2::geom_path(
+            data = border_data,
+            ggplot2::aes(x = x, y = y, group = path_id),
+            colour = border_color,
+            linewidth = border_size,
+            lineend = border_lineend,
+            linejoin = border_linejoin,
+            inherit.aes = FALSE
+          )
+        }
+      } else {
+        border_data <- boundary_data[boundary_data$edge_type %in%
+                                       c("parcel", "network"), ,
+                                     drop = FALSE]
+        if (nrow(border_data) > 0) {
+          p <- p + ggplot2::geom_segment(
+            data = border_data,
+            ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+            colour = border_color,
+            linewidth = border_size,
+            lineend = border_lineend,
+            linejoin = border_linejoin,
+            inherit.aes = FALSE
+          )
+        }
       }
     }
 
     if (network_border) {
-      net_data <- boundary_data[boundary_data$edge_type == "network", , drop = FALSE]
-      if (nrow(net_data) > 0) {
-        p <- p + ggplot2::geom_segment(
-          data = net_data,
-          ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-          colour = network_border_color,
-          linewidth = network_border_size,
-          lineend = border_lineend,
-          linejoin = border_linejoin,
-          inherit.aes = FALSE
-        )
+      if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
+        net_data <- boundary_paths[boundary_paths$edge_type == "network", ,
+                                  drop = FALSE]
+        if (nrow(net_data) > 0) {
+          net_data <- net_data[order(net_data$path_id,
+                                     net_data$vertex_order), ,
+                               drop = FALSE]
+          p <- p + ggplot2::geom_path(
+            data = net_data,
+            ggplot2::aes(x = x, y = y, group = path_id),
+            colour = network_border_color,
+            linewidth = network_border_size,
+            lineend = border_lineend,
+            linejoin = border_linejoin,
+            inherit.aes = FALSE
+          )
+        }
+      } else {
+        net_data <- boundary_data[boundary_data$edge_type == "network", ,
+                                  drop = FALSE]
+        if (nrow(net_data) > 0) {
+          p <- p + ggplot2::geom_segment(
+            data = net_data,
+            ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+            colour = network_border_color,
+            linewidth = network_border_size,
+            lineend = border_lineend,
+            linejoin = border_linejoin,
+            inherit.aes = FALSE
+          )
+        }
       }
     }
 
     if (silhouette) {
-      sil_data <- boundary_data[boundary_data$edge_type == "silhouette", , drop = FALSE]
-      if (nrow(sil_data) > 0) {
-        p <- p + ggplot2::geom_segment(
-          data = sil_data,
-          ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-          colour = silhouette_color,
-          linewidth = silhouette_size,
-          lineend = border_lineend,
-          linejoin = border_linejoin,
-          inherit.aes = FALSE
-        )
+      if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
+        sil_data <- boundary_paths[boundary_paths$edge_type == "silhouette", ,
+                                  drop = FALSE]
+        if (nrow(sil_data) > 0) {
+          sil_data <- sil_data[order(sil_data$path_id,
+                                     sil_data$vertex_order), ,
+                               drop = FALSE]
+          p <- p + ggplot2::geom_path(
+            data = sil_data,
+            ggplot2::aes(x = x, y = y, group = path_id),
+            colour = silhouette_color,
+            linewidth = silhouette_size,
+            lineend = border_lineend,
+            linejoin = border_linejoin,
+            inherit.aes = FALSE
+          )
+        }
+      } else {
+        sil_data <- boundary_data[boundary_data$edge_type == "silhouette", ,
+                                  drop = FALSE]
+        if (nrow(sil_data) > 0) {
+          p <- p + ggplot2::geom_segment(
+            data = sil_data,
+            ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+            colour = silhouette_color,
+            linewidth = silhouette_size,
+            lineend = border_lineend,
+            linejoin = border_linejoin,
+            inherit.aes = FALSE
+          )
+        }
       }
     }
   }

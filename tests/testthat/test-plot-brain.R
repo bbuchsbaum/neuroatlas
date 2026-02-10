@@ -114,11 +114,36 @@ test_that(".compute_boundary_edges classifies silhouette and network boundaries"
 
   expect_s3_class(edges, "tbl_df")
   expect_true("edge_type" %in% names(edges))
+  expect_true(all(c("v1", "v2") %in% names(edges)))
 
   # Outer square edges appear once -> silhouette (4 edges)
   expect_equal(sum(edges$edge_type == "silhouette"), 4L)
   # Shared diagonal is between different parcels and networks -> network (1 edge)
   expect_equal(sum(edges$edge_type == "network"), 1L)
+})
+
+test_that(".boundary_edges_to_paths chains undirected edges into ordered paths", {
+  edges <- tibble::tibble(
+    panel = "Left Lateral",
+    edge_type = "parcel",
+    v1 = c(1L, 2L, 3L, 4L),
+    v2 = c(2L, 3L, 4L, 1L),
+    x = c(0, 1, 1, 0),
+    y = c(0, 0, 1, 1),
+    xend = c(1, 1, 0, 0),
+    yend = c(0, 1, 1, 0)
+  )
+
+  paths <- neuroatlas:::.boundary_edges_to_paths(edges)
+  expect_s3_class(paths, "tbl_df")
+  expect_true(all(c("x", "y", "path_id", "vertex_order", "edge_type", "panel") %in%
+                    names(paths)))
+
+  # A simple 4-edge cycle should become one path
+  expect_equal(length(unique(paths$path_id)), 1L)
+
+  got <- unique(paste0(paths$x, ",", paths$y))
+  expect_setequal(got, c("0,0", "1,0", "1,1", "0,1"))
 })
 
 test_that("plot_brain rejects non-surfatlas input", {
