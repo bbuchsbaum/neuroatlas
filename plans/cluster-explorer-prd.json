@@ -1,0 +1,269 @@
+{
+  "document": {
+    "id": "cluster-explorer-prd-v1",
+    "title": "Cluster and Parcel Activity Explorer",
+    "type": "product_requirements_document",
+    "status": "proposed",
+    "created_at": "2026-02-12",
+    "owners": [
+      "neuroatlas"
+    ]
+  },
+  "summary": {
+    "problem": "Analysts need an interactive workflow to threshold a statistic map, form volumetric clusters, annotate with atlas parcels, and inspect associated 4D signal against flexible design variables.",
+    "solution": "A Shiny explorer with linked views: parcel brain visualization (upper left), design-aware ggplot panel (upper right), and cluster summary DT table (bottom)."
+  },
+  "scope": {
+    "in_scope": [
+      "Volumetric clustering from a NeuroVol statistic map",
+      "Surface parcel visualization using plot_brain",
+      "Linked interactions between table, brain plot, and signal plot",
+      "Flexible sample table schema with only row-count alignment to NeuroVec dim4",
+      "Automatic predictor type detection for plot defaults",
+      "Export of current cluster table and plots"
+    ],
+    "out_of_scope_v1": [
+      "Model fitting engine",
+      "Multiple-comparison correction framework",
+      "Non-atlas multimodal overlays"
+    ]
+  },
+  "product_decisions": {
+    "clustering_backend": {
+      "function": "neuroim2::conn_comp",
+      "input": "NeuroVol",
+      "connectivity_options": [
+        "6-connect",
+        "18-connect",
+        "26-connect"
+      ],
+      "default_connectivity": "26-connect"
+    },
+    "tail_and_mixed_sign_handling": {
+      "tail_modes": [
+        "positive",
+        "negative",
+        "two_sided"
+      ],
+      "two_sided_strategy": "Run conn_comp separately on positive (stat > z) and negative (-stat > z) masks; never mix signs during component formation.",
+      "cluster_id_scheme": "Prefix IDs by sign (P1..Pk, N1..Nm)",
+      "min_cluster_size_rule": "Apply minimum cluster size independently within each sign"
+    },
+    "volume_surface_split": {
+      "clustering": "volumetric",
+      "visualization": "surface parcel-level plot_brain"
+    },
+    "sample_mapping_schema": {
+      "required": [
+        "nrow(sample_table) == dim(neuro_vec)[4]"
+      ],
+      "required_columns": [],
+      "auto_added_columns": [
+        ".sample_index"
+      ],
+      "notes": "No enforced semantic columns in v1; users map variables in the UI."
+    },
+    "recompute_vs_replot": {
+      "recompute_trigger": "Explicit Apply button for expensive clustering recomputation",
+      "replot_trigger": "Automatic when selection changes (table row selection or plot_brain click)",
+      "shared_selection_state": "selected_cluster_ids",
+      "conflict_policy": "Last interaction wins, tracked by source and timestamp"
+    }
+  },
+  "ui_layout": {
+    "upper_left": "plot_brain parcel visualization for currently filtered/selected clusters",
+    "upper_right": "ggplot panel for cluster/parcels time series and design relationships",
+    "bottom": "DT cluster summary table with sorting/filtering/selection",
+    "controls": [
+      "threshold",
+      "tail",
+      "connectivity",
+      "minimum cluster size",
+      "display mode",
+      "predictor variable",
+      "response aggregation"
+    ]
+  },
+  "functional_requirements": [
+    {
+      "id": "FR1",
+      "requirement": "Validate atlas, stat map, NeuroVec, and sample table compatibility before rendering."
+    },
+    {
+      "id": "FR2",
+      "requirement": "Compute connected components from thresholded stat maps using selected tail/connectivity."
+    },
+    {
+      "id": "FR3",
+      "requirement": "Filter clusters by min_cluster_size and compute summary metrics."
+    },
+    {
+      "id": "FR4",
+      "requirement": "Render bottom DT table with cluster_id, sign, n_voxels, max_stat, peak_coord, atlas_label_primary, n_parcels, parcel_overlap."
+    },
+    {
+      "id": "FR5",
+      "requirement": "Render surface parcel map with values aligned to surfatlas IDs."
+    },
+    {
+      "id": "FR6",
+      "requirement": "Support parcel display modes: dominant, positive_only, negative_only, split_panels."
+    },
+    {
+      "id": "FR7",
+      "requirement": "Auto-detect predictor type: continuous -> scatter/line+smoother; categorical -> box/violin+jitter+summary."
+    },
+    {
+      "id": "FR8",
+      "requirement": "Selection from table or brain updates right panel using shared selected_cluster_ids state."
+    },
+    {
+      "id": "FR9",
+      "requirement": "Export current cluster table to CSV and active plots to PNG/SVG."
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR1",
+      "requirement": "Typical recompute latency under 2 seconds for moderate datasets."
+    },
+    {
+      "id": "NFR2",
+      "requirement": "Deterministic outputs for fixed inputs and settings."
+    },
+    {
+      "id": "NFR3",
+      "requirement": "Graceful error messages for mismatches and empty results."
+    },
+    {
+      "id": "NFR4",
+      "requirement": "Use optional dependency guards (requireNamespace) for shiny and DT."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "criterion": "App launches with valid inputs and all three panes render."
+    },
+    {
+      "id": "AC2",
+      "criterion": "Changing threshold/tail/connectivity/min size does not recompute until Apply is clicked."
+    },
+    {
+      "id": "AC3",
+      "criterion": "Apply triggers recomputation and updates cluster table and brain map consistently."
+    },
+    {
+      "id": "AC4",
+      "criterion": "Two-sided mode yields separate positive and negative cluster IDs with no mixed-sign component IDs."
+    },
+    {
+      "id": "AC5",
+      "criterion": "Table selection updates brain highlight and right-panel plot."
+    },
+    {
+      "id": "AC6",
+      "criterion": "plot_brain parcel click updates selected_cluster_ids and table highlight/filter."
+    },
+    {
+      "id": "AC7",
+      "criterion": "Predictor type detection selects expected default geom families."
+    },
+    {
+      "id": "AC8",
+      "criterion": "If sample_table rows do not match NeuroVec dim4, app errors with explicit message."
+    },
+    {
+      "id": "AC9",
+      "criterion": "Exported CSV matches currently visible/filtered table rows."
+    },
+    {
+      "id": "AC10",
+      "criterion": "Unit tests cover cluster extraction, mixed-sign splitting, parcel mapping, type inference, and selection linkage logic."
+    }
+  ],
+  "implementation_plan": [
+    {
+      "phase": "P1",
+      "name": "Backend computation",
+      "tasks": [
+        "Implement threshold and connected-component extraction wrappers around conn_comp",
+        "Implement sign-aware cluster summarization and table schema",
+        "Implement cluster-to-parcel mapping and display value modes",
+        "Add deterministic unit tests for backend helpers"
+      ]
+    },
+    {
+      "phase": "P2",
+      "name": "Shiny scaffold",
+      "tasks": [
+        "Create UI layout with control panel and three linked panes",
+        "Wire DT table rendering and plot_brain rendering",
+        "Build design-aware ggplot renderer with type inference"
+      ]
+    },
+    {
+      "phase": "P3",
+      "name": "Interaction model",
+      "tasks": [
+        "Implement shared selected_cluster_ids reactive state",
+        "Handle table-driven and brain-driven selection updates",
+        "Add last-interaction-wins policy with source/timestamp"
+      ]
+    },
+    {
+      "phase": "P4",
+      "name": "Export and hardening",
+      "tasks": [
+        "Add CSV and image export actions",
+        "Profile recompute and rendering pathways",
+        "Polish edge-case handling and user-facing error messages"
+      ]
+    },
+    {
+      "phase": "P5",
+      "name": "Documentation and QA",
+      "tasks": [
+        "Add user-facing examples/vignette",
+        "Run devtools::test and targeted interactive checks",
+        "Finalize API docs and release notes"
+      ]
+    }
+  ],
+  "suggested_enhancements": [
+    {
+      "id": "E1",
+      "enhancement": "Signed dual-map display with synchronized positive/negative panes."
+    },
+    {
+      "id": "E2",
+      "enhancement": "Cluster split/merge tools by atlas boundaries."
+    },
+    {
+      "id": "E3",
+      "enhancement": "Subject-level trajectories with optional mixed-effects overlays."
+    },
+    {
+      "id": "E4",
+      "enhancement": "Bookmarkable app state (RDS or URL query)."
+    },
+    {
+      "id": "E5",
+      "enhancement": "One-click HTML report with table and figure snapshots."
+    }
+  ],
+  "risks_and_mitigations": [
+    {
+      "risk": "Large data can cause sluggish reactivity.",
+      "mitigation": "Gate expensive recompute behind Apply, cache intermediate products, and debounce control changes."
+    },
+    {
+      "risk": "Ambiguous design variables can produce confusing default plots.",
+      "mitigation": "Show detected variable type and allow manual override in the UI."
+    },
+    {
+      "risk": "Parcel click to cluster mapping may be one-to-many.",
+      "mitigation": "Support multi-select and display mapping counts in the table status bar."
+    }
+  ]
+}
