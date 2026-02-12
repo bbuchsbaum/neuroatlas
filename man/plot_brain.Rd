@@ -15,6 +15,7 @@ plot_brain(
   palette = "cork",
   lim = NULL,
   interactive = TRUE,
+  data_id_mode = c("parcel", "polygon"),
   ncol = 2L,
   border = TRUE,
   border_geom = c("path", "segment"),
@@ -33,6 +34,14 @@ plot_brain(
   shading_gamma = 1,
   shading_color = "black",
   fill_alpha = 1,
+  overlay = NULL,
+  overlay_threshold = NULL,
+  overlay_alpha = 0.45,
+  overlay_palette = "vik",
+  overlay_lim = NULL,
+  overlay_border = TRUE,
+  overlay_border_color = "black",
+  overlay_border_size = 0.25,
   outline = FALSE,
   bg = "white",
   ...
@@ -75,6 +84,11 @@ mode). Defaults to range of \code{vals}.}
 \item{interactive}{Logical. If \code{TRUE} (default), returns a
 \code{ggiraph::girafe} widget with hover tooltips. If \code{FALSE},
 returns a static \code{ggplot2} object.}
+
+\item{data_id_mode}{Interactive data-id granularity (when
+\code{interactive = TRUE}): \code{"parcel"} (default) uses parcel ids;
+\code{"polygon"} encodes panel + parcel + polygon/face id for
+click-to-surface workflows.}
 
 \item{ncol}{Integer: number of columns in the facet layout. Default: 2.}
 
@@ -135,6 +149,31 @@ Higher values concentrate shadows in more oblique regions. Default:
 
 \item{fill_alpha}{Numeric in \code{[0, 1]}. Opacity of parcel fills.
 Lower values can help the shading read more clearly. Default: \code{1}.}
+
+\item{overlay}{Optional vertex-wise overlay list with components \code{lh}
+and \code{rh} (numeric vectors matching the vertex count of each
+hemisphere mesh). Intended for projected volumetric cluster overlays.}
+
+\item{overlay_threshold}{Optional absolute threshold for overlay values
+before rendering.}
+
+\item{overlay_alpha}{Numeric in \code{[0, 1]}. Opacity of overlay polygons.
+Default: \code{0.45}.}
+
+\item{overlay_palette}{scico palette for overlay colour mapping. Default:
+\code{"vik"}.}
+
+\item{overlay_lim}{Optional numeric length-2 limits for overlay colour
+mapping.}
+
+\item{overlay_border}{Logical. If \code{TRUE}, draw cluster overlay
+boundaries. Default: \code{TRUE}.}
+
+\item{overlay_border_color}{Colour for overlay boundaries. Default:
+\code{"black"}.}
+
+\item{overlay_border_size}{Line width for overlay boundaries. Default:
+\code{0.25}.}
 
 \item{outline}{Logical. If \code{TRUE}, draw every triangle edge (mesh
 wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}

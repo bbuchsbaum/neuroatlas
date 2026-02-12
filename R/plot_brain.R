@@ -2,7 +2,8 @@
 utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
                          "view", "tooltip", "data_id", "fill_color",
                          "fill_value", "xend", "yend", "poly_id", "edge_type",
-                         "path_id", "v1", "v2", "alpha", "shade"))
+                         "path_id", "v1", "v2", "alpha", "shade",
+                         "overlay_color"))
 
 #' Compute face normals for a triangle mesh
 #'
@@ -610,6 +611,54 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   list(xy = xy, view_dir = view_dir)
 }
 
+#' Project Surface Vertices to a Canonical 2D View
+#'
+#' Public wrapper for the core surface-view projection used by
+#' \code{\link{plot_brain}()}.
+#'
+#' @param verts Numeric matrix (\eqn{N \times 3}) of vertex coordinates.
+#' @param view Character scalar: one of \code{"lateral"}, \code{"medial"},
+#'   \code{"dorsal"}, \code{"ventral"}.
+#' @param hemi Character scalar: \code{"left"} or \code{"right"}.
+#'
+#' @return A list with elements:
+#' \describe{
+#'   \item{\code{xy}}{Numeric matrix (\eqn{N \times 2}) of projected coordinates.}
+#'   \item{\code{view_dir}}{Numeric length-3 view direction vector used for
+#'     backface culling.}
+#' }
+#' @export
+project_surface_view <- function(verts,
+                                 view = c("lateral", "medial",
+                                          "dorsal", "ventral"),
+                                 hemi = c("left", "right")) {
+  view <- match.arg(view)
+  hemi <- match.arg(hemi)
+
+  if (!is.matrix(verts) || ncol(verts) != 3) {
+    stop("'verts' must be a numeric matrix with 3 columns.", call. = FALSE)
+  }
+
+  .project_view(verts = verts, view = view, hemi = hemi)
+}
+
+#' Encode stable interactive IDs for plot_brain polygons
+#'
+#' @param panel Character vector of panel labels.
+#' @param parcel_id Integer/numeric parcel ids.
+#' @param shape_id Integer/numeric shape ids (poly_id or face_id).
+#' @return Character vector of encoded ids.
+#' @keywords internal
+#' @noRd
+.encode_plot_brain_data_id <- function(panel, parcel_id, shape_id) {
+  paste(
+    as.character(panel),
+    as.integer(parcel_id),
+    as.integer(shape_id),
+    sep = "::"
+  )
+}
+
 #' Build polygon data for brain surface rendering
 #'
 #' Generates a tibble of 2D projected polygon vertices for all requested
@@ -725,6 +774,202 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @noRd
 .build_brain_polygon_data_memo <- memoise::memoise(.build_brain_polygon_data)
 
+#' Build Surface Polygon Data for Rendering
+#'
+#' Build 2D projected polygon/boundary data from a \code{surfatlas} for custom
+#' rendering workflows. This exposes the mesh-projection data pipeline used
+#' internally by \code{\link{plot_brain}()}.
+#'
+#' @param surfatlas A surface atlas object inheriting from class
+#'   \code{"surfatlas"}.
+#' @param views Character vector of views to include. Any combination of
+#'   \code{"lateral"}, \code{"medial"}, \code{"dorsal"}, \code{"ventral"}.
+#' @param surface Character scalar identifying the surface type label.
+#' @param merged Logical. If \code{TRUE} (default), returns merged
+#'   parcel-level polygons (faster, fewer shapes). If \code{FALSE}, returns
+#'   per-triangle polygons.
+#' @param use_cache Logical. If \code{TRUE} (default), use memoized builders.
+#'
+#' @return A list with components:
+#' \describe{
+#'   \item{\code{polygons}}{A tibble of projected polygon vertices.}
+#'   \item{\code{boundaries}}{A tibble of projected boundary segments.}
+#' }
+#' @export
+build_surface_polygon_data <- function(surfatlas,
+                                       views = c("lateral", "medial"),
+                                       surface = "inflated",
+                                       merged = TRUE,
+                                       use_cache = TRUE) {
+  if (!inherits(surfatlas, "surfatlas")) {
+    stop("'surfatlas' must inherit from class 'surfatlas'.", call. = FALSE)
+  }
+
+  views <- match.arg(
+    views,
+    choices = c("lateral", "medial", "dorsal", "ventral"),
+    several.ok = TRUE
+  )
+
+  if (!is.logical(merged) || length(merged) != 1 || is.na(merged)) {
+    stop("'merged' must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.logical(use_cache) || length(use_cache) != 1 || is.na(use_cache)) {
+    stop("'use_cache' must be TRUE or FALSE.", call. = FALSE)
+  }
+
+  if (isTRUE(merged)) {
+    builder <- if (isTRUE(use_cache)) {
+      .build_merged_polygon_data_memo
+    } else {
+      .build_merged_polygon_data
+    }
+  } else {
+    builder <- if (isTRUE(use_cache)) {
+      .build_brain_polygon_data_memo
+    } else {
+      .build_brain_polygon_data
+    }
+  }
+
+  builder(surfatlas = surfatlas, views = views, surface = surface)
+}
+
+
+#' Build overlay face polygons from vertex-wise values
+#'
+#' @param surfatlas A surface atlas.
+#' @param overlay A list with components \code{lh} and \code{rh} containing
+#'   vertex-wise numeric vectors.
+#' @param views Character vector of views.
+#' @param hemis Character vector of hemispheres.
+#' @param threshold Optional absolute threshold for overlay face values.
+#' @return A list with \code{polygons} and \code{boundaries}.
+#' @keywords internal
+#' @noRd
+.build_overlay_polygon_data <- function(surfatlas,
+                                        overlay,
+                                        views,
+                                        hemis,
+                                        threshold = NULL) {
+  hemi_keys <- c(left = "lh", right = "rh")
+  poly_list <- list()
+  boundary_list <- list()
+  global_face_id <- 0L
+
+  for (h in hemis) {
+    hk <- hemi_keys[[h]]
+    atlas_hemi <- surfatlas[[paste0(hk, "_atlas")]]
+    geom <- atlas_hemi@geometry
+    verts <- t(geom@mesh$vb[1:3, , drop = FALSE])
+    faces <- t(geom@mesh$it)
+    fnormals <- .face_normals(verts, faces)
+
+    ov <- overlay[[hk]]
+    if (is.null(ov)) next
+    ov <- as.numeric(ov)
+    if (length(ov) != nrow(verts)) next
+
+    for (v in views) {
+      proj <- .project_view(verts, v, h)
+      vdir <- proj$view_dir
+      dots <- fnormals[, 1] * vdir[1] +
+        fnormals[, 2] * vdir[2] +
+        fnormals[, 3] * vdir[3]
+
+      visible <- which(dots > 0)
+      if (length(visible) == 0) next
+
+      vis_faces <- faces[visible, , drop = FALSE]
+      fvals <- rowMeans(
+        cbind(
+          ov[vis_faces[, 1]],
+          ov[vis_faces[, 2]],
+          ov[vis_faces[, 3]]
+        ),
+        na.rm = TRUE
+      )
+
+      finite <- is.finite(fvals)
+      if (!is.null(threshold) && is.finite(threshold)) {
+        finite <- finite & abs(fvals) >= threshold
+      }
+
+      panel_label <- paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v))
+
+      # Boundary between overlay-in and overlay-out regions
+      face_bin <- integer(length(fvals))
+      face_bin[finite] <- 1L
+      if (any(face_bin == 1L)) {
+        bedge <- .compute_boundary_edges(vis_faces, face_bin, proj$xy)
+        if (!is.null(bedge)) {
+          bedge <- bedge[bedge$edge_type == "parcel", , drop = FALSE]
+          if (nrow(bedge) > 0) {
+            bedge$panel <- panel_label
+            boundary_list[[length(boundary_list) + 1L]] <- bedge
+          }
+        }
+      }
+
+      keep_faces <- which(finite)
+      if (length(keep_faces) == 0) next
+
+      vis_faces_keep <- vis_faces[keep_faces, , drop = FALSE]
+      vals_keep <- fvals[keep_faces]
+      n_keep <- nrow(vis_faces_keep)
+
+      fids <- global_face_id + seq_len(n_keep)
+      global_face_id <- global_face_id + n_keep
+
+      chunk <- tibble::tibble(
+        x = c(proj$xy[vis_faces_keep[, 1], 1],
+              proj$xy[vis_faces_keep[, 2], 1],
+              proj$xy[vis_faces_keep[, 3], 1]),
+        y = c(proj$xy[vis_faces_keep[, 1], 2],
+              proj$xy[vis_faces_keep[, 2], 2],
+              proj$xy[vis_faces_keep[, 3], 2]),
+        face_id = rep(fids, 3),
+        panel = panel_label,
+        overlay_value = rep(vals_keep, 3)
+      )
+      poly_list[[length(poly_list) + 1L]] <- chunk
+    }
+  }
+
+  list(
+    polygons = dplyr::bind_rows(poly_list),
+    boundaries = dplyr::bind_rows(boundary_list)
+  )
+}
+
+
+#' Map numeric overlay values to hex colours
+#' @keywords internal
+#' @noRd
+.overlay_value_to_hex <- function(vals, palette = "vik", lim = NULL) {
+  vals <- as.numeric(vals)
+  finite <- is.finite(vals)
+  out <- rep(NA_character_, length(vals))
+  if (!any(finite)) return(out)
+
+  if (is.null(lim)) {
+    lim <- range(vals[finite], na.rm = TRUE)
+    if (!all(is.finite(lim))) return(out)
+    if (lim[1] == lim[2]) {
+      lim <- lim + c(-1e-6, 1e-6)
+    }
+  }
+
+  pal <- scico::scico(256, palette = palette)
+  v <- vals
+  v[v < lim[1]] <- lim[1]
+  v[v > lim[2]] <- lim[2]
+  idx <- floor((v - lim[1]) / (lim[2] - lim[1]) * 255) + 1
+  idx[!finite] <- NA_integer_
+  out[finite] <- pal[idx[finite]]
+  out
+}
+
 
 #' Plot Brain Surface Atlas
 #'
@@ -760,6 +1005,10 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @param interactive Logical. If \code{TRUE} (default), returns a
 #'   \code{ggiraph::girafe} widget with hover tooltips. If \code{FALSE},
 #'   returns a static \code{ggplot2} object.
+#' @param data_id_mode Interactive data-id granularity (when
+#'   \code{interactive = TRUE}): \code{"parcel"} (default) uses parcel ids;
+#'   \code{"polygon"} encodes panel + parcel + polygon/face id for
+#'   click-to-surface workflows.
 #' @param ncol Integer: number of columns in the facet layout. Default: 2.
 #' @param border Logical. If \code{TRUE} (default), draw thin lines at parcel
 #'   boundaries (edges between different parcels). Gives a clean ggseg-like
@@ -802,6 +1051,23 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @param shading_color Colour of the shading overlay. Default: \code{"black"}.
 #' @param fill_alpha Numeric in \code{[0, 1]}. Opacity of parcel fills.
 #'   Lower values can help the shading read more clearly. Default: \code{1}.
+#' @param overlay Optional vertex-wise overlay list with components \code{lh}
+#'   and \code{rh} (numeric vectors matching the vertex count of each
+#'   hemisphere mesh). Intended for projected volumetric cluster overlays.
+#' @param overlay_threshold Optional absolute threshold for overlay values
+#'   before rendering.
+#' @param overlay_alpha Numeric in \code{[0, 1]}. Opacity of overlay polygons.
+#'   Default: \code{0.45}.
+#' @param overlay_palette scico palette for overlay colour mapping. Default:
+#'   \code{"vik"}.
+#' @param overlay_lim Optional numeric length-2 limits for overlay colour
+#'   mapping.
+#' @param overlay_border Logical. If \code{TRUE}, draw cluster overlay
+#'   boundaries. Default: \code{TRUE}.
+#' @param overlay_border_color Colour for overlay boundaries. Default:
+#'   \code{"black"}.
+#' @param overlay_border_size Line width for overlay boundaries. Default:
+#'   \code{0.25}.
 #' @param outline Logical. If \code{TRUE}, draw every triangle edge (mesh
 #'   wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.
 #' @param bg Character: background colour for the plot. Default: \code{"white"}.
@@ -856,6 +1122,7 @@ plot_brain <- function(surfatlas,
                        palette = "cork",
                        lim = NULL,
                        interactive = TRUE,
+                       data_id_mode = c("parcel", "polygon"),
                        ncol = 2L,
                        border = TRUE,
                        border_geom = c("path", "segment"),
@@ -874,6 +1141,14 @@ plot_brain <- function(surfatlas,
                        shading_gamma = 1,
                        shading_color = "black",
                        fill_alpha = 1,
+                       overlay = NULL,
+                       overlay_threshold = NULL,
+                       overlay_alpha = 0.45,
+                       overlay_palette = "vik",
+                       overlay_lim = NULL,
+                       overlay_border = TRUE,
+                       overlay_border_color = "black",
+                       overlay_border_size = 0.25,
                        outline = FALSE,
                        bg = "white",
                        ...) {
@@ -887,6 +1162,7 @@ plot_brain <- function(surfatlas,
   views <- match.arg(views, c("lateral", "medial", "dorsal", "ventral"),
                      several.ok = TRUE)
   hemis <- match.arg(hemis, c("left", "right"), several.ok = TRUE)
+  data_id_mode <- match.arg(data_id_mode)
   border_geom <- match.arg(border_geom)
   border_lineend <- match.arg(border_lineend, c("butt", "round", "square"))
   border_linejoin <- match.arg(border_linejoin, c("round", "mitre", "bevel"))
@@ -894,6 +1170,10 @@ plot_brain <- function(surfatlas,
   if (!is.numeric(fill_alpha) || length(fill_alpha) != 1 ||
       is.na(fill_alpha) || fill_alpha < 0 || fill_alpha > 1) {
     stop("'fill_alpha' must be a numeric scalar in [0, 1].", call. = FALSE)
+  }
+  if (!is.numeric(overlay_alpha) || length(overlay_alpha) != 1 ||
+      is.na(overlay_alpha) || overlay_alpha < 0 || overlay_alpha > 1) {
+    stop("'overlay_alpha' must be a numeric scalar in [0, 1].", call. = FALSE)
   }
 
   if (!is.numeric(shading_strength) || length(shading_strength) != 1 ||
@@ -944,6 +1224,10 @@ plot_brain <- function(surfatlas,
     stop("No polygon data generated. Check views and hemis arguments.",
          call. = FALSE)
   }
+
+  # Merged polygons use poly_id; triangle mode uses face_id.
+  # This controls both grouping and optional polygon-level interactive ids.
+  group_col <- if (outline) "face_id" else "poly_id"
 
   # --- Colour assignment ---
   if (is.null(vals)) {
@@ -999,7 +1283,15 @@ plot_brain <- function(surfatlas,
   } else {
     poly_data$tooltip <- poly_data$label
   }
-  poly_data$data_id <- as.character(poly_data$parcel_id)
+  poly_data$data_id <- if (identical(data_id_mode, "parcel")) {
+    as.character(poly_data$parcel_id)
+  } else {
+    .encode_plot_brain_data_id(
+      panel = poly_data$panel,
+      parcel_id = poly_data$parcel_id,
+      shape_id = poly_data[[group_col]]
+    )
+  }
 
   # Order panels for faceting
   panel_levels <- c()
@@ -1016,8 +1308,6 @@ plot_brain <- function(surfatlas,
   # to eliminate anti-aliasing seams between adjacent same-parcel triangles.
   poly_lwd <- if (outline) 0.1 else 0.15
 
-  # Merged polygons use poly_id; triangle mode uses face_id
-  group_col <- if (outline) "face_id" else "poly_id"
   p <- ggplot2::ggplot(poly_data,
                        ggplot2::aes(x = x, y = y, group = .data[[group_col]]))
 
@@ -1067,6 +1357,81 @@ plot_brain <- function(surfatlas,
   # Colour identity scale needed when borders match fill via after_scale()
   if (!outline) {
     p <- p + ggplot2::scale_colour_identity()
+  }
+
+  # Optional projected cluster overlay
+  if (!is.null(overlay)) {
+    if (!is.list(overlay)) {
+      stop("'overlay' must be NULL or a list with components 'lh' and 'rh'.",
+           call. = FALSE)
+    }
+
+    ov_build <- .build_overlay_polygon_data(
+      surfatlas = surfatlas,
+      overlay = overlay,
+      views = views,
+      hemis = hemis,
+      threshold = overlay_threshold
+    )
+
+    ov_poly <- ov_build$polygons
+    ov_bnd <- ov_build$boundaries
+
+    if (!is.null(ov_poly) && nrow(ov_poly) > 0) {
+      ov_poly$panel <- factor(ov_poly$panel, levels = levels(poly_data$panel))
+      ov_poly$overlay_color <- .overlay_value_to_hex(
+        ov_poly$overlay_value,
+        palette = overlay_palette,
+        lim = overlay_lim
+      )
+
+      p <- p + ggplot2::geom_polygon(
+        data = ov_poly,
+        ggplot2::aes(
+          x = x, y = y, group = face_id,
+          fill = I(overlay_color)
+        ),
+        alpha = overlay_alpha,
+        colour = NA,
+        inherit.aes = FALSE
+      )
+
+      if (isTRUE(overlay_border) && !is.null(ov_bnd) && nrow(ov_bnd) > 0) {
+        ov_bnd$panel <- factor(ov_bnd$panel, levels = levels(poly_data$panel))
+        ov_paths <- NULL
+        if (border_geom == "path") {
+          ov_paths <- .boundary_edges_to_paths(ov_bnd)
+          if (!is.null(ov_paths) && nrow(ov_paths) > 0) {
+            ov_paths$panel <- factor(ov_paths$panel,
+                                     levels = levels(poly_data$panel))
+          }
+        }
+
+        if (!is.null(ov_paths) && nrow(ov_paths) > 0) {
+          ov_paths <- ov_paths[order(ov_paths$path_id, ov_paths$vertex_order), ,
+                               drop = FALSE]
+          p <- p + ggplot2::geom_path(
+            data = ov_paths,
+            ggplot2::aes(x = x, y = y, group = path_id),
+            colour = overlay_border_color,
+            linewidth = overlay_border_size,
+            lineend = "round",
+            linejoin = "round",
+            inherit.aes = FALSE
+          )
+        } else {
+          p <- p + ggplot2::geom_segment(
+            data = ov_bnd,
+            ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+            colour = overlay_border_color,
+            linewidth = overlay_border_size,
+            lineend = "round",
+            linejoin = "round",
+            inherit.aes = FALSE
+          )
+        }
+      }
+    }
   }
 
   # Optional shading overlay (static polygons; uses triangle mesh data)

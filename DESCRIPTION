@@ -41,6 +41,7 @@ Imports:
     utils
 Suggests:
     albersdown,
+    DT,
     echarts4r,
     FNN,
     geojsonio,
@@ -48,9 +49,11 @@ Suggests:
     ggseg,
     ggsegGlasser,
     ggsegSchaefer,
+    jsonlite,
     knitr,
     patchwork,
     rmarkdown,
+    shiny,
     sf,
     testthat (>= 3.0.0),
     uwot

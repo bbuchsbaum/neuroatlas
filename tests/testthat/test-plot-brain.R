@@ -15,6 +15,26 @@ test_that(".face_normals computes correct normals", {
   expect_equal(normals[1, 2], 0, tolerance = 1e-10)
 })
 
+test_that("project_surface_view validates and projects vertices", {
+  verts <- matrix(c(
+    -1, 0, 0,
+    -1, 1, 0,
+    -1, 0, 1
+  ), ncol = 3, byrow = TRUE)
+
+  proj <- project_surface_view(verts, view = "lateral", hemi = "left")
+  expect_true(is.list(proj))
+  expect_true(all(c("xy", "view_dir") %in% names(proj)))
+  expect_equal(dim(proj$xy), c(3, 2))
+  expect_equal(length(proj$view_dir), 3)
+})
+
+test_that("build_surface_polygon_data rejects non-surfatlas input", {
+  fake <- list(name = "fake")
+  class(fake) <- "atlas"
+  expect_error(build_surface_polygon_data(fake), "surfatlas")
+})
+
 test_that(".face_normals handles multiple faces", {
   verts <- matrix(c(0, 0, 0,
                      1, 0, 0,
@@ -144,6 +164,15 @@ test_that(".boundary_edges_to_paths chains undirected edges into ordered paths",
 
   got <- unique(paste0(paths$x, ",", paths$y))
   expect_setequal(got, c("0,0", "1,0", "1,1", "0,1"))
+})
+
+test_that(".encode_plot_brain_data_id creates stable polygon keys", {
+  key <- neuroatlas:::.encode_plot_brain_data_id(
+    panel = "Left Lateral",
+    parcel_id = 12L,
+    shape_id = 44L
+  )
+  expect_equal(key, "Left Lateral::12::44")
 })
 
 test_that("plot_brain rejects non-surfatlas input", {
