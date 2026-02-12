@@ -581,7 +581,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   surf <- match.arg(surf, c("inflated", "white", "pial"))
 
   fsaverage <- NULL  # To avoid R CMD check NOTE
-  utils::data("fsaverage", envir = environment())
+  utils::data("fsaverage", package = "neuroatlas", envir = environment())
 
   get_hemi <- function(hemi) {
     fname <- paste0(

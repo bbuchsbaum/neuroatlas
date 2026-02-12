@@ -50,6 +50,73 @@ make_toy_cluster_explorer_inputs <- function(n_time = 4) {
   )
 }
 
+make_toy_surfatlas <- function() {
+  surfatlas <- list(
+    ids = c(1L, 2L),
+    labels = c("A", "B"),
+    hemi = c("left", "right")
+  )
+  class(surfatlas) <- c("toy_surf", "surfatlas", "atlas")
+  surfatlas
+}
+
+make_toy_mismatch_cluster_explorer_inputs <- function(n_time = 4) {
+  atlas_dims <- c(5, 5, 5)
+  stat_dims <- c(6, 6, 6)
+
+  atlas_space <- neuroim2::NeuroSpace(
+    dim = atlas_dims,
+    spacing = c(1, 1, 1),
+    origin = c(0, 0, 0)
+  )
+  stat_space <- neuroim2::NeuroSpace(
+    dim = stat_dims,
+    spacing = c(1, 1, 1),
+    origin = c(0, 0, 0)
+  )
+
+  atlas_arr <- array(0L, dim = atlas_dims)
+  atlas_arr[2:4, 2:4, 2:4] <- 1L
+  atlas_vol <- neuroim2::NeuroVol(atlas_arr, space = atlas_space)
+  atlas <- list(
+    name = "toy_mismatch_atlas",
+    atlas = atlas_vol,
+    ids = 1L,
+    labels = "A",
+    orig_labels = "A",
+    hemi = NA_character_,
+    roi_metadata = tibble::tibble(
+      id = 1L,
+      label = "A",
+      hemi = NA_character_
+    )
+  )
+  class(atlas) <- c("toy", "atlas")
+
+  stat_arr <- array(0, dim = stat_dims)
+  stat_arr[2:4, 2:4, 2:4] <- 4.5
+  stat_map <- neuroim2::NeuroVol(stat_arr, space = stat_space)
+
+  sp4 <- neuroim2::NeuroSpace(dim = c(stat_dims, n_time), spacing = c(1, 1, 1))
+  data_arr <- array(0, dim = c(stat_dims, n_time))
+  for (t in seq_len(n_time)) {
+    data_arr[2:4, 2:4, 2:4, t] <- t
+  }
+  data_vec <- neuroim2::NeuroVec(data_arr, sp4)
+
+  sample_table <- tibble::tibble(
+    condition = rep("A", n_time),
+    trial = seq_len(n_time)
+  )
+
+  list(
+    atlas = atlas,
+    stat_map = stat_map,
+    data_vec = data_vec,
+    sample_table = sample_table
+  )
+}
+
 test_that("build_cluster_explorer_data separates positive and negative clusters",
           {
   x <- make_toy_cluster_explorer_inputs(n_time = 4)
@@ -143,18 +210,31 @@ test_that("cluster_explorer constructs a shiny app object", {
   skip_if_not_installed("ggiraph")
 
   x <- make_toy_cluster_explorer_inputs(n_time = 3)
-  fake_surfatlas <- list(
-    ids = c(1L, 2L),
-    labels = c("A", "B"),
-    hemi = c("left", "right")
-  )
-  class(fake_surfatlas) <- c("toy_surf", "surfatlas", "atlas")
+  fake_surfatlas <- make_toy_surfatlas()
 
   app <- cluster_explorer(
     data_source = x$data_vec,
     atlas = x$atlas,
     stat_map = x$stat_map,
     surfatlas = fake_surfatlas,
+    sample_table = x$sample_table
+  )
+
+  expect_s3_class(app, "shiny.appobj")
+})
+
+test_that("cluster_explorer infers surfatlas from atlas payload", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("DT")
+  skip_if_not_installed("ggiraph")
+
+  x <- make_toy_cluster_explorer_inputs(n_time = 3)
+  x$atlas$surfatlas <- make_toy_surfatlas()
+
+  app <- cluster_explorer(
+    data_source = x$data_vec,
+    atlas = x$atlas,
+    stat_map = x$stat_map,
     sample_table = x$sample_table
   )
 
@@ -168,6 +248,66 @@ test_that("cluster_explorer supports zero-argument demo mode", {
 
   app <- suppressMessages(cluster_explorer())
   expect_s3_class(app, "shiny.appobj")
+})
+
+test_that("build_cluster_explorer_data supports 3D data_source as one sample", {
+  x <- make_toy_cluster_explorer_inputs(n_time = 3)
+
+  res <- suppressWarnings(
+    build_cluster_explorer_data(
+      data_source = x$stat_map,
+      atlas = x$atlas,
+      stat_map = x$stat_map,
+      threshold = 3,
+      min_cluster_size = 4
+    )
+  )
+
+  expect_true(is.data.frame(res$cluster_ts))
+  expect_equal(length(unique(res$cluster_ts$.sample_index)), 1L)
+  expect_true(all(res$cluster_ts$.sample_index == 1L))
+})
+
+test_that("atlas harmonization resamples to stat_map dimensions", {
+  x <- make_toy_mismatch_cluster_explorer_inputs(n_time = 3)
+
+  out <- neuroatlas:::.harmonize_cluster_explorer_atlas(x$atlas, x$stat_map)
+  out_vol <- neuroatlas:::.get_atlas_volume(out$atlas)
+
+  expect_true(isTRUE(out$resampled))
+  expect_equal(dim(out_vol)[1:3], dim(x$stat_map)[1:3])
+})
+
+test_that("build_cluster_explorer_data auto-resamples compatible atlas spaces", {
+  x <- make_toy_mismatch_cluster_explorer_inputs(n_time = 3)
+
+  expect_message(
+    res <- suppressWarnings(
+      build_cluster_explorer_data(
+        data_source = x$data_vec,
+        atlas = x$atlas,
+        stat_map = x$stat_map,
+        sample_table = x$sample_table,
+        threshold = 3,
+        min_cluster_size = 4
+      )
+    ),
+    "resampled atlas"
+  )
+
+  expect_true(is.list(res))
+  expect_true(nrow(res$cluster_table) >= 1)
+})
+
+test_that("atlas/surface mismatch warning is emitted", {
+  x <- make_toy_cluster_explorer_inputs(n_time = 3)
+  bad_surf <- make_toy_surfatlas()
+  bad_surf$ids <- c(10L, 11L)
+
+  expect_warning(
+    neuroatlas:::.warn_if_atlas_surface_mismatch(x$atlas, bad_surf),
+    "No overlapping ROI IDs"
+  )
 })
 
 test_that("build_design_plot evaluates aesthetics without pronoun errors", {

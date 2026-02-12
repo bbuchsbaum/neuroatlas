@@ -9,6 +9,9 @@
 #'   (\code{n x 3} matrix) or indices. Rows of the returned matrix correspond to
 #'   samples/design rows.
 #' @param atlas A volumetric \code{atlas} object used for parcel annotation.
+#'   When atlas and \code{stat_map} dimensions differ, the atlas is
+#'   automatically resampled to \code{stat_map} space (nearest-neighbor labels)
+#'   before cluster annotation.
 #' @param stat_map A \code{NeuroVol} statistic image used for thresholding and
 #'   clustering.
 #' @param sample_table Optional data frame with one row per sample. If
@@ -68,6 +71,16 @@ build_cluster_explorer_data <- function(data_source,
                                         series_cache_env = NULL) {
   connectivity <- match.arg(connectivity)
   tail <- match.arg(tail)
+
+  aligned <- .harmonize_cluster_explorer_atlas(atlas, stat_map)
+  atlas <- aligned$atlas
+  if (!is.null(aligned$message)) {
+    message(aligned$message)
+  }
+  if (!is.null(aligned$warning)) {
+    warning(aligned$warning, call. = FALSE)
+  }
+
   n_samples <- .infer_n_samples(
     data_source = data_source,
     sample_table = sample_table,
@@ -175,8 +188,10 @@ build_cluster_explorer_data <- function(data_source,
 #'
 #' @inheritParams build_cluster_explorer_data
 #' @param surfatlas A surface atlas object used by \code{\link{plot_brain}()}.
-#'   If \code{NULL} and all primary data inputs are also \code{NULL}, a bundled
-#'   synthetic demo dataset is used.
+#'   If \code{NULL}, the function attempts to infer a surface atlas from a
+#'   compatible `atlas` input (for example Schaefer or Glasser). If
+#'   inference is not possible, and non-demo inputs are otherwise present, input
+#'   validation fails.
 #' @param design Optional design table (one row per sample). When provided, it
 #'   is column-bound to \code{sample_table}.
 #' @param overlay_space Optional surface space override used to fetch white/pial
@@ -282,6 +297,13 @@ cluster_explorer <- function(data_source = NULL,
     design <- demo$design
     message("cluster_explorer(): using built-in demo dataset.")
   } else {
+    if (is.null(surfatlas) && !is.null(atlas)) {
+      inferred <- .infer_surfatlas_from_atlas(atlas)
+      if (!is.null(inferred)) {
+        surfatlas <- inferred
+      }
+    }
+
     missing_required <- c(
       data_source = is.null(data_source),
       atlas = is.null(atlas),
@@ -292,7 +314,8 @@ cluster_explorer <- function(data_source = NULL,
       stop(
         "Missing required inputs: ",
         paste(names(missing_required)[missing_required], collapse = ", "),
-        ".\nProvide all required inputs, or call cluster_explorer() with no arguments for demo mode.",
+        ".\nProvide all required inputs, pass a supported `atlas` that can infer a `surfatlas`, ",
+        "or call cluster_explorer() with no arguments for demo mode.",
         call. = FALSE
       )
     }
@@ -301,6 +324,17 @@ cluster_explorer <- function(data_source = NULL,
   if (!inherits(surfatlas, "surfatlas")) {
     stop("'surfatlas' must inherit from class 'surfatlas'.")
   }
+
+  aligned <- .harmonize_cluster_explorer_atlas(atlas, stat_map)
+  atlas <- aligned$atlas
+  if (!is.null(aligned$message)) {
+    message(aligned$message)
+  }
+  if (!is.null(aligned$warning)) {
+    warning(aligned$warning, call. = FALSE)
+  }
+
+  .warn_if_atlas_surface_mismatch(atlas, surfatlas)
 
   selection_engine <- match.arg(selection_engine)
   sphere_units <- match.arg(sphere_units)
@@ -1465,6 +1499,15 @@ infer_design_var_type <- function(x) {
   sphere_units <- match.arg(sphere_units)
   sphere_combine <- match.arg(sphere_combine)
 
+  aligned <- .harmonize_cluster_explorer_atlas(atlas, stat_map)
+  atlas <- aligned$atlas
+  if (!is.null(aligned$message)) {
+    message(aligned$message)
+  }
+  if (!is.null(aligned$warning)) {
+    warning(aligned$warning, call. = FALSE)
+  }
+
   if (identical(selection_engine, "cluster")) {
     return(build_cluster_explorer_data(
       data_source = data_source,
@@ -2245,6 +2288,123 @@ infer_design_var_type <- function(x) {
   all(ok_hemi)
 }
 
+.warn_if_atlas_surface_mismatch <- function(atlas, surfatlas) {
+  if (is.null(atlas) || is.null(surfatlas)) {
+    return(invisible(NULL))
+  }
+
+  atlas_ids <- suppressWarnings(as.integer(atlas$ids))
+  surf_ids <- suppressWarnings(as.integer(surfatlas$ids))
+
+  atlas_ids <- unique(atlas_ids[is.finite(atlas_ids)])
+  surf_ids <- unique(surf_ids[is.finite(surf_ids)])
+
+  if (length(atlas_ids) == 0 || length(surf_ids) == 0) {
+    return(invisible(NULL))
+  }
+
+  overlap <- intersect(atlas_ids, surf_ids)
+  n_overlap <- length(overlap)
+
+  if (n_overlap == 0) {
+    warning(
+      "No overlapping ROI IDs between `atlas` and `surfatlas`. ",
+      "Use matching atlas variants (e.g., Schaefer 400/17 with Schaefer ",
+      "surface 400/17).",
+      call. = FALSE
+    )
+    return(invisible(NULL))
+  }
+
+  if (!setequal(atlas_ids, surf_ids)) {
+    warning(
+      "`atlas` and `surfatlas` ROI IDs partially overlap (",
+      n_overlap, "/", length(atlas_ids), " atlas IDs; ",
+      n_overlap, "/", length(surf_ids), " surface IDs). ",
+      "Results may be difficult to interpret unless both atlases match.",
+      call. = FALSE
+    )
+  }
+
+  invisible(NULL)
+}
+
+.infer_surfatlas_from_atlas <- function(atlas) {
+  if (is.null(atlas) || !is.list(atlas)) {
+    return(NULL)
+  }
+
+  embedded <- tryCatch(atlas$surfatlas, error = function(e) NULL)
+  if (is.list(embedded) && inherits(embedded, "surfatlas")) {
+    return(embedded)
+  }
+
+  if (inherits(atlas, "schaefer")) {
+    name <- tryCatch(as.character(atlas$name), error = function(e) character(0))
+    if (length(name) > 0) {
+      name <- name[[1]]
+    } else {
+      name <- NA_character_
+    }
+    parcels <- NULL
+    networks <- NULL
+
+    if (!is.na(name) &&
+        nzchar(name) &&
+        grepl("^Schaefer-\\d+-\\d+networks", name, perl = TRUE)) {
+      parcels <- suppressWarnings(
+        as.integer(sub("^Schaefer-(\\d+)-.*$", "\\1", name))
+      )
+      networks <- suppressWarnings(
+        as.integer(sub("^Schaefer-\\d+-(\\d+)networks.*$", "\\1", name))
+      )
+    }
+
+    networks <- suppressWarnings(as.integer(networks))
+    parcels <- suppressWarnings(as.integer(parcels))
+    if (length(networks) != 1) networks <- NA_integer_
+    if (length(parcels) != 1) parcels <- NA_integer_
+
+    if (is.na(networks)) {
+      if (!is.null(atlas$network)) {
+        nunique <- unique(as.character(atlas$network))
+        nunique <- nunique[!is.na(nunique) & nzchar(nunique)]
+        if (length(nunique) %in% c(7L, 17L)) {
+          networks <- length(nunique)
+        }
+      }
+    }
+
+    if (is.na(parcels) &&
+        !is.null(atlas$ids) && length(atlas$ids) > 0) {
+      n_ids <- length(atlas$ids)
+      parcels <- as.integer(n_ids)
+    }
+
+    if (!is.na(parcels) && !is.na(networks) &&
+        parcels %in% c(100L, 200L, 300L, 400L, 500L, 600L, 800L, 1000L) &&
+        networks %in% c(7L, 17L)) {
+      return(tryCatch(
+        schaefer_surf(
+          parcels = parcels,
+          networks = networks,
+          surf = "inflated"
+        ),
+        error = function(e) NULL
+      ))
+    }
+  }
+
+  if (inherits(atlas, "glasser")) {
+    return(tryCatch(
+      glasser_surf(space = "fsaverage", surf = "pial"),
+      error = function(e) NULL
+    ))
+  }
+
+  NULL
+}
+
 .fallback_brain_plot <- function(surfatlas,
                                  vals = NULL,
                                  palette = "vik",
@@ -2343,8 +2503,13 @@ infer_design_var_type <- function(x) {
 
 .infer_n_samples <- function(data_source, sample_table = NULL, design = NULL) {
   ds_dim <- dim(data_source)
-  if (!is.null(ds_dim) && length(ds_dim) >= 4) {
-    return(as.integer(ds_dim[4]))
+  if (!is.null(ds_dim)) {
+    if (length(ds_dim) >= 4) {
+      return(as.integer(ds_dim[4]))
+    }
+    if (length(ds_dim) == 3) {
+      return(1L)
+    }
   }
   if (!is.null(sample_table)) {
     return(nrow(sample_table))
@@ -2356,6 +2521,103 @@ infer_design_var_type <- function(x) {
     "Unable to infer number of samples from data_source. ",
     "Provide a sample_table or design with one row per sample."
   )
+}
+
+.set_atlas_volume <- function(atlas, vol) {
+  has_atlas <- !is.null(atlas$atlas) &&
+    (methods::is(atlas$atlas, "NeuroVol") ||
+       methods::is(atlas$atlas, "ClusteredNeuroVol"))
+  has_data <- !is.null(atlas$data) &&
+    (methods::is(atlas$data, "NeuroVol") ||
+       methods::is(atlas$data, "ClusteredNeuroVol"))
+
+  if (isTRUE(has_atlas)) {
+    atlas$atlas <- vol
+    return(atlas)
+  }
+  if (isTRUE(has_data)) {
+    atlas$data <- vol
+    return(atlas)
+  }
+
+  atlas$atlas <- vol
+  atlas
+}
+
+.count_nonzero_voxels <- function(vol) {
+  if (methods::is(vol, "ClusteredNeuroVol")) {
+    return(length(vol@clusters))
+  }
+  if (methods::is(vol, "NeuroVol")) {
+    arr <- as.array(vol)
+    return(sum(is.finite(arr) & arr != 0, na.rm = TRUE))
+  }
+  NA_integer_
+}
+
+.harmonize_cluster_explorer_atlas <- function(atlas, stat_map) {
+  ret <- list(atlas = atlas, resampled = FALSE, message = NULL, warning = NULL)
+
+  if (is.null(atlas) || is.null(stat_map) || !inherits(atlas, "atlas")) {
+    return(ret)
+  }
+  if (!methods::is(stat_map, "NeuroVol")) {
+    return(ret)
+  }
+
+  atlas_vol <- tryCatch(.get_atlas_volume(atlas), error = function(e) NULL)
+  if (is.null(atlas_vol)) {
+    return(ret)
+  }
+
+  atlas_dims <- dim(atlas_vol)[1:3]
+  stat_dims <- dim(stat_map)[1:3]
+  if (all(atlas_dims == stat_dims)) {
+    return(ret)
+  }
+
+  target_space <- tryCatch(neuroim2::space(stat_map), error = function(e) NULL)
+  if (is.null(target_space) || !methods::is(target_space, "NeuroSpace")) {
+    ret$warning <- paste0(
+      "Spatial dimensions of atlas (", paste(atlas_dims, collapse = "x"),
+      ") and stat_map (", paste(stat_dims, collapse = "x"),
+      ") differ, and stat_map space is unavailable for atlas auto-resampling."
+    )
+    return(ret)
+  }
+
+  resampled <- tryCatch(
+    resample(atlas_vol, outspace = target_space, smooth = FALSE, interp = 0),
+    error = function(e) e
+  )
+  if (inherits(resampled, "error")) {
+    ret$warning <- paste0(
+      "Failed to auto-resample atlas from ", paste(atlas_dims, collapse = "x"),
+      " to ", paste(stat_dims, collapse = "x"), ": ",
+      conditionMessage(resampled)
+    )
+    return(ret)
+  }
+
+  n_nonzero <- .count_nonzero_voxels(resampled)
+  if (!is.finite(n_nonzero) || n_nonzero <= 0) {
+    ret$warning <- paste0(
+      "Atlas auto-resampling produced an empty atlas in stat_map space ",
+      "(", paste(stat_dims, collapse = "x"), ")."
+    )
+    return(ret)
+  }
+
+  ret$atlas <- .set_atlas_volume(atlas, resampled)
+  ret$resampled <- TRUE
+  ret$message <- paste0(
+    "cluster_explorer(): resampled atlas from ",
+    paste(atlas_dims, collapse = "x"),
+    " to ",
+    paste(dim(resampled)[1:3], collapse = "x"),
+    " to match stat_map space."
+  )
+  ret
 }
 
 .validate_cluster_explorer_inputs <- function(data_source,
@@ -2385,10 +2647,10 @@ infer_design_var_type <- function(x) {
 
   if (!is.null(data_dims)) {
     assertthat::assert_that(
-      all(atlas_dims == data_dims),
+      all(stat_dims == data_dims),
       msg = paste0(
-        "Spatial dimensions of atlas (",
-        paste(atlas_dims, collapse = "x"),
+        "Spatial dimensions of stat_map (",
+        paste(stat_dims, collapse = "x"),
         ") and data_source (",
         paste(data_dims, collapse = "x"),
         ") must match when data_source has spatial dims."
@@ -3116,7 +3378,7 @@ infer_design_var_type <- function(x) {
       is.null(density_override) &&
       is.null(resolution_override)) {
     fsaverage <- NULL
-    utils::data("fsaverage", envir = environment())
+    utils::data("fsaverage", package = "neuroatlas", envir = environment())
     if (exists("fsaverage", envir = environment(), inherits = FALSE)) {
       fsaverage <- get("fsaverage", envir = environment())
       geom_name <- paste0(hemi, "_", surface_type)
