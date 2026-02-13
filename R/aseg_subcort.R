@@ -56,6 +56,10 @@
 get_aseg_atlas <- function(outspace=NULL) {
   fname <- system.file("extdata/atlas_aparc_aseg_prob33.nii.gz", package="neuroatlas")
   atlas <- neuroim2::read_vol(fname)
+  template_space <- .template_space_from_outspace(
+    outspace,
+    default_space = "MNI152NLin6Asym"
+  )
 
   if (!is.null(outspace)) {
     atlas <- resample(atlas, outspace)
@@ -124,5 +128,23 @@ get_aseg_atlas <- function(outspace=NULL) {
   )
 
   class(ret) <- c("aseg", "atlas")
-  ret
+  ref <- new_atlas_ref(
+    family = "aseg",
+    model = "FreeSurferASEG",
+    representation = "volume",
+    template_space = template_space,
+    coord_space = "MNI152",
+    resolution = "1mm",
+    provenance = "inst/extdata/atlas_aparc_aseg_prob33.nii.gz",
+    source = "bundled_extdata",
+    lineage = "Bundled package atlas volume.",
+    confidence = if (is.null(outspace)) "high" else "approximate",
+    notes = paste(
+      "Header (193x229x193; 1mm; RAS) matches MNI152NLin6Asym.",
+      "FreeSurfer aparc+aseg uses FSL's MNI152 as standard space.",
+      "Confirmed via data-raw/audit_bundled_spaces.R."
+    )
+  )
+
+  .attach_atlas_ref(ret, ref)
 }

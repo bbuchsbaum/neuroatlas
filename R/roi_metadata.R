@@ -23,6 +23,9 @@ NULL
 #'     \item{label_full}{Original/full region label}
 #'     \item{hemi}{Hemisphere ("left", "right", or NA for bilateral/midline)}
 #'     \item{color_r, color_g, color_b}{RGB color values (0-255)}
+#'     \item{template_space}{Template space identifier (e.g., "MNI152NLin6Asym"), when atlas_ref is available}
+#'     \item{coord_space}{Coordinate space (e.g., "MNI152", "MNI305"), when atlas_ref is available}
+#'     \item{atlas_family}{Atlas family identifier (e.g., "schaefer"), when atlas_ref is available}
 #'   }
 #'   Additional atlas-specific columns may be present (e.g., \code{network} for Schaefer atlases).
 #'
@@ -48,10 +51,16 @@ roi_metadata <- function(x, ...) {
 #' @rdname roi_metadata
 #' @export
 roi_metadata.atlas <- function(x, ...) {
-  # If roi_metadata already exists as a field, return it
-
-if (!is.null(x$roi_metadata)) {
-    return(x$roi_metadata)
+  # If roi_metadata already exists as a field, augment with atlas_ref if needed
+  if (!is.null(x$roi_metadata)) {
+    meta <- x$roi_metadata
+    if (!is.null(x$atlas_ref) &&
+        !("template_space" %in% names(meta))) {
+      meta$template_space <- x$atlas_ref$template_space
+      meta$coord_space <- x$atlas_ref$coord_space
+      meta$atlas_family <- x$atlas_ref$family
+    }
+    return(meta)
   }
 
   # Otherwise, construct from legacy fields for backwards compatibility
@@ -81,6 +90,13 @@ if (!is.null(x$roi_metadata)) {
   # Add network if present (e.g., Schaefer atlas)
   if (!is.null(x$network) && length(x$network) == n) {
     meta$network <- x$network
+  }
+
+  # Add atlas_ref provenance if available
+  if (!is.null(x$atlas_ref)) {
+    meta$template_space <- x$atlas_ref$template_space
+    meta$coord_space <- x$atlas_ref$coord_space
+    meta$atlas_family <- x$atlas_ref$family
   }
 
   meta
@@ -252,6 +268,11 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
     ret$network <- new_network
   }
 
+  # Preserve atlas_ref if present
+  if (!is.null(x$atlas_ref)) {
+    ret$atlas_ref <- x$atlas_ref
+  }
+
   # Build roi_metadata tibble
   ret$roi_metadata <- .build_roi_metadata(ret)
 
@@ -338,6 +359,13 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
 
   if (!is.null(x$network)) {
     meta$network <- x$network
+  }
+
+  # Add atlas_ref provenance if available
+  if (!is.null(x$atlas_ref)) {
+    meta$template_space <- x$atlas_ref$template_space
+    meta$coord_space <- x$atlas_ref$coord_space
+    meta$atlas_family <- x$atlas_ref$family
   }
 
   meta

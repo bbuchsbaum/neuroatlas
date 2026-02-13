@@ -1,0 +1,13 @@
+from_space,to_space,transform_type,backend,confidence,reversible,data_files,status,notes
+MNI305,MNI152,affine,internal_affine,exact,TRUE,NA,available,FreeSurfer mni152.register.dat
+MNI152,MNI305,affine,internal_affine,exact,TRUE,NA,available,Inverse of FreeSurfer mni152.register.dat
+MNI152NLin6Asym,MNI152NLin2009cAsym,nonlinear_warp,templateflow_ants,high,TRUE,from-MNI152NLin6Asym_to-MNI152NLin2009cAsym_mode-image_xfm.h5,planned,TemplateFlow composite warp
+MNI152NLin2009cAsym,MNI152NLin6Asym,nonlinear_warp,templateflow_ants,high,TRUE,from-MNI152NLin2009cAsym_to-MNI152NLin6Asym_mode-image_xfm.h5,planned,TemplateFlow composite warp inverse
+fsaverage,fsaverage6,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Downsample 164k to 41k on registration sphere
+fsaverage6,fsaverage,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Upsample 41k to 164k on registration sphere
+fsaverage,fsaverage5,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Downsample 164k to 10k on registration sphere
+fsaverage5,fsaverage,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Upsample 10k to 164k on registration sphere
+fsaverage,fsLR_32k,sphere_resample,workbench,high,TRUE,fs_LR-deformed_to-fsaverage.?H.sphere.reg.surf.gii,planned,HCP sphere registration via Workbench
+fsLR_32k,fsaverage,sphere_resample,workbench,high,TRUE,fsaverage_to-fs_LR.?H.sphere.reg.surf.gii,planned,HCP sphere registration via Workbench
+MNI152NLin2009cAsym,fsaverage,vol2surf,neurosurf,approximate,FALSE,NA,planned,Requires white and pial surfaces
+fsaverage,MNI152NLin2009cAsym,surf2vol,ribbon_fill,approximate,FALSE,NA,planned,Requires ribbon mask construction

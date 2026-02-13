@@ -174,6 +174,8 @@ as_parcel_data.atlas <- function(x,
                                  atlas_space = NULL,
                                  schema_version = "1.0.0",
                                  ...) {
+  ref <- atlas_ref(x)
+
   meta <- roi_metadata(x)
 
   needed <- c("id", "label", "hemi")
@@ -230,12 +232,22 @@ as_parcel_data.atlas <- function(x,
     }
   }
 
+  if (is.null(atlas_space) && !is.null(ref$template_space) &&
+      !is.na(ref$template_space) && nzchar(ref$template_space)) {
+    atlas_space <- ref$template_space
+  }
+
   atlas_ref <- list(
     id = atlas_id,
     name = if (!is.null(x$name)) x$name else atlas_id,
     version = atlas_version,
     space = atlas_space,
     class = class(x)[1],
+    family = ref$family,
+    model = ref$model,
+    representation = ref$representation,
+    coord_space = ref$coord_space,
+    confidence = ref$confidence,
     n_parcels = nrow(parcels)
   )
 

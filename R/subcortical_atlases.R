@@ -214,7 +214,20 @@ get_subcortical_atlas <- function(name,
   )
 
   class(ret) <- c("subcortical", "atlas")
-  ret
+  ref <- new_atlas_ref(
+    family = "subcortical",
+    model = spec$id,
+    representation = "volume",
+    template_space = tf_space,
+    coord_space = "MNI152",
+    resolution = res,
+    provenance = "https://github.com/PennLINC/AtlasPack",
+    source = "templateflow",
+    lineage = paste0("TemplateFlow atlas=", spec$atlas),
+    confidence = if (is.null(outspace)) "high" else "approximate"
+  )
+
+  .attach_atlas_ref(ret, ref)
 }
 
 # Internal specification table -----------------------------------------------

@@ -194,10 +194,13 @@ test_that("plot_brain rejects vals of wrong length", {
 
 test_that("plot_brain returns ggplot when interactive = FALSE", {
   skip_on_cran()
-  skip("Requires network access to download surface atlas")
 
-  # This test would require a real surfatlas object
-  # atl <- schaefer_surf(100, 7)
-  # p <- plot_brain(atl, interactive = FALSE)
-  # expect_s3_class(p, "ggplot")
+  atl <- tryCatch({
+    schaefer_surf(100, 7)
+  }, error = function(e) {
+    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+  })
+
+  p <- plot_brain(atl, interactive = FALSE)
+  expect_s3_class(p, "ggplot")
 })

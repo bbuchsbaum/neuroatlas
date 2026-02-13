@@ -4,15 +4,17 @@
 \alias{get_glasser_atlas}
 \title{Load Glasser Atlas}
 \source{
-Atlas files are downloaded from:
-\url{https://github.com/PennBBL/xcpEngine/tree/master/atlas/glasser360}
+Source-specific links are recorded in \code{atlas_ref(atlas)$provenance}.
 }
 \usage{
-get_glasser_atlas(outspace = NULL)
+get_glasser_atlas(outspace = NULL, source = c("mni2009c", "xcpengine"))
 }
 \arguments{
 \item{outspace}{Optional \code{NeuroSpace} object specifying desired output space.
 If provided, the atlas will be resampled to this space. Default: NULL}
+
+\item{source}{Volume source to use. One of \code{"mni2009c"} (default) or
+\code{"xcpengine"}.}
 }
 \value{
 A list with class 'glasser' and 'atlas' containing:
@@ -26,19 +28,27 @@ A list with class 'glasser' and 'atlas' containing:
 }
 }
 \description{
-Retrieves and loads the Glasser360 cortical parcellation atlas from the PennBBL
-repository. The atlas provides a detailed parcellation of the human cerebral cortex
-based on multi-modal neuroimaging data.
+Retrieves and loads a volumetric representation of the Glasser/HCP-MMP 1.0
+cortical parcellation atlas.
 }
 \details{
 The Glasser atlas divides each hemisphere into 180 areas (360 total) based on
-cortical architecture, function, connectivity, and topography. The atlas is
-downloaded from the PennBBL xcpEngine repository and includes:
+cortical architecture, function, connectivity, and topography.
+
+Supported sources:
 \itemize{
-  \item Volume data in MNI space
-  \item Region labels and hemisphere information
-  \item Color specifications for visualization
+  \item \code{"mni2009c"} (default): MNI152NLin2009cAsym-provenance volume
+    file (\code{MMP_in_MNI_corr.nii.gz}).
+  \item \code{"xcpengine"}: legacy xcpEngine Glasser360 volume
+    (\code{glasser360MNI.nii.gz}) with less explicit template provenance.
 }
+
+If \code{source = "mni2009c"} is unavailable at runtime, the loader
+automatically falls back to \code{"xcpengine"} and marks confidence as
+\code{"uncertain"}.
+
+Region labels are read from the xcpEngine node-name table to provide stable
+parcel naming across sources.
 }
 \examples{
 \dontrun{

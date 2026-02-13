@@ -172,3 +172,67 @@ test_that("direct transform matrix application works", {
 
   expect_equal(result1, result2)
 })
+
+test_that("template_to_coord_space handles volumetric templates", {
+  expect_equal(template_to_coord_space("MNI152NLin6Asym"), "MNI152")
+  expect_equal(template_to_coord_space("MNI152NLin2009cAsym"), "MNI152")
+  expect_equal(template_to_coord_space("MNI152"), "MNI152")
+  expect_equal(template_to_coord_space("MNI305"), "MNI305")
+})
+
+test_that("template_to_coord_space handles surface templates", {
+  expect_equal(template_to_coord_space("fsaverage"), "MNI305")
+  expect_equal(template_to_coord_space("fsaverage5"), "MNI305")
+  expect_equal(template_to_coord_space("fsaverage6"), "MNI305")
+  expect_equal(template_to_coord_space("fsLR_32k"), "MNI152")
+})
+
+test_that("template_to_coord_space handles aliases", {
+  expect_equal(template_to_coord_space("fslr32k"), "MNI152")
+  expect_equal(template_to_coord_space("fslr"), "MNI152")
+})
+
+test_that("template_to_coord_space warns on unknown", {
+  expect_warning(
+    result <- template_to_coord_space("unknown_space"),
+    "Unknown template"
+  )
+  expect_equal(result, "Unknown")
+})
+
+test_that("needs_coord_transform detects cross-coord-system cases", {
+  expect_true(needs_coord_transform("fsaverage", "MNI152NLin6Asym"))
+  expect_true(needs_coord_transform("fsaverage6", "MNI152"))
+  expect_true(needs_coord_transform("MNI305", "MNI152NLin2009cAsym"))
+})
+
+test_that("needs_coord_transform returns FALSE for same coord system", {
+  expect_false(needs_coord_transform("fsaverage", "MNI305"))
+  expect_false(needs_coord_transform("fsaverage", "fsaverage6"))
+  expect_false(needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym"))
+  expect_false(needs_coord_transform("MNI152", "MNI152NLin6Asym"))
+})
+
+test_that("needs_template_warp detects same-coord-different-template", {
+  expect_true(needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym"))
+  expect_true(needs_template_warp("fsaverage", "fsaverage6"))
+  expect_true(needs_template_warp("fsaverage", "fsaverage5"))
+})
+
+test_that("needs_template_warp returns FALSE for identical templates", {
+  expect_false(needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym"))
+  expect_false(needs_template_warp("fsaverage", "fsaverage"))
+})
+
+test_that("needs_template_warp returns FALSE for cross-coord-system", {
+  expect_false(needs_template_warp("fsaverage", "MNI152"))
+  expect_false(needs_template_warp("MNI305", "MNI152NLin6Asym"))
+})
+
+test_that("needs_template_warp returns NA for unknown templates", {
+  expect_warning(
+    result <- needs_template_warp("unknown", "MNI152"),
+    "unknown template"
+  )
+  expect_true(is.na(result))
+})

@@ -71,7 +71,7 @@ test_that("dilate_atlas works on Glasser atlas", {
   skip_on_cran()  # Skip on CRAN for demonstration purposes
   
   # Load the Glasser atlas
-  gl <- get_glasser_atlas()
+  gl <- suppressWarnings(get_glasser_atlas())
   
   # Create a simple mask that's just the atlas itself
   # This tests that dilate_atlas handles the case where there's nothing to dilate

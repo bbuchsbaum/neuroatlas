@@ -356,6 +356,10 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
                        choices = c("7","17"))
   resolution <- match.arg(as.character(resolution),
                          choices = c("1","2"))
+  template_space <- .template_space_from_outspace(
+    outspace,
+    default_space = "MNI152NLin6Asym"
+  )
 
   # Resolve outspace if it's not NULL and not already a NeuroSpace (T6.1.4)
   if (!is.null(outspace) && !methods::is(outspace, "NeuroSpace")) {
@@ -431,7 +435,22 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
   )
 
   class(ret) <- c("schaefer", "volatlas", "atlas")
-  ret
+
+  ref <- new_atlas_ref(
+    family = "schaefer",
+    model = "Schaefer2018",
+    representation = "volume",
+    template_space = template_space,
+    coord_space = "MNI152",
+    resolution = paste0(resolution, "mm"),
+    provenance = "https://github.com/ThomasYeoLab/CBIG",
+    source = "cbig_mni",
+    lineage = "Computed on fsaverage6 and sampled to MNI volume in CBIG release.",
+    confidence = if (is.null(outspace)) "high" else "approximate",
+    notes = "CBIG filenames use FSLMNI152_*mm naming."
+  )
+
+  .attach_atlas_ref(ret, ref)
 }
 
 
@@ -635,7 +654,21 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   )
 
   class(ret) <- c("schaefer", "surfatlas", "atlas")
-  ret
+
+  ref <- new_atlas_ref(
+    family = "schaefer",
+    model = "Schaefer2018",
+    representation = "surface",
+    template_space = "fsaverage6",
+    coord_space = get_surface_coordinate_space("fsaverage6"),
+    density = "41k",
+    provenance = "https://github.com/ThomasYeoLab/CBIG",
+    source = "cbig_fsaverage6",
+    lineage = "Original Schaefer2018 surface parcellation space.",
+    confidence = "high"
+  )
+
+  .attach_atlas_ref(ret, ref)
 }
 
 
@@ -744,7 +777,21 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   )
 
   class(ret) <- c("schaefer", "surfatlas", "atlas")
-  ret
+
+  ref <- new_atlas_ref(
+    family = "schaefer",
+    model = "Schaefer2018",
+    representation = "surface",
+    template_space = mapping$space,
+    coord_space = get_surface_coordinate_space(mapping$space),
+    density = mapping$tf_density,
+    provenance = "https://github.com/ThomasYeoLab/CBIG;https://www.templateflow.org",
+    source = "cbig_labels_templateflow_geometry",
+    lineage = "CBIG Schaefer labels projected onto TemplateFlow surface geometry.",
+    confidence = "high"
+  )
+
+  .attach_atlas_ref(ret, ref)
 }
 
 
@@ -1005,5 +1052,3 @@ sy_1000_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_ca
   get_schaefer_atlas(parcels = "1000", networks = "17", resolution = resolution,
                      outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
 }
-
-

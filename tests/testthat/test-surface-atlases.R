@@ -264,7 +264,7 @@ test_that("color map handling works correctly across atlas operations", {
   atlases <- list(
     schaefer = tryCatch(get_schaefer_atlas(parcels = "100", networks = "7"), 
                        error = function(e) NULL),
-    glasser = tryCatch(get_glasser_atlas(), error = function(e) NULL),
+    glasser = tryCatch(suppressWarnings(get_glasser_atlas()), error = function(e) NULL),
     aseg = tryCatch(get_aseg_atlas(), error = function(e) NULL)
   )
   

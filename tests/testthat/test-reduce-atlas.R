@@ -44,7 +44,7 @@ test_that("reduce_atlas errors with mismatched dimensions", {
 
 test_that("reduce_atlas works on Glasser atlas", {
   skip_on_cran()
-  gl <- get_glasser_atlas()
+  gl <- suppressWarnings(get_glasser_atlas())
   vol <- neuroim2::NeuroVol(array(rnorm(prod(dim(gl$atlas))), dim=dim(gl$atlas)),
                              space = neuroim2::space(gl$atlas))
   

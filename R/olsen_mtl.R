@@ -74,6 +74,10 @@
 get_olsen_mtl <- function(outspace=NULL) {
   olsen_mtl <- NULL  # To avoid R CMD check NOTE
   utils::data("olsen_mtl", envir = environment())
+  template_space <- .template_space_from_outspace(
+    outspace,
+    default_space = "MNI152_custom"
+  )
 
   ret <- if (is.null(outspace)) {
     olsen_mtl
@@ -104,7 +108,27 @@ get_olsen_mtl <- function(outspace=NULL) {
     )
   }
 
-  ret
+  # Keep explicit template metadata in returned object.
+  ref <- new_atlas_ref(
+    family = "olsen",
+    model = "OlsenMTL",
+    representation = "volume",
+    template_space = template_space,
+    coord_space = "MNI152",
+    resolution = "1mm",
+    provenance = "inst/extdata/Olsen_MNI_MTL_prob33.nii.gz",
+    source = "bundled_data",
+    lineage = "Bundled package atlas volume.",
+    confidence = if (is.null(outspace)) "uncertain" else "approximate",
+    notes = paste(
+      "182x218x182 at 1mm: custom-cropped MNI152-like grid.",
+      "Does not match MNI152NLin6Asym (193x229x193) or NLin2009cAsym.",
+      "Likely MNI152 coordinate system but non-standard bounding box.",
+      "Audit: data-raw/audit_bundled_spaces.R."
+    )
+  )
+
+  .attach_atlas_ref(ret, ref)
 }
 
 #' Extract Hippocampal Parcellation
@@ -158,6 +182,10 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
     tmp$atlas <- atres
     tmp
   }
+  template_space <- .template_space_from_outspace(
+    outspace,
+    default_space = "MNI152_custom"
+  )
 
   # Extract hippocampal regions
   atlas <- x$atlas
@@ -208,6 +236,18 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
   )
 
   class(ret) <- c("hippocampus", "atlas")
-  ret
-}
+  ref <- new_atlas_ref(
+    family = "olsen",
+    model = "OlsenMTL-Hippocampus",
+    representation = "derived",
+    template_space = template_space,
+    coord_space = "MNI152",
+    resolution = "1mm",
+    provenance = "Derived from Olsen MTL bundled atlas.",
+    source = "derived_from_olsen_mtl",
+    lineage = "Binary/selective derivation from Olsen MTL labels.",
+    confidence = if (is.null(outspace)) "uncertain" else "approximate"
+  )
 
+  .attach_atlas_ref(ret, ref)
+}

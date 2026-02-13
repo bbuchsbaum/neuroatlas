@@ -1,22 +1,32 @@
 #' Load Glasser Atlas
 #'
 #' @description
-#' Retrieves and loads the Glasser360 cortical parcellation atlas from the PennBBL
-#' repository. The atlas provides a detailed parcellation of the human cerebral cortex
-#' based on multi-modal neuroimaging data.
+#' Retrieves and loads a volumetric representation of the Glasser/HCP-MMP 1.0
+#' cortical parcellation atlas.
 #'
 #' @details
 #' The Glasser atlas divides each hemisphere into 180 areas (360 total) based on
-#' cortical architecture, function, connectivity, and topography. The atlas is
-#' downloaded from the PennBBL xcpEngine repository and includes:
+#' cortical architecture, function, connectivity, and topography.
+#'
+#' Supported sources:
 #' \itemize{
-#'   \item Volume data in MNI space
-#'   \item Region labels and hemisphere information
-#'   \item Color specifications for visualization
+#'   \item \code{"mni2009c"} (default): MNI152NLin2009cAsym-provenance volume
+#'     file (\code{MMP_in_MNI_corr.nii.gz}).
+#'   \item \code{"xcpengine"}: legacy xcpEngine Glasser360 volume
+#'     (\code{glasser360MNI.nii.gz}) with less explicit template provenance.
 #' }
+#'
+#' If \code{source = "mni2009c"} is unavailable at runtime, the loader
+#' automatically falls back to \code{"xcpengine"} and marks confidence as
+#' \code{"uncertain"}.
+#'
+#' Region labels are read from the xcpEngine node-name table to provide stable
+#' parcel naming across sources.
 #'
 #' @param outspace Optional \code{NeuroSpace} object specifying desired output space.
 #'   If provided, the atlas will be resampled to this space. Default: NULL
+#' @param source Volume source to use. One of \code{"mni2009c"} (default) or
+#'   \code{"xcpengine"}.
 #'
 #' @return A list with class 'glasser' and 'atlas' containing:
 #' \describe{
@@ -33,8 +43,7 @@
 #' cortex. Nature, 536(7615), 171-178.
 #'
 #' @source
-#' Atlas files are downloaded from:
-#' \url{https://github.com/PennBBL/xcpEngine/tree/master/atlas/glasser360}
+#' Source-specific links are recorded in \code{atlas_ref(atlas)$provenance}.
 #'
 #' @examples
 #' \dontrun{
@@ -53,16 +62,42 @@
 #' @importFrom utils read.table
 #' @importFrom grDevices col2rgb rainbow
 #' @export
-get_glasser_atlas <- function(outspace=NULL) {
-  # Download and read atlas volume
-  fname <- "glasser360MNI.nii.gz"
-  rpath <- "https://github.com/PennBBL/xcpEngine/raw/master/atlas/glasser360/"
-  path <- paste0(rpath, fname)
-  
-  des <- paste0(tempdir(), "/", fname)
-  ret <- download(path, des)
-  
-  vol <- neuroim2::read_vol(des)
+get_glasser_atlas <- function(outspace=NULL,
+                              source = c("mni2009c", "xcpengine")) {
+  source <- match.arg(source)
+  requested_source <- source
+  source_info <- .glasser_volume_source_info(source)
+  vol_path <- tryCatch({
+    .download_glasser_volume(source_info$volume_url, source_info$fname)
+  }, error = function(e) {
+    NULL
+  })
+
+  fallback_needed <- is.null(vol_path) ||
+    .is_lfs_pointer_file(vol_path) ||
+    (file.exists(vol_path) && file.info(vol_path)$size < 1024)
+
+  if (fallback_needed && identical(source, "mni2009c")) {
+    warning(
+      "Default source='mni2009c' was unavailable; falling back to ",
+      "source='xcpengine' with confidence='uncertain'.",
+      call. = FALSE
+    )
+    source <- "xcpengine"
+    source_info <- .glasser_volume_source_info(source)
+    vol_path <- .download_glasser_volume(source_info$volume_url, source_info$fname)
+  }
+
+  template_space <- .template_space_from_outspace(
+    outspace,
+    default_space = if (source == "mni2009c") {
+      "MNI152NLin2009cAsym"
+    } else {
+      "MNI152_unspecified"
+    }
+  )
+
+  vol <- neuroim2::read_vol(vol_path)
   
   if (!is.null(outspace)) {
     vol <- resample(vol, outspace)
@@ -71,7 +106,7 @@ get_glasser_atlas <- function(outspace=NULL) {
   # Download and process labels
   label_name <- "glasser360NodeNames.txt"
   des2 <- paste0(tempdir(), "/", label_name)
-  ret <- download(paste0(rpath, label_name), des2)
+  ret <- download(source_info$label_url, des2)
   
   labels <- read.table(des2, as.is=TRUE)
   cols <- t(col2rgb(rainbow(nrow(labels))))
@@ -115,7 +150,30 @@ get_glasser_atlas <- function(outspace=NULL) {
   )
 
   class(ret) <- c("glasser", "atlas")
-  ret
+
+  ref <- new_atlas_ref(
+    family = "glasser",
+    model = "HCP-MMP1.0",
+    representation = "volume",
+    template_space = template_space,
+    coord_space = "MNI152",
+    resolution = if (source == "mni2009c") "1mm" else NA_character_,
+    provenance = source_info$provenance,
+    source = source,
+    lineage = if (!identical(source, requested_source)) {
+      paste(source_info$lineage, "(fallback from mni2009c request)")
+    } else {
+      source_info$lineage
+    },
+    confidence = if (source == "mni2009c") {
+      if (is.null(outspace)) "high" else "approximate"
+    } else {
+      "uncertain"
+    },
+    notes = source_info$notes
+  )
+
+  .attach_atlas_ref(ret, ref)
 }
 
 #' @rdname map_atlas
@@ -326,7 +384,86 @@ glasser_surf <- function(space = "fsaverage",
   )
 
   class(ret) <- c("glasser_surf", "surfatlas", "atlas")
-  ret
+  ref <- new_atlas_ref(
+    family = "glasser",
+    model = "HCP-MMP1.0",
+    representation = "surface",
+    template_space = "fsaverage",
+    coord_space = get_surface_coordinate_space("fsaverage"),
+    density = "164k",
+    provenance = "https://doi.org/10.6084/m9.figshare.3498446",
+    source = "mills_figshare_fsaverage",
+    lineage = "Projected from HCP fsLR32k labels to fsaverage surface.",
+    confidence = "high"
+  )
+
+  .attach_atlas_ref(ret, ref)
+}
+
+
+#' @keywords internal
+#' @noRd
+.glasser_volume_source_info <- function(source) {
+  if (identical(source, "mni2009c")) {
+    return(list(
+      fname = "MMP_in_MNI_corr.nii.gz",
+      volume_url = paste0(
+        "https://raw.githubusercontent.com/Raj-Lab-UCSF/",
+        "Human_Brain_Atlases-glasser/master/MMP_in_MNI_corr.nii.gz"
+      ),
+      label_url = paste0(
+        "https://github.com/PennBBL/xcpEngine/raw/master/atlas/",
+        "glasser360/glasser360NodeNames.txt"
+      ),
+      provenance = paste(
+        "MNI2009c volume (MMP_in_MNI_corr) mirrored at",
+        "https://github.com/Raj-Lab-UCSF/Human_Brain_Atlases-glasser"
+      ),
+      lineage = "Surface reconstruction/projection to MNI152NLin2009cAsym volume.",
+      notes = "Default source with explicit 2009c provenance."
+    ))
+  }
+
+  warning(
+    "Using legacy source='xcpengine' with uncertain template provenance. ",
+    "Prefer source='mni2009c' for explicit 2009c alignment.",
+    call. = FALSE
+  )
+
+  list(
+    fname = "glasser360MNI.nii.gz",
+    volume_url = paste0(
+      "https://github.com/PennBBL/xcpEngine/raw/master/atlas/",
+      "glasser360/glasser360MNI.nii.gz"
+    ),
+    label_url = paste0(
+      "https://github.com/PennBBL/xcpEngine/raw/master/atlas/",
+      "glasser360/glasser360NodeNames.txt"
+    ),
+    provenance = "https://github.com/PennBBL/xcpEngine/tree/master/atlas/glasser360",
+    lineage = "xcpEngine-distributed volumetric derivative.",
+    notes = "Template identity is not explicitly documented by the source."
+  )
+}
+
+
+#' @keywords internal
+#' @noRd
+.download_glasser_volume <- function(url, fname) {
+  des <- file.path(tempdir(), fname)
+  downloader::download(url, des)
+  des
+}
+
+
+#' @keywords internal
+#' @noRd
+.is_lfs_pointer_file <- function(path) {
+  if (!file.exists(path)) {
+    return(FALSE)
+  }
+  hdr <- tryCatch(readLines(path, n = 1L, warn = FALSE), error = function(e) "")
+  identical(hdr, "version https://git-lfs.github.com/spec/v1")
 }
 
 
@@ -345,9 +482,9 @@ glasser_surf <- function(space = "fsaverage",
   }
 
   url <- if (hemi == "lh") {
-    "https://figshare.com/ndownloader/files/5528816"
+    "https://ndownloader.figshare.com/files/5528816"
   } else {
-    "https://figshare.com/ndownloader/files/5528819"
+    "https://ndownloader.figshare.com/files/5528819"
   }
 
   tmp <- tempfile(fileext = ".annot")
@@ -387,17 +524,33 @@ glasser_surf <- function(space = "fsaverage",
     NULL
   })
 
-  geom <- if (!is.null(surf_path) && file.exists(surf_path)) {
-    neurosurf::read_surf_geometry(surf_path)
-  } else {
-    # Fallback to packaged fsaverage surfaces if TemplateFlow is unavailable
+  geom <- NULL
+  if (!is.null(surf_path) && file.exists(surf_path)) {
+    geom <- tryCatch(
+      neurosurf::read_surf_geometry(surf_path),
+      error = function(e) NULL
+    )
+    # Fallback: read GIFTI directly if neurosurf parser fails
+    if (is.null(geom) && requireNamespace("gifti", quietly = TRUE)) {
+      geom <- tryCatch({
+        gii <- gifti::readgii(surf_path)
+        hemi_label <- if (hemi == "lh") "left" else "right"
+        neurosurf::SurfaceGeometry(
+          vert = gii$data[[1]], faces = gii$data[[2]], hemi = hemi_label
+        )
+      }, error = function(e) NULL)
+    }
+  }
+  if (is.null(geom)) {
+    # Fallback to packaged fsaverage surfaces (low-res, may cause vertex
+    # mismatch with full-resolution annotation files)
     data("fsaverage", package = "neuroatlas", envir = environment())
     fsavg_obj <- get("fsaverage", envir = environment())
     surf_name <- paste0(hemi, "_", surf)
     if (is.null(fsavg_obj[[surf_name]])) {
       stop("Failed to load fsaverage surface geometry for hemisphere ", hemi, " (", surf, ")")
     }
-    fsavg_obj[[surf_name]]
+    geom <- fsavg_obj[[surf_name]]
   }
 
   annot <- suppressWarnings(
@@ -405,9 +558,11 @@ glasser_surf <- function(space = "fsaverage",
   )
 
   # Basic sanity check: number of vertices should match
-  n_vertices <- ncol(geom@mesh$vb) - 1L
+  n_vertices <- ncol(geom@mesh$vb)
   if (length(annot@data) != n_vertices) {
-    stop("Vertex mismatch between Glasser annotation and fsaverage surface for hemisphere ", hemi)
+    stop("Vertex mismatch between Glasser annotation (", length(annot@data),
+         " vertices) and fsaverage surface (", n_vertices,
+         " vertices) for hemisphere ", hemi)
   }
 
   annot

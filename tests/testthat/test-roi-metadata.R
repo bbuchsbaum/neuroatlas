@@ -172,3 +172,54 @@ test_that("roi_metadata color columns are integers", {
   expect_type(meta$color_g, "integer")
   expect_type(meta$color_b, "integer")
 })
+
+test_that("roi_metadata.atlas includes atlas_ref columns when available", {
+  # Create a mock atlas with atlas_ref
+  ref <- new_atlas_ref(
+    family = "test",
+    model = "TestAtlas",
+    representation = "volume",
+    template_space = "MNI152NLin6Asym",
+    coord_space = "MNI152",
+    confidence = "high"
+  )
+
+  mock_atlas <- list(
+    ids = 1:3,
+    labels = c("region_a", "region_b", "region_c"),
+    orig_labels = c("Region_A", "Region_B", "Region_C"),
+    hemi = c("left", "left", "right"),
+    cmap = data.frame(r = c(255, 0, 0), g = c(0, 255, 0), b = c(0, 0, 255)),
+    network = NULL,
+    atlas_ref = ref
+  )
+  class(mock_atlas) <- "atlas"
+
+  meta <- roi_metadata(mock_atlas)
+
+  expect_true("template_space" %in% names(meta))
+  expect_true("coord_space" %in% names(meta))
+  expect_true("atlas_family" %in% names(meta))
+  expect_equal(unique(meta$template_space), "MNI152NLin6Asym")
+  expect_equal(unique(meta$coord_space), "MNI152")
+  expect_equal(unique(meta$atlas_family), "test")
+})
+
+test_that("roi_metadata.atlas works without atlas_ref", {
+  mock_atlas <- list(
+    ids = 1:2,
+    labels = c("a", "b"),
+    orig_labels = c("A", "B"),
+    hemi = c("left", "right"),
+    cmap = data.frame(r = c(255, 0), g = c(0, 255), b = c(0, 0)),
+    network = NULL
+  )
+  class(mock_atlas) <- "atlas"
+
+  meta <- roi_metadata(mock_atlas)
+
+  # Should NOT have atlas_ref columns
+  expect_false("template_space" %in% names(meta))
+  expect_false("coord_space" %in% names(meta))
+  expect_false("atlas_family" %in% names(meta))
+})

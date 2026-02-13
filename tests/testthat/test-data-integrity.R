@@ -150,6 +150,17 @@ test_that("Edge cases in atlas operations are handled correctly", {
     expect_true(all(reduced_uniform$value == 42))
   }
   
-  # Test 3: Extreme values - skip as reduce_atlas is not implemented
-  skip("reduce_atlas method not yet implemented")
+  # Test 3: Extreme values
+  extreme_data <- neuroim2::NeuroVol(
+    rep(.Machine$double.xmax / 2, prod(dim(test_vol))),
+    space = neuroim2::space(test_vol)
+  )
+
+  reduced_extreme <- tryCatch({
+    reduce_atlas(atlas, extreme_data, mean)
+  }, error = function(e) e)
+
+  if (!inherits(reduced_extreme, "error")) {
+    expect_true(all(is.finite(reduced_extreme$value)))
+  }
 })

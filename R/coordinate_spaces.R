@@ -379,6 +379,149 @@ get_surface_coordinate_space <- function(template_id) {
 }
 
 
+#' Get Coordinate Space for Any Template
+#'
+#' Determine which standard coordinate space a template's data are defined in.
+#' Handles both surface templates (e.g., fsaverage) and volumetric templates
+#' (e.g., MNI152NLin6Asym).
+#'
+#' @param template_id Character string identifying the template.
+#'   Examples: "fsaverage", "fsaverage6", "fsLR_32k", "MNI152NLin6Asym",
+#'   "MNI152NLin2009cAsym", "MNI152", "MNI305".
+#'
+#' @return Character string indicating the coordinate space
+#'   (`"MNI305"`, `"MNI152"`, or `"Unknown"`).
+#'
+#' @details
+#' This function normalizes the input using the same alias resolution as the
+#' space transform registry, then maps it to a coordinate space:
+#' \describe{
+#'   \item{MNI305}{fsaverage, fsaverage5, fsaverage6, MNI305}
+#'   \item{MNI152}{fsLR_32k, MNI152, MNI152NLin6Asym, MNI152NLin2009cAsym}
+#' }
+#'
+#' @seealso [get_surface_coordinate_space()] for the surface-only version,
+#'   [needs_coord_transform()] and [needs_template_warp()] for transform checks.
+#'
+#' @examples
+#' template_to_coord_space("fsaverage")            # "MNI305"
+#' template_to_coord_space("MNI152NLin6Asym")      # "MNI152"
+#' template_to_coord_space("MNI152NLin2009cAsym")   # "MNI152"
+#' template_to_coord_space("fsLR_32k")              # "MNI152"
+#'
+#' @export
+template_to_coord_space <- function(template_id) {
+  if (!is.character(template_id) || length(template_id) != 1L) {
+    stop("'template_id' must be a single character string")
+  }
+
+  normalized <- .normalize_space_id(template_id)
+
+  mni305_templates <- c("fsaverage", "fsaverage5", "fsaverage6", "MNI305")
+  mni152_templates <- c("fsLR_32k", "MNI152", "MNI152NLin6Asym",
+                         "MNI152NLin2009cAsym")
+
+  if (normalized %in% mni305_templates) {
+    return(coord_spaces$MNI305)
+  }
+  if (normalized %in% mni152_templates) {
+    return(coord_spaces$MNI152)
+  }
+
+  warning("Unknown template '", template_id,
+          "'. Returning 'Unknown' coordinate space.")
+  coord_spaces$UNKNOWN
+}
+
+
+#' Check if a Coordinate Transform is Needed
+#'
+#' Determines whether two template spaces require an affine coordinate
+#' transform (e.g., MNI305 to MNI152).
+#'
+#' @param from Source template space identifier.
+#' @param to Target template space identifier.
+#'
+#' @return Logical. `TRUE` if the coordinate spaces differ, `FALSE` if they
+#'   match, `NA` if either space is unknown.
+#'
+#' @details
+#' This checks whether the *coordinate systems* differ (MNI305 vs MNI152),
+#' which requires an affine transform. It does NOT check whether the template
+#' grids differ within the same coordinate system (use [needs_template_warp()]
+#' for that).
+#'
+#' @seealso [needs_template_warp()] for checking template-grid differences,
+#'   [template_to_coord_space()] for the underlying lookup.
+#'
+#' @examples
+#' needs_coord_transform("fsaverage", "MNI152NLin6Asym")  # TRUE
+#' needs_coord_transform("fsaverage", "MNI305")            # FALSE
+#' needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # FALSE
+#'
+#' @export
+needs_coord_transform <- function(from, to) {
+  from_coord <- template_to_coord_space(from)
+  to_coord <- template_to_coord_space(to)
+
+  if (from_coord == coord_spaces$UNKNOWN || to_coord == coord_spaces$UNKNOWN) {
+    warning("Cannot determine coord transform need for unknown template(s)")
+    return(NA)
+  }
+
+  from_coord != to_coord
+}
+
+
+#' Check if a Nonlinear Template Warp is Needed
+#'
+#' Determines whether two template spaces are in the same coordinate system
+#' but on different template grids, requiring a nonlinear warp.
+#'
+#' @param from Source template space identifier.
+#' @param to Target template space identifier.
+#'
+#' @return Logical. `TRUE` if the templates share a coordinate space but differ
+#'   in grid/registration, `FALSE` otherwise, `NA` if either space is unknown.
+#'
+#' @details
+#' This function identifies cases where an affine transform is NOT needed but
+#' a nonlinear warp IS needed. For example, MNI152NLin6Asym and
+#' MNI152NLin2009cAsym are both in MNI152 coordinate space but use different
+#' nonlinear registration targets, so voxel grids don't align exactly
+#' (~2mm difference).
+#'
+#' @seealso [needs_coord_transform()] for checking coordinate-space differences,
+#'   [atlas_transform_plan()] for planning multi-step transforms.
+#'
+#' @examples
+#' needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # TRUE
+#' needs_template_warp("fsaverage", "fsaverage6")                   # TRUE
+#' needs_template_warp("fsaverage", "MNI152")                       # FALSE (different coord spaces)
+#' needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym")       # FALSE (identical)
+#'
+#' @export
+needs_template_warp <- function(from, to) {
+  from_norm <- .normalize_space_id(from)
+  to_norm <- .normalize_space_id(to)
+
+  if (identical(from_norm, to_norm)) {
+    return(FALSE)
+  }
+
+  from_coord <- template_to_coord_space(from)
+  to_coord <- template_to_coord_space(to)
+
+  if (from_coord == coord_spaces$UNKNOWN || to_coord == coord_spaces$UNKNOWN) {
+    warning("Cannot determine template warp need for unknown template(s)")
+    return(NA)
+  }
+
+  # Warp needed only when coord spaces match but templates differ
+  identical(from_coord, to_coord)
+}
+
+
 #' Check if Transform is Needed Between Spaces
 #'
 #' Convenience function to check whether a coordinate transform is required
