@@ -36,7 +36,6 @@ Imports:
     scico,
     stringr,
     tibble,
-    tidyr,
     tools,
     utils
 Suggests:
@@ -46,6 +45,9 @@ Suggests:
     FNN,
     geojsonio,
     geojsonsf,
+    ggseg,
+    gifti,
+    htmltools,
     jsonlite,
     knitr,
     patchwork,

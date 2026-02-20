@@ -128,7 +128,7 @@ ggseg_schaefer(parcels = 200, networks = 7) +
   data structures
 - [neurosurf](https://github.com/bbuchsbaum/neurosurf) - Surface-based
   operations
-- [ggseg](https://github.com/ggseg/ggseg) - Brain visualization
+- [ggseg](https://github.com/ggsegverse/ggseg) - Brain visualization
 
 ## License
 

@@ -3,8 +3,10 @@ title: 'Surface Templates: Geometry vs. Data'
 author: neuroatlas Dev Team
 date: '`r Sys.Date()`'
 output: rmarkdown::html_vignette
-vignette: |
-  %\VignetteIndexEntry{Surface Templates: Geometry vs. Data} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+vignette: >
+  %\VignetteIndexEntry{Surface Templates: Geometry vs. Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 params:
   family: red
 css: albers.css

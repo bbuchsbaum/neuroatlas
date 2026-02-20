@@ -3,8 +3,10 @@ title: Surface Parcellations with neurosurf
 author: neuroatlas Dev Team
 date: '`r Sys.Date()`'
 output: rmarkdown::html_vignette
-vignette: |
-  %\VignetteIndexEntry{Surface Parcellations with neurosurf} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+vignette: >
+  %\VignetteIndexEntry{Surface Parcellations with neurosurf}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 params:
   family: red
 css: albers.css

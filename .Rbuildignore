@@ -30,3 +30,7 @@
 ^README\.html$
 ^neuroatlas_cheatsheet_v3\.md$
 ^vignettes/.*_cache$
+^\.ecosystem\.yml$
+^\.rcmdcheck_result\.rds$
+^Rplots\.pdf$
+^plans$

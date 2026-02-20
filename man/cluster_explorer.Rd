@@ -42,14 +42,19 @@ cluster_explorer(
 (\code{n x 3} matrix) or indices. Rows of the returned matrix correspond to
 samples/design rows.}
 
-\item{atlas}{A volumetric \code{atlas} object used for parcel annotation.}
+\item{atlas}{A volumetric \code{atlas} object used for parcel annotation.
+When atlas and \code{stat_map} dimensions differ, the atlas is
+automatically resampled to \code{stat_map} space (nearest-neighbor labels)
+before cluster annotation.}
 
 \item{stat_map}{A \code{NeuroVol} statistic image used for thresholding and
 clustering.}
 
 \item{surfatlas}{A surface atlas object used by \code{\link{plot_brain}()}.
-If \code{NULL} and all primary data inputs are also \code{NULL}, a bundled
-synthetic demo dataset is used.}
+If \code{NULL}, the function attempts to infer a surface atlas from a
+compatible `atlas` input (for example Schaefer or Glasser). If
+inference is not possible, and non-demo inputs are otherwise present, input
+validation fails.}
 
 \item{sample_table}{Optional data frame with one row per sample. If
 \code{NULL}, a default table with \code{.sample_index} is created.}

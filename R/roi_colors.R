@@ -911,7 +911,7 @@ roi_colors_embedding <- function(rois,
     E <- uwot::umap(
       X,
       n_components = 2,
-      n_neighbors = 15,
+      n_neighbors = min(15L, nrow(X) - 1L),
       min_dist = 0.25,
       metric = "euclidean",
       ret_model = FALSE

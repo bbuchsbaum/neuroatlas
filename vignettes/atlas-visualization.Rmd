@@ -1,8 +1,10 @@
 ---
 title: Atlas Visualization with Optimal Colours
 output: rmarkdown::html_vignette
-vignette: |
-  %\VignetteIndexEntry{Atlas Visualization with Optimal Colours} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+vignette: >
+  %\VignetteIndexEntry{Atlas Visualization with Optimal Colours}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 params:
   family: red
 css: albers.css

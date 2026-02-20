@@ -28,7 +28,10 @@ build_cluster_explorer_data(
 (\code{n x 3} matrix) or indices. Rows of the returned matrix correspond to
 samples/design rows.}
 
-\item{atlas}{A volumetric \code{atlas} object used for parcel annotation.}
+\item{atlas}{A volumetric \code{atlas} object used for parcel annotation.
+When atlas and \code{stat_map} dimensions differ, the atlas is
+automatically resampled to \code{stat_map} space (nearest-neighbor labels)
+before cluster annotation.}
 
 \item{stat_map}{A \code{NeuroVol} statistic image used for thresholding and
 clustering.}

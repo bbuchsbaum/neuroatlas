@@ -1,3 +1,5 @@
+utils::globalVariables(c("signal", "cluster_id"))
+
 #' Build Cluster Explorer Data
 #'
 #' Compute sign-aware volumetric connected components from a statistic map,
@@ -1499,13 +1501,15 @@ infer_design_var_type <- function(x) {
   sphere_units <- match.arg(sphere_units)
   sphere_combine <- match.arg(sphere_combine)
 
-  aligned <- .harmonize_cluster_explorer_atlas(atlas, stat_map)
-  atlas <- aligned$atlas
-  if (!is.null(aligned$message)) {
-    message(aligned$message)
-  }
-  if (!is.null(aligned$warning)) {
-    warning(aligned$warning, call. = FALSE)
+  if (!identical(selection_engine, "custom")) {
+    aligned <- .harmonize_cluster_explorer_atlas(atlas, stat_map)
+    atlas <- aligned$atlas
+    if (!is.null(aligned$message)) {
+      message(aligned$message)
+    }
+    if (!is.null(aligned$warning)) {
+      warning(aligned$warning, call. = FALSE)
+    }
   }
 
   if (identical(selection_engine, "cluster")) {
@@ -3027,6 +3031,8 @@ infer_design_var_type <- function(x) {
     {
       if (!is.null(series_fun)) {
         series_fun(data_source, voxel_coords)
+      } else if (methods::is(data_source, "NeuroVol")) {
+        matrix(data_source[voxel_coords], nrow = 1)
       } else {
         neuroim2::series(data_source, voxel_coords)
       }

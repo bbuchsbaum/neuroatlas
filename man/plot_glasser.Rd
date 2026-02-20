@@ -20,8 +20,7 @@ containing the values to plot. Defaults to "value"}
 \item{position}{Character string specifying layout type.}
 }
 \value{
-An echarts4r visualization object or an error if dependencies are
-  unavailable.
+An error; this function has been removed.
 }
 \description{
 `r lifecycle::badge("deprecated")`

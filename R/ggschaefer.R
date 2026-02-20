@@ -24,39 +24,11 @@ utils::globalVariables(c("hemi", "orig_label", "hemi.x", "hemi.y", "x", "y", "gr
 #' @importFrom stringr str_extract_all
 #' @export
 get_ggseg_atlas <- function(atlas) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "0.2.0", "get_ggseg_atlas()",
     "plot_brain()",
     details = "Use schaefer_surf() + plot_brain() for surface visualisation."
   )
-
-  if (!requireNamespace("ggsegSchaefer", quietly = TRUE)) {
-    stop("Package 'ggsegSchaefer' is required for this deprecated function but is not installed.\n",
-         "Consider using plot_brain(schaefer_surf(...)) instead.",
-         call. = FALSE)
-  }
-
-  matches <- stringr::str_extract_all(atlas$name, "\\d+")
-  atlas_num <- unlist(matches)
-  parcels <- as.numeric(atlas_num[1])
-  networks <- as.numeric(atlas_num[2])
-
-  if ((parcels %in% seq(100, 1000, 100)) && (networks %in% c(7, 17))) {
-    atlas_string <- paste0("schaefer", networks, "_", parcels)
-    atlas_obj <- tryCatch({
-      if (exists(atlas_string, envir = asNamespace("ggsegSchaefer"))) {
-        get(atlas_string, envir = asNamespace("ggsegSchaefer"))
-      } else {
-        eval(parse(text = paste0("ggsegSchaefer::", atlas_string)))
-      }
-    }, error = function(e) {
-      stop("Failed to load atlas '", atlas_string, "' from ggsegSchaefer: ", e$message,
-           call. = FALSE)
-    })
-    return(atlas_obj)
-  } else {
-    stop("Invalid atlas name. Must be Schaefer atlas with 7 or 17 networks and 100-1000 parcels.")
-  }
 }
 
 #' @rdname map_atlas
@@ -133,57 +105,9 @@ map_to_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE) {
 ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
                            palette = "Spectral", interactive = TRUE,
                            lim = range(vals)) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "0.2.0", "ggseg_schaefer()",
     "plot_brain()",
     details = "Use plot_brain(schaefer_surf(...), vals = ...) instead."
   )
-
-  if (!requireNamespace("ggseg", quietly = TRUE) ||
-      !requireNamespace("ggsegSchaefer", quietly = TRUE)) {
-    stop("Packages 'ggseg' and 'ggsegSchaefer' are required for this deprecated function.\n",
-         "Consider using plot_brain(schaefer_surf(...), vals = ...) instead.",
-         call. = FALSE)
-  }
-
-  mapped_data <- map_atlas.atlas(atlas, vals, thresh = thresh, pos = pos)
-
-  # Attempt legacy ggseg path if packages are available
-  gatl <- get_ggseg_atlas(atlas)
-  gatl$data <- mapped_data
-
-  ggseg_fn <- get("ggseg", envir = asNamespace("ggseg"))
-  ggobj <- ggseg_fn(
-    atlas = gatl,
-    position = "stacked",
-    colour = "gray",
-    guide = TRUE,
-    mapping = aes(fill = .data$statistic)
-  )
-
-  ggobj <- ggobj +
-    scale_fill_distiller(
-      palette = palette,
-      limits = lim,
-      direction = -1,
-      oob = scales::squish
-    )
-
-  if (interactive) {
-    ggiraph::girafe(
-      ggobj = ggobj,
-      width_svg = 8,
-      height_svg = 6,
-      options = list(
-        opts_tooltip(opacity = .7,
-                     css = "font-family: Arial, Helvetica, sans-serif;"),
-        opts_hover(css = "fill:yellow;"),
-        opts_selection(css = "fill:red;",
-                       type = "single",
-                       only_shiny = FALSE)
-      )
-    )
-  } else {
-    ggobj
-  }
 }
