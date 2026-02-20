@@ -64,16 +64,7 @@ get_ggseg_atlas <- function(atlas) {
   }
 
   atlas_string <- paste0("schaefer", networks, "_", parcels)
-  atlas_obj <- tryCatch(
-    get(atlas_string, envir = asNamespace("ggsegSchaefer"), inherits = FALSE),
-    error = function(e) {
-      stop(
-        "Failed to load atlas '", atlas_string,
-        "' from ggsegSchaefer: ", e$message,
-        call. = FALSE
-      )
-    }
-  )
+  atlas_obj <- .load_ggseg_schaefer_atlas(atlas_string)
 
   atlas_obj
 }
@@ -235,4 +226,55 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
   }
 
   dplyr::left_join(ggseg_data, mapped_data, by = join_by)
+}
+
+#' Load a ggsegSchaefer atlas object with namespace and data() fallback
+#' @keywords internal
+#' @noRd
+.load_ggseg_schaefer_atlas <- function(atlas_string, pkg = "ggsegSchaefer",
+                                       namespace_env = NULL,
+                                       data_loader = utils::data) {
+  if (is.null(namespace_env)) {
+    namespace_env <- asNamespace(pkg)
+  }
+
+  namespace_error <- NULL
+  atlas_obj <- tryCatch(
+    get(atlas_string, envir = namespace_env, inherits = FALSE),
+    error = function(e) {
+      namespace_error <<- conditionMessage(e)
+      NULL
+    }
+  )
+
+  if (!is.null(atlas_obj)) {
+    return(atlas_obj)
+  }
+
+  data_env <- new.env(parent = emptyenv())
+  data_error <- NULL
+  tryCatch(
+    suppressWarnings(
+      data_loader(list = atlas_string, package = pkg, envir = data_env)
+    ),
+    error = function(e) {
+      data_error <<- conditionMessage(e)
+      NULL
+    }
+  )
+
+  if (exists(atlas_string, envir = data_env, inherits = FALSE)) {
+    return(get(atlas_string, envir = data_env, inherits = FALSE))
+  }
+
+  if (is.null(data_error)) {
+    data_error <- "object not found via data() fallback"
+  }
+
+  stop(
+    "Failed to load atlas '", atlas_string, "' from ", pkg, ": ",
+    "namespace lookup error [", namespace_error, "]; ",
+    "data() fallback error [", data_error, "]",
+    call. = FALSE
+  )
 }
