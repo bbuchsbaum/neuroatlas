@@ -1,0 +1,11 @@
+ecosystem: true
+package: neuroatlas
+language: R
+role: ingest
+tags:
+  - bids
+  - neuroimaging
+  - fmri
+entrypoints: []
+release_tag: eco-atlas
+asset: atlas-pack.tgz
