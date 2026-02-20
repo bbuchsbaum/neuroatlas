@@ -66,7 +66,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Bradley Buchsbaum \email{brad.buchsbaum@gmail.com} (\href{https://orcid.org/0000-0000-0000-0000}{ORCID})
+\strong{Maintainer}: Bradley Buchsbaum \email{brad.buchsbaum@gmail.com} (\href{https://orcid.org/0000-0002-1108-4866}{ORCID})
 
 }
 \keyword{internal}

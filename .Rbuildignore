@@ -8,6 +8,7 @@
 ^\.Rproj\.user$
 ^\.claude$
 ^AGENTS\.md$
+^R/AGENTS\.md$
 ^\.github$
 ^\.httr-oauth$
 ^\.zenodo\.json$
