@@ -60,7 +60,10 @@ Suggests:
 VignetteBuilder:
     knitr
 Remotes:
-    bbuchsbaum/neurosurf
+    bbuchsbaum/neurosurf,
+    bbuchsbaum/albersdown,
+    ggseg/ggsegGlasser,
+    ggseg/ggsegSchaefer
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB
