@@ -16,14 +16,23 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-tags: true
       - name: Get tag
+        id: get_tag
         run: |
           git fetch --tags --force
-          TAG=$(git tag --contains $(git rev-parse HEAD))
-          TAG_BODY=$(git tag --contains $(git rev-parse HEAD) --format='%(contents)')
+          TAG=$(git tag --contains $(git rev-parse HEAD) | head -n1)
           echo "tag=$TAG" >> $GITHUB_ENV
-          echo "$TAG_BODY" > body.md
+          echo "has_tag=$( [ -n \"$TAG\" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          if [ -n "$TAG" ]; then
+            TAG_BODY=$(git tag -l "$TAG" --format='%(contents)')
+            echo "$TAG_BODY" > body.md
+          else
+            echo "No tag on this commit — skipping release." > body.md
+          fi
       - uses: ncipollo/release-action@v1
+        if: steps.get_tag.outputs.has_tag == 'true'
         with:
           name: Release ${{ env.tag }}
           tag: ${{ env.tag }}
