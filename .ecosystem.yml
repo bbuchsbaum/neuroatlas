@@ -3,9 +3,30 @@ package: neuroatlas
 language: R
 role: ingest
 tags:
-  - bids
   - neuroimaging
-  - fmri
-entrypoints: []
+  - atlas
+  - parcellation
+  - mni
+  - templateflow
+  - surface
+  - schaefer
+  - glasser
+  - freesurfer
+  - roi
+  - visualization
+entrypoints:
+  - get_schaefer_atlas
+  - get_glasser_atlas
+  - get_aseg_atlas
+  - get_olsen_mtl
+  - get_template
+  - map_atlas
+  - reduce_atlas
+  - get_roi
+  - dilate_atlas
+  - plot_brain
+  - cluster_explorer
+  - merge_atlases
+  - filter_atlas
 release_tag: eco-atlas
 asset: atlas-pack.tgz
