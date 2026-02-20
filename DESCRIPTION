@@ -46,9 +46,6 @@ Suggests:
     FNN,
     geojsonio,
     geojsonsf,
-    ggseg,
-    ggsegGlasser,
-    ggsegSchaefer,
     jsonlite,
     knitr,
     patchwork,
@@ -61,9 +58,7 @@ VignetteBuilder:
     knitr
 Remotes:
     bbuchsbaum/neurosurf,
-    bbuchsbaum/albersdown,
-    ggseg/ggsegGlasser,
-    ggseg/ggsegSchaefer
+    bbuchsbaum/albersdown
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB

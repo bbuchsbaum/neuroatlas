@@ -152,7 +152,8 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
   gatl <- get_ggseg_atlas(atlas)
   gatl$data <- mapped_data
 
-  ggobj <- ggseg::ggseg(
+  ggseg_fn <- get("ggseg", envir = asNamespace("ggseg"))
+  ggobj <- ggseg_fn(
     atlas = gatl,
     position = "stacked",
     colour = "gray",
