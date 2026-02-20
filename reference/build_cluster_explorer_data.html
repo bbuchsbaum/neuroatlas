@@ -84,7 +84,10 @@ samples/design rows.</p></dd>
 
 
 <dt id="arg-atlas">atlas<a class="anchor" aria-label="anchor" href="#arg-atlas"></a></dt>
-<dd><p>A volumetric <code>atlas</code> object used for parcel annotation.</p></dd>
+<dd><p>A volumetric <code>atlas</code> object used for parcel annotation.
+When atlas and <code>stat_map</code> dimensions differ, the atlas is
+automatically resampled to <code>stat_map</code> space (nearest-neighbor labels)
+before cluster annotation.</p></dd>
 
 
 <dt id="arg-stat-map">stat_map<a class="anchor" aria-label="anchor" href="#arg-stat-map"></a></dt>

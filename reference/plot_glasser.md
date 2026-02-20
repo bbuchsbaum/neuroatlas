@@ -35,8 +35,7 @@ plot_glasser(vals = NULL, value_col = "value", position = "dispersed")
 
 ## Value
 
-An echarts4r visualization object or an error if dependencies are
-unavailable.
+An error; this function has been removed.
 
 ## Examples
 

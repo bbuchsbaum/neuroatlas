@@ -37,7 +37,9 @@ build_cluster_explorer_data(
 
 - atlas:
 
-  A volumetric `atlas` object used for parcel annotation.
+  A volumetric `atlas` object used for parcel annotation. When atlas and
+  `stat_map` dimensions differ, the atlas is automatically resampled to
+  `stat_map` space (nearest-neighbor labels) before cluster annotation.
 
 - stat_map:
 

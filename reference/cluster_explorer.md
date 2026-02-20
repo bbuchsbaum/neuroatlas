@@ -51,7 +51,9 @@ cluster_explorer(
 
 - atlas:
 
-  A volumetric `atlas` object used for parcel annotation.
+  A volumetric `atlas` object used for parcel annotation. When atlas and
+  `stat_map` dimensions differ, the atlas is automatically resampled to
+  `stat_map` space (nearest-neighbor labels) before cluster annotation.
 
 - stat_map:
 
@@ -60,8 +62,10 @@ cluster_explorer(
 - surfatlas:
 
   A surface atlas object used by [`plot_brain()`](plot_brain.md). If
-  `NULL` and all primary data inputs are also `NULL`, a bundled
-  synthetic demo dataset is used.
+  `NULL`, the function attempts to infer a surface atlas from a
+  compatible \`atlas\` input (for example Schaefer or Glasser). If
+  inference is not possible, and non-demo inputs are otherwise present,
+  input validation fails.
 
 - sample_table:
 

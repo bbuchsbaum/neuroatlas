@@ -98,7 +98,10 @@ samples/design rows.</p></dd>
 
 
 <dt id="arg-atlas">atlas<a class="anchor" aria-label="anchor" href="#arg-atlas"></a></dt>
-<dd><p>A volumetric <code>atlas</code> object used for parcel annotation.</p></dd>
+<dd><p>A volumetric <code>atlas</code> object used for parcel annotation.
+When atlas and <code>stat_map</code> dimensions differ, the atlas is
+automatically resampled to <code>stat_map</code> space (nearest-neighbor labels)
+before cluster annotation.</p></dd>
 
 
 <dt id="arg-stat-map">stat_map<a class="anchor" aria-label="anchor" href="#arg-stat-map"></a></dt>
@@ -108,8 +111,10 @@ clustering.</p></dd>
 
 <dt id="arg-surfatlas">surfatlas<a class="anchor" aria-label="anchor" href="#arg-surfatlas"></a></dt>
 <dd><p>A surface atlas object used by <code><a href="plot_brain.html">plot_brain()</a></code>.
-If <code>NULL</code> and all primary data inputs are also <code>NULL</code>, a bundled
-synthetic demo dataset is used.</p></dd>
+If <code>NULL</code>, the function attempts to infer a surface atlas from a
+compatible `atlas` input (for example Schaefer or Glasser). If
+inference is not possible, and non-demo inputs are otherwise present, input
+validation fails.</p></dd>
 
 
 <dt id="arg-sample-table">sample_table<a class="anchor" aria-label="anchor" href="#arg-sample-table"></a></dt>
