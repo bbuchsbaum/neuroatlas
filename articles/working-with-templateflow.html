@@ -11,7 +11,7 @@
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="Working with TemplateFlow in neuroatlas">
+<script src="../extra.js"></script><meta property="og:title" content="Working with TemplateFlow in neuroatlas">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -34,7 +34,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+<li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+    <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
+    <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
   </ul>
 </li>
@@ -62,7 +65,7 @@
                         <h4 data-toc-skip class="author">neuroatlas Dev
 Team</h4>
             
-            <h4 data-toc-skip class="date">2025-08-20</h4>
+            <h4 data-toc-skip class="date">2026-02-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/vignettes/working-with-templateflow.Rmd" class="external-link"><code>vignettes/working-with-templateflow.Rmd</code></a></small>
       <div class="d-none name"><code>working-with-templateflow.Rmd</code></div>
@@ -126,43 +129,132 @@ template space identifiers:</p>
 <code class="sourceCode R"><span><span class="co"># List all available template spaces</span></span>
 <span><span class="va">all_templates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_spaces.html">tflow_spaces</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">all_templates</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total templates available:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_templates</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
-<p>Example output:</p>
-<pre><code><span><span class="co">#&gt; [1] "AMYGDALA" "ARA"      "BRODMANN" "CHARITE"  "Fischer344" "GS"</span></span>
-<span><span class="co">#&gt; Total templates available: 76</span></span></code></pre>
+<span><span class="co">#&gt; [1] "Fischer344"          "MNI152Lin"           "MNI152NLin2009aAsym"</span></span>
+<span><span class="co">#&gt; [4] "MNI152NLin2009aSym"  "MNI152NLin2009bAsym" "MNI152NLin2009bSym"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total templates available:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_templates</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total templates available: 30</span></span></code></pre></div>
+<p>(If nothing prints here during build, see the note below.)</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"TemplateFlow was not available during vignette build.\n"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Run the chunk locally to see your real template list.\n"</span><span class="op">)</span></span></code></pre></div>
 <p>You can also filter this list with a pattern (regular
 expression):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Find all MNI templates</span></span>
 <span><span class="va">mni_templates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_spaces.html">tflow_spaces</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"MNI"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_templates</span><span class="op">)</span></span></code></pre></div>
-<p>Example output:</p>
-<pre><code><span><span class="co">#&gt; [1] "MNI152Lin"           "MNI152NLin2009cAsym" "MNI152NLin6Asym"    </span></span>
-<span><span class="co">#&gt; [4] "MNI152NLin6Sym"      "MNIInfant"           "MNIPediatricAsym"</span></span></code></pre>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_templates</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "MNI152Lin"           "MNI152NLin2009aAsym" "MNI152NLin2009aSym" </span></span>
+<span><span class="co">#&gt;  [4] "MNI152NLin2009bAsym" "MNI152NLin2009bSym"  "MNI152NLin2009cAsym"</span></span>
+<span><span class="co">#&gt;  [7] "MNI152NLin2009cSym"  "MNI152NLin6Asym"     "MNI152NLin6Sym"     </span></span>
+<span><span class="co">#&gt; [10] "MNI305"              "MNIColin27"          "MNIInfant"          </span></span>
+<span><span class="co">#&gt; [13] "MNIPediatricAsym"</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"TemplateFlow was not available during vignette build.\n"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Run this chunk locally to see matching MNI spaces.\n"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="listing-specific-files-metadata-query">Listing Specific Files (Metadata Query)<a class="anchor" aria-label="anchor" href="#listing-specific-files-metadata-query"></a>
+<h3 id="discovering-volumetric-templates">Discovering Volumetric Templates<a class="anchor" aria-label="anchor" href="#discovering-volumetric-templates"></a>
 </h3>
-<p>To find specific files within a template space based on metadata
-(like suffix, resolution, description), use
-<code><a href="../reference/tflow_files.html">tflow_files()</a></code>:</p>
+<p>Use <code><a href="../reference/tflow_files.html">tflow_files()</a></code> to query available volumetric files
+within a template space:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Find all T1w images for the 'MNI152NLin2009cAsym' space</span></span>
+<code class="sourceCode R"><span><span class="co"># Find all T1w images for MNI space</span></span>
 <span><span class="va">mni_t1w_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span></span>
 <span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
 <span>  query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">"T1w"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mni_t1w_files</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_t1w_files</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Find brain masks for 'MNI152NLin2009cAsym' at 1mm resolution</span></span>
-<span><span class="va">mni_brain_masks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span></span>
+<span><span class="co"># Find brain masks at specific resolution</span></span>
+<span><span class="va">mni_masks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span></span>
 <span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
 <span>  query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">"mask"</span>, desc <span class="op">=</span> <span class="st">"brain"</span>, resolution <span class="op">=</span> <span class="st">"1"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_brain_masks</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_masks</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Find tissue probability maps (GM, WM, CSF)</span></span>
+<span><span class="va">mni_probseg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span></span>
+<span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
+<span>  query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">"probseg"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_probseg</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Find all files at 2mm resolution</span></span>
+<span><span class="va">mni_2mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span></span>
+<span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
+<span>  query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>resolution <span class="op">=</span> <span class="st">"2"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_2mm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Find atlas/parcellation files</span></span>
+<span><span class="va">mni_atlases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span></span>
+<span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
+<span>  query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">"dseg"</span><span class="op">)</span>  <span class="co"># discrete segmentation</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_atlases</span><span class="op">)</span></span></code></pre></div>
+<p>Common volumetric query parameters: - <code>suffix</code>: “T1w”,
+“T2w”, “mask”, “probseg”, “dseg” - <code>desc</code>: “brain”, “head”,
+or specific descriptions - <code>resolution</code>: “1”, “2”, “01”, “02”
+(template-dependent) - <code>label</code>: “GM”, “WM”, “CSF” (for
+probseg files) - <code>atlas</code>: atlas name (e.g.,
+“Schaefer2018”)</p>
 <p>This function returns a character vector of full paths to the files
-that TemplateFlow would download/has cached.</p>
+that TemplateFlow has cached (downloading them if needed).</p>
 </div>
+<div class="section level3">
+<h3 id="discovering-surface-templates">Discovering Surface Templates<a class="anchor" aria-label="anchor" href="#discovering-surface-templates"></a>
+</h3>
+<p>TemplateFlow includes surface geometry files for templates like
+<code>fsLR</code> and <code>fsaverage</code>. Here’s how to discover
+what’s available:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Find surface-related template spaces</span></span>
+<span><span class="fu"><a href="../reference/tflow_spaces.html">tflow_spaces</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"fs"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "fsLR"      "fsaverage"</span></span>
+<span></span>
+<span><span class="co"># List available surface files for fsLR</span></span>
+<span><span class="co"># Filter by hemisphere</span></span>
+<span><span class="va">fslr_left</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsLR"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hemi <span class="op">=</span> <span class="st">"L"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fslr_left</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Filter by surface type and density</span></span>
+<span><span class="va">fslr_midthick</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsLR"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  suffix <span class="op">=</span> <span class="st">"midthickness"</span>,</span>
+<span>  hemi <span class="op">=</span> <span class="st">"L"</span>,</span>
+<span>  density <span class="op">=</span> <span class="st">"32k"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fslr_midthick</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># List fsaverage surfaces</span></span>
+<span><span class="va">fsavg_pial</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsaverage"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  suffix <span class="op">=</span> <span class="st">"pial"</span>,</span>
+<span>  hemi <span class="op">=</span> <span class="st">"L"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fsavg_pial</span><span class="op">)</span></span></code></pre></div>
+<p>Common surface query parameters: - <code>hemi</code>: “L” or “R” for
+hemisphere - <code>density</code>: “32k”, “164k”, etc.
+(template-dependent) - <code>suffix</code>: surface type - “pial”,
+“white”, “midthickness”, “inflated”, “sphere” - <code>resolution</code>:
+“06” for fsaverage6, etc.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="troubleshooting">Troubleshooting<a class="anchor" aria-label="anchor" href="#troubleshooting"></a>
+</h2>
+<p>If you encounter issues listing templates or fetching files:</p>
+<ul>
+<li>Check Python and TemplateFlow availability:
+<code><a href="../reference/check_templateflow.html">neuroatlas::check_templateflow()</a></code>
+</li>
+<li>Install or repair the Python environment:
+<code><a href="../reference/install_templateflow.html">neuroatlas::install_templateflow()</a></code>
+</li>
+<li>Network hiccups can prevent metadata fetches; if resolutions cannot
+be retrieved, <code>neuroatlas</code> skips that check with a
+warning.</li>
+<li>For Python-side errors, inspect
+<code><a href="https://rstudio.github.io/reticulate/reference/py_last_error.html" class="external-link">reticulate::py_last_error()</a></code> after a failure.</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="fetching-templates-with-get_template">Fetching Templates with <code>get_template()</code><a class="anchor" aria-label="anchor" href="#fetching-templates-with-get_template"></a>
@@ -175,14 +267,14 @@ TemplateFlow archive.</p>
 </h3>
 <p>To get the default MNI T1-weighted brain template (1mm
 resolution):</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the default template (MNI152NLin2009cAsym T1w brain at 1mm)</span></span>
 <span><span class="va">mni_t1w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span><span class="op">)</span> </span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_t1w</span><span class="op">)</span></span></code></pre></div>
 <p>For this vignette, we’ll simulate the object:</p>
 <pre><code><span><span class="co">#&gt; [1] "MNI152NLin2009cAsym_T1w"</span></span></code></pre>
 <p>To fetch a specific template space, suffix, and resolution:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get MNI T1w template at 2mm resolution</span></span>
 <span><span class="va">mni_t1w_res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
 <span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>, </span>
@@ -196,7 +288,7 @@ resolution):</p>
 </h3>
 <p>You can specify other TemplateFlow entities like <code>desc</code>
 (description) and <code>label</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get brain mask for MNI template</span></span>
 <span><span class="va">mni_brain_mask</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
 <span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
@@ -207,11 +299,37 @@ resolution):</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_brain_mask</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="tissue-probability-gmwmcsf">Tissue Probability (GM/WM/CSF)<a class="anchor" aria-label="anchor" href="#tissue-probability-gmwmcsf"></a>
+</h3>
+<p>For tissue probability maps, use <code>variant = "probseg"</code> and
+set <code>label</code> (e.g., <code>"GM"</code>, <code>"WM"</code>,
+<code>"CSF"</code>). Do not set <code>desc</code> for these — it’s
+determined by <code>suffix</code> + <code>label</code>.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Gray matter probability map at 1mm</span></span>
+<span><span class="va">mni_gm_prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
+<span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
+<span>  variant <span class="op">=</span> <span class="st">"probseg"</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"GM"</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="st">"1"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mni_gm_prob</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># File path only</span></span>
+<span><span class="va">gm_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
+<span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
+<span>  variant <span class="op">=</span> <span class="st">"probseg"</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"GM"</span>,</span>
+<span>  path_only <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gm_path</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
 <h3 id="getting-file-paths-only">Getting File Paths Only<a class="anchor" aria-label="anchor" href="#getting-file-paths-only"></a>
 </h3>
 <p>If you only need the path to the file (e.g., for use with other
 tools), set <code>path_only = TRUE</code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get just the file path, not the loaded NeuroVol object</span></span>
 <span><span class="va">mni_t1w_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
 <span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>, </span>
@@ -229,7 +347,7 @@ tools), set <code>path_only = TRUE</code>:</p>
 <code>variant</code>, <code>modality</code>, <code>resolution</code>, or
 <code>label</code> to be a vector, returning a named list of
 results.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get both 1mm and 2mm resolution templates</span></span>
 <span><span class="va">t1_multi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
 <span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>, </span>
@@ -286,7 +404,7 @@ wrappers:</p>
 <div class="section level3">
 <h3 id="volumetric-data-with-get_volume_template">Volumetric Data with <code>get_volume_template()</code><a class="anchor" aria-label="anchor" href="#volumetric-data-with-get_volume_template"></a>
 </h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get T1-weighted volume using the convenience function</span></span>
 <span><span class="va">t1_vol</span> <span class="op">&lt;-</span> <span class="fu">get_volume_template</span><span class="op">(</span></span>
 <span>  template <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>, </span>
@@ -302,7 +420,7 @@ wrappers:</p>
 </h3>
 <p>This helper typically returns file paths, as surfaces are often
 handled by specialized geometry software.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get fsLR left hemisphere pial surface</span></span>
 <span><span class="va">fslr_pial_L_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_surface_template</a></span><span class="op">(</span></span>
 <span>  template_id <span class="op">=</span> <span class="st">"fsLR"</span>,       <span class="co"># e.g., "fsaverage", "fsLR"</span></span>
@@ -316,6 +434,71 @@ handled by specialized geometry software.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="downloading-templates-to-a-local-folder">Downloading Templates to a Local Folder<a class="anchor" aria-label="anchor" href="#downloading-templates-to-a-local-folder"></a>
+</h2>
+<p>TemplateFlow automatically caches files when you query them. If you
+want to copy templates to a specific folder (e.g., for use with other
+tools or sharing), here are some approaches:</p>
+<div class="section level3">
+<h3 id="copy-from-templateflow-cache">Copy from TemplateFlow cache<a class="anchor" aria-label="anchor" href="#copy-from-templateflow-cache"></a>
+</h3>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get file paths (files are downloaded to cache automatically)</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsLR"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hemi <span class="op">=</span> <span class="st">"L"</span>, density <span class="op">=</span> <span class="st">"32k"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Copy to your folder</span></span>
+<span><span class="va">dest_folder</span> <span class="op">&lt;-</span> <span class="st">"~/my_surfaces"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">dest_folder</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="va">files</span>, <span class="va">dest_folder</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="download-specific-surfaces-with-get_surface_template">Download specific surfaces with
+<code>get_surface_template()</code><a class="anchor" aria-label="anchor" href="#download-specific-surfaces-with-get_surface_template"></a>
+</h3>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Download and get path to a specific surface</span></span>
+<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_surface_template</a></span><span class="op">(</span><span class="st">"fsLR"</span>, <span class="st">"midthickness"</span>, hemi <span class="op">=</span> <span class="st">"L"</span>, density <span class="op">=</span> <span class="st">"32k"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"~/my_surfaces/"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bulk-download-helper">Bulk download helper<a class="anchor" aria-label="anchor" href="#bulk-download-helper"></a>
+</h3>
+<p>For downloading multiple files at once:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">download_templateflow_files</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">space</span>, <span class="va">query_args</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">dest_folder</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">dest_folder</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="va">space</span>, query_args <span class="op">=</span> <span class="va">query_args</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No files found"</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># Copy files preserving names</span></span>
+<span>  <span class="va">dest_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">dest_folder</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">success</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="va">files</span>, <span class="va">dest_paths</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Copied "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">success</span><span class="op">)</span>, <span class="st">" of "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span>, <span class="st">" files to "</span>, <span class="va">dest_folder</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="va">dest_paths</span><span class="op">[</span><span class="va">success</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Download all fsLR 32k left hemisphere surfaces</span></span>
+<span><span class="fu">download_templateflow_files</span><span class="op">(</span></span>
+<span>  <span class="st">"fsLR"</span>,</span>
+<span>  query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hemi <span class="op">=</span> <span class="st">"L"</span>, density <span class="op">=</span> <span class="st">"32k"</span><span class="op">)</span>,</span>
+<span>  dest_folder <span class="op">=</span> <span class="st">"~/my_surfaces/fsLR"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download fsaverage pial surfaces (both hemispheres)</span></span>
+<span><span class="fu">download_templateflow_files</span><span class="op">(</span></span>
+<span>  <span class="st">"fsaverage"</span>,</span>
+<span>  query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">"pial"</span><span class="op">)</span>,</span>
+<span>  dest_folder <span class="op">=</span> <span class="st">"~/my_surfaces/fsaverage"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
 <h2 id="caching-behavior">Caching Behavior<a class="anchor" aria-label="anchor" href="#caching-behavior"></a>
 </h2>
 <p><code>neuroatlas</code> and TemplateFlow employ multiple layers of
@@ -323,7 +506,7 @@ caching: 1. <strong>R-level Memoisation</strong>:
 <code><a href="../reference/get_template.html">get_template()</a></code> memoises the <em>file paths</em> it
 resolves. If you request the same template with identical parameters
 multiple times in an R session, the path is retrieved from this memory
-cache. If <code>path_only=FALSE</code>, <code><a href="../reference/as_neurovol.html">as_neurovol()</a></code>
+cache. If <code>path_only=FALSE</code>, <code>as_neurovol()</code>
 (which loads the NIfTI file) is also memoised, so the
 <code>NeuroVol</code> object itself is cached in memory for the session
 if the same path is read again. 2. <strong>Python Disk Cache</strong>:
@@ -335,7 +518,7 @@ new R sessions) will use the disk-cached version if
 <code>TEMPLATEFLOW_HOME</code> remains consistent.</p>
 <p>You can inspect and manage the <code>neuroatlas</code>-specific
 TemplateFlow cache:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Show the path to the cache directory</span></span>
 <span><span class="va">cache_loc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/show_templateflow_cache_path.html">show_templateflow_cache_path</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cache_loc</span><span class="op">)</span></span>
@@ -350,7 +533,7 @@ TemplateFlow cache:</p>
 <p>The <code>outspace</code> argument in functions like
 <code><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas()</a></code> can accept TemplateFlow
 identifiers:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load Schaefer atlas resampled to a TemplateFlow space</span></span>
 <span><span class="va">schaefer_in_mni</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span></span>
 <span>  parcels <span class="op">=</span> <span class="st">"100"</span>, </span>
@@ -412,7 +595,7 @@ website</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

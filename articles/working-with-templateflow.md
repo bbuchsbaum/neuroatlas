@@ -1,0 +1,508 @@
+# Working with TemplateFlow in neuroatlas
+
+## Introduction
+
+[TemplateFlow](https://www.templateflow.org/) is a repository of curated
+neuroimaging templates and atlases, accessible via a Python client. The
+`neuroatlas` package provides an R interface to TemplateFlow, allowing
+you to easily discover, download, and use these resources within your R
+workflows.
+
+This vignette provides a guide to using the TemplateFlow functionalities
+in `neuroatlas`.
+
+## Getting Started: The `templateflow` Object
+
+The main entry point for interacting with TemplateFlow is by creating a
+`templateflow` interface object. This object manages the connection to
+the Python API and caching configurations.
+
+``` r
+# Create a templateflow interface object
+tf <- create_templateflow()
+print(tf)
+```
+
+If Python or the templateflow module are not available, you’ll need to
+install them first:
+
+``` r
+# Install the Python templateflow package
+install_templateflow()
+```
+
+Running `print(tf)` (if `tf` is successfully created) will show you: -
+The local cache path where TemplateFlow files will be stored.
+`neuroatlas` sets this up in a user-specific directory (e.g.,
+`~/.cache/neuroatlas/templateflow` on Linux). - The status of the
+connection to the Python API. - A few examples of available templates
+and their total count.
+
+Output might look like:
+
+    #> <neuroatlas TemplateFlow Interface>
+    #>   Cache Path:  /Users/youruser/Library/Caches/org.R-project.R/R/neuroatlas/templateflow 
+    #>   API Status:  Connected (Python API handle initialized) 
+    #>   Available Templates (Examples):  AMYGDALA, ARA, BRODMANN, CHARITE, Fischer344, ... (Total: 76)
+
+(Note: The exact cache path and template list may vary.)
+
+The underlying Python TemplateFlow library uses the `TEMPLATEFLOW_HOME`
+environment variable to determine its storage location. `neuroatlas`
+attempts to set this to its managed cache path to centralize downloads.
+
+## Discovering Templates and Metadata
+
+Before fetching files, you might want to see what’s available.
+
+### Listing Available Template Spaces
+
+Use [`tflow_spaces()`](../reference/tflow_spaces.md) to get a list of
+all top-level template space identifiers:
+
+``` r
+# List all available template spaces
+all_templates <- tflow_spaces()
+print(head(all_templates))
+#> [1] "Fischer344"          "MNI152Lin"           "MNI152NLin2009aAsym"
+#> [4] "MNI152NLin2009aSym"  "MNI152NLin2009bAsym" "MNI152NLin2009bSym"
+cat("Total templates available:", length(all_templates), "\n")
+#> Total templates available: 30
+```
+
+(If nothing prints here during build, see the note below.)
+
+``` r
+cat("TemplateFlow was not available during vignette build.\n")
+cat("Run the chunk locally to see your real template list.\n")
+```
+
+You can also filter this list with a pattern (regular expression):
+
+``` r
+# Find all MNI templates
+mni_templates <- tflow_spaces(pattern = "MNI")
+print(mni_templates)
+#>  [1] "MNI152Lin"           "MNI152NLin2009aAsym" "MNI152NLin2009aSym" 
+#>  [4] "MNI152NLin2009bAsym" "MNI152NLin2009bSym"  "MNI152NLin2009cAsym"
+#>  [7] "MNI152NLin2009cSym"  "MNI152NLin6Asym"     "MNI152NLin6Sym"     
+#> [10] "MNI305"              "MNIColin27"          "MNIInfant"          
+#> [13] "MNIPediatricAsym"
+```
+
+``` r
+cat("TemplateFlow was not available during vignette build.\n")
+cat("Run this chunk locally to see matching MNI spaces.\n")
+```
+
+### Discovering Volumetric Templates
+
+Use [`tflow_files()`](../reference/tflow_files.md) to query available
+volumetric files within a template space:
+
+``` r
+# Find all T1w images for MNI space
+mni_t1w_files <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(suffix = "T1w")
+)
+print(mni_t1w_files)
+
+# Find brain masks at specific resolution
+mni_masks <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(suffix = "mask", desc = "brain", resolution = "1")
+)
+print(mni_masks)
+
+# Find tissue probability maps (GM, WM, CSF)
+mni_probseg <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(suffix = "probseg")
+)
+print(mni_probseg)
+
+# Find all files at 2mm resolution
+mni_2mm <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(resolution = "2")
+)
+print(mni_2mm)
+
+# Find atlas/parcellation files
+mni_atlases <- tflow_files(
+  space = "MNI152NLin2009cAsym",
+  query_args = list(suffix = "dseg")  # discrete segmentation
+)
+print(mni_atlases)
+```
+
+Common volumetric query parameters: - `suffix`: “T1w”, “T2w”, “mask”,
+“probseg”, “dseg” - `desc`: “brain”, “head”, or specific descriptions -
+`resolution`: “1”, “2”, “01”, “02” (template-dependent) - `label`: “GM”,
+“WM”, “CSF” (for probseg files) - `atlas`: atlas name (e.g.,
+“Schaefer2018”)
+
+This function returns a character vector of full paths to the files that
+TemplateFlow has cached (downloading them if needed).
+
+### Discovering Surface Templates
+
+TemplateFlow includes surface geometry files for templates like `fsLR`
+and `fsaverage`. Here’s how to discover what’s available:
+
+``` r
+# Find surface-related template spaces
+tflow_spaces(pattern = "fs")
+#> [1] "fsLR"      "fsaverage"
+
+# List available surface files for fsLR
+# Filter by hemisphere
+fslr_left <- tflow_files("fsLR", query_args = list(hemi = "L"))
+print(head(fslr_left))
+
+# Filter by surface type and density
+fslr_midthick <- tflow_files("fsLR", query_args = list(
+  suffix = "midthickness",
+  hemi = "L",
+  density = "32k"
+))
+print(fslr_midthick)
+
+# List fsaverage surfaces
+fsavg_pial <- tflow_files("fsaverage", query_args = list(
+  suffix = "pial",
+  hemi = "L"
+))
+print(fsavg_pial)
+```
+
+Common surface query parameters: - `hemi`: “L” or “R” for hemisphere -
+`density`: “32k”, “164k”, etc. (template-dependent) - `suffix`: surface
+type - “pial”, “white”, “midthickness”, “inflated”, “sphere” -
+`resolution`: “06” for fsaverage6, etc.
+
+## Troubleshooting
+
+If you encounter issues listing templates or fetching files:
+
+- Check Python and TemplateFlow availability:
+  [`neuroatlas::check_templateflow()`](../reference/check_templateflow.md)
+- Install or repair the Python environment:
+  [`neuroatlas::install_templateflow()`](../reference/install_templateflow.md)
+- Network hiccups can prevent metadata fetches; if resolutions cannot be
+  retrieved, `neuroatlas` skips that check with a warning.
+- For Python-side errors, inspect
+  [`reticulate::py_last_error()`](https://rstudio.github.io/reticulate/reference/py_last_error.html)
+  after a failure.
+
+## Fetching Templates with `get_template()`
+
+The primary function for fetching template files is
+[`get_template()`](../reference/get_template.md). It provides a flexible
+R interface to the TemplateFlow archive.
+
+### Basic Retrieval (Volumetric Data)
+
+To get the default MNI T1-weighted brain template (1mm resolution):
+
+``` r
+# Get the default template (MNI152NLin2009cAsym T1w brain at 1mm)
+mni_t1w <- get_template() 
+print(mni_t1w)
+```
+
+For this vignette, we’ll simulate the object:
+
+    #> [1] "MNI152NLin2009cAsym_T1w"
+
+To fetch a specific template space, suffix, and resolution:
+
+``` r
+# Get MNI T1w template at 2mm resolution
+mni_t1w_res2 <- get_template(
+  space = "MNI152NLin2009cAsym", 
+  suffix = "T1w", 
+  resolution = "2" # or 2
+)
+print(mni_t1w_res2)
+```
+
+### Fetching Other Variants (e.g., Masks)
+
+You can specify other TemplateFlow entities like `desc` (description)
+and `label`.
+
+``` r
+# Get brain mask for MNI template
+mni_brain_mask <- get_template(
+  space = "MNI152NLin2009cAsym",
+  desc = "brain", # 'brain' for brain masks
+  suffix = "mask",
+  resolution = "1"
+)
+print(mni_brain_mask)
+```
+
+### Tissue Probability (GM/WM/CSF)
+
+For tissue probability maps, use `variant = "probseg"` and set `label`
+(e.g., `"GM"`, `"WM"`, `"CSF"`). Do not set `desc` for these — it’s
+determined by `suffix` + `label`.
+
+``` r
+# Gray matter probability map at 1mm
+mni_gm_prob <- get_template(
+  space = "MNI152NLin2009cAsym",
+  variant = "probseg",
+  label = "GM",
+  resolution = "1"
+)
+print(mni_gm_prob)
+
+# File path only
+gm_path <- get_template(
+  space = "MNI152NLin2009cAsym",
+  variant = "probseg",
+  label = "GM",
+  path_only = TRUE
+)
+print(gm_path)
+```
+
+### Getting File Paths Only
+
+If you only need the path to the file (e.g., for use with other tools),
+set `path_only = TRUE`:
+
+``` r
+# Get just the file path, not the loaded NeuroVol object
+mni_t1w_path <- get_template(
+  space = "MNI152NLin2009cAsym", 
+  suffix = "T1w", 
+  path_only = TRUE
+)
+print(mni_t1w_path)
+```
+
+Example output (path will vary):
+
+    [1] "/Users/youruser/Library/Caches/org.R-project.R/R/neuroatlas/templateflow/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T1w.nii.gz"
+
+### Vectorized Retrieval
+
+[`get_template()`](../reference/get_template.md) allows one of `space`,
+`variant`, `modality`, `resolution`, or `label` to be a vector,
+returning a named list of results.
+
+``` r
+# Get both 1mm and 2mm resolution templates
+t1_multi_res <- get_template(
+  space = "MNI152NLin2009cAsym", 
+  suffix = "T1w",
+  resolution = c("1", "2") # Get both 1mm and 2mm
+)
+print(names(t1_multi_res))
+# Access individual resolutions
+print(t1_multi_res[["1"]]) # The 1mm NeuroVol
+print(t1_multi_res[["2"]]) # The 2mm NeuroVol
+```
+
+### Key Parameters for `get_template()`
+
+- `space`: Template identifier (e.g., “MNI152NLin2009cAsym”).
+- `variant`: High-level type (e.g., “brain”, “mask”, “probseg”). Used to
+  infer `desc` and `suffix` for common cases.
+- `modality`: Image type (e.g., “T1w”, “T2w”). Used to infer `suffix`.
+- `resolution`: Resolution (e.g., “1”, “2”, “01”).
+- `desc`: Specific TemplateFlow `desc` field.
+- `suffix`: Specific TemplateFlow `suffix` field.
+- `label`: E.g., for `variant="probseg"`, tissue labels like “GM”,
+  “CSF”.
+- `atlas`: E.g., “Schaefer2018” if fetching an atlas file.
+- `...`: Other BIDS-like entities (e.g., `hemi="L"`, `den="32k"`) can be
+  passed.
+
+The function performs pre-flight validation checks for `space` and
+`resolution` against information available from TemplateFlow.
+
+## Typed Helper Functions
+
+For common tasks, `neuroatlas` provides convenient wrappers:
+
+### Volumetric Data with `get_volume_template()`
+
+``` r
+# Get T1-weighted volume using the convenience function
+t1_vol <- get_volume_template(
+  template = "MNI152NLin2009cAsym", 
+  type = "T1w", 
+  resolution = "1"
+)
+print(t1_vol)
+```
+
+Supported `type`s include “T1w”, “T2w”, “bold”, “probseg”, “dseg”.
+
+### Surface Data with `get_surface_template()`
+
+This helper typically returns file paths, as surfaces are often handled
+by specialized geometry software.
+
+``` r
+# Get fsLR left hemisphere pial surface
+fslr_pial_L_path <- get_surface_template(
+  template_id = "fsLR",       # e.g., "fsaverage", "fsLR"
+  surface_type = "pial",      # e.g., "pial", "white", "inflated"
+  hemi = "L",                 # "L" or "R"
+  density = "32k"             # e.g., "32k", "164k" (for fsLR)
+)
+print(fslr_pial_L_path)
+```
+
+Example output (path will vary):
+
+    [1] "/Users/youruser/Library/Caches/org.R-project.R/R/neuroatlas/templateflow/tpl-fsLR/tpl-fsLR_den-32k_hemi-L_desc-pial_surf.gii"
+
+## Downloading Templates to a Local Folder
+
+TemplateFlow automatically caches files when you query them. If you want
+to copy templates to a specific folder (e.g., for use with other tools
+or sharing), here are some approaches:
+
+### Copy from TemplateFlow cache
+
+``` r
+# Get file paths (files are downloaded to cache automatically)
+files <- tflow_files("fsLR", query_args = list(hemi = "L", density = "32k"))
+
+# Copy to your folder
+dest_folder <- "~/my_surfaces"
+dir.create(dest_folder, showWarnings = FALSE, recursive = TRUE)
+file.copy(files, dest_folder)
+```
+
+### Download specific surfaces with `get_surface_template()`
+
+``` r
+# Download and get path to a specific surface
+path <- get_surface_template("fsLR", "midthickness", hemi = "L", density = "32k")
+file.copy(path, "~/my_surfaces/")
+```
+
+### Bulk download helper
+
+For downloading multiple files at once:
+
+``` r
+download_templateflow_files <- function(space, query_args = list(), dest_folder) {
+  dir.create(dest_folder, recursive = TRUE, showWarnings = FALSE)
+
+  files <- tflow_files(space, query_args = query_args)
+
+  if (length(files) == 0) {
+    message("No files found")
+    return(invisible(character(0)))
+  }
+
+  # Copy files preserving names
+  dest_paths <- file.path(dest_folder, basename(files))
+  success <- file.copy(files, dest_paths, overwrite = TRUE)
+
+  message("Copied ", sum(success), " of ", length(files), " files to ", dest_folder)
+  invisible(dest_paths[success])
+}
+
+# Download all fsLR 32k left hemisphere surfaces
+download_templateflow_files(
+  "fsLR",
+  query_args = list(hemi = "L", density = "32k"),
+  dest_folder = "~/my_surfaces/fsLR"
+)
+
+# Download fsaverage pial surfaces (both hemispheres)
+download_templateflow_files(
+  "fsaverage",
+  query_args = list(suffix = "pial"),
+  dest_folder = "~/my_surfaces/fsaverage"
+)
+```
+
+## Caching Behavior
+
+`neuroatlas` and TemplateFlow employ multiple layers of caching: 1.
+**R-level Memoisation**:
+[`get_template()`](../reference/get_template.md) memoises the *file
+paths* it resolves. If you request the same template with identical
+parameters multiple times in an R session, the path is retrieved from
+this memory cache. If `path_only=FALSE`, `as_neurovol()` (which loads
+the NIfTI file) is also memoised, so the `NeuroVol` object itself is
+cached in memory for the session if the same path is read again. 2.
+**Python Disk Cache**: The underlying Python `templateflow` library
+maintains a disk cache for downloaded files. `neuroatlas` configures
+this to use a directory like `~/.cache/neuroatlas/templateflow` (path
+varies by OS). Once a file is downloaded, subsequent requests (even in
+new R sessions) will use the disk-cached version if `TEMPLATEFLOW_HOME`
+remains consistent.
+
+You can inspect and manage the `neuroatlas`-specific TemplateFlow cache:
+
+``` r
+# Show the path to the cache directory
+cache_loc <- show_templateflow_cache_path()
+print(cache_loc)
+
+# Clear the disk cache and R-level memoisation for TemplateFlow paths
+# clear_templateflow_cache()                 # Asks for confirmation if interactive
+# clear_templateflow_cache(confirm = FALSE)  # Clears without asking
+```
+
+## Integration with Other `neuroatlas` Functions
+
+The `outspace` argument in functions like
+[`get_schaefer_atlas()`](../reference/get_schaefer_atlas.md) can accept
+TemplateFlow identifiers:
+
+``` r
+# Load Schaefer atlas resampled to a TemplateFlow space
+schaefer_in_mni <- get_schaefer_atlas(
+  parcels = "100", 
+  networks = "7",
+  outspace = "MNI152NLin2009cAsym" # Resolves to default 1mm T1w brain
+)
+
+# Or be more specific with a list:
+schaefer_in_mni_res2 <- get_schaefer_atlas(
+  parcels = "100",
+  networks = "7",
+  outspace = list(space = "MNI152NLin2009cAsym", resolution = "2")
+)
+print(schaefer_in_mni_res2)
+```
+
+This uses an internal helper
+[`.resolve_template_input()`](../reference/dot-resolve_template_input.md)
+to fetch the template and extract its `NeuroSpace` information.
+
+## Summary
+
+The `neuroatlas` package provides a comprehensive R interface to
+TemplateFlow:
+
+- **Easy Setup**: Use
+  [`create_templateflow()`](../reference/create_templateflow.md) to
+  initialize the interface
+- **Discovery**: Find templates with
+  [`tflow_spaces()`](../reference/tflow_spaces.md) and
+  [`tflow_files()`](../reference/tflow_files.md)
+- **Flexible Retrieval**: Use
+  [`get_template()`](../reference/get_template.md) with various
+  parameters
+- **Integration**: Use TemplateFlow spaces directly in atlas functions
+- **Caching**: Automatic caching at both R and Python levels
+
+## Further Information
+
+For more details on TemplateFlow itself, including the full range of
+available templates and BIDS-inspired naming conventions, please visit
+the [TemplateFlow website](https://www.templateflow.org/).

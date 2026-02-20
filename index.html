@@ -11,9 +11,9 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
-<meta property="og:title" content="Neuroimaging Atlases and Parcellations">
-<meta name="description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports visualization through the ggseg ecosystem.">
-<meta property="og:description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports visualization through the ggseg ecosystem.">
+<script src="extra.js"></script><meta property="og:title" content="Neuroimaging Atlases and Parcellations">
+<meta name="description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
+<meta property="og:description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -36,7 +36,10 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+<li><a class="dropdown-item" href="articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
+    <li><a class="dropdown-item" href="articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+    <li><a class="dropdown-item" href="articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
+    <li><a class="dropdown-item" href="articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
     <li><a class="dropdown-item" href="articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
   </ul>
 </li>
@@ -54,42 +57,166 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9">
-<div class="section level1">
-<div class="page-header"><h1 id="neuroatlas">neuroatlas<a class="anchor" aria-label="anchor" href="#neuroatlas"></a>
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header"><h1 id="neuroatlas-">neuroatlas <img src="reference/figures/logo.png" align="right" height="139" alt=""><a class="anchor" aria-label="anchor" href="#neuroatlas-"></a>
 </h1></div>
-<p>The goal of neuroatlas is to …</p>
+<!-- badges: start -->
+
+<p><strong>neuroatlas</strong> provides a unified interface for working with neuroimaging atlases and parcellations in R. Whether you’re conducting ROI-based analyses, visualizing brain data, or integrating different parcellation schemes, neuroatlas streamlines these tasks with consistent, user-friendly functions.</p>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
+<ul>
+<li>
+<strong>Multiple Atlas Support</strong>: Access Schaefer (100-1000 parcels), Glasser (360 regions), FreeSurfer ASEG, and Olsen MTL atlases</li>
+<li>
+<strong>Flexible Resampling</strong>: Transform atlases to different spaces and resolutions</li>
+<li>
+<strong>ROI Analysis</strong>: Extract and analyze specific regions of interest with <code><a href="reference/get_roi.html">get_roi()</a></code>, <code><a href="reference/map_atlas.html">map_atlas()</a></code>, and <code><a href="reference/reduce_atlas.html">reduce_atlas()</a></code>
+</li>
+<li>
+<strong>Surface &amp; Volume</strong>: Work with both volumetric and surface-based parcellations</li>
+<li>
+<strong>TemplateFlow Integration</strong>: Access standardized templates via the Python TemplateFlow API</li>
+<li>
+<strong>Visualization</strong>: Integration with the ggseg ecosystem for brain visualization</li>
+</ul>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the development version from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inbo/neuroatlas"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"bbuchsbaum/neuroatlas"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="templateflow-setup">TemplateFlow Setup<a class="anchor" aria-label="anchor" href="#templateflow-setup"></a>
+</h3>
+<p>For TemplateFlow functionality, you’ll need Python with the templateflow package:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># After installing neuroatlas:</span></span>
+<span><span class="fu">neuroatlas</span><span class="fu">::</span><span class="fu"><a href="reference/install_templateflow.html">install_templateflow</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
-<span><span class="co">## basic example code</span></span></code></pre></div>
-<p>What is special about using <code>README.Rmd</code> instead of just <code>README.md</code>? You can include R chunks like so:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cars</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      speed           dist       </span></span>
-<span><span class="co">#&gt;  Min.   : 4.0   Min.   :  2.00  </span></span>
-<span><span class="co">#&gt;  1st Qu.:12.0   1st Qu.: 26.00  </span></span>
-<span><span class="co">#&gt;  Median :15.0   Median : 36.00  </span></span>
-<span><span class="co">#&gt;  Mean   :15.4   Mean   : 42.98  </span></span>
-<span><span class="co">#&gt;  3rd Qu.:19.0   3rd Qu.: 56.00  </span></span>
-<span><span class="co">#&gt;  Max.   :25.0   Max.   :120.00</span></span></code></pre></div>
-<p>You’ll still need to render <code>README.Rmd</code> regularly, to keep <code>README.md</code> up-to-date. <code>devtools::build_readme()</code> is handy for this.</p>
-<p>You can also embed plots, for example:</p>
-<p>In that case, don’t forget to commit and push the resulting figure files, so they display on GitHub and CRAN.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get a Schaefer atlas (200 parcels, 7 networks)</span></span>
+<span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">schaefer</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Extract specific ROIs</span></span>
+<span><span class="va">roi</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">schaefer</span>, <span class="st">"DefaultA"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get Glasser atlas</span></span>
+<span><span class="va">glasser</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_glasser_atlas.html">get_glasser_atlas</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Access templates via TemplateFlow</span></span>
+<span><span class="va">mni_brain</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_template.html">get_template</a></span><span class="op">(</span><span class="st">"MNI152NLin2009cAsym"</span>, variant <span class="op">=</span> <span class="st">"brain"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="palette-demos">Palette demos<a class="anchor" aria-label="anchor" href="#palette-demos"></a>
+</h2>
+<p><code>neuroatlas</code> now includes perceptually-optimised palettes for atlas ROIs. For instance, you can generate a slice-aware palette for the Schaefer 200×7 atlas and feed it directly into <code>ggseg</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ggseg/ggseg" class="external-link">ggseg</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/roi_metadata.html">roi_metadata</a></span><span class="op">(</span><span class="va">schaefer</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/roi_colors_maximin_view.html">roi_colors_maximin_view</a></span><span class="op">(</span></span>
+<span>  <span class="va">meta</span>,</span>
+<span>  hemi_col <span class="op">=</span> <span class="st">"hemi"</span>,</span>
+<span>  network_col <span class="op">=</span> <span class="st">"network"</span>,</span>
+<span>  pair_col <span class="op">=</span> <span class="st">"pair_id"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/ggseg_schaefer.html">ggseg_schaefer</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_sf</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">pal</span><span class="op">$</span><span class="va">color</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">label</span>, <span class="va">pal</span><span class="op">$</span><span class="va">roi</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_fill_identity</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="available-atlases">Available Atlases<a class="anchor" aria-label="anchor" href="#available-atlases"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Atlas</th>
+<th>Function</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Schaefer</td>
+<td><code><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas()</a></code></td>
+<td>Cortical parcellations (100-1000 regions, 7 or 17 networks)</td>
+</tr>
+<tr class="even">
+<td>Glasser</td>
+<td><code><a href="reference/get_glasser_atlas.html">get_glasser_atlas()</a></code></td>
+<td>360-region multi-modal cortical parcellation</td>
+</tr>
+<tr class="odd">
+<td>ASEG</td>
+<td><code><a href="reference/get_aseg_atlas.html">get_aseg_atlas()</a></code></td>
+<td>FreeSurfer subcortical segmentation</td>
+</tr>
+<tr class="even">
+<td>Olsen MTL</td>
+<td><code><a href="reference/get_olsen_mtl.html">get_olsen_mtl()</a></code></td>
+<td>Medial temporal lobe atlas with hippocampal subfields</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<ul>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.html" class="external-link">Getting Started</a> - Introduction and basic usage</li>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html" class="external-link">Working with TemplateFlow</a> - Template access and management</li>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html" class="external-link">Surface Parcellations</a> - Surface-based atlas operations</li>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/reference/index.html" class="external-link">Function Reference</a> - Complete API documentation</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="related-packages">Related Packages<a class="anchor" aria-label="anchor" href="#related-packages"></a>
+</h2>
+<ul>
+<li>
+<a href="https://github.com/bbuchsbaum/neuroim2" class="external-link">neuroim2</a> - Core neuroimaging data structures</li>
+<li>
+<a href="https://github.com/bbuchsbaum/neurosurf" class="external-link">neurosurf</a> - Surface-based operations</li>
+<li>
+<a href="https://github.com/ggseg/ggseg" class="external-link">ggseg</a> - Brain visualization</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>MIT © Bradley Buchsbaum</p>
+<!-- albersdown:theme-note:start -->
+</div>
+<div class="section level2">
+<h2 id="albers-theme">Albers theme<a class="anchor" aria-label="anchor" href="#albers-theme"></a>
+</h2>
+<p>This package uses the albersdown theme. Existing vignette theme hooks are replaced so <code>albers.css</code> and local <code>albers.js</code> render consistently on CRAN and GitHub Pages. The palette family is provided via <code>params$family</code> (default ‘red’). The pkgdown site uses <code>template: { package: albersdown }</code>. <!-- albersdown:theme-note:end --></p>
 </div>
 </div>
-
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
@@ -125,12 +252,9 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.repostatus.org/#concept" class="external-link"><img src="https://www.repostatus.org/badges/latest/concept.svg" alt="Project Status: Concept – Minimal or no implementation has been done yet, or the repository is only intended to be a limited example, demo, or proof-of-concept."></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
-<li><a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link"><img src="https://img.shields.io/badge/license-GPL--3-blue.svg?style=flat" alt="License"></a></li>
-<li><a href="https://github.com/inbo/neuroatlas/releases" class="external-link"><img src="https://img.shields.io/github/release/inbo/neuroatlas.svg" alt="Release"></a></li>
-<li><a href="https://github.com/inbo/neuroatlas/actions" class="external-link"><img src="https://github.com/inbo/neuroatlas/workflows/check%20package%20on%20main/badge.svg" alt="R build status"></a></li>
-<li><a href="https://app.codecov.io/gh/inbo/neuroatlas?branch=main" class="external-link"><img src="https://codecov.io/gh/inbo/neuroatlas/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a></li>
 </ul>
 </div>
 
@@ -143,7 +267,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
