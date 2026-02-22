@@ -9,6 +9,7 @@ build_surface_polygon_data(
   views = c("lateral", "medial"),
   surface = "inflated",
   merged = TRUE,
+  projection_smooth = 0L,
   use_cache = TRUE
 )
 }
@@ -24,6 +25,11 @@ build_surface_polygon_data(
 \item{merged}{Logical. If \code{TRUE} (default), returns merged
 parcel-level polygons (faster, fewer shapes). If \code{FALSE}, returns
 per-triangle polygons.}
+
+\item{projection_smooth}{Non-negative integer controlling Laplacian-like
+smoothing iterations applied to projected vertex coordinates before
+polygon and boundary construction. \code{0} (default) keeps native mesh
+coordinates.}
 
 \item{use_cache}{Logical. If \code{TRUE} (default), use memoized builders.}
 }

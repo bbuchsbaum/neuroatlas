@@ -166,6 +166,73 @@ test_that(".boundary_edges_to_paths chains undirected edges into ordered paths",
   expect_setequal(got, c("0,0", "1,0", "1,1", "0,1"))
 })
 
+test_that(".smooth_boundary_paths increases path density while preserving ids", {
+  edges <- tibble::tibble(
+    panel = "Left Lateral",
+    edge_type = "parcel",
+    v1 = c(1L, 2L, 3L, 4L),
+    v2 = c(2L, 3L, 4L, 1L),
+    x = c(0, 1, 1, 0),
+    y = c(0, 0, 1, 1),
+    xend = c(1, 1, 0, 0),
+    yend = c(0, 1, 1, 0)
+  )
+
+  paths <- neuroatlas:::.boundary_edges_to_paths(edges)
+  smooth0 <- neuroatlas:::.smooth_boundary_paths(paths, n_iter = 0L)
+  smooth1 <- neuroatlas:::.smooth_boundary_paths(paths, n_iter = 1L)
+
+  expect_equal(smooth0$x, paths$x)
+  expect_equal(smooth0$y, paths$y)
+  expect_gt(nrow(smooth1), nrow(paths))
+  expect_equal(unique(smooth1$path_id), unique(paths$path_id))
+  expect_equal(unique(smooth1$edge_type), unique(paths$edge_type))
+  expect_equal(unique(smooth1$panel), unique(paths$panel))
+})
+
+test_that(".mesh_vertex_neighbors builds expected adjacency from faces", {
+  faces <- matrix(
+    c(1L, 2L, 3L,
+      1L, 3L, 4L),
+    ncol = 3,
+    byrow = TRUE
+  )
+
+  nb <- neuroatlas:::.mesh_vertex_neighbors(faces, n_vertices = 4L)
+
+  expect_length(nb, 4L)
+  expect_setequal(nb[[1]], c(2L, 3L, 4L))
+  expect_setequal(nb[[2]], c(1L, 3L))
+  expect_setequal(nb[[3]], c(1L, 2L, 4L))
+  expect_setequal(nb[[4]], c(1L, 3L))
+})
+
+test_that(".smooth_projected_xy smooths coordinates while preserving shape", {
+  faces <- matrix(
+    c(1L, 2L, 3L,
+      1L, 3L, 4L),
+    ncol = 3,
+    byrow = TRUE
+  )
+  nb <- neuroatlas:::.mesh_vertex_neighbors(faces, n_vertices = 4L)
+
+  xy <- matrix(
+    c(0, 0,
+      1, 0,
+      1, 1,
+      0, 1),
+    ncol = 2,
+    byrow = TRUE
+  )
+
+  sm0 <- neuroatlas:::.smooth_projected_xy(xy, nb, n_iter = 0L)
+  sm1 <- neuroatlas:::.smooth_projected_xy(xy, nb, n_iter = 1L, lambda = 0.5)
+
+  expect_equal(sm0, xy)
+  expect_equal(dim(sm1), dim(xy))
+  expect_true(any(abs(sm1 - xy) > 1e-8))
+})
+
 test_that(".encode_plot_brain_data_id creates stable polygon keys", {
   key <- neuroatlas:::.encode_plot_brain_data_id(
     panel = "Left Lateral",

@@ -17,8 +17,12 @@ plot_brain(
   interactive = TRUE,
   data_id_mode = c("parcel", "polygon"),
   ncol = 2L,
+  panel_layout = c("native", "presentation"),
+  style = c("default", "ggseg_like"),
   border = TRUE,
   border_geom = c("path", "segment"),
+  boundary_smooth = 0L,
+  projection_smooth = 0L,
   border_color = "grey30",
   border_size = 0.15,
   border_lineend = "round",
@@ -92,6 +96,18 @@ click-to-surface workflows.}
 
 \item{ncol}{Integer: number of columns in the facet layout. Default: 2.}
 
+\item{panel_layout}{Panel coordinate layout strategy:
+\code{"native"} (default) preserves raw projected units;
+\code{"presentation"} recentres each panel, rotates dorsal/ventral views
+to horizontal, and normalises per-panel scale for a cleaner ggseg-like
+grid.}
+
+\item{style}{Visual preset. \code{"default"} keeps existing behaviour.
+\code{"ggseg_like"} enables a cleaner publication style and, unless
+explicitly overridden, switches \code{panel_layout} to
+\code{"presentation"} with softer border defaults and light projection
+smoothing.}
+
 \item{border}{Logical. If \code{TRUE} (default), draw thin lines at parcel
 boundaries (edges between different parcels). Gives a clean ggseg-like
 appearance.}
@@ -99,6 +115,17 @@ appearance.}
 \item{border_geom}{Boundary rendering method. \code{"path"} (default) chains
 boundary edges into longer paths for smoother lines; \code{"segment"} draws
 each boundary edge independently.}
+
+\item{boundary_smooth}{Non-negative integer controlling Chaikin smoothing
+iterations applied to boundary paths when \code{border_geom = "path"}.
+\code{0} (default) keeps original mesh-aligned boundaries; \code{1} or
+\code{2} yields cleaner curves in close-up figures.}
+
+\item{projection_smooth}{Non-negative integer controlling Laplacian-like
+smoothing iterations applied to projected vertex coordinates before parcel
+polygons are constructed. This smooths filled parcel edges while
+preserving shared boundaries across parcels. \code{0} (default) keeps raw
+projected coordinates.}
 
 \item{border_color}{Colour for parcel boundary lines. Default:
 \code{"grey30"}.}

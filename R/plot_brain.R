@@ -319,6 +319,113 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   dplyr::bind_rows(out)
 }
 
+#' Chaikin corner-cutting for 2D polylines
+#'
+#' @param x Numeric x coordinates.
+#' @param y Numeric y coordinates.
+#' @param n_iter Non-negative integer number of smoothing iterations.
+#' @return A list with smoothed numeric vectors \code{x} and \code{y}.
+#' @keywords internal
+#' @noRd
+.chaikin_smooth_xy <- function(x, y, n_iter = 1L) {
+  n_iter <- as.integer(n_iter)
+  if (n_iter <= 0L) return(list(x = x, y = y))
+
+  pts <- cbind(as.numeric(x), as.numeric(y))
+  n <- nrow(pts)
+  if (n < 3L) return(list(x = pts[, 1], y = pts[, 2]))
+
+  tol <- 1e-8
+  is_closed <- n >= 4L &&
+    abs(pts[1, 1] - pts[n, 1]) < tol &&
+    abs(pts[1, 2] - pts[n, 2]) < tol
+
+  if (is_closed) {
+    pts <- pts[-n, , drop = FALSE]
+  }
+
+  for (iter in seq_len(n_iter)) {
+    n0 <- nrow(pts)
+    if (n0 < 3L) break
+
+    if (is_closed) {
+      out <- matrix(0, nrow = 2L * n0, ncol = 2L)
+      for (i in seq_len(n0)) {
+        j <- if (i == n0) 1L else i + 1L
+        p <- pts[i, ]
+        q <- pts[j, ]
+        out[2L * i - 1L, ] <- 0.75 * p + 0.25 * q
+        out[2L * i, ] <- 0.25 * p + 0.75 * q
+      }
+    } else {
+      out <- matrix(0, nrow = 2L * n0, ncol = 2L)
+      out[1, ] <- pts[1, ]
+      k <- 2L
+      for (i in seq_len(n0 - 1L)) {
+        p <- pts[i, ]
+        q <- pts[i + 1L, ]
+        out[k, ] <- 0.75 * p + 0.25 * q
+        out[k + 1L, ] <- 0.25 * p + 0.75 * q
+        k <- k + 2L
+      }
+      out[k, ] <- pts[n0, ]
+    }
+
+    pts <- out
+  }
+
+  if (is_closed) {
+    pts <- rbind(pts, pts[1, , drop = FALSE])
+  }
+
+  list(x = pts[, 1], y = pts[, 2])
+}
+
+#' Smooth boundary paths for cleaner rendered parcel edges
+#'
+#' @param paths Tibble produced by [.boundary_edges_to_paths()].
+#' @param n_iter Non-negative integer number of Chaikin iterations.
+#' @return Smoothed path tibble.
+#' @keywords internal
+#' @noRd
+.smooth_boundary_paths <- function(paths, n_iter = 1L) {
+  if (is.null(paths) || nrow(paths) == 0) return(paths)
+
+  n_iter <- as.integer(n_iter)
+  if (is.na(n_iter) || n_iter <= 0L) return(paths)
+
+  needed <- c("x", "y", "path_id", "vertex_order", "edge_type", "panel")
+  if (!all(needed %in% names(paths))) return(paths)
+
+  split_paths <- split(paths, paths$path_id)
+  out <- vector("list", length(split_paths))
+  i <- 1L
+
+  for (sub in split_paths) {
+    sub <- sub[order(sub$vertex_order), , drop = FALSE]
+    if (nrow(sub) < 3L) {
+      sub$vertex_order <- seq_len(nrow(sub))
+      out[[i]] <- sub
+      i <- i + 1L
+      next
+    }
+
+    sm <- .chaikin_smooth_xy(sub$x, sub$y, n_iter = n_iter)
+
+    out[[i]] <- tibble::tibble(
+      x = sm$x,
+      y = sm$y,
+      path_id = sub$path_id[[1]],
+      vertex_order = seq_along(sm$x),
+      edge_type = sub$edge_type[[1]],
+      panel = sub$panel[[1]]
+    )
+    i <- i + 1L
+  }
+
+  dplyr::bind_rows(out)
+}
+
 #' Chain boundary half-edges into ordered polygon loops per parcel
 #'
 #' For each parcel in a single view, finds the directed boundary half-edges
@@ -486,7 +593,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @return A list with \code{polygons} and \code{boundaries} tibbles.
 #' @keywords internal
 #' @noRd
-.build_merged_polygon_data <- function(surfatlas, views, surface) {
+.build_merged_polygon_data <- function(surfatlas, views, surface,
+                                       projection_smooth = 0L) {
   hemis <- c("left", "right")
   hemi_keys <- c(left = "lh", right = "rh")
 
@@ -512,12 +620,23 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
     verts <- t(geom@mesh$vb[1:3, ])
     faces <- t(geom@mesh$it)
     parcel_vec <- as.integer(atlas_hemi@data)
+    neighbors <- NULL
+    if (projection_smooth > 0L) {
+      neighbors <- .mesh_vertex_neighbors(faces, nrow(verts))
+    }
 
     fnormals <- .face_normals(verts, faces)
     fparcel <- .face_parcel_ids(parcel_vec, faces)
 
     for (v in views) {
       proj <- .project_view(verts, v, h)
+      if (projection_smooth > 0L) {
+        proj$xy <- .smooth_projected_xy(
+          proj$xy,
+          neighbors = neighbors,
+          n_iter = projection_smooth
+        )
+      }
       vdir <- proj$view_dir
 
       dots <- fnormals[, 1] * vdir[1] +
@@ -611,6 +730,88 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   list(xy = xy, view_dir = view_dir)
 }
 
+#' Build per-vertex mesh neighbour lists from triangular faces
+#'
+#' @param faces Integer matrix (\code{F x 3}) of vertex indices.
+#' @param n_vertices Total number of mesh vertices.
+#' @return A list of integer neighbour vectors (length \code{n_vertices}).
+#' @keywords internal
+#' @noRd
+.mesh_vertex_neighbors <- function(faces, n_vertices) {
+  if (is.null(faces) || nrow(faces) == 0 || n_vertices <= 0) {
+    return(vector("list", max(0L, as.integer(n_vertices))))
+  }
+
+  edges <- rbind(
+    faces[, c(1, 2), drop = FALSE],
+    faces[, c(2, 3), drop = FALSE],
+    faces[, c(3, 1), drop = FALSE]
+  )
+  edges <- rbind(edges, edges[, c(2, 1), drop = FALSE])
+  edges <- edges[edges[, 1] != edges[, 2], , drop = FALSE]
+  edges <- edges[order(edges[, 1], edges[, 2]), , drop = FALSE]
+
+  neigh <- vector("list", as.integer(n_vertices))
+  if (nrow(edges) == 0) return(neigh)
+
+  split_nb <- split(edges[, 2], edges[, 1])
+  idx <- as.integer(names(split_nb))
+  for (k in seq_along(split_nb)) {
+    i <- idx[[k]]
+    if (!is.na(i) && i >= 1 && i <= n_vertices) {
+      neigh[[i]] <- unique(as.integer(split_nb[[k]]))
+    }
+  }
+
+  neigh
+}
+
+#' Smooth projected 2D coordinates over mesh adjacency
+#'
+#' Applies iterative Laplacian-like smoothing in projected space while
+#' preserving shared parcel boundaries (all parcels share the same smoothed
+#' vertex coordinates).
+#'
+#' @param xy Numeric matrix (\code{N x 2}) of projected coordinates.
+#' @param neighbors List of integer neighbour indices from
+#'   [.mesh_vertex_neighbors()].
+#' @param n_iter Non-negative integer smoothing iterations.
+#' @param lambda Numeric blend weight in \code{(0, 1)}. Larger values smooth
+#'   more aggressively.
+#' @return Smoothed \code{xy} matrix.
+#' @keywords internal
+#' @noRd
+.smooth_projected_xy <- function(xy, neighbors, n_iter = 1L, lambda = 0.35) {
+  n_iter <- as.integer(n_iter)
+  if (is.na(n_iter) || n_iter <= 0L) return(xy)
+  if (!is.matrix(xy) || ncol(xy) != 2) return(xy)
+  if (!is.list(neighbors) || length(neighbors) != nrow(xy)) return(xy)
+  if (!is.numeric(lambda) || length(lambda) != 1 || is.na(lambda) ||
+      lambda <= 0 || lambda >= 1) return(xy)
+
+  out <- xy
+  n <- nrow(out)
+
+  for (iter in seq_len(n_iter)) {
+    x_new <- out[, 1]
+    y_new <- out[, 2]
+
+    for (i in seq_len(n)) {
+      nb <- neighbors[[i]]
+      if (length(nb) == 0L) next
+      mx <- mean(out[nb, 1])
+      my <- mean(out[nb, 2])
+      x_new[i] <- (1 - lambda) * out[i, 1] + lambda * mx
+      y_new[i] <- (1 - lambda) * out[i, 2] + lambda * my
+    }
+
+    out[, 1] <- x_new
+    out[, 2] <- y_new
+  }
+
+  out
+}
+
 #' Project Surface Vertices to a Canonical 2D View
 #'
 #' Public wrapper for the core surface-view projection used by
@@ -672,7 +873,8 @@ project_surface_view <- function(verts,
 #'   \code{boundaries} (tibble with columns x, y, xend, yend, panel).
 #' @keywords internal
 #' @noRd
-.build_brain_polygon_data <- function(surfatlas, views, surface) {
+.build_brain_polygon_data <- function(surfatlas, views, surface,
+                                      projection_smooth = 0L) {
   hemis <- c("left", "right")
   hemi_keys <- c(left = "lh", right = "rh")
 
@@ -699,6 +901,10 @@ project_surface_view <- function(verts,
     geom <- atlas_hemi@geometry
     verts <- t(geom@mesh$vb[1:3, ])   # N x 3
     faces <- t(geom@mesh$it)           # F x 3
+    neighbors <- NULL
+    if (projection_smooth > 0L) {
+      neighbors <- .mesh_vertex_neighbors(faces, nrow(verts))
+    }
 
     # Per-vertex parcel IDs
     parcel_vec <- as.integer(atlas_hemi@data)
@@ -709,6 +915,13 @@ project_surface_view <- function(verts,
 
     for (v in views) {
       proj <- .project_view(verts, v, h)
+      if (projection_smooth > 0L) {
+        proj$xy <- .smooth_projected_xy(
+          proj$xy,
+          neighbors = neighbors,
+          n_iter = projection_smooth
+        )
+      }
       vdir <- proj$view_dir
 
       # Backface culling: keep faces whose normal dots positively with view dir
@@ -788,6 +1001,10 @@ project_surface_view <- function(verts,
 #' @param merged Logical. If \code{TRUE} (default), returns merged
 #'   parcel-level polygons (faster, fewer shapes). If \code{FALSE}, returns
 #'   per-triangle polygons.
+#' @param projection_smooth Non-negative integer controlling Laplacian-like
+#'   smoothing iterations applied to projected vertex coordinates before
+#'   polygon and boundary construction. \code{0} (default) keeps native mesh
+#'   coordinates.
 #' @param use_cache Logical. If \code{TRUE} (default), use memoized builders.
 #'
 #' @return A list with components:
@@ -800,6 +1017,7 @@ build_surface_polygon_data <- function(surfatlas,
                                        views = c("lateral", "medial"),
                                        surface = "inflated",
                                        merged = TRUE,
+                                       projection_smooth = 0L,
                                        use_cache = TRUE) {
   if (!inherits(surfatlas, "surfatlas")) {
     stop("'surfatlas' must inherit from class 'surfatlas'.", call. = FALSE)
@@ -817,6 +1035,13 @@ build_surface_polygon_data <- function(surfatlas,
   if (!is.logical(use_cache) || length(use_cache) != 1 || is.na(use_cache)) {
     stop("'use_cache' must be TRUE or FALSE.", call. = FALSE)
   }
+  if (!is.numeric(projection_smooth) || length(projection_smooth) != 1 ||
+      is.na(projection_smooth) || projection_smooth < 0 ||
+      projection_smooth != as.integer(projection_smooth)) {
+    stop("'projection_smooth' must be a non-negative integer scalar.",
+         call. = FALSE)
+  }
+  projection_smooth <- as.integer(projection_smooth)
 
   if (isTRUE(merged)) {
     builder <- if (isTRUE(use_cache)) {
@@ -832,7 +1057,12 @@ build_surface_polygon_data <- function(surfatlas,
     }
   }
 
-  builder(surfatlas = surfatlas, views = views, surface = surface)
+  builder(
+    surfatlas = surfatlas,
+    views = views,
+    surface = surface,
+    projection_smooth = projection_smooth
+  )
 }
 
 
@@ -851,6 +1081,7 @@ build_surface_polygon_data <- function(surfatlas,
                                         overlay,
                                         views,
                                         hemis,
+                                        projection_smooth = 0L,
                                         threshold = NULL) {
   hemi_keys <- c(left = "lh", right = "rh")
   poly_list <- list()
@@ -863,6 +1094,10 @@ build_surface_polygon_data <- function(surfatlas,
     geom <- atlas_hemi@geometry
     verts <- t(geom@mesh$vb[1:3, , drop = FALSE])
     faces <- t(geom@mesh$it)
+    neighbors <- NULL
+    if (projection_smooth > 0L) {
+      neighbors <- .mesh_vertex_neighbors(faces, nrow(verts))
+    }
     fnormals <- .face_normals(verts, faces)
 
     ov <- overlay[[hk]]
@@ -872,6 +1107,13 @@ build_surface_polygon_data <- function(surfatlas,
 
     for (v in views) {
       proj <- .project_view(verts, v, h)
+      if (projection_smooth > 0L) {
+        proj$xy <- .smooth_projected_xy(
+          proj$xy,
+          neighbors = neighbors,
+          n_iter = projection_smooth
+        )
+      }
       vdir <- proj$view_dir
       dots <- fnormals[, 1] * vdir[1] +
         fnormals[, 2] * vdir[2] +
@@ -971,6 +1213,153 @@ build_surface_polygon_data <- function(surfatlas,
 }
 
 
+#' Compute panel-wise layout transforms for projected brain polygons
+#'
+#' @param poly_data Polygon data with columns \code{panel}, \code{view},
+#'   \code{x}, \code{y}.
+#' @param panel_layout Character scalar: \code{"native"} or
+#'   \code{"presentation"}.
+#' @return A tibble with per-panel transform parameters, or \code{NULL}.
+#' @keywords internal
+#' @noRd
+.compute_panel_layout_transforms <- function(poly_data,
+                                             panel_layout = c("native",
+                                                              "presentation")) {
+  panel_layout <- match.arg(panel_layout)
+  if (panel_layout == "native") return(NULL)
+  if (is.null(poly_data) || nrow(poly_data) == 0) return(NULL)
+
+  needed <- c("panel", "view", "x", "y")
+  if (!all(needed %in% names(poly_data))) return(NULL)
+
+  ext <- poly_data |>
+    dplyr::group_by(panel, view) |>
+    dplyr::summarise(
+      xmin = min(x),
+      xmax = max(x),
+      ymin = min(y),
+      ymax = max(y),
+      .groups = "drop"
+    ) |>
+    dplyr::mutate(
+      cx = (xmin + xmax) / 2,
+      cy = (ymin + ymax) / 2,
+      width = xmax - xmin,
+      height = ymax - ymin,
+      rotate = view %in% c("dorsal", "ventral"),
+      width_rot = dplyr::if_else(rotate, height, width),
+      height_rot = dplyr::if_else(rotate, width, height)
+    )
+
+  span <- pmax(ext$width_rot, ext$height_rot)
+  span[!is.finite(span) | span <= 0] <- 1
+  ext$scale <- 1 / span
+
+  ext[, c("panel", "cx", "cy", "rotate", "scale")]
+}
+
+#' Apply panel-wise transforms to point geometry
+#'
+#' @param dat Data frame with columns \code{panel}, \code{x}, \code{y}.
+#' @param transforms Output of [.compute_panel_layout_transforms()].
+#' @param x_col Name of x column.
+#' @param y_col Name of y column.
+#' @return Transformed data frame.
+#' @keywords internal
+#' @noRd
+.apply_panel_layout_to_points <- function(dat, transforms,
+                                          x_col = "x", y_col = "y") {
+  if (is.null(dat) || nrow(dat) == 0) return(dat)
+  if (is.null(transforms) || nrow(transforms) == 0) return(dat)
+  if (!all(c("panel", x_col, y_col) %in% names(dat))) return(dat)
+
+  out <- dplyr::left_join(
+    dat,
+    transforms,
+    by = "panel"
+  )
+
+  cx <- out$cx
+  cy <- out$cy
+  rotate <- out$rotate
+  scale <- out$scale
+
+  missing_t <- is.na(cx) | is.na(cy) | is.na(scale)
+  cx[missing_t] <- 0
+  cy[missing_t] <- 0
+  rotate[is.na(rotate)] <- FALSE
+  scale[missing_t] <- 1
+
+  x0 <- out[[x_col]] - cx
+  y0 <- out[[y_col]] - cy
+
+  x1 <- ifelse(rotate, -y0, x0)
+  y1 <- ifelse(rotate, x0, y0)
+
+  out[[x_col]] <- x1 * scale
+  out[[y_col]] <- y1 * scale
+
+  out$cx <- NULL
+  out$cy <- NULL
+  out$rotate <- NULL
+  out$scale <- NULL
+  out
+}
+
+#' Apply panel-wise transforms to segment geometry
+#'
+#' @param dat Data frame with columns \code{panel}, \code{x}, \code{y},
+#'   \code{xend}, \code{yend}.
+#' @param transforms Output of [.compute_panel_layout_transforms()].
+#' @return Transformed data frame.
+#' @keywords internal
+#' @noRd
+.apply_panel_layout_to_segments <- function(dat, transforms) {
+  if (is.null(dat) || nrow(dat) == 0) return(dat)
+  if (is.null(transforms) || nrow(transforms) == 0) return(dat)
+  if (!all(c("panel", "x", "y", "xend", "yend") %in% names(dat))) return(dat)
+
+  out <- dplyr::left_join(
+    dat,
+    transforms,
+    by = "panel"
+  )
+
+  cx <- out$cx
+  cy <- out$cy
+  rotate <- out$rotate
+  scale <- out$scale
+
+  missing_t <- is.na(cx) | is.na(cy) | is.na(scale)
+  cx[missing_t] <- 0
+  cy[missing_t] <- 0
+  rotate[is.na(rotate)] <- FALSE
+  scale[missing_t] <- 1
+
+  apply_xy <- function(x, y) {
+    x0 <- x - cx
+    y0 <- y - cy
+    x1 <- ifelse(rotate, -y0, x0)
+    y1 <- ifelse(rotate, x0, y0)
+    list(x = x1 * scale, y = y1 * scale)
+  }
+
+  p1 <- apply_xy(out$x, out$y)
+  p2 <- apply_xy(out$xend, out$yend)
+
+  out$x <- p1$x
+  out$y <- p1$y
+  out$xend <- p2$x
+  out$yend <- p2$y
+
+  out$cx <- NULL
+  out$cy <- NULL
+  out$rotate <- NULL
+  out$scale <- NULL
+  out
+}
+
+
 #' Plot Brain Surface Atlas
 #'
 #' @description
@@ -1010,12 +1399,31 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{"polygon"} encodes panel + parcel + polygon/face id for
 #'   click-to-surface workflows.
 #' @param ncol Integer: number of columns in the facet layout. Default: 2.
+#' @param panel_layout Panel coordinate layout strategy:
+#'   \code{"native"} (default) preserves raw projected units;
+#'   \code{"presentation"} recentres each panel, rotates dorsal/ventral views
+#'   to horizontal, and normalises per-panel scale for a cleaner ggseg-like
+#'   grid.
+#' @param style Visual preset. \code{"default"} keeps existing behaviour.
+#'   \code{"ggseg_like"} enables a cleaner publication style and, unless
+#'   explicitly overridden, switches \code{panel_layout} to
+#'   \code{"presentation"} with softer border defaults and light projection
+#'   smoothing.
 #' @param border Logical. If \code{TRUE} (default), draw thin lines at parcel
 #'   boundaries (edges between different parcels). Gives a clean ggseg-like
 #'   appearance.
 #' @param border_geom Boundary rendering method. \code{"path"} (default) chains
 #'   boundary edges into longer paths for smoother lines; \code{"segment"} draws
 #'   each boundary edge independently.
+#' @param boundary_smooth Non-negative integer controlling Chaikin smoothing
+#'   iterations applied to boundary paths when \code{border_geom = "path"}.
+#'   \code{0} (default) keeps original mesh-aligned boundaries; \code{1} or
+#'   \code{2} yields cleaner curves in close-up figures.
+#' @param projection_smooth Non-negative integer controlling Laplacian-like
+#'   smoothing iterations applied to projected vertex coordinates before parcel
+#'   polygons are constructed. This smooths filled parcel edges while
+#'   preserving shared boundaries across parcels. \code{0} (default) keeps raw
+#'   projected coordinates.
 #' @param border_color Colour for parcel boundary lines. Default:
 #'   \code{"grey30"}.
 #' @param border_size Line width for parcel boundaries. Default: \code{0.15}.
@@ -1124,8 +1532,12 @@ plot_brain <- function(surfatlas,
                        interactive = TRUE,
                        data_id_mode = c("parcel", "polygon"),
                        ncol = 2L,
+                       panel_layout = c("native", "presentation"),
+                       style = c("default", "ggseg_like"),
                        border = TRUE,
                        border_geom = c("path", "segment"),
+                       boundary_smooth = 0L,
+                       projection_smooth = 0L,
                        border_color = "grey30",
                        border_size = 0.15,
                        border_lineend = "round",
@@ -1152,6 +1564,32 @@ plot_brain <- function(surfatlas,
                        outline = FALSE,
                        bg = "white",
                        ...) {
+  style <- match.arg(style)
+
+  panel_layout_missing <- missing(panel_layout)
+  border_color_missing <- missing(border_color)
+  border_size_missing <- missing(border_size)
+  boundary_smooth_missing <- missing(boundary_smooth)
+  projection_smooth_missing <- missing(projection_smooth)
+  silhouette_missing <- missing(silhouette)
+  silhouette_color_missing <- missing(silhouette_color)
+  network_border_missing <- missing(network_border)
+  shading_missing <- missing(shading)
+  bg_missing <- missing(bg)
+
+  if (identical(style, "ggseg_like")) {
+    if (panel_layout_missing) panel_layout <- "presentation"
+    if (boundary_smooth_missing) boundary_smooth <- 2L
+    if (projection_smooth_missing) projection_smooth <- 1L
+    if (border_color_missing) border_color <- "grey82"
+    if (border_size_missing) border_size <- 0.24
+    if (silhouette_missing) silhouette <- FALSE
+    if (silhouette_color_missing) silhouette_color <- border_color
+    if (network_border_missing) network_border <- FALSE
+    if (shading_missing) shading <- FALSE
+    if (bg_missing) bg <- "#f7f7f7"
+  }
+
   # Input validation
   if (!inherits(surfatlas, "surfatlas")) {
     stop("'surfatlas' must be a surface atlas object of class 'surfatlas'.\n",
@@ -1163,7 +1601,23 @@ plot_brain <- function(surfatlas,
                      several.ok = TRUE)
   hemis <- match.arg(hemis, c("left", "right"), several.ok = TRUE)
   data_id_mode <- match.arg(data_id_mode)
+  panel_layout <- match.arg(panel_layout)
   border_geom <- match.arg(border_geom)
+  if (!is.numeric(boundary_smooth) || length(boundary_smooth) != 1 ||
+      is.na(boundary_smooth) || boundary_smooth < 0 ||
+      boundary_smooth != as.integer(boundary_smooth)) {
+    stop("'boundary_smooth' must be a non-negative integer scalar.",
+         call. = FALSE)
+  }
+  boundary_smooth <- as.integer(boundary_smooth)
+  if (!is.numeric(projection_smooth) || length(projection_smooth) != 1 ||
+      is.na(projection_smooth) || projection_smooth < 0 ||
+      projection_smooth != as.integer(projection_smooth)) {
+    stop("'projection_smooth' must be a non-negative integer scalar.",
+         call. = FALSE)
+  }
+  projection_smooth <- as.integer(projection_smooth)
+
   border_lineend <- match.arg(border_lineend, c("butt", "round", "square"))
   border_linejoin <- match.arg(border_linejoin, c("round", "mitre", "bevel"))
 
@@ -1203,9 +1657,19 @@ plot_brain <- function(surfatlas,
   # Use merged parcel polygons (~800 SVG elements) unless outline mode
   # requests the full triangle mesh (~160k elements).
   if (outline) {
-    build_result <- .build_brain_polygon_data_memo(surfatlas, views, surface)
+    build_result <- .build_brain_polygon_data_memo(
+      surfatlas,
+      views,
+      surface,
+      projection_smooth = projection_smooth
+    )
   } else {
-    build_result <- .build_merged_polygon_data_memo(surfatlas, views, surface)
+    build_result <- .build_merged_polygon_data_memo(
+      surfatlas,
+      views,
+      surface,
+      projection_smooth = projection_smooth
+    )
   }
   poly_data <- build_result$polygons
   boundary_data <- build_result$boundaries
@@ -1228,6 +1692,19 @@ plot_brain <- function(surfatlas,
   # Merged polygons use poly_id; triangle mode uses face_id.
   # This controls both grouping and optional polygon-level interactive ids.
   group_col <- if (outline) "face_id" else "poly_id"
+
+  # Optional panel-wise layout normalisation for presentation use.
+  panel_transforms <- .compute_panel_layout_transforms(
+    poly_data,
+    panel_layout = panel_layout
+  )
+  if (!is.null(panel_transforms)) {
+    poly_data <- .apply_panel_layout_to_points(poly_data, panel_transforms)
+    if (!is.null(boundary_data) && nrow(boundary_data) > 0) {
+      boundary_data <- .apply_panel_layout_to_segments(boundary_data,
+                                                       panel_transforms)
+    }
+  }
 
   # --- Colour assignment ---
   if (is.null(vals)) {
@@ -1371,6 +1848,7 @@ plot_brain <- function(surfatlas,
       overlay = overlay,
       views = views,
       hemis = hemis,
+      projection_smooth = projection_smooth,
       threshold = overlay_threshold
     )
 
@@ -1378,6 +1856,9 @@ plot_brain <- function(surfatlas,
     ov_bnd <- ov_build$boundaries
 
     if (!is.null(ov_poly) && nrow(ov_poly) > 0) {
+      if (!is.null(panel_transforms)) {
+        ov_poly <- .apply_panel_layout_to_points(ov_poly, panel_transforms)
+      }
       ov_poly$panel <- factor(ov_poly$panel, levels = levels(poly_data$panel))
       ov_poly$overlay_color <- .overlay_value_to_hex(
         ov_poly$overlay_value,
@@ -1397,11 +1878,20 @@ plot_brain <- function(surfatlas,
       )
 
       if (isTRUE(overlay_border) && !is.null(ov_bnd) && nrow(ov_bnd) > 0) {
+        if (!is.null(panel_transforms)) {
+          ov_bnd <- .apply_panel_layout_to_segments(ov_bnd, panel_transforms)
+        }
         ov_bnd$panel <- factor(ov_bnd$panel, levels = levels(poly_data$panel))
         ov_paths <- NULL
         if (border_geom == "path") {
           ov_paths <- .boundary_edges_to_paths(ov_bnd)
           if (!is.null(ov_paths) && nrow(ov_paths) > 0) {
+            if (boundary_smooth > 0L) {
+              ov_paths <- .smooth_boundary_paths(
+                ov_paths,
+                n_iter = boundary_smooth
+              )
+            }
             ov_paths$panel <- factor(ov_paths$panel,
                                      levels = levels(poly_data$panel))
           }
@@ -1448,6 +1938,9 @@ plot_brain <- function(surfatlas,
 
     if (!is.null(shade_data) && nrow(shade_data) > 0 &&
         "shade" %in% names(shade_data)) {
+      if (!is.null(panel_transforms)) {
+        shade_data <- .apply_panel_layout_to_points(shade_data, panel_transforms)
+      }
       shade_data$panel <- factor(shade_data$panel,
                                  levels = levels(poly_data$panel))
 
@@ -1475,6 +1968,12 @@ plot_brain <- function(surfatlas,
     if (border_geom == "path") {
       boundary_paths <- .boundary_edges_to_paths(boundary_data)
       if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
+        if (boundary_smooth > 0L) {
+          boundary_paths <- .smooth_boundary_paths(
+            boundary_paths,
+            n_iter = boundary_smooth
+          )
+        }
         boundary_paths$panel <- factor(boundary_paths$panel,
                                        levels = levels(poly_data$panel))
       }
