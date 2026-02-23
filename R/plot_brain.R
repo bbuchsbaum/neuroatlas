@@ -3,7 +3,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
                          "view", "tooltip", "data_id", "fill_color",
                          "fill_value", "xend", "yend", "poly_id", "edge_type",
                          "path_id", "v1", "v2", "alpha", "shade",
-                         "overlay_color"))
+                         "overlay_color",
+                         "xmin", "xmax", "ymin", "ymax",
+                         "rotate", "height", "width"))
 
 #' Compute face normals for a triangle mesh
 #'
@@ -1459,9 +1461,11 @@ build_surface_polygon_data <- function(surfatlas,
 #' @param shading_color Colour of the shading overlay. Default: \code{"black"}.
 #' @param fill_alpha Numeric in \code{[0, 1]}. Opacity of parcel fills.
 #'   Lower values can help the shading read more clearly. Default: \code{1}.
-#' @param overlay Optional vertex-wise overlay list with components \code{lh}
-#'   and \code{rh} (numeric vectors matching the vertex count of each
-#'   hemisphere mesh). Intended for projected volumetric cluster overlays.
+#' @param overlay Vertex-wise overlay or a \code{NeuroVol}.
+#'   If a \code{NeuroVol}, it is automatically projected onto the surface
+#'   using \code{neurosurf::vol_to_surf()}.
+#'   Otherwise, a list with \code{lh} and \code{rh} components (numeric
+#'   vectors matching the vertex count of each hemisphere mesh).
 #' @param overlay_threshold Optional absolute threshold for overlay values
 #'   before rendering.
 #' @param overlay_alpha Numeric in \code{[0, 1]}. Opacity of overlay polygons.
@@ -1470,6 +1474,14 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{"vik"}.
 #' @param overlay_lim Optional numeric length-2 limits for overlay colour
 #'   mapping.
+#' @param overlay_fun Character: interpolation function passed to
+#'   \code{neurosurf::vol_to_surf()} when \code{overlay} is a
+#'   \code{NeuroVol}. One of \code{"avg"}, \code{"nn"}, or \code{"mode"}.
+#'   Default: \code{"avg"}.
+#' @param overlay_sampling Character: sampling strategy passed to
+#'   \code{neurosurf::vol_to_surf()} when \code{overlay} is a
+#'   \code{NeuroVol}. One of \code{"midpoint"}, \code{"normal_line"}, or
+#'   \code{"thickness"}. Default: \code{"midpoint"}.
 #' @param overlay_border Logical. If \code{TRUE}, draw cluster overlay
 #'   boundaries. Default: \code{TRUE}.
 #' @param overlay_border_color Colour for overlay boundaries. Default:
@@ -1561,6 +1573,9 @@ plot_brain <- function(surfatlas,
                        overlay_border = TRUE,
                        overlay_border_color = "black",
                        overlay_border_size = 0.25,
+                       overlay_fun = c("avg", "nn", "mode"),
+                       overlay_sampling = c("midpoint", "normal_line",
+                                            "thickness"),
                        outline = FALSE,
                        bg = "white",
                        ...) {
@@ -1838,8 +1853,19 @@ plot_brain <- function(surfatlas,
 
   # Optional projected cluster overlay
   if (!is.null(overlay)) {
+    if (inherits(overlay, "NeuroVol")) {
+      overlay_fun <- match.arg(overlay_fun)
+      overlay_sampling <- match.arg(overlay_sampling)
+      proj <- .project_cluster_overlay(
+        cluster_vol = overlay,
+        surfatlas = surfatlas,
+        fun = overlay_fun,
+        sampling = overlay_sampling
+      )
+      overlay <- proj$overlay
+    }
     if (!is.list(overlay)) {
-      stop("'overlay' must be NULL or a list with components 'lh' and 'rh'.",
+      stop("'overlay' must be a NeuroVol, or a list with 'lh'/'rh' vertex vectors.",
            call. = FALSE)
     }
 

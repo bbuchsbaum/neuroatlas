@@ -46,6 +46,8 @@ plot_brain(
   overlay_border = TRUE,
   overlay_border_color = "black",
   overlay_border_size = 0.25,
+  overlay_fun = c("avg", "nn", "mode"),
+  overlay_sampling = c("midpoint", "normal_line", "thickness"),
   outline = FALSE,
   bg = "white",
   ...
@@ -177,9 +179,11 @@ Higher values concentrate shadows in more oblique regions. Default:
 \item{fill_alpha}{Numeric in \code{[0, 1]}. Opacity of parcel fills.
 Lower values can help the shading read more clearly. Default: \code{1}.}
 
-\item{overlay}{Optional vertex-wise overlay list with components \code{lh}
-and \code{rh} (numeric vectors matching the vertex count of each
-hemisphere mesh). Intended for projected volumetric cluster overlays.}
+\item{overlay}{Vertex-wise overlay or a \code{NeuroVol}.
+If a \code{NeuroVol}, it is automatically projected onto the surface
+using \code{neurosurf::vol_to_surf()}.
+Otherwise, a list with \code{lh} and \code{rh} components (numeric
+vectors matching the vertex count of each hemisphere mesh).}
 
 \item{overlay_threshold}{Optional absolute threshold for overlay values
 before rendering.}
@@ -201,6 +205,16 @@ boundaries. Default: \code{TRUE}.}
 
 \item{overlay_border_size}{Line width for overlay boundaries. Default:
 \code{0.25}.}
+
+\item{overlay_fun}{Character: interpolation function passed to
+\code{neurosurf::vol_to_surf()} when \code{overlay} is a
+\code{NeuroVol}. One of \code{"avg"}, \code{"nn"}, or \code{"mode"}.
+Default: \code{"avg"}.}
+
+\item{overlay_sampling}{Character: sampling strategy passed to
+\code{neurosurf::vol_to_surf()} when \code{overlay} is a
+\code{NeuroVol}. One of \code{"midpoint"}, \code{"normal_line"}, or
+\code{"thickness"}. Default: \code{"midpoint"}.}
 
 \item{outline}{Logical. If \code{TRUE}, draw every triangle edge (mesh
 wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}
