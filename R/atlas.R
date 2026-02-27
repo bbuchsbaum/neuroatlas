@@ -273,9 +273,9 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
 #' @rdname sub_atlas
 #' @export
 #' @method sub_atlas atlas
-sub_atlas.atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, ...) {
-  if (is.null(ids) && is.null(labels) && is.null(hemi)) {
-    stop("at least one of 'ids', 'labels', or 'hemi' must be supplied")
+sub_atlas.atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...) {
+  if (is.null(ids) && is.null(labels) && is.null(hemi) && is.null(network)) {
+    stop("at least one of 'ids', 'labels', 'hemi', or 'network' must be supplied")
   }
 
   # Start with all indices
@@ -307,6 +307,14 @@ sub_atlas.atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, ...) {
     keep <- keep & (x$hemi %in% hemi)
   }
 
+  # Filter by network
+  if (!is.null(network)) {
+    if (is.null(x$network)) {
+      stop("Atlas does not have network information; cannot filter by network")
+    }
+    keep <- keep & (x$network %in% network)
+  }
+
   keep_ids <- x$ids[keep]
   if (length(keep_ids) == 0) {
     stop("selection resulted in no matching regions")
@@ -327,7 +335,9 @@ sub_atlas.atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, ...) {
 #'
 #' @export
 #' @method reduce_atlas atlas
-reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
+reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
+                                level = c("parcel", "network", "hemisphere"),
+                                by = NULL) {
 
   # --- Input Validation ---
   if (!methods::is(data_vol, "NeuroVol") && !methods::is(data_vol, "NeuroVec")) {
@@ -463,6 +473,87 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
       long_data$value <- as.numeric(t(extracted_values))
       result_tibble <- tibble::as_tibble(long_data)
     }
+  }
+
+  # --- Hierarchical aggregation ---
+  level <- match.arg(level)
+
+  # by formula takes priority over level
+  if (!is.null(by)) {
+    if (!inherits(by, "formula")) {
+      stop("'by' must be a formula (e.g., ~ network + hemi)")
+    }
+    group_vars <- all.vars(by)
+    meta <- roi_metadata(atlas)
+
+    # Validate group vars exist in metadata
+    missing_vars <- setdiff(group_vars, names(meta))
+    if (length(missing_vars) > 0) {
+      stop("Variables not found in roi_metadata: ",
+           paste(missing_vars, collapse = ", "))
+    }
+
+    # Ensure we have long-format results for grouping
+    if (format == "wide" && nrow(extracted_values) > 1) {
+      # For NeuroVec wide format, convert to long first
+      long_results <- tibble::tibble(
+        time = rep(seq_len(nrow(extracted_values)),
+                   each = ncol(extracted_values)),
+        region = rep(colnames(extracted_values),
+                     nrow(extracted_values)),
+        value = as.numeric(t(extracted_values))
+      )
+    } else if (format == "long") {
+      long_results <- result_tibble
+    } else {
+      long_results <- result_tibble
+    }
+
+    # Determine region column name
+    region_col <- if ("region" %in% names(long_results)) {
+      "region"
+    } else {
+      names(long_results)[1]
+    }
+
+    # Create grouping lookup from metadata
+    group_lookup <- meta[, c("label", group_vars), drop = FALSE]
+    # Also map orig_labels if available
+    if (!is.null(atlas$orig_labels) && "label_full" %in% names(meta)) {
+      group_lookup2 <- meta[, c("label_full", group_vars), drop = FALSE]
+      names(group_lookup2)[1] <- "label"
+      group_lookup <- rbind(group_lookup, group_lookup2)
+    }
+
+    # Merge and aggregate
+    merged <- merge(long_results, group_lookup,
+                    by.x = region_col, by.y = "label", all.x = TRUE)
+
+    group_cols <- group_vars
+    if ("time" %in% names(merged)) group_cols <- c("time", group_cols)
+
+    agg <- stats::aggregate(merged[["value"]],
+                            by = merged[group_cols],
+                            FUN = stat_func)
+    names(agg)[ncol(agg)] <- "value"
+    result_tibble <- tibble::as_tibble(agg)
+
+  } else if (level != "parcel") {
+    # level-based aggregation
+    if (level == "network") {
+      if (is.null(atlas$network)) {
+        stop("Atlas does not have network information; cannot aggregate by network")
+      }
+      group_var <- "network"
+    } else if (level == "hemisphere") {
+      group_var <- "hemi"
+    }
+
+    # Recursive call with by= instead of level=
+    by_formula <- stats::as.formula(paste("~", group_var))
+    return(reduce_atlas.atlas(atlas, data_vol, stat_func, ...,
+                               format = format, level = "parcel",
+                               by = by_formula))
   }
 
   return(result_tibble)

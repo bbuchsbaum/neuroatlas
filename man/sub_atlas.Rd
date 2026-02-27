@@ -7,7 +7,7 @@
 \usage{
 sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, ...)
 
-\method{sub_atlas}{atlas}(x, ids = NULL, labels = NULL, hemi = NULL, ...)
+\method{sub_atlas}{atlas}(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...)
 }
 \arguments{
 \item{x}{An atlas object.}

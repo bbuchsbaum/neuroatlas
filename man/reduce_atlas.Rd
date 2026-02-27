@@ -7,7 +7,15 @@
 \usage{
 reduce_atlas(atlas, data_vol, stat_func, ..., format = NULL)
 
-\method{reduce_atlas}{atlas}(atlas, data_vol, stat_func, ..., format = NULL)
+\method{reduce_atlas}{atlas}(
+  atlas,
+  data_vol,
+  stat_func,
+  ...,
+  format = NULL,
+  level = c("parcel", "network", "hemisphere"),
+  by = NULL
+)
 }
 \arguments{
 \item{atlas}{An atlas object or another object for which a method is defined.}

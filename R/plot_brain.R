@@ -1488,6 +1488,10 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{"black"}.
 #' @param overlay_border_size Line width for overlay boundaries. Default:
 #'   \code{0.25}.
+#' @param colorbar Logical. When \code{vals} is non-NULL and
+#'   \code{interactive = FALSE}, add a standalone colorbar panel composed
+#'   alongside the main plot via \pkg{patchwork}. Default: \code{FALSE}.
+#' @param colorbar_title Optional character label for the colorbar.
 #' @param outline Logical. If \code{TRUE}, draw every triangle edge (mesh
 #'   wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.
 #' @param bg Character: background colour for the plot. Default: \code{"white"}.
@@ -1576,6 +1580,8 @@ plot_brain <- function(surfatlas,
                        overlay_fun = c("avg", "nn", "mode"),
                        overlay_sampling = c("midpoint", "normal_line",
                                             "thickness"),
+                       colorbar = FALSE,
+                       colorbar_title = NULL,
                        outline = FALSE,
                        bg = "white",
                        ...) {
@@ -2125,6 +2131,13 @@ plot_brain <- function(surfatlas,
     ggplot2::labs(fill = NULL)
 
   if (!interactive) {
+    if (isTRUE(colorbar) && !is.null(vals)) {
+      cb <- .make_colorbar_panel(palette = palette, lim = lim,
+                                 title = colorbar_title, bg = bg)
+      p <- p + patchwork::inset_element(
+        cb, left = 0.85, bottom = 0.15, right = 0.98, top = 0.85
+      )
+    }
     return(p)
   }
 
@@ -2157,4 +2170,47 @@ plot_brain <- function(surfatlas,
       ggiraph::opts_sizing(rescale = TRUE, width = 0.9)
     )
   )
+}
+
+
+#' Build a standalone colorbar ggplot panel
+#'
+#' @param palette scico palette name.
+#' @param lim Numeric length-2 colour limits.
+#' @param title Optional title string for the colour guide.
+#' @param bg Background colour.
+#' @return A \code{ggplot2} object containing only a colour bar.
+#' @keywords internal
+#' @noRd
+.make_colorbar_panel <- function(palette, lim, title = NULL, bg = "white") {
+  dummy <- data.frame(x = 1, y = 1, fill = mean(lim))
+  p <- ggplot2::ggplot(dummy, ggplot2::aes(x = x, y = y, fill = fill)) +
+    ggplot2::geom_point(alpha = 0, show.legend = TRUE) +
+    scico::scale_fill_scico(
+      palette = palette, limits = lim, oob = scales::squish,
+      name = title,
+      guide = ggplot2::guide_colorbar(
+        barwidth = ggplot2::unit(0.8, "lines"),
+        barheight = ggplot2::unit(6, "lines"),
+        title.position = "top",
+        title.hjust = 0.5,
+        direction = "vertical"
+      )
+    ) +
+    ggplot2::theme_void() +
+    ggplot2::theme(
+      legend.position = "right",
+      plot.background = ggplot2::element_rect(fill = NA, colour = NA)
+    )
+  cowplot_extract <- function(pl) {
+    gt <- ggplot2::ggplotGrob(pl)
+    guide_idx <- grep("guide", gt$layout$name)
+    if (length(guide_idx) == 0) return(pl)
+    guide_grob <- gt$grobs[[guide_idx[1]]]
+    gridExtra <- requireNamespace("gridExtra", quietly = TRUE)
+    ggplot2::ggplot() + ggplot2::theme_void() +
+      ggplot2::theme(plot.background = ggplot2::element_rect(fill = NA, colour = NA)) +
+      ggplot2::annotation_custom(guide_grob)
+  }
+  cowplot_extract(p)
 }

@@ -29,38 +29,46 @@ Imports:
     methods,
     neuroim2,
     neurosurf,
-    reticulate,
     rlang,
     Rnanoflann,
     scales,
     scico,
     stringr,
+    templateflow,
     tibble,
     tools,
     utils
 Suggests:
     albersdown,
+    corpcor,
     DT,
     echarts4r,
     FNN,
+    future.apply,
     geojsonio,
     geojsonsf,
     ggseg,
+    ggsegSchaefer,
     gifti,
     htmltools,
+    igraph,
     jsonlite,
     knitr,
+    mockery,
     patchwork,
+    reticulate,
     rmarkdown,
     shiny,
     sf,
     testthat (>= 3.0.0),
+    tidyr,
     uwot
 VignetteBuilder:
     knitr
 Remotes:
     bbuchsbaum/neurosurf,
-    bbuchsbaum/albersdown
+    bbuchsbaum/albersdown,
+    bbuchsbaum/templateflow
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB
@@ -68,3 +76,50 @@ LazyData: true
 LazyDataCompression: xz
 RoxygenNote: 7.3.3
 Config/Needs/website: albersdown
+Collate: 
+    'alignment_registry.R'
+    'all_generic.R'
+    'aseg_subcort.R'
+    'atlas.R'
+    'atlas_colors.R'
+    'atlas_connectivity.R'
+    'atlas_graph.R'
+    'atlas_hierarchy.R'
+    'atlas_methods.R'
+    'atlas_operators.R'
+    'atlas_overlap.R'
+    'atlas_ref.R'
+    'atlas_utils.R'
+    'batch_reduce.R'
+    'ce_atlas.R'
+    'ce_compute.R'
+    'ce_overlay.R'
+    'ce_picking.R'
+    'ce_plot.R'
+    'ce_plugins.R'
+    'ce_selection.R'
+    'plot_brain.R'
+    'ce_shared_exports.R'
+    'chart.R'
+    'cluster_explorer.R'
+    'coordinate_spaces.R'
+    'data-schaefer.R'
+    'dilate_parcels.R'
+    'fsaverage.R'
+    'ggschaefer.R'
+    'glasser.R'
+    'neuroatlas-package.R'
+    'olsen_mtl.R'
+    'parcel_data.R'
+    'plot_brain_grid.R'
+    'print-plot-methods.R'
+    'query_point.R'
+    'reduce_atlas_vec.R'
+    'roi_colors.R'
+    'roi_metadata.R'
+    'schaefer.R'
+    'spin_test.R'
+    'subcortical_atlases.R'
+    'template_flow.R'
+    'transform_registry.R'
+    'zzz.R'

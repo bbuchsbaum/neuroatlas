@@ -48,6 +48,8 @@ plot_brain(
   overlay_border_size = 0.25,
   overlay_fun = c("avg", "nn", "mode"),
   overlay_sampling = c("midpoint", "normal_line", "thickness"),
+  colorbar = FALSE,
+  colorbar_title = NULL,
   outline = FALSE,
   bg = "white",
   ...
@@ -215,6 +217,12 @@ Default: \code{"avg"}.}
 \code{neurosurf::vol_to_surf()} when \code{overlay} is a
 \code{NeuroVol}. One of \code{"midpoint"}, \code{"normal_line"}, or
 \code{"thickness"}. Default: \code{"midpoint"}.}
+
+\item{colorbar}{Logical. When \code{vals} is non-NULL and
+\code{interactive = FALSE}, add a standalone colorbar panel composed
+alongside the main plot via \pkg{patchwork}. Default: \code{FALSE}.}
+
+\item{colorbar_title}{Optional character label for the colorbar.}
 
 \item{outline}{Logical. If \code{TRUE}, draw every triangle edge (mesh
 wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}
