@@ -43,3 +43,4 @@ output
 renv/library
 .rcmdcheck_result.rds
 tmp/
+vignettes/figures/
