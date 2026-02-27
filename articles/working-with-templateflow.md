@@ -64,17 +64,16 @@ all top-level template space identifiers:
 # List all available template spaces
 all_templates <- tflow_spaces()
 print(head(all_templates))
-#> [1] "Fischer344"          "MNI152Lin"           "MNI152NLin2009aAsym"
-#> [4] "MNI152NLin2009aSym"  "MNI152NLin2009bAsym" "MNI152NLin2009bSym"
 cat("Total templates available:", length(all_templates), "\n")
-#> Total templates available: 30
 ```
 
 (If nothing prints here during build, see the note below.)
 
 ``` r
 cat("TemplateFlow was not available during vignette build.\n")
+#> TemplateFlow was not available during vignette build.
 cat("Run the chunk locally to see your real template list.\n")
+#> Run the chunk locally to see your real template list.
 ```
 
 You can also filter this list with a pattern (regular expression):
@@ -83,16 +82,13 @@ You can also filter this list with a pattern (regular expression):
 # Find all MNI templates
 mni_templates <- tflow_spaces(pattern = "MNI")
 print(mni_templates)
-#>  [1] "MNI152Lin"           "MNI152NLin2009aAsym" "MNI152NLin2009aSym" 
-#>  [4] "MNI152NLin2009bAsym" "MNI152NLin2009bSym"  "MNI152NLin2009cAsym"
-#>  [7] "MNI152NLin2009cSym"  "MNI152NLin6Asym"     "MNI152NLin6Sym"     
-#> [10] "MNI305"              "MNIColin27"          "MNIInfant"          
-#> [13] "MNIPediatricAsym"
 ```
 
 ``` r
 cat("TemplateFlow was not available during vignette build.\n")
+#> TemplateFlow was not available during vignette build.
 cat("Run this chunk locally to see matching MNI spaces.\n")
+#> Run this chunk locally to see matching MNI spaces.
 ```
 
 ### Discovering Volumetric Templates

@@ -1,8 +1,6 @@
 # Clear neuroatlas TemplateFlow Cache
 
-Removes all files and subdirectories from the \`neuroatlas\` package's
-cache directory used for TemplateFlow downloads. This function also
-clears the in-memory memoisation cache for TemplateFlow path lookups.
+Removes cached files and clears in-memory memoisation.
 
 ## Usage
 
@@ -14,31 +12,18 @@ clear_templateflow_cache(confirm = TRUE)
 
 - confirm:
 
-  Logical. If \`TRUE\` (the default), the function will ask for
-  interactive confirmation before deleting files if the session is
-  interactive. If \`FALSE\`, or if the session is not interactive,
-  deletion will proceed without confirmation.
+  Logical. If \`TRUE\` (the default), asks for interactive confirmation.
 
 ## Value
 
-Invisibly returns \`TRUE\` if the cache was cleared or attempted to be
-cleared, and \`FALSE\` if the operation was aborted by the user during
-confirmation.
-
-## Details
-
-The TemplateFlow cache directory is typically located within the path
-returned by \`tools::R_user_dir("neuroatlas", "cache")\`, in a
-subdirectory named "templateflow".
+Invisibly returns \`TRUE\` if the cache was cleared, \`FALSE\` if
+aborted.
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-  # Clear the TemplateFlow cache (will ask for confirmation if interactive)
-  # clear_templateflow_cache()
-
-  # Clear without confirmation
-  # clear_templateflow_cache(confirm = FALSE)
+  clear_templateflow_cache()
+  clear_templateflow_cache(confirm = FALSE)
 } # }
 ```

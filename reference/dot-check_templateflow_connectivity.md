@@ -1,8 +1,7 @@
 # Check TemplateFlow Connectivity
 
 Internal function to test if TemplateFlow API is accessible and
-functioning. This helps distinguish between network issues and other
-problems.
+functioning.
 
 ## Usage
 

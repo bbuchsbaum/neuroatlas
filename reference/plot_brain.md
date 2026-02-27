@@ -20,8 +20,12 @@ plot_brain(
   interactive = TRUE,
   data_id_mode = c("parcel", "polygon"),
   ncol = 2L,
+  panel_layout = c("native", "presentation"),
+  style = c("default", "ggseg_like"),
   border = TRUE,
   border_geom = c("path", "segment"),
+  boundary_smooth = 0L,
+  projection_smooth = 0L,
   border_color = "grey30",
   border_size = 0.15,
   border_lineend = "round",
@@ -45,6 +49,10 @@ plot_brain(
   overlay_border = TRUE,
   overlay_border_color = "black",
   overlay_border_size = 0.25,
+  overlay_fun = c("avg", "nn", "mode"),
+  overlay_sampling = c("midpoint", "normal_line", "thickness"),
+  colorbar = FALSE,
+  colorbar_title = NULL,
   outline = FALSE,
   bg = "white",
   ...
@@ -120,6 +128,20 @@ plot_brain(
 
   Integer: number of columns in the facet layout. Default: 2.
 
+- panel_layout:
+
+  Panel coordinate layout strategy: `"native"` (default) preserves raw
+  projected units; `"presentation"` recentres each panel, rotates
+  dorsal/ventral views to horizontal, and normalises per-panel scale for
+  a cleaner ggseg-like grid.
+
+- style:
+
+  Visual preset. `"default"` keeps existing behaviour. `"ggseg_like"`
+  enables a cleaner publication style and, unless explicitly overridden,
+  switches `panel_layout` to `"presentation"` with softer border
+  defaults and light projection smoothing.
+
 - border:
 
   Logical. If `TRUE` (default), draw thin lines at parcel boundaries
@@ -131,6 +153,21 @@ plot_brain(
   Boundary rendering method. `"path"` (default) chains boundary edges
   into longer paths for smoother lines; `"segment"` draws each boundary
   edge independently.
+
+- boundary_smooth:
+
+  Non-negative integer controlling Chaikin smoothing iterations applied
+  to boundary paths when `border_geom = "path"`. `0` (default) keeps
+  original mesh-aligned boundaries; `1` or `2` yields cleaner curves in
+  close-up figures.
+
+- projection_smooth:
+
+  Non-negative integer controlling Laplacian-like smoothing iterations
+  applied to projected vertex coordinates before parcel polygons are
+  constructed. This smooths filled parcel edges while preserving shared
+  boundaries across parcels. `0` (default) keeps raw projected
+  coordinates.
 
 - border_color:
 
@@ -208,9 +245,11 @@ plot_brain(
 
 - overlay:
 
-  Optional vertex-wise overlay list with components `lh` and `rh`
-  (numeric vectors matching the vertex count of each hemisphere mesh).
-  Intended for projected volumetric cluster overlays.
+  Vertex-wise overlay or a `NeuroVol`. If a `NeuroVol`, it is
+  automatically projected onto the surface using
+  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html).
+  Otherwise, a list with `lh` and `rh` components (numeric vectors
+  matching the vertex count of each hemisphere mesh).
 
 - overlay_threshold:
 
@@ -239,6 +278,30 @@ plot_brain(
 - overlay_border_size:
 
   Line width for overlay boundaries. Default: `0.25`.
+
+- overlay_fun:
+
+  Character: interpolation function passed to
+  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html)
+  when `overlay` is a `NeuroVol`. One of `"avg"`, `"nn"`, or `"mode"`.
+  Default: `"avg"`.
+
+- overlay_sampling:
+
+  Character: sampling strategy passed to
+  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html)
+  when `overlay` is a `NeuroVol`. One of `"midpoint"`, `"normal_line"`,
+  or `"thickness"`. Default: `"midpoint"`.
+
+- colorbar:
+
+  Logical. When `vals` is non-NULL and `interactive = FALSE`, add a
+  standalone colorbar panel composed alongside the main plot via
+  patchwork. Default: `FALSE`.
+
+- colorbar_title:
+
+  Optional character label for the colorbar.
 
 - outline:
 

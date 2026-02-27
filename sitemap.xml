@@ -1,6 +1,9 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
 <url><loc>/AGENTS.html</loc></url>
+<url><loc>/CLAUDE.html</loc></url>
+<url><loc>/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>/CONTRIBUTING.html</loc></url>
 <url><loc>/CRAN_guidance.html</loc></url>
 <url><loc>/CRAN_submission_notes.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
@@ -16,15 +19,26 @@
 <url><loc>/news/index.html</loc></url>
 <url><loc>/reference/MNI152_to_MNI305.html</loc></url>
 <url><loc>/reference/MNI305_to_MNI152.html</loc></url>
+<url><loc>/reference/Schaefer17_200.html</loc></url>
+<url><loc>/reference/Schaefer17_400.html</loc></url>
+<url><loc>/reference/Schaefer17_600.html</loc></url>
+<url><loc>/reference/as_igraph.html</loc></url>
+<url><loc>/reference/as_neurovol.html</loc></url>
 <url><loc>/reference/as_parcel_data.html</loc></url>
 <url><loc>/reference/atlas_alignment.html</loc></url>
+<url><loc>/reference/atlas_connectivity.html</loc></url>
 <url><loc>/reference/atlas_coord_space.html</loc></url>
 <url><loc>/reference/atlas_family.html</loc></url>
+<url><loc>/reference/atlas_graph.html</loc></url>
+<url><loc>/reference/atlas_hierarchy.html</loc></url>
+<url><loc>/reference/atlas_overlap.html</loc></url>
 <url><loc>/reference/atlas_ref.html</loc></url>
 <url><loc>/reference/atlas_roi_colors.html</loc></url>
 <url><loc>/reference/atlas_space.html</loc></url>
 <url><loc>/reference/atlas_transform_manifest.html</loc></url>
 <url><loc>/reference/atlas_transform_plan.html</loc></url>
+<url><loc>/reference/batch_reduce.html</loc></url>
+<url><loc>/reference/build_brain_polygon_data.html</loc></url>
 <url><loc>/reference/build_cluster_explorer_data.html</loc></url>
 <url><loc>/reference/build_conflict_edges.html</loc></url>
 <url><loc>/reference/build_surface_polygon_data.html</loc></url>
@@ -39,9 +53,13 @@
 <url><loc>/reference/dot-as_neurovol_unmemoised.html</loc></url>
 <url><loc>/reference/dot-check_templateflow_connectivity.html</loc></url>
 <url><loc>/reference/dot-init_templateflow_api.html</loc></url>
+<url><loc>/reference/dot-memoised_fetch_templateflow_path.html</loc></url>
 <url><loc>/reference/dot-neuroatlas_cache_dir.html</loc></url>
 <url><loc>/reference/dot-perform_tf_get_and_convert_to_path.html</loc></url>
 <url><loc>/reference/dot-resolve_template_input.html</loc></url>
+<url><loc>/reference/dot-schaefer_fsaverage6_surf.html</loc></url>
+<url><loc>/reference/dot-schaefer_surface_space_mapping.html</loc></url>
+<url><loc>/reference/dot-schaefer_templateflow_surf.html</loc></url>
 <url><loc>/reference/filter_atlas.html</loc></url>
 <url><loc>/reference/fsaverage.html</loc></url>
 <url><loc>/reference/get_aseg_atlas.html</loc></url>
@@ -66,6 +84,7 @@
 <url><loc>/reference/get_template_wm.html</loc></url>
 <url><loc>/reference/ggseg_schaefer.html</loc></url>
 <url><loc>/reference/glasser_surf.html</loc></url>
+<url><loc>/reference/grapes-where-grapes.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/infer_design_var_type.html</loc></url>
 <url><loc>/reference/install_templateflow.html</loc></url>
@@ -86,6 +105,7 @@
 <url><loc>/reference/parcel_values.html</loc></url>
 <url><loc>/reference/plot-methods.html</loc></url>
 <url><loc>/reference/plot_brain.html</loc></url>
+<url><loc>/reference/plot_brain_grid.html</loc></url>
 <url><loc>/reference/plot_glasser.html</loc></url>
 <url><loc>/reference/print-methods.html</loc></url>
 <url><loc>/reference/print.atlas_alignment.html</loc></url>
@@ -93,6 +113,7 @@
 <url><loc>/reference/print.atlas_transform_plan.html</loc></url>
 <url><loc>/reference/print.templateflow.html</loc></url>
 <url><loc>/reference/project_surface_view.html</loc></url>
+<url><loc>/reference/query_point.html</loc></url>
 <url><loc>/reference/read_parcel_data.html</loc></url>
 <url><loc>/reference/reduce_atlas.html</loc></url>
 <url><loc>/reference/reduce_atlas_vec.html</loc></url>
@@ -107,6 +128,7 @@
 <url><loc>/reference/schaefer_surf_options.html</loc></url>
 <url><loc>/reference/show_templateflow_cache_path.html</loc></url>
 <url><loc>/reference/space_transform_manifest.html</loc></url>
+<url><loc>/reference/spin_test.html</loc></url>
 <url><loc>/reference/sub-sub-.templateflow.html</loc></url>
 <url><loc>/reference/sub_atlas.html</loc></url>
 <url><loc>/reference/subcortical_atlas_options.html</loc></url>

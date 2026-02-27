@@ -41,7 +41,7 @@ internally by plot_brain()."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Build Surface Polygon Data for Rendering</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/R/plot_brain.R" class="external-link"><code>R/plot_brain.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/plot_brain.R" class="external-link"><code>R/plot_brain.R</code></a></small>
       <div class="d-none name"><code>build_surface_polygon_data.Rd</code></div>
     </div>
 
@@ -58,6 +58,7 @@ internally by <code><a href="plot_brain.html">plot_brain()</a></code>.</p>
 <span>  views <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lateral"</span>, <span class="st">"medial"</span><span class="op">)</span>,</span>
 <span>  surface <span class="op">=</span> <span class="st">"inflated"</span>,</span>
 <span>  merged <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  projection_smooth <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  use_cache <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -84,6 +85,13 @@ internally by <code><a href="plot_brain.html">plot_brain()</a></code>.</p>
 <dd><p>Logical. If <code>TRUE</code> (default), returns merged
 parcel-level polygons (faster, fewer shapes). If <code>FALSE</code>, returns
 per-triangle polygons.</p></dd>
+
+
+<dt id="arg-projection-smooth">projection_smooth<a class="anchor" aria-label="anchor" href="#arg-projection-smooth"></a></dt>
+<dd><p>Non-negative integer controlling Laplacian-like
+smoothing iterations applied to projected vertex coordinates before
+polygon and boundary construction. <code>0</code> (default) keeps native mesh
+coordinates.</p></dd>
 
 
 <dt id="arg-use-cache">use_cache<a class="anchor" aria-label="anchor" href="#arg-use-cache"></a></dt>

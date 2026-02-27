@@ -37,7 +37,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>neuroatlas</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/AGENTS.md" class="external-link"><code>AGENTS.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/AGENTS.md" class="external-link"><code>AGENTS.md</code></a></small>
     </div>
 
 <div id="neuroatlas" class="section level1">
@@ -48,40 +48,40 @@
 </div>
 <div class="section level2">
 <h2 id="key-files">Key Files<a class="anchor" aria-label="anchor" href="#key-files"></a></h2>
-<table class="table"><colgroup><col width="31%"><col width="68%"></colgroup><thead><tr class="header"><th>File</th>
+<table class="table"><colgroup><col width="31%"><col width="68%"></colgroup><thead><tr><th>File</th>
 <th>Description</th>
-</tr></thead><tbody><tr class="odd"><td><code>DESCRIPTION</code></td>
+</tr></thead><tbody><tr><td><code>DESCRIPTION</code></td>
 <td>Package metadata, version, and dependency declarations</td>
-</tr><tr class="even"><td><code>NAMESPACE</code></td>
+</tr><tr><td><code>NAMESPACE</code></td>
 <td>Auto-generated exports/imports (managed by roxygen2 — never edit manually)</td>
-</tr><tr class="odd"><td><code>CLAUDE.md</code></td>
+</tr><tr><td><code>CLAUDE.md</code></td>
 <td>Development instructions for Claude Code</td>
-</tr><tr class="even"><td><code>_pkgdown.yml</code></td>
+</tr><tr><td><code>_pkgdown.yml</code></td>
 <td>pkgdown site configuration</td>
-</tr><tr class="odd"><td><code>README.Rmd</code></td>
+</tr><tr><td><code>README.Rmd</code></td>
 <td>Package README source (renders to README.md)</td>
-</tr><tr class="even"><td><code>NEWS.md</code></td>
+</tr><tr><td><code>NEWS.md</code></td>
 <td>Changelog</td>
 </tr></tbody></table></div>
 <div class="section level2">
 <h2 id="subdirectories">Subdirectories<a class="anchor" aria-label="anchor" href="#subdirectories"></a></h2>
-<table class="table"><colgroup><col width="55%"><col width="45%"></colgroup><thead><tr class="header"><th>Directory</th>
+<table class="table"><colgroup><col width="55%"><col width="45%"></colgroup><thead><tr><th>Directory</th>
 <th>Purpose</th>
-</tr></thead><tbody><tr class="odd"><td><code>R/</code></td>
+</tr></thead><tbody><tr><td><code>R/</code></td>
 <td>All R source code — S3 classes, generics, methods (see <code>R/AGENTS.md</code>)</td>
-</tr><tr class="even"><td><code>tests/testthat/</code></td>
+</tr><tr><td><code>tests/testthat/</code></td>
 <td>testthat test suite (see <code>tests/testthat/AGENTS.md</code>)</td>
-</tr><tr class="odd"><td><code>data/</code></td>
+</tr><tr><td><code>data/</code></td>
 <td>Precomputed <code>.rda</code> datasets bundled with the package</td>
-</tr><tr class="even"><td><code>data-raw/</code></td>
+</tr><tr><td><code>data-raw/</code></td>
 <td>Scripts and raw files used to generate <code>data/</code> contents</td>
-</tr><tr class="odd"><td><code>inst/extdata/</code></td>
+</tr><tr><td><code>inst/extdata/</code></td>
 <td>NIfTI atlas volumes shipped with the package</td>
-</tr><tr class="even"><td><code>vignettes/</code></td>
+</tr><tr><td><code>vignettes/</code></td>
 <td>Package vignettes and tutorials</td>
-</tr><tr class="odd"><td><code>man/</code></td>
+</tr><tr><td><code>man/</code></td>
 <td>Auto-generated roxygen2 documentation (do not edit)</td>
-</tr><tr class="even"><td><code>docs/</code></td>
+</tr><tr><td><code>docs/</code></td>
 <td>Auto-generated pkgdown website (do not edit)</td>
 </tr></tbody></table></div>
 <div class="section level2">
@@ -90,7 +90,7 @@
 <h3 id="working-in-this-directory">Working In This Directory<a class="anchor" aria-label="anchor" href="#working-in-this-directory"></a></h3>
 <ul><li>Follow tidyverse style: 2-space indentation, no tabs, ~80 char lines, <code>snake_case</code> functions</li>
 <li>Use <code>UpperCamelCase</code> for S3/S4 classes</li>
-<li>All exports require roxygen2 documentation; run <code>devtools::document()</code> after changes</li>
+<li>All exports require roxygen2 documentation; run <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code> after changes</li>
 <li>Use <code>assertthat</code> for input validation</li>
 <li>Check optional packages with <code><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace()</a></code> before use</li>
 <li>The NAMESPACE file is auto-generated — never edit it manually</li>
@@ -99,8 +99,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="testing-requirements">Testing Requirements<a class="anchor" aria-label="anchor" href="#testing-requirements"></a></h3>
-<ul><li>Run <code>devtools::test()</code> for the full suite, or <code><a href="https://testthat.r-lib.org/reference/test_file.html" class="external-link">testthat::test_file()</a></code> for individual files</li>
-<li>Tests must <code>devtools::load_all()</code> first (or use <code>devtools::test()</code> which does this)</li>
+<ul><li>Run <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code> for the full suite, or <code><a href="https://testthat.r-lib.org/reference/test_file.html" class="external-link">testthat::test_file()</a></code> for individual files</li>
+<li>Tests must <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> first (or use <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code> which does this)</li>
 <li>Use <code>skip_on_cran()</code> for network-dependent or slow tests</li>
 <li>Use <code>make_toy_*()</code> helpers for synthetic data — avoid requiring atlas downloads in unit tests</li>
 <li>Add tests with every feature or bug fix</li>
@@ -108,7 +108,7 @@
 <div class="section level3">
 <h3 id="build-and-check">Build and Check<a class="anchor" aria-label="anchor" href="#build-and-check"></a></h3>
 <ul><li>
-<code>devtools::check()</code> or <code>R CMD check --as-cran</code> for CRAN compliance</li>
+<code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code> or <code>R CMD check --as-cran</code> for CRAN compliance</li>
 <li>No non-ASCII characters in code or data</li>
 <li>Examples must run in &lt; 5 seconds (use <code>\dontrun{}</code> or <code>\donttest{}</code> for slow ones)</li>
 <li>CI tracks coverage via Codecov</li>
@@ -117,7 +117,7 @@
 <h3 id="commit-guidelines">Commit Guidelines<a class="anchor" aria-label="anchor" href="#commit-guidelines"></a></h3>
 <ul><li>Concise, present-tense commit messages (e.g., “Add Schaefer atlas loader”)</li>
 <li>Group related changes; don’t mix refactors with behavioral changes</li>
-<li>Ensure <code>devtools::check()</code> and <code>devtools::test()</code> pass before committing</li>
+<li>Ensure <code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code> and <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code> pass before committing</li>
 </ul></div>
 <div class="section level3">
 <h3 id="key-architecture">Key Architecture<a class="anchor" aria-label="anchor" href="#key-architecture"></a></h3>

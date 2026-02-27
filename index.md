@@ -90,12 +90,12 @@ ggseg_schaefer(parcels = 200, networks = 7) +
 
 ## Available Atlases
 
-| Atlas     | Function                                                  | Description                                                 |
-|-----------|-----------------------------------------------------------|-------------------------------------------------------------|
-| Schaefer  | [`get_schaefer_atlas()`](reference/get_schaefer_atlas.md) | Cortical parcellations (100-1000 regions, 7 or 17 networks) |
-| Glasser   | [`get_glasser_atlas()`](reference/get_glasser_atlas.md)   | 360-region multi-modal cortical parcellation                |
-| ASEG      | [`get_aseg_atlas()`](reference/get_aseg_atlas.md)         | FreeSurfer subcortical segmentation                         |
-| Olsen MTL | [`get_olsen_mtl()`](reference/get_olsen_mtl.md)           | Medial temporal lobe atlas with hippocampal subfields       |
+| Atlas | Function | Description |
+|----|----|----|
+| Schaefer | [`get_schaefer_atlas()`](reference/get_schaefer_atlas.md) | Cortical parcellations (100-1000 regions, 7 or 17 networks) |
+| Glasser | [`get_glasser_atlas()`](reference/get_glasser_atlas.md) | 360-region multi-modal cortical parcellation |
+| ASEG | [`get_aseg_atlas()`](reference/get_aseg_atlas.md) | FreeSurfer subcortical segmentation |
+| Olsen MTL | [`get_olsen_mtl()`](reference/get_olsen_mtl.md) | Medial temporal lobe atlas with hippocampal subfields |
 
 ## Documentation
 

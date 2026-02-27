@@ -1,7 +1,6 @@
-# List Attributes of the TemplateFlow API Object
+# List Attributes of the TemplateFlow Object (DEPRECATED)
 
-Lists the names of attributes and methods available on the underlying
-Python TemplateFlow API object.
+List Attributes of the TemplateFlow Object (DEPRECATED)
 
 ## Usage
 
@@ -18,19 +17,4 @@ names(x)
 
 ## Value
 
-A character vector of available attribute and method names.
-
-## Examples
-
-``` r
-if (FALSE) { # \dontrun{
-  # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) &&
-      reticulate::py_module_available("templateflow")) {
-    tf <- create_templateflow()
-    # print(names(tf))
-  } else {
-    message("Python or templateflow module not available. Skipping example.")
-  }
-} # }
-```
+A character vector of available element names.

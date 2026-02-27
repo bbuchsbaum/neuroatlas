@@ -9,7 +9,15 @@ This is an S3 generic function.
 reduce_atlas(atlas, data_vol, stat_func, ..., format = NULL)
 
 # S3 method for class 'atlas'
-reduce_atlas(atlas, data_vol, stat_func, ..., format = NULL)
+reduce_atlas(
+  atlas,
+  data_vol,
+  stat_func,
+  ...,
+  format = NULL,
+  level = c("parcel", "network", "hemisphere"),
+  by = NULL
+)
 ```
 
 ## Arguments

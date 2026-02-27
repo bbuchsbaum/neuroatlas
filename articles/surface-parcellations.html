@@ -65,9 +65,9 @@
                         <h4 data-toc-skip class="author">neuroatlas Dev
 Team</h4>
             
-            <h4 data-toc-skip class="date">2026-02-20</h4>
+            <h4 data-toc-skip class="date">2026-02-26</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/vignettes/surface-parcellations.Rmd" class="external-link"><code>vignettes/surface-parcellations.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/vignettes/surface-parcellations.Rmd" class="external-link"><code>vignettes/surface-parcellations.Rmd</code></a></small>
       <div class="d-none name"><code>surface-parcellations.Rmd</code></div>
     </div>
 
@@ -227,18 +227,10 @@ spaces).</p>
 <span>  space    <span class="op">=</span> <span class="st">"fsaverage6"</span>,  <span class="co"># packaged geometry (no TF), keeps it fast</span></span>
 <span>  surf     <span class="op">=</span> <span class="st">"inflated"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_200Parcels_7Networks_order.txt</span></span>
 <span></span>
 <span><span class="va">geom_l</span> <span class="op">&lt;-</span> <span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/geometry-methods.html" class="external-link">geometry</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">)</span></span>
 <span><span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/snapshot_surface.html" class="external-link">snapshot_surface</a></span><span class="op">(</span><span class="va">geom_l</span>, file <span class="op">=</span> <span class="va">png_path</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in min(x): no non-missing arguments to min; returning Inf</span></span>
-<span><span class="co">#&gt; Warning in max(x): no non-missing arguments to max; returning -Inf</span></span>
-<span><span class="co">#&gt; Warning in neurosurf::snapshot_surface(geom_l, file = png_path):</span></span>
-<span><span class="co">#&gt; rgl.useNULL=TRUE and webshot2 not installed; snapshot may be blank in headless</span></span>
-<span><span class="co">#&gt; builds.</span></span>
-<span><span class="va">png_path</span></span>
-<span><span class="co">#&gt; [1] "figures/schaefer200_fs6_L_inflated.png"</span></span></code></pre></div>
-<p><img src="figures/schaefer200_fs6_L_inflated.png" class="r-plt" alt="Schaefer 200x7 fsaverage6 inflated left hemisphere labeled surface" width="600"></p>
+<span><span class="va">png_path</span></span></code></pre></div>
 <p>If the image renders, the parcellated surface is displayable.</p>
 </div>
 </div>
@@ -317,6 +309,108 @@ write stats into <code>data</code>.</li>
 <code><a href="../reference/map_atlas.html">map_atlas()</a></code> to project parcel statistics back onto the mesh
 for visualization.</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="dense-vertex-wise-overlays">Dense vertex-wise overlays<a class="anchor" aria-label="anchor" href="#dense-vertex-wise-overlays"></a>
+</h2>
+<p><code><a href="../reference/plot_brain.html">plot_brain()</a></code> supports dense (per-vertex) overlays in
+addition to parcel-level colouring. You can pass a list with
+<code>lh</code> and <code>rh</code> numeric vectors — one value per
+vertex — and the result is a continuous colour map draped over the
+cortical surface.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">atl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">7</span>, space <span class="op">=</span> <span class="st">"fsaverage6"</span>, surf <span class="op">=</span> <span class="st">"inflated"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">make_spatial_overlay</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">atlas_hemi</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">verts</span> <span class="op">&lt;-</span> <span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/vertices-methods.html" class="external-link">vertices</a></span><span class="op">(</span><span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/geometry-methods.html" class="external-link">geometry</a></span><span class="op">(</span><span class="va">atlas_hemi</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">verts</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
+<span>  <span class="va">z</span> <span class="op">&lt;-</span> <span class="va">verts</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span></span>
+<span>  <span class="va">vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">y</span> <span class="op">/</span> <span class="fl">25</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">z</span> <span class="op">/</span> <span class="fl">30</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">vals</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">ov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  lh <span class="op">=</span> <span class="fu">make_spatial_overlay</span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">)</span>,</span>
+<span>  rh <span class="op">=</span> <span class="fu">make_spatial_overlay</span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">rh_atlas</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">atl</span>,</span>
+<span>  overlay         <span class="op">=</span> <span class="va">ov</span>,</span>
+<span>  overlay_alpha   <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  overlay_palette <span class="op">=</span> <span class="st">"vik"</span>,</span>
+<span>  interactive     <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="surface-parcellations_files/figure-html/overlay-dense-1.png" class="r-plt" alt="" width="768"></p>
+<div class="section level3">
+<h3 id="automatic-neurovol-projection">Automatic NeuroVol projection<a class="anchor" aria-label="anchor" href="#automatic-neurovol-projection"></a>
+</h3>
+<p>When <code>overlay</code> is a <code>NeuroVol</code> (e.g. a
+whole-brain statistical map), <code><a href="../reference/plot_brain.html">plot_brain()</a></code> automatically
+projects it onto the surface via <code><a href="https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html" class="external-link">neurosurf::vol_to_surf()</a></code> —
+no manual preprocessing required. Here we build a synthetic volume with
+two positive “activation” blobs over frontal cortex and one negative
+blob over occipital cortex.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">spacing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">origin</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">80</span>, <span class="op">-</span><span class="fl">120</span>, <span class="op">-</span><span class="fl">60</span><span class="op">)</span></span>
+<span><span class="va">dims</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40L</span>, <span class="fl">50L</span>, <span class="fl">40L</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sp</span>  <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroSpace.html" class="external-link">NeuroSpace</a></span><span class="op">(</span><span class="va">dims</span>, spacing <span class="op">=</span> <span class="va">spacing</span>, origin <span class="op">=</span> <span class="va">origin</span><span class="op">)</span></span>
+<span><span class="va">arr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="fl">0</span>, dim <span class="op">=</span> <span class="va">dims</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">dims</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">dims</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">for</span> <span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">dims</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">coord</span> <span class="op">&lt;-</span> <span class="va">origin</span> <span class="op">+</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">k</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="va">spacing</span></span>
+<span>      <span class="va">d1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">coord</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">20</span>, <span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span>      <span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">coord</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="fl">20</span>, <span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span>      <span class="va">d3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">coord</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>  <span class="fl">0</span>,<span class="op">-</span><span class="fl">60</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span>      <span class="va">arr</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">d1</span> <span class="op">/</span> <span class="fl">800</span><span class="op">)</span> <span class="op">+</span></span>
+<span>                       <span class="fl">3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">d2</span> <span class="op">/</span> <span class="fl">800</span><span class="op">)</span> <span class="op">-</span></span>
+<span>                       <span class="fl">2.5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">d3</span> <span class="op">/</span> <span class="fl">600</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">stat_vol</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroVol.html" class="external-link">NeuroVol</a></span><span class="op">(</span><span class="va">arr</span>, <span class="va">sp</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">atl</span>,</span>
+<span>  overlay           <span class="op">=</span> <span class="va">stat_vol</span>,</span>
+<span>  overlay_threshold <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  overlay_palette   <span class="op">=</span> <span class="st">"vik"</span>,</span>
+<span>  overlay_alpha     <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  interactive       <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="surface-parcellations_files/figure-html/overlay-vol-1.png" class="r-plt" alt="" width="768"></p>
+<p>In practice you would load a real statistical map instead:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">stat_vol</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/read_vol.html" class="external-link">read_vol</a></span><span class="op">(</span><span class="st">"my_tstat.nii.gz"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span><span class="va">atl</span>, overlay <span class="op">=</span> <span class="va">stat_vol</span>, overlay_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>           overlay_palette <span class="op">=</span> <span class="st">"vik"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>Two optional parameters control the volume-to-surface projection:</p>
+<ul>
+<li>
+<strong><code>overlay_fun</code></strong>: interpolation function —
+<code>"avg"</code> (default), <code>"nn"</code> (nearest-neighbour), or
+<code>"mode"</code> (most frequent label).</li>
+<li>
+<strong><code>overlay_sampling</code></strong>: sampling strategy —
+<code>"midpoint"</code> (default, halfway between white and pial),
+<code>"normal_line"</code> (multiple samples along the surface normal),
+or <code>"thickness"</code> (cortical-thickness–aware sampling).</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">atl</span>,</span>
+<span>  overlay          <span class="op">=</span> <span class="va">stat_vol</span>,</span>
+<span>  overlay_fun      <span class="op">=</span> <span class="st">"nn"</span>,</span>
+<span>  overlay_sampling <span class="op">=</span> <span class="st">"normal_line"</span>,</span>
+<span>  overlay_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  interactive       <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="notes-on-dependencies">Notes on dependencies<a class="anchor" aria-label="anchor" href="#notes-on-dependencies"></a>

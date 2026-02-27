@@ -6,13 +6,20 @@
   Transform Matrix
 - [`MNI305_to_MNI152`](MNI305_to_MNI152.md) : MNI305 to MNI152 Affine
   Transform Matrix
+- [`as_igraph()`](as_igraph.md) : Convert Atlas Connectivity to igraph
 - [`as_parcel_data()`](as_parcel_data.md) : Convert an Object to
   \`parcel_data\`
 - [`atlas_alignment()`](atlas_alignment.md) : Atlas Alignment Lookup
+- [`atlas_connectivity()`](atlas_connectivity.md) : Compute Connectivity
+  Matrix from Atlas Parcellations
 - [`atlas_coord_space()`](atlas_coord_space.md) : Atlas Coordinate-Space
   Convenience Accessor
 - [`atlas_family()`](atlas_family.md) : Atlas Family Convenience
   Accessor
+- [`atlas_graph()`](atlas_graph.md) : Compute Parcel Adjacency Graph
+  from an Atlas
+- [`atlas_hierarchy()`](atlas_hierarchy.md) : Atlas Hierarchy
+- [`atlas_overlap()`](atlas_overlap.md) : Cross-Atlas Overlap Analysis
 - [`atlas_ref()`](atlas_ref.md) : Atlas Reference Accessor
 - [`atlas_roi_colors()`](atlas_roi_colors.md) : Assign optimal colours
   to atlas regions
@@ -22,14 +29,16 @@
   Transform Manifest
 - [`atlas_transform_plan()`](atlas_transform_plan.md) : Plan a Transform
   Between Spaces
+- [`batch_reduce()`](batch_reduce.md) : Batch Reduce Multiple Volumes by
+  an Atlas
+- [`build_brain_polygon_data()`](build_brain_polygon_data.md) : Build
+  brain polygon render data for a surface atlas
 - [`build_cluster_explorer_data()`](build_cluster_explorer_data.md) :
   Build Cluster Explorer Data
 - [`build_conflict_edges()`](build_conflict_edges.md) : Build
   slice-aware conflict edges between ROIs
 - [`build_surface_polygon_data()`](build_surface_polygon_data.md) :
   Build Surface Polygon Data for Rendering
-- [`` `$`( ``*`<templateflow>`*`)`](cash-.templateflow.md) : Access
-  Attributes of the TemplateFlow Object
 - [`check_templateflow()`](check_templateflow.md) : Check TemplateFlow
   Installation Status
 - [`clear_templateflow_cache()`](clear_templateflow_cache.md) : Clear
@@ -94,10 +103,12 @@
   Atlas Visualization
 - [`glasser_surf()`](glasser_surf.md) : Glasser Surface Atlas
   (fsaverage)
+- [`` `%where%` ``](grapes-where-grapes.md) : Filter Atlas with Infix
+  Operator
 - [`infer_design_var_type()`](infer_design_var_type.md) : Infer Design
   Variable Type
 - [`install_templateflow()`](install_templateflow.md) : Install
-  Templateflow Python package
+  Templateflow (DEPRECATED)
 - [`launch_cluster_explorer()`](launch_cluster_explorer.md) : Launch
   Cluster Explorer in Interactive Session
 - [`load_surface_template()`](load_surface_template.md) : Load a surface
@@ -106,8 +117,6 @@
 - [`map_to_schaefer()`](map_to_schaefer.md) : Map Values to Schaefer
   Atlas Format
 - [`merge_atlases()`](merge_atlases.md) : Merge Two Brain Atlases
-- [`names(`*`<templateflow>`*`)`](names.templateflow.md) : List
-  Attributes of the TemplateFlow API Object
 - [`needs_coord_transform()`](needs_coord_transform.md) : Check if a
   Coordinate Transform is Needed
 - [`needs_template_warp()`](needs_template_warp.md) : Check if a
@@ -125,6 +134,8 @@
   [`plot(`*`<glasser>`*`)`](plot-methods.md)
   [`plot(`*`<surfatlas>`*`)`](plot-methods.md) : Plot Glasser Atlas
 - [`plot_brain()`](plot_brain.md) : Plot Brain Surface Atlas
+- [`plot_brain_grid()`](plot_brain_grid.md) : Multi-panel Brain Plot
+  Grid
 - [`plot_glasser()`](plot_glasser.md) : Plot Glasser Atlas Values
 - [`print(`*`<atlas>`*`)`](print-methods.md)
   [`print(`*`<glasser>`*`)`](print-methods.md)
@@ -140,6 +151,8 @@
   TemplateFlow Object
 - [`project_surface_view()`](project_surface_view.md) : Project Surface
   Vertices to a Canonical 2D View
+- [`query_point()`](query_point.md) : Look Up Atlas Regions at MNI
+  Coordinates
 - [`read_parcel_data()`](read_parcel_data.md) : Read a \`parcel_data\`
   Object from Disk
 - [`reduce_atlas()`](reduce_atlas.md) : Reduce a NeuroVol or NeuroVec by
@@ -165,8 +178,8 @@
   Show neuroatlas TemplateFlow Cache Path
 - [`space_transform_manifest()`](space_transform_manifest.md) : Space
   Transform Manifest
-- [`` `[[`( ``*`<templateflow>`*`)`](sub-sub-.templateflow.md) : Access
-  Attributes of the TemplateFlow Object using \[\[
+- [`spin_test()`](spin_test.md) : Spin Test for Spatial Correlation
+  Significance
 - [`sub_atlas()`](sub_atlas.md) : Select a Subset of Atlas Regions
 - [`subcortical_atlas_options()`](subcortical_atlas_options.md) :
   Subcortical Atlas Options (TemplateFlow-backed)

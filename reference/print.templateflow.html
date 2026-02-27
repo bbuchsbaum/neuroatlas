@@ -37,7 +37,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Print a TemplateFlow Object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/R/template_flow.R" class="external-link"><code>R/template_flow.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/template_flow.R" class="external-link"><code>R/template_flow.R</code></a></small>
       <div class="d-none name"><code>print.templateflow.Rd</code></div>
     </div>
 
@@ -68,21 +68,6 @@
     <p>The input object <code>x</code>, returned invisibly.</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_available.html" class="external-link">py_available</a></span><span class="op">(</span>initialize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span>    <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_module_available.html" class="external-link">py_module_available</a></span><span class="op">(</span><span class="st">"templateflow"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span><span class="va">tf</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_templateflow.html">create_templateflow</a></span><span class="op">(</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tf</span><span class="op">)</span><span class="op">}</span>,</span></span>
-<span class="r-in"><span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;neuroatlas TemplateFlow Interface&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Cache Path:  /home/runner/.cache/R/neuroatlas/templateflow </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   API Status:  Connected (Python API handle initialized) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Available Templates (Examples):  Fischer344, MNI152Lin, MNI152NLin2009aAsym, MNI152NLin2009aSym, MNI152NLin2009bAsym, ... (Total: 30)</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

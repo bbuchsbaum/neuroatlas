@@ -37,7 +37,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>CRAN Documentation Compliance Strategy (roxygen2)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/CRAN_guidance.md" class="external-link"><code>CRAN_guidance.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/CRAN_guidance.md" class="external-link"><code>CRAN_guidance.md</code></a></small>
     </div>
 
 
@@ -381,33 +381,33 @@ Suggests:
 <h3 id="essential-local-checks">Essential Local Checks<a class="anchor" aria-label="anchor" href="#essential-local-checks"></a></h3>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Generate documentation and NAMESPACE</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span> <span class="co"># or roxygen2::roxygenise()</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">document</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># or roxygen2::roxygenise()</span></span>
 <span></span>
 <span><span class="co"># 2. Run comprehensive CRAN checks (THE GOLD STANDARD)</span></span>
 <span><span class="co"># This will also build and check vignettes if present.</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span>cran <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span>cran <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 3. Check for spelling errors in documentation</span></span>
 <span><span class="co"># Add a WORDLIST file for technical terms.</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">spell_check</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/spell_check.html" class="external-link">spell_check</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 4. Validate all URLs in documentation, DESCRIPTION, etc.</span></span>
-<span><span class="fu">urlchecker</span><span class="fu">::</span><span class="fu">url_check</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">urlchecker</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/urlchecker/man/url_check.html" class="external-link">url_check</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="multi-platform-testing-crucial-before-submission">Multi-Platform Testing (Crucial Before Submission)<a class="anchor" aria-label="anchor" href="#multi-platform-testing-crucial-before-submission"></a></h3>
 <p>Use services to check on platforms you don’t have access to:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Windows (devel and release)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check_win_devel</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check_win_release</span><span class="op">(</span><span class="op">)</span> <span class="co"># If available</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check_win.html" class="external-link">check_win_devel</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check_win.html" class="external-link">check_win_release</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># If available</span></span>
 <span></span>
 <span><span class="co"># macOS</span></span>
 <span><span class="co"># devtools::check_mac_release() # (Often relies on external services or specific local setup)</span></span>
 <span></span>
 <span><span class="co"># R-hub builder (various Linux distributions, Windows, macOS)</span></span>
 <span><span class="co"># devtools::check_rhub() or rhub::check_for_cran()</span></span>
-<span><span class="fu">rhub</span><span class="fu">::</span><span class="fu">check_for_cran</span><span class="op">(</span><span class="op">)</span> <span class="co"># Simpler interface for CRAN-like checks</span></span>
+<span><span class="fu">rhub</span><span class="fu">::</span><span class="fu"><a href="https://r-hub.github.io/rhub/reference/check_for_cran.html" class="external-link">check_for_cran</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># Simpler interface for CRAN-like checks</span></span>
 <span></span>
 <span><span class="co"># Check results from these services thoroughly.</span></span></code></pre></div>
 </div>
@@ -418,36 +418,36 @@ Suggests:
 </div>
 <div class="section level2">
 <h2 id="x-common-cran-pitfalls-to-avoid">X. Common CRAN Pitfalls to Avoid<a class="anchor" aria-label="anchor" href="#x-common-cran-pitfalls-to-avoid"></a></h2>
-<table class="table"><colgroup><col width="29%"><col width="70%"></colgroup><thead><tr class="header"><th>Issue</th>
+<table class="table"><colgroup><col width="29%"><col width="70%"></colgroup><thead><tr><th>Issue</th>
 <th>Solution / Best Practice</th>
-</tr></thead><tbody><tr class="odd"><td>Missing <code>@export</code>
+</tr></thead><tbody><tr><td>Missing <code>@export</code>
 </td>
 <td>Add to all user-facing functions, classes, methods.</td>
-</tr><tr class="even"><td>Undocumented exported objects</td>
+</tr><tr><td>Undocumented exported objects</td>
 <td>Document <em>every</em> exported object (functions, data, classes).</td>
-</tr><tr class="odd"><td>Slow examples (<code>@examples</code>)</td>
+</tr><tr><td>Slow examples (<code>@examples</code>)</td>
 <td>Use <code>\donttest{}</code> for examples &gt;~5 seconds; optimize code.</td>
-</tr><tr class="even"><td>
+</tr><tr><td>
 <code>\dontrun{}</code> overuse</td>
 <td>Only for examples that truly cannot be run safely/automatically by CRAN. Justify heavily.</td>
-</tr><tr class="odd"><td>Errors/Warnings in examples</td>
+</tr><tr><td>Errors/Warnings in examples</td>
 <td>Examples must run cleanly. Debug or use conditional logic.</td>
-</tr><tr class="even"><td>Broken URLs</td>
-<td>Check with <code>urlchecker::url_check()</code> and fix.</td>
-</tr><tr class="odd"><td>Writing to file system outside <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code>
+</tr><tr><td>Broken URLs</td>
+<td>Check with <code><a href="https://rdrr.io/pkg/urlchecker/man/url_check.html" class="external-link">urlchecker::url_check()</a></code> and fix.</td>
+</tr><tr><td>Writing to file system outside <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code>
 </td>
 <td>Always use <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> in examples/tests and clean up.</td>
-</tr><tr class="even"><td>Non-ASCII characters without <code>Encoding</code>
+</tr><tr><td>Non-ASCII characters without <code>Encoding</code>
 </td>
 <td>Add <code>Encoding: UTF-8</code> to <code>DESCRIPTION</code> and save files as UTF-8.</td>
-</tr><tr class="odd"><td>Typos/Grammar</td>
-<td>Use <code>devtools::spell_check()</code>; proofread carefully.</td>
-</tr><tr class="even"><td>Incorrect <code>Title:</code> / <code>Description:</code> case</td>
+</tr><tr><td>Typos/Grammar</td>
+<td>Use <code><a href="https://devtools.r-lib.org/reference/spell_check.html" class="external-link">devtools::spell_check()</a></code>; proofread carefully.</td>
+</tr><tr><td>Incorrect <code>Title:</code> / <code>Description:</code> case</td>
 <td>Use Sentence case for <code>Title:</code> fields, standard paragraph for <code>Description:</code>.</td>
-</tr><tr class="odd"><td>Missing or incorrect <code>License</code>
+</tr><tr><td>Missing or incorrect <code>License</code>
 </td>
 <td>Use a CRAN-accepted open-source license; ensure <code>LICENSE</code> file is correct.</td>
-</tr><tr class="even"><td>Vignettes fail to build or are slow</td>
+</tr><tr><td>Vignettes fail to build or are slow</td>
 <td>Ensure vignettes are robust, efficient, and build correctly.</td>
 </tr></tbody></table></div>
 <div class="section level2">
@@ -455,15 +455,15 @@ Suggests:
 <ol style="list-style-type: decimal"><li>
 <strong>Use <code>usethis</code> for Setup:</strong>
 <ul><li>
-<code>usethis::use_package_doc()</code>: Sets up package-level documentation file.</li>
+<code><a href="https://usethis.r-lib.org/reference/use_package_doc.html" class="external-link">usethis::use_package_doc()</a></code>: Sets up package-level documentation file.</li>
 <li>
-<code>usethis::use_data()</code>: Prepares datasets for inclusion in <code>data/</code> and optionally creates <code>R/data.R</code>.</li>
+<code><a href="https://usethis.r-lib.org/reference/use_data.html" class="external-link">usethis::use_data()</a></code>: Prepares datasets for inclusion in <code>data/</code> and optionally creates <code>R/data.R</code>.</li>
 <li>
 <code>usethis::use_vignette("my-vignette-title")</code>: Creates a vignette template.</li>
 <li>
-<code>usethis::use_mit_license()</code>, <code>usethis::use_gpl3_license()</code>, etc.: Sets up license files.</li>
+<code><a href="https://usethis.r-lib.org/reference/licenses.html" class="external-link">usethis::use_mit_license()</a></code>, <code><a href="https://usethis.r-lib.org/reference/licenses.html" class="external-link">usethis::use_gpl3_license()</a></code>, etc.: Sets up license files.</li>
 <li>
-<code>usethis::use_testthat()</code>: Sets up testing infrastructure.</li>
+<code><a href="https://usethis.r-lib.org/reference/use_testthat.html" class="external-link">usethis::use_testthat()</a></code>: Sets up testing infrastructure.</li>
 </ul></li>
 <li>
 <strong>Consistent Documentation Style:</strong>
@@ -492,24 +492,24 @@ Suggests:
 <div class="section level2">
 <h2 id="xii-vignettes-highly-recommended">XII. Vignettes (Highly Recommended)<a class="anchor" aria-label="anchor" href="#xii-vignettes-highly-recommended"></a></h2>
 <p>Vignettes are longer-form documents that illustrate how to use your package, often with narrative and extended examples. CRAN reviewers value well-written vignettes.</p>
-<ul><li>
-<strong>Purpose:</strong> Show practical applications, workflows, or delve into specific functionalities more deeply than function examples allow.</li>
+<ul><li><p><strong>Purpose:</strong> Show practical applications, workflows, or delve into specific functionalities more deeply than function examples allow.</p></li>
+<li><p><strong>Creation:</strong> Use <code>usethis::use_vignette("your-vignette-title")</code>. This creates an <code>.Rmd</code> file in <code>inst/doc/</code>.</p></li>
+<li><p><strong>Format:</strong> R Markdown (<code>.Rmd</code>) is standard.</p></li>
 <li>
-<strong>Creation:</strong> Use <code>usethis::use_vignette("your-vignette-title")</code>. This creates an <code>.Rmd</code> file in <code>inst/doc/</code>.</li>
-<li>
-<strong>Format:</strong> R Markdown (<code>.Rmd</code>) is standard.</li>
-<li>
-<strong>Content:</strong>
+<p><strong>Content:</strong></p>
 <ul><li>Include an introduction explaining the vignette’s purpose.</li>
 <li>Use a mix of narrative text and runnable R code chunks.</li>
 <li>Ensure code chunks are efficient and don’t produce excessive output.</li>
 <li>Make them self-contained if possible.</li>
 </ul></li>
 <li>
-<strong><code>DESCRIPTION</code> file entries:</strong> If you include vignettes, you must declare the builder (usually <code>knitr</code>) and list necessary packages in <code>Suggests</code>: <code>dcf     VignetteBuilder: knitr     Suggests:         knitr,         rmarkdown # And any other packages used ONLY in vignettes</code>
+<p><strong><code>DESCRIPTION</code> file entries:</strong> If you include vignettes, you must declare the builder (usually <code>knitr</code>) and list necessary packages in <code>Suggests</code>:</p>
+<pre class="dcf"><code>VignetteBuilder: knitr
+Suggests:
+    knitr,
+    rmarkdown # And any other packages used ONLY in vignettes</code></pre>
 </li>
-<li>
-<strong>Building and Checking:</strong> <code>devtools::check()</code> will attempt to build your vignettes. Ensure they build without errors and reasonably quickly.</li>
+<li><p><strong>Building and Checking:</strong> <code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code> will attempt to build your vignettes. Ensure they build without errors and reasonably quickly.</p></li>
 </ul></div>
 <div class="section level2">
 <h2 id="resources">Resources<a class="anchor" aria-label="anchor" href="#resources"></a></h2>

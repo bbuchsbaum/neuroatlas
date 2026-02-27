@@ -43,9 +43,12 @@ The new [`get_template`](get_template.md)
 
 ``` r
 # \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_head(), error = function(e) NULL)
 }
+#> Warning: The `name` argument of `get_template_head()` is deprecated as of neuroatlas
+#> 0.10.0.
+#> ℹ Please use `get_template()` instead.
+#> NULL
 # }
 ```

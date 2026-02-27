@@ -158,12 +158,12 @@ Densities are TemplateFlow defaults; surface types are those exposed by
 [`get_surface_template()`](../reference/get_template.md) (and used by
 our atlas helpers).
 
-| template_id | density/res    | surface types                               | packaged?         |
-|-------------|----------------|---------------------------------------------|-------------------|
-| fsaverage   | 164k           | white, pial, inflated, midthickness, sphere | TF                |
-| fsaverage6  | 41k (`res-06`) | white, pial, inflated                       | **yes** (bundled) |
-| fsaverage5  | 10k (`res-05`) | white, pial, inflated                       | TF                |
-| fsLR        | 32k            | white, pial, inflated, midthickness, sphere | TF                |
+| template_id | density/res | surface types | packaged? |
+|----|----|----|----|
+| fsaverage | 164k | white, pial, inflated, midthickness, sphere | TF |
+| fsaverage6 | 41k (`res-06`) | white, pial, inflated | **yes** (bundled) |
+| fsaverage5 | 10k (`res-05`) | white, pial, inflated | TF |
+| fsLR | 32k | white, pial, inflated, midthickness, sphere | TF |
 
 ### Batch snapshot script (run locally)
 

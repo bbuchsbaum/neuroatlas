@@ -12,6 +12,7 @@ build_surface_polygon_data(
   views = c("lateral", "medial"),
   surface = "inflated",
   merged = TRUE,
+  projection_smooth = 0L,
   use_cache = TRUE
 )
 ```
@@ -35,6 +36,12 @@ build_surface_polygon_data(
 
   Logical. If `TRUE` (default), returns merged parcel-level polygons
   (faster, fewer shapes). If `FALSE`, returns per-triangle polygons.
+
+- projection_smooth:
+
+  Non-negative integer controlling Laplacian-like smoothing iterations
+  applied to projected vertex coordinates before polygon and boundary
+  construction. `0` (default) keeps native mesh coordinates.
 
 - use_cache:
 

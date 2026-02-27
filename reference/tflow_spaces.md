@@ -1,8 +1,7 @@
 # List Available TemplateFlow Template Spaces
 
 Retrieves a list of all available template space identifiers from the
-TemplateFlow archive. These identifiers are top-level names like
-"MNI152NLin2009cAsym", "fsLR", etc.
+TemplateFlow archive.
 
 ## Usage
 
@@ -20,9 +19,7 @@ tflow_spaces(pattern = NULL, api_handle = NULL, ...)
 
 - api_handle:
 
-  (Optional) An existing \`templateflow\` S3 object created by
-  \`create_templateflow()\`. If \`NULL\`, a default one will be
-  initialized.
+  Deprecated and ignored.
 
 - ...:
 
@@ -31,8 +28,7 @@ tflow_spaces(pattern = NULL, api_handle = NULL, ...)
 
 ## Value
 
-A character vector of available template space names. Returns \`NULL\`
-if the list cannot be retrieved, with a warning.
+A character vector of available template space names.
 
 ## Examples
 
@@ -40,10 +36,8 @@ if the list cannot be retrieved, with a warning.
 # \donttest{
   # List all template spaces
   # all_spaces <- tflow_spaces()
-  # print(head(all_spaces))
 
   # List template spaces containing "MNI"
   # mni_spaces <- tflow_spaces(pattern = "MNI")
-  # print(mni_spaces)
 # }
 ```

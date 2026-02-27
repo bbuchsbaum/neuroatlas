@@ -47,8 +47,7 @@ load_surface_template(
 - ...:
 
   Additional arguments forwarded to
-  [`get_surface_template`](get_template.md), such as alternative cache
-  directories.
+  [`get_surface_template`](get_template.md).
 
 ## Value
 

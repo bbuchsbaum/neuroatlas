@@ -11,7 +11,7 @@ given they are intersected.
 sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, ...)
 
 # S3 method for class 'atlas'
-sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, ...)
+sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...)
 ```
 
 ## Arguments

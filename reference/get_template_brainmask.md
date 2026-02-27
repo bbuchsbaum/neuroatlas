@@ -43,11 +43,29 @@ The new [`get_template`](get_template.md)
 
 ``` r
 # \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_brainmask(), error = function(e) NULL)
 }
-#> Downloading uv...
-#> Done!
+#> Warning: The `name` argument of `get_template_brainmask()` is deprecated as of
+#> neuroatlas 0.10.0.
+#> ℹ Please use `get_template()` instead.
+#> [templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz
+#> 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |=======                                                               |  11%
+  |                                                                            
+  |=======================                                               |  34%
+  |                                                                            
+  |===============================                                       |  44%
+  |                                                                            
+  |=======================================                               |  55%
+  |                                                                            
+  |==============================================================        |  88%
+  |                                                                            
+  |===================================================================== |  98%
+  |                                                                            
+  |======================================================================| 100%
 # }
 ```

@@ -146,21 +146,11 @@ atl <- schaefer_surf(
   space    = "fsaverage6",  # packaged geometry (no TF), keeps it fast
   surf     = "inflated"
 )
-#> downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_200Parcels_7Networks_order.txt
 
 geom_l <- neurosurf::geometry(atl$lh_atlas)
 neurosurf::snapshot_surface(geom_l, file = png_path)
-#> Warning in min(x): no non-missing arguments to min; returning Inf
-#> Warning in max(x): no non-missing arguments to max; returning -Inf
-#> Warning in neurosurf::snapshot_surface(geom_l, file = png_path):
-#> rgl.useNULL=TRUE and webshot2 not installed; snapshot may be blank in headless
-#> builds.
 png_path
-#> [1] "figures/schaefer200_fs6_L_inflated.png"
 ```
-
-![Schaefer 200x7 fsaverage6 inflated left hemisphere labeled
-surface](figures/schaefer200_fs6_L_inflated.png)
 
 If the image renders, the parcellated surface is displayable.
 
@@ -236,6 +226,114 @@ download_surfaces("fsLR", list(density = "32k"), "~/my_surfaces/fsLR_32k")
   [`reduce_atlas()`](../reference/reduce_atlas.md) or surface atlases
   with [`map_atlas()`](../reference/map_atlas.md) to project parcel
   statistics back onto the mesh for visualization.
+
+## Dense vertex-wise overlays
+
+[`plot_brain()`](../reference/plot_brain.md) supports dense (per-vertex)
+overlays in addition to parcel-level colouring. You can pass a list with
+`lh` and `rh` numeric vectors — one value per vertex — and the result is
+a continuous colour map draped over the cortical surface.
+
+``` r
+atl <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
+
+make_spatial_overlay <- function(atlas_hemi) {
+  verts <- neurosurf::vertices(neurosurf::geometry(atlas_hemi))
+  y <- verts[, 2]
+  z <- verts[, 3]
+  vals <- sin(y / 25) * cos(z / 30)
+  as.numeric(vals)
+}
+
+ov <- list(
+  lh = make_spatial_overlay(atl$lh_atlas),
+  rh = make_spatial_overlay(atl$rh_atlas)
+)
+
+plot_brain(
+  atl,
+  overlay         = ov,
+  overlay_alpha   = 0.7,
+  overlay_palette = "vik",
+  interactive     = FALSE
+)
+```
+
+![](surface-parcellations_files/figure-html/overlay-dense-1.png)
+
+### Automatic NeuroVol projection
+
+When `overlay` is a `NeuroVol` (e.g. a whole-brain statistical map),
+[`plot_brain()`](../reference/plot_brain.md) automatically projects it
+onto the surface via
+[`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html)
+— no manual preprocessing required. Here we build a synthetic volume
+with two positive “activation” blobs over frontal cortex and one
+negative blob over occipital cortex.
+
+``` r
+spacing <- c(4, 4, 4)
+origin  <- c(-80, -120, -60)
+dims    <- c(40L, 50L, 40L)
+
+sp  <- neuroim2::NeuroSpace(dims, spacing = spacing, origin = origin)
+arr <- array(0, dim = dims)
+
+for (i in seq_len(dims[1])) {
+  for (j in seq_len(dims[2])) {
+    for (k in seq_len(dims[3])) {
+      coord <- origin + (c(i, j, k) - 1) * spacing
+      d1 <- sum((coord - c(-20, 30, 40))^2)
+      d2 <- sum((coord - c( 20, 30, 40))^2)
+      d3 <- sum((coord - c(  0,-60, 20))^2)
+      arr[i, j, k] <- 3 * exp(-d1 / 800) +
+                       3 * exp(-d2 / 800) -
+                       2.5 * exp(-d3 / 600)
+    }
+  }
+}
+
+stat_vol <- neuroim2::NeuroVol(arr, sp)
+
+plot_brain(
+  atl,
+  overlay           = stat_vol,
+  overlay_threshold = 0.5,
+  overlay_palette   = "vik",
+  overlay_alpha     = 0.7,
+  interactive       = FALSE
+)
+```
+
+![](surface-parcellations_files/figure-html/overlay-vol-1.png)
+
+In practice you would load a real statistical map instead:
+
+``` r
+stat_vol <- neuroim2::read_vol("my_tstat.nii.gz")
+plot_brain(atl, overlay = stat_vol, overlay_threshold = 2,
+           overlay_palette = "vik", interactive = FALSE)
+```
+
+Two optional parameters control the volume-to-surface projection:
+
+- **`overlay_fun`**: interpolation function — `"avg"` (default), `"nn"`
+  (nearest-neighbour), or `"mode"` (most frequent label).
+- **`overlay_sampling`**: sampling strategy — `"midpoint"` (default,
+  halfway between white and pial), `"normal_line"` (multiple samples
+  along the surface normal), or `"thickness"` (cortical-thickness–aware
+  sampling).
+
+``` r
+plot_brain(
+  atl,
+  overlay          = stat_vol,
+  overlay_fun      = "nn",
+  overlay_sampling = "normal_line",
+  overlay_threshold = 2,
+  interactive       = FALSE
+)
+```
 
 ## Notes on dependencies
 

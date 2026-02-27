@@ -7,8 +7,8 @@
   --muted: #5e636b;
   --border: #ddd8cf;
   --code-bg: #f3f1ec;
-  --shadow-soft: 0 2px 8px rgba(16, 20, 25, 0.03);
-  --shadow-card: 0 2px 12px rgba(21, 24, 29, 0.05);
+  --shadow-soft: 0 10px 30px rgba(16, 20, 25, 0.05);
+  --shadow-card: 0 12px 38px rgba(21, 24, 29, 0.08);
   --content: 78ch;
   --anchor-offset: 76px;
 
@@ -23,56 +23,16 @@
   --accent-ink: var(--accent-ink-light);
   --accent: var(--A500);
   --accent-strong: var(--A700);
-  --accent-tint: color-mix(in srgb, var(--A500) 9%, transparent);
+  --accent-tint: rgba(228, 73, 38, 0.09);
   --accent-band: color-mix(in srgb, var(--A500) 14%, transparent);
 }
 
-/* -- Palette families ---------------------------------------------------- */
-.palette-lapis  { --A900: #1b2a74; --A700: #20399c; --A500: #2c4fcc; --A300: #4968d6; }
-.palette-ochre  { --A900: #6f5200; --A700: #8b6700; --A500: #b48900; --A300: #d7a700; }
-.palette-teal   { --A900: #0d4a4a; --A700: #0f5e5e; --A500: #127373; --A300: #2f8c8c; }
-.palette-green  { --A900: #1b5e20; --A700: #2e7d32; --A500: #388e3c; --A300: #66bb6a; }
+.palette-lapis { --A900: #1b2a74; --A700: #20399c; --A500: #2c4fcc; --A300: #4968d6; }
+.palette-ochre { --A900: #6f5200; --A700: #8b6700; --A500: #b48900; --A300: #d7a700; }
+.palette-teal { --A900: #0d4a4a; --A700: #0f5e5e; --A500: #127373; --A300: #2f8c8c; }
+.palette-green { --A900: #1b5e20; --A700: #2e7d32; --A500: #388e3c; --A300: #66bb6a; }
 .palette-violet { --A900: #4a148c; --A700: #6a1b9a; --A500: #8e24aa; --A300: #ba68c8; --accent-ink-dark: #d59ae7; }
 
-/* -- Presets: ground / surface / ink variations --------------------------- */
-
-/* Study — clean analytical white (Interaction of Color plates) */
-.preset-study {
-  --bg: #fafaf8; --surface: #ffffff; --surface-strong: #fdfdfb;
-  --ink: #1a1a1a; --muted: #6b7280;
-  --border: #e2e2de; --code-bg: #f5f5f2;
-}
-
-/* Structural — stark, precise (Structural Constellations) */
-.preset-structural {
-  --bg: #edecea; --surface: #f8f7f4; --surface-strong: #f2f1ed;
-  --ink: #111111; --muted: #4a4e56;
-  --border: #c8c4b8; --code-bg: #e8e6e0;
-  --shadow-soft: none; --shadow-card: none;
-}
-
-/* Adobe — warm earth (Mexican adobe studies) */
-.preset-adobe {
-  --bg: #f0e8db; --surface: #f9f4ec; --surface-strong: #f5efe4;
-  --ink: #2c1e12; --muted: #6b5d4f;
-  --border: #d8cfc0; --code-bg: #ede6da;
-  --shadow-soft: 0 4px 14px rgba(42, 31, 21, 0.05);
-  --shadow-card: 0 4px 18px rgba(42, 31, 21, 0.06);
-}
-
-/* Midnight — deep dark (jewel-tone accents against indigo-black) */
-.preset-midnight {
-  --bg: #0e1117; --surface: #161b24; --surface-strong: #1c2129;
-  --ink: #e6e1d4; --muted: #9498a4;
-  --border: #2a2f3c; --code-bg: #111520;
-  --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 6px 24px rgba(0, 0, 0, 0.45);
-  --accent-ink: var(--accent-ink-dark);
-  --accent-tint: color-mix(in srgb, var(--A700) 18%, transparent);
-  --accent-band: color-mix(in srgb, var(--A500) 22%, transparent);
-}
-
-/* -- Dark mode (system / Bootstrap) -------------------------------------- */
 @media (prefers-color-scheme: dark) {
   :root {
     --ink: #ece8de;
@@ -82,8 +42,8 @@
     --muted: #a7a9ae;
     --border: #31353c;
     --code-bg: #181c21;
-    --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.35);
-    --shadow-card: 0 6px 24px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 14px 38px rgba(0, 0, 0, 0.45);
     --accent-ink: var(--accent-ink-dark);
     --accent-tint: color-mix(in srgb, var(--A700) 20%, transparent);
     --accent-band: color-mix(in srgb, var(--A500) 24%, transparent);
@@ -98,14 +58,13 @@
   --muted: #a7a9ae;
   --border: #31353c;
   --code-bg: #181c21;
-  --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.35);
-  --shadow-card: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 14px 38px rgba(0, 0, 0, 0.45);
   --accent-ink: var(--accent-ink-dark);
   --accent-tint: color-mix(in srgb, var(--A700) 20%, transparent);
   --accent-band: color-mix(in srgb, var(--A500) 24%, transparent);
 }
 
-/* -- Base typography & layout -------------------------------------------- */
 :root { scrollbar-gutter: stable both-edges; }
 
 html,
@@ -120,10 +79,9 @@ body {
 
 body {
   background-image:
-    linear-gradient(180deg,
-      transparent 0 70px,
-      color-mix(in srgb, var(--A500) 10%, transparent) 70px 71px,
-      transparent 71px 100%);
+    linear-gradient(115deg, transparent 0 58%, var(--accent-band) 58% 64%, transparent 64% 100%),
+    radial-gradient(circle at 84% 10%, color-mix(in srgb, var(--A300) 11%, transparent) 0 18%, transparent 18%),
+    linear-gradient(180deg, transparent 0 70px, color-mix(in srgb, var(--A500) 11%, transparent) 70px 71px, transparent 71px 100%);
   background-attachment: fixed;
 }
 
@@ -137,7 +95,6 @@ main,
   padding-inline: clamp(16px, 2.4vw, 34px);
 }
 
-/* -- Surfaces ------------------------------------------------------------ */
 .page-content,
 .article,
 .reference,
@@ -155,7 +112,6 @@ main,
 
 .navbar {
   background: color-mix(in srgb, var(--surface-strong) 96%, transparent) !important;
-  border-top: 2px solid var(--A500);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(6px);
 }
@@ -185,7 +141,6 @@ main,
   border-radius: 4px;
 }
 
-/* -- Typography ---------------------------------------------------------- */
 p { margin-block: 0 1rem; }
 
 h1,
@@ -206,7 +161,7 @@ h1 {
 
 h2 {
   font-size: clamp(1.35rem, 2vw, 1.55rem);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
@@ -222,7 +177,6 @@ h3 {
   scroll-margin-top: var(--anchor-offset);
 }
 
-/* -- Links --------------------------------------------------------------- */
 a,
 a:visited {
   color: var(--accent-ink) !important;
@@ -230,7 +184,6 @@ a:visited {
   text-decoration-thickness: 0.09em;
   text-underline-offset: 2px;
   text-decoration-skip-ink: auto;
-  transition: color 0.15s ease;
 }
 
 a:hover {
@@ -250,7 +203,6 @@ button.copy-code:focus,
 
 a:focus { outline: none; }
 
-/* -- Code ---------------------------------------------------------------- */
 code,
 pre,
 kbd,
@@ -278,9 +230,9 @@ pre::before {
   position: absolute;
   left: 11px;
   top: 11px;
-  width: 11px;
-  height: 11px;
-  background: var(--A700);
+  width: 10px;
+  height: 10px;
+  background: var(--A500);
 }
 
 pre code {
@@ -311,7 +263,6 @@ p code {
   padding: 0.12em 0.36em;
 }
 
-/* -- Tables -------------------------------------------------------------- */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -326,11 +277,8 @@ td {
 }
 
 thead th {
-  background: color-mix(in srgb, var(--accent-tint) 48%, transparent);
+  background: color-mix(in srgb, var(--accent-tint) 58%, transparent);
   font-weight: 650;
-  text-transform: uppercase;
-  font-size: 0.88em;
-  letter-spacing: 0.04em;
 }
 
 tbody tr:nth-child(odd) {
@@ -344,10 +292,9 @@ caption {
   font-size: 0.94em;
 }
 
-/* -- Callouts ------------------------------------------------------------ */
 blockquote,
 .callout {
-  border-left: 4px solid var(--A500);
+  border-left: 3px solid var(--A500);
   background: color-mix(in srgb, var(--accent-tint) 72%, transparent);
   border-radius: 4px;
   padding: 16px 22px;
@@ -356,7 +303,6 @@ blockquote,
 
 blockquote p { margin: 0; }
 
-/* -- Anchors ------------------------------------------------------------- */
 h2:hover .anchor,
 h3:hover .anchor,
 h2:focus-within .anchor,
@@ -376,7 +322,6 @@ h3:focus-within .anchor {
   transition: opacity 0.15s ease-in-out;
 }
 
-/* -- Homage hero & decorative elements ----------------------------------- */
 .homage-hero {
   aspect-ratio: 8 / 3;
   margin-block: 1.35rem;
@@ -415,7 +360,6 @@ h3:focus-within .anchor {
 
 .overview ul { list-style: square; }
 
-/* -- Responsive ---------------------------------------------------------- */
 @media (max-width: 920px) {
   html,
   body { font-size: 16.9px; }

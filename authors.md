@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/bbuchsbaum/neuroatlas/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/DESCRIPTION)
 
 Buchsbaum B (2026). *neuroatlas: Neuroimaging Atlases and
 Parcellations*. R package version 0.1.0,

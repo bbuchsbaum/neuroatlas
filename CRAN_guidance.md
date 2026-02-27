@@ -507,33 +507,36 @@ with the package.
 
 ## X. Common CRAN Pitfalls to Avoid
 
-| Issue                                                                              | Solution / Best Practice                                                                       |
-|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| Missing `@export`                                                                  | Add to all user-facing functions, classes, methods.                                            |
-| Undocumented exported objects                                                      | Document *every* exported object (functions, data, classes).                                   |
-| Slow examples (`@examples`)                                                        | Use `\donttest{}` for examples \>~5 seconds; optimize code.                                    |
-| `\dontrun{}` overuse                                                               | Only for examples that truly cannot be run safely/automatically by CRAN. Justify heavily.      |
-| Errors/Warnings in examples                                                        | Examples must run cleanly. Debug or use conditional logic.                                     |
-| Broken URLs                                                                        | Check with `urlchecker::url_check()` and fix.                                                  |
+| Issue | Solution / Best Practice |
+|----|----|
+| Missing `@export` | Add to all user-facing functions, classes, methods. |
+| Undocumented exported objects | Document *every* exported object (functions, data, classes). |
+| Slow examples (`@examples`) | Use `\donttest{}` for examples \>~5 seconds; optimize code. |
+| `\dontrun{}` overuse | Only for examples that truly cannot be run safely/automatically by CRAN. Justify heavily. |
+| Errors/Warnings in examples | Examples must run cleanly. Debug or use conditional logic. |
+| Broken URLs | Check with [`urlchecker::url_check()`](https://rdrr.io/pkg/urlchecker/man/url_check.html) and fix. |
 | Writing to file system outside [`tempdir()`](https://rdrr.io/r/base/tempfile.html) | Always use [`tempdir()`](https://rdrr.io/r/base/tempfile.html) in examples/tests and clean up. |
-| Non-ASCII characters without `Encoding`                                            | Add `Encoding: UTF-8` to `DESCRIPTION` and save files as UTF-8.                                |
-| Typos/Grammar                                                                      | Use `devtools::spell_check()`; proofread carefully.                                            |
-| Incorrect `Title:` / `Description:` case                                           | Use Sentence case for `Title:` fields, standard paragraph for `Description:`.                  |
-| Missing or incorrect `License`                                                     | Use a CRAN-accepted open-source license; ensure `LICENSE` file is correct.                     |
-| Vignettes fail to build or are slow                                                | Ensure vignettes are robust, efficient, and build correctly.                                   |
+| Non-ASCII characters without `Encoding` | Add `Encoding: UTF-8` to `DESCRIPTION` and save files as UTF-8. |
+| Typos/Grammar | Use [`devtools::spell_check()`](https://devtools.r-lib.org/reference/spell_check.html); proofread carefully. |
+| Incorrect `Title:` / `Description:` case | Use Sentence case for `Title:` fields, standard paragraph for `Description:`. |
+| Missing or incorrect `License` | Use a CRAN-accepted open-source license; ensure `LICENSE` file is correct. |
+| Vignettes fail to build or are slow | Ensure vignettes are robust, efficient, and build correctly. |
 
 ## XI. Pro Tips for Smooth Submissions
 
 1.  **Use `usethis` for Setup:**
-    - `usethis::use_package_doc()`: Sets up package-level documentation
-      file.
-    - `usethis::use_data()`: Prepares datasets for inclusion in `data/`
-      and optionally creates `R/data.R`.
+    - [`usethis::use_package_doc()`](https://usethis.r-lib.org/reference/use_package_doc.html):
+      Sets up package-level documentation file.
+    - [`usethis::use_data()`](https://usethis.r-lib.org/reference/use_data.html):
+      Prepares datasets for inclusion in `data/` and optionally creates
+      `R/data.R`.
     - `usethis::use_vignette("my-vignette-title")`: Creates a vignette
       template.
-    - `usethis::use_mit_license()`, `usethis::use_gpl3_license()`, etc.:
-      Sets up license files.
-    - `usethis::use_testthat()`: Sets up testing infrastructure.
+    - [`usethis::use_mit_license()`](https://usethis.r-lib.org/reference/licenses.html),
+      [`usethis::use_gpl3_license()`](https://usethis.r-lib.org/reference/licenses.html),
+      etc.: Sets up license files.
+    - [`usethis::use_testthat()`](https://usethis.r-lib.org/reference/use_testthat.html):
+      Sets up testing infrastructure.
 2.  **Consistent Documentation Style:**
     - Use active voice and clear, concise language.
     - Be very specific in `@param` descriptions (e.g., “A numeric
@@ -565,21 +568,34 @@ value well-written vignettes.
 
 - **Purpose:** Show practical applications, workflows, or delve into
   specific functionalities more deeply than function examples allow.
+
 - **Creation:** Use `usethis::use_vignette("your-vignette-title")`. This
   creates an `.Rmd` file in `inst/doc/`.
+
 - **Format:** R Markdown (`.Rmd`) is standard.
+
 - **Content:**
+
   - Include an introduction explaining the vignette’s purpose.
   - Use a mix of narrative text and runnable R code chunks.
   - Ensure code chunks are efficient and don’t produce excessive output.
   - Make them self-contained if possible.
+
 - **`DESCRIPTION` file entries:** If you include vignettes, you must
   declare the builder (usually `knitr`) and list necessary packages in
   `Suggests`:
-  `dcf VignetteBuilder: knitr Suggests: knitr, rmarkdown # And any other packages used ONLY in vignettes`
-- **Building and Checking:** `devtools::check()` will attempt to build
-  your vignettes. Ensure they build without errors and reasonably
-  quickly.
+
+  ``` dcf
+  VignetteBuilder: knitr
+  Suggests:
+      knitr,
+      rmarkdown # And any other packages used ONLY in vignettes
+  ```
+
+- **Building and Checking:**
+  [`devtools::check()`](https://devtools.r-lib.org/reference/check.html)
+  will attempt to build your vignettes. Ensure they build without errors
+  and reasonably quickly.
 
 ## Resources
 

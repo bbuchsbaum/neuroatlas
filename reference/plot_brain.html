@@ -41,7 +41,7 @@ the legacy ggseg-based visualisation pipeline."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Plot Brain Surface Atlas</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/R/plot_brain.R" class="external-link"><code>R/plot_brain.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/R/plot_brain.R" class="external-link"><code>R/plot_brain.R</code></a></small>
       <div class="d-none name"><code>plot_brain.Rd</code></div>
     </div>
 
@@ -66,8 +66,12 @@ the legacy ggseg-based visualisation pipeline.</p>
 <span>  interactive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  data_id_mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"parcel"</span>, <span class="st">"polygon"</span><span class="op">)</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  panel_layout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"native"</span>, <span class="st">"presentation"</span><span class="op">)</span>,</span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"ggseg_like"</span><span class="op">)</span>,</span>
 <span>  border <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  border_geom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"path"</span>, <span class="st">"segment"</span><span class="op">)</span>,</span>
+<span>  boundary_smooth <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  projection_smooth <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  border_color <span class="op">=</span> <span class="st">"grey30"</span>,</span>
 <span>  border_size <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>  border_lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
@@ -91,6 +95,10 @@ the legacy ggseg-based visualisation pipeline.</p>
 <span>  overlay_border <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  overlay_border_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  overlay_border_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  overlay_fun <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"avg"</span>, <span class="st">"nn"</span>, <span class="st">"mode"</span><span class="op">)</span>,</span>
+<span>  overlay_sampling <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="st">"normal_line"</span>, <span class="st">"thickness"</span><span class="op">)</span>,</span>
+<span>  colorbar <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  colorbar_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  outline <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  bg <span class="op">=</span> <span class="st">"white"</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -169,6 +177,22 @@ click-to-surface workflows.</p></dd>
 <dd><p>Integer: number of columns in the facet layout. Default: 2.</p></dd>
 
 
+<dt id="arg-panel-layout">panel_layout<a class="anchor" aria-label="anchor" href="#arg-panel-layout"></a></dt>
+<dd><p>Panel coordinate layout strategy:
+<code>"native"</code> (default) preserves raw projected units;
+<code>"presentation"</code> recentres each panel, rotates dorsal/ventral views
+to horizontal, and normalises per-panel scale for a cleaner ggseg-like
+grid.</p></dd>
+
+
+<dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
+<dd><p>Visual preset. <code>"default"</code> keeps existing behaviour.
+<code>"ggseg_like"</code> enables a cleaner publication style and, unless
+explicitly overridden, switches <code>panel_layout</code> to
+<code>"presentation"</code> with softer border defaults and light projection
+smoothing.</p></dd>
+
+
 <dt id="arg-border">border<a class="anchor" aria-label="anchor" href="#arg-border"></a></dt>
 <dd><p>Logical. If <code>TRUE</code> (default), draw thin lines at parcel
 boundaries (edges between different parcels). Gives a clean ggseg-like
@@ -179,6 +203,21 @@ appearance.</p></dd>
 <dd><p>Boundary rendering method. <code>"path"</code> (default) chains
 boundary edges into longer paths for smoother lines; <code>"segment"</code> draws
 each boundary edge independently.</p></dd>
+
+
+<dt id="arg-boundary-smooth">boundary_smooth<a class="anchor" aria-label="anchor" href="#arg-boundary-smooth"></a></dt>
+<dd><p>Non-negative integer controlling Chaikin smoothing
+iterations applied to boundary paths when <code>border_geom = "path"</code>.
+<code>0</code> (default) keeps original mesh-aligned boundaries; <code>1</code> or
+<code>2</code> yields cleaner curves in close-up figures.</p></dd>
+
+
+<dt id="arg-projection-smooth">projection_smooth<a class="anchor" aria-label="anchor" href="#arg-projection-smooth"></a></dt>
+<dd><p>Non-negative integer controlling Laplacian-like
+smoothing iterations applied to projected vertex coordinates before parcel
+polygons are constructed. This smooths filled parcel edges while
+preserving shared boundaries across parcels. <code>0</code> (default) keeps raw
+projected coordinates.</p></dd>
 
 
 <dt id="arg-border-color">border_color<a class="anchor" aria-label="anchor" href="#arg-border-color"></a></dt>
@@ -262,9 +301,11 @@ Lower values can help the shading read more clearly. Default: <code>1</code>.</p
 
 
 <dt id="arg-overlay">overlay<a class="anchor" aria-label="anchor" href="#arg-overlay"></a></dt>
-<dd><p>Optional vertex-wise overlay list with components <code>lh</code>
-and <code>rh</code> (numeric vectors matching the vertex count of each
-hemisphere mesh). Intended for projected volumetric cluster overlays.</p></dd>
+<dd><p>Vertex-wise overlay or a <code>NeuroVol</code>.
+If a <code>NeuroVol</code>, it is automatically projected onto the surface
+using <code><a href="https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html" class="external-link">neurosurf::vol_to_surf()</a></code>.
+Otherwise, a list with <code>lh</code> and <code>rh</code> components (numeric
+vectors matching the vertex count of each hemisphere mesh).</p></dd>
 
 
 <dt id="arg-overlay-threshold">overlay_threshold<a class="anchor" aria-label="anchor" href="#arg-overlay-threshold"></a></dt>
@@ -300,6 +341,30 @@ boundaries. Default: <code>TRUE</code>.</p></dd>
 <dt id="arg-overlay-border-size">overlay_border_size<a class="anchor" aria-label="anchor" href="#arg-overlay-border-size"></a></dt>
 <dd><p>Line width for overlay boundaries. Default:
 <code>0.25</code>.</p></dd>
+
+
+<dt id="arg-overlay-fun">overlay_fun<a class="anchor" aria-label="anchor" href="#arg-overlay-fun"></a></dt>
+<dd><p>Character: interpolation function passed to
+<code><a href="https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html" class="external-link">neurosurf::vol_to_surf()</a></code> when <code>overlay</code> is a
+<code>NeuroVol</code>. One of <code>"avg"</code>, <code>"nn"</code>, or <code>"mode"</code>.
+Default: <code>"avg"</code>.</p></dd>
+
+
+<dt id="arg-overlay-sampling">overlay_sampling<a class="anchor" aria-label="anchor" href="#arg-overlay-sampling"></a></dt>
+<dd><p>Character: sampling strategy passed to
+<code><a href="https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html" class="external-link">neurosurf::vol_to_surf()</a></code> when <code>overlay</code> is a
+<code>NeuroVol</code>. One of <code>"midpoint"</code>, <code>"normal_line"</code>, or
+<code>"thickness"</code>. Default: <code>"midpoint"</code>.</p></dd>
+
+
+<dt id="arg-colorbar">colorbar<a class="anchor" aria-label="anchor" href="#arg-colorbar"></a></dt>
+<dd><p>Logical. When <code>vals</code> is non-NULL and
+<code>interactive = FALSE</code>, add a standalone colorbar panel composed
+alongside the main plot via <span class="pkg">patchwork</span>. Default: <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-colorbar-title">colorbar_title<a class="anchor" aria-label="anchor" href="#arg-colorbar-title"></a></dt>
+<dd><p>Optional character label for the colorbar.</p></dd>
 
 
 <dt id="arg-outline">outline<a class="anchor" aria-label="anchor" href="#arg-outline"></a></dt>

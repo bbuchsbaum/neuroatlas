@@ -2,8 +2,7 @@
 
 **DEPRECATED:** This function signature is deprecated. Please use the
 new [`get_template`](get_template.md) function which offers a more
-comprehensive and R-native interface. The new function handles common
-variants and modalities more directly.
+comprehensive and R-native interface.
 
 ## Usage
 
@@ -62,9 +61,13 @@ The new [`get_template`](get_template.md) with updated signature.
 
 ``` r
 # \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_legacy(), error = function(e) NULL)
 }
+#> Warning: The `name` argument of `get_template()` is deprecated as of neuroatlas 0.10.0.
+#> ℹ Please use the `space` argument instead.
+#> ℹ The signature get_template(name, desc, resolution, ...) is deprecated. Please
+#>   use the new signature: get_template(space, variant, modality, resolution,
+#>   ...).
 # }
 ```
