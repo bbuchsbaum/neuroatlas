@@ -2,19 +2,17 @@
 % Please edit documentation in R/template_flow.R
 \name{.as_neurovol_unmemoised}
 \alias{.as_neurovol_unmemoised}
-\title{Internal Helper to Convert Python Object/Path to NeuroVol}
+\title{Internal Helper to Convert File Path to NeuroVol}
 \usage{
-.as_neurovol_unmemoised(path_or_py_obj)
+.as_neurovol_unmemoised(file_path)
 }
 \arguments{
-\item{path_or_py_obj}{A file path string or a Python object (e.g., \code{pathlib.Path}).}
+\item{file_path}{A character string file path to a NIfTI file.}
 }
 \value{
 A \code{neuroim2::NeuroVol} object.
 }
 \description{
-This function takes a file path (string) or a Python object that can be resolved
-to a NIfTI file path (e.g., a Python Path object from TemplateFlow) and reads it
-into a \code{neuroim2::NeuroVol} object.
+Reads a NIfTI file into a \code{neuroim2::NeuroVol} object.
 }
 \keyword{internal}

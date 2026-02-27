@@ -2,32 +2,19 @@
 % Please edit documentation in R/template_flow.R
 \name{[[.templateflow}
 \alias{[[.templateflow}
-\title{Access Attributes of the TemplateFlow Object using [[}
+\title{Access Attributes of the TemplateFlow Object using [[ (DEPRECATED)}
 \usage{
 \method{[[}{templateflow}(x, name)
 }
 \arguments{
 \item{x}{An object of class \code{templateflow}.}
 
-\item{name}{The name of the attribute or method to access on the Python object.}
+\item{name}{The name of the attribute to access.}
 }
 \value{
-The attribute or method from the Python TemplateFlow API object.
+The list element, or NULL if not found.
 }
 \description{
-Allows R-native access (via \code{[[}) to attributes and methods of the
-underlying Python TemplateFlow API object.
+Access Attributes of the TemplateFlow Object using [[ (DEPRECATED)
 }
-\examples{
-\dontrun{
-  # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) &&
-      reticulate::py_module_available("templateflow")) {
-    tf <- create_templateflow()
-    # Example: Access the 'get' method (it's a Python function)
-    # print(tf[["get"]])
-  } else {
-    message("Python or templateflow module not available. Skipping example.")
-  }
-}
-}
+\keyword{internal}

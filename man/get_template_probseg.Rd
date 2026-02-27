@@ -30,8 +30,7 @@ Retrieves probability maps for different tissue types (GM, WM, CSF).
 }
 \examples{
 \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_probseg(), error = function(e) NULL)
 }
 }

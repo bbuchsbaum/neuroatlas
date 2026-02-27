@@ -41,49 +41,41 @@ Supported: \code{"brain"} (default), \code{"head"}, \code{"mask"}, \code{"probse
 This is used to infer \code{desc} and sometimes \code{suffix} if they are not explicitly provided.}
 
 \item{modality}{Character string. The imaging modality or primary suffix for the template file.
-Supported: \code{"T1w"} (default), \code{"T2w"}, \code{"mask"} (often used with \code{variant="mask"}).
+Supported: \code{"T1w"} (default), \code{"T2w"}, \code{"mask"}.
 This is used to infer \code{suffix} if not explicitly provided.}
 
 \item{resolution}{(Optional) Character string specifying the resolution, primarily for
-fsaverage variants (e.g., "06" for fsaverage6, which is `tpl-fsaverage_res-06...`).
-Passed as `resolution` to `get_template`.}
+fsaverage variants (e.g., "06" for fsaverage6).}
 
-\item{cohort}{Character string. Optional cohort identifier (e.g., \code{"adhokshaj"}).}
+\item{cohort}{Character string. Optional cohort identifier.}
 
-\item{desc}{Character string. Specific TemplateFlow \code{desc} field. Defaults to \code{"brain"} for
-volumetric templates and is automatically dropped for variants where \code{desc} is typically
-unused (e.g., \code{probseg}, \code{dseg}, surface queries). If provided explicitly, this overrides
-any inferred \code{desc}.}
+\item{desc}{Character string. Specific TemplateFlow \code{desc} field. Defaults to \code{"brain"}.}
 
-\item{label}{Character string. Specific TemplateFlow \code{label} field (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"} for \code{variant="probseg"} or \code{variant="dseg"}).}
+\item{label}{Character string. Specific TemplateFlow \code{label} field (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"}).}
 
 \item{atlas}{Character string. Specific TemplateFlow \code{atlas} field (e.g., \code{"Schaefer2018"}).}
 
-\item{suffix}{Character string. Specific TemplateFlow \code{suffix} field. If provided, this overrides
+\item{suffix}{Character string. Specific TemplateFlow \code{suffix} field. Overrides
 any \code{suffix} inferred from \code{modality} or \code{variant}.}
 
 \item{extension}{Character string. The file extension. Default: \code{".nii.gz"}.}
 
-\item{path_only}{Logical. If \code{TRUE}, returns the file path to the template as a string
-instead of loading it as a \code{NeuroVol} object. Default: \code{FALSE}.}
+\item{path_only}{Logical. If \code{TRUE}, returns the file path as a string
+instead of loading as a \code{NeuroVol}. Default: \code{FALSE}.}
 
-\item{use_cache}{Logical. (Currently primarily for future R-level memoisation).
-TemplateFlow's Python API has its own caching. Default: `TRUE`.
-Actual R-level path memoisation is now active.}
+\item{use_cache}{Logical. If \code{TRUE} (default), uses memoised NeuroVol loading.}
 
-\item{api_handle}{An optional S3 object of class `templateflow` obtained from
-`create_templateflow()`. If `NULL` (default), a default instance is created internally.}
+\item{api_handle}{Deprecated and ignored. Kept for backward compatibility.}
 
-\item{...}{Additional arguments passed directly to the Python `templateflow.api.get()` method
-(e.g., `raise_on_empty = TRUE`). This allows specifying any valid TemplateFlow query
-entity not explicitly listed as a parameter (e.g., `hemi`, `density`).}
+\item{...}{Additional arguments passed to the TemplateFlow query
+(e.g., \code{hemi}, \code{density}).}
 
 \item{template_id}{The main TemplateFlow template identifier for the surface
 (e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to `get_template`.}
 
 \item{surface_type}{A character string indicating the type of surface to retrieve.
 Common values include: "pial", "white", "inflated", "midthickness", "sphere".
-This is passed as the `desc` argument to `get_template`.}
+This is passed as the `suffix` argument to `get_template`.}
 
 \item{hemi}{Character string, "L" for left hemisphere or "R" for right hemisphere.
 Passed as `hemi` to `get_template`.}
@@ -93,86 +85,45 @@ Passed as `hemi` to `get_template`.}
 as `density`.}
 
 \item{load_as_path}{Logical, whether to return only the path to the file.
-Defaults to `TRUE` as `NeuroVol` objects are not typically used for surface geometry.
-If `FALSE`, attempts to load using `as_neurovol` (via `get_template`).}
+Defaults to `TRUE`.}
 }
 \value{
-If any of `space`, `variant`, `modality`, `resolution`, or `label` are vectors
-  of length > 1 (and only one of them is vectorized per call), a named list of results is returned.
-  The names of the list elements correspond to the values of the vectorized parameter.
-  If all parameters are scalar (or vectors of length 1), a single \code{neuroim2::NeuroVol} object
-  or a file path string is returned directly (depending on \code{path_only}).
+If any of \code{space}, \code{variant}, \code{modality}, \code{resolution},
+  or \code{label} are vectors of length > 1, a named list of results is returned.
+  Otherwise a single \code{neuroim2::NeuroVol} or file path string.
 
-If `load_as_path` is `TRUE`, a character string (path) or a list of character strings (paths).
-        If `load_as_path` is `FALSE`, the result of `as_neurovol` (which might be a `NeuroVol`
-        if `neuroim2::read_vol` supports the format, or could error if not).
-        Returns `NULL` if no template is found.
+If `load_as_path` is `TRUE`, a character string (path).
+        If `load_as_path` is `FALSE`, the result of `as_neurovol`.
 }
 \description{
 Unified function to retrieve neuroimaging templates and related files from
-the TemplateFlow repository. This function provides a more R-native interface
-to the underlying Python \code{templateflow.api.get()} method.
+the TemplateFlow repository via the pure R \code{templateflow} package.
 }
 \details{
 The function performs several pre-flight checks:
-  - Validates the existence of the specified `space` using `tf$api$templates()`.
-  - Validates the specified `resolution` against available resolutions when metadata is available
-    (legacy `api$resolutions()` or `api$get_metadata()` fallback). The check is skipped silently
-    if resolution metadata cannot be retrieved.
+  - Validates the existence of the specified \code{space}.
+  - Validates the specified \code{resolution} against available resolutions.
 
-Caching behavior:
-  - This function uses `memoise` to cache the resolved file paths from TemplateFlow at the R level for the current session.
-  - The underlying Python TemplateFlow library also maintains its own disk cache, typically configured via the
-    `TEMPLATEFLOW_HOME` environment variable (which this package helps manage).
+Caching behaviour:
+  - The \code{templateflow} R package maintains its own disk cache.
+  - \code{NeuroVol} loading is memoised at the R session level to avoid
+    re-reading large NIfTI files.
 }
 \examples{
 \dontrun{
-  # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) &&
-      reticulate::py_module_available("templateflow")) {
+  # Get default MNI T1w brain template
+  mni_brain <- get_template()
 
-    # Get default MNI T1w brain template (scalar call)
-    mni_brain <- get_template()
-    print(mni_brain)
+  # Vectorized: Get MNI brain and mask variants
+  mni_variants <- get_template(variant = c("brain", "mask"))
 
-    # Vectorized call: Get MNI brain and mask variants
-    # mni_variants <- get_template(variant = c("brain", "mask"))
-    # print(names(mni_variants))
-    # print(mni_variants$brain)
-    # print(mni_variants$mask)
-
-    # Vectorized call: Get MNI T1w at 1mm and 2mm resolutions
-    # mni_resolutions <- get_template(resolution = c(1, 2))
-    # print(mni_resolutions$`1`)
-    # print(mni_resolutions$`2`)
-
-    # Vectorized call: Get GM and CSF probseg for MNI
-    # mni_probsegs <- get_template(variant = "probseg", label = c("GM", "CSF"))
-    # print(mni_probsegs$GM)
-
-    # Path only example with vectorization
-    # mni_mask_paths <- get_template(space = "MNI152NLin2009cAsym",
-    #                              variant = "mask",
-    #                              resolution = c(1,2),
-    #                              path_only = TRUE)
-    # print(mni_mask_paths)
-
-  } else {
-    message("Python or templateflow module not available. Skipping example.")
-  }
+  # Path only
+  path <- get_template(path_only = TRUE)
 }
 \donttest{
   # Get the pial surface for the left hemisphere of fsLR 32k template (as path)
   # fslr_pial_L_path <- get_surface_template(template_id = "fsLR", surface_type = "pial",
   #                                        hemi = "L", density = "32k")
   # print(fslr_pial_L_path)
-
-  # Get the white surface for fsaverage6 (res="06", density="41k") right hemisphere
-  # fsaverage6_white_R_path <- get_surface_template(template_id = "fsaverage",
-  #                                               surface_type = "white",
-  #                                               hemi = "R",
-  #                                               resolution = "06", # for fsaverage6
-  #                                               density = "41k")   # for fsaverage6
-  # print(fsaverage6_white_R_path)
 }
 }

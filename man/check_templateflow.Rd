@@ -10,8 +10,8 @@ check_templateflow()
 Invisible NULL. Prints status information to the console.
 }
 \description{
-Checks whether TemplateFlow and required dependencies are properly installed
-and provides information about the Python environment being used.
+Checks whether the TemplateFlow R package is installed and provides
+cache information.
 }
 \examples{
 \donttest{

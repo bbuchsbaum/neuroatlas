@@ -27,8 +27,7 @@ Convenience function to get CSF probability map.
 }
 \examples{
 \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_csf(), error = function(e) NULL)
 }
 }

@@ -7,36 +7,22 @@
 create_templateflow(cache_dir = NULL, verbosity = 0, default_template = NULL)
 }
 \arguments{
-\item{cache_dir}{Optional. Path to a directory for caching TemplateFlow downloads.
-If NULL (default), uses a neuroatlas-specific cache directory obtained
-via \code{.neuroatlas_cache_dir("templateflow")}.
-This will also set the \code{TEMPLATEFLOW_HOME} environment variable for the Python session.}
+\item{cache_dir}{Ignored. Kept for backward compatibility.}
 
-\item{verbosity}{Optional. An integer for verbosity level (not yet implemented).}
+\item{verbosity}{Ignored. Kept for backward compatibility.}
 
-\item{default_template}{Optional. A string for a default template to use (not yet implemented).}
+\item{default_template}{Ignored. Kept for backward compatibility.}
 }
 \value{
-An S3 object of class \code{templateflow} containing:
-  \itemize{
-    \item \code{api}: The raw Python TemplateFlow API handle from \code{reticulate}.
-    \item \code{cache_path}: The R-side cache path being used.
-    \item \code{options}: A list of user-provided options.
-  }
+An S3 object of class \code{templateflow} (deprecated stub).
 }
 \description{
-Initializes and returns an S3 object of class \code{templateflow} which acts as
-a gateway to the TemplateFlow Python API and manages configurations.
+**DEPRECATED:** TemplateFlow is now accessed via the pure R `templateflow`
+package. No initialization is needed. Use [get_template()], [tflow_spaces()],
+and [tflow_files()] directly.
 }
 \examples{
 \dontrun{
-  # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) &&
-      reticulate::py_module_available("templateflow")) {
-    tf <- create_templateflow()
-    print(tf)
-  } else {
-    message("Python or templateflow module not available. Skipping example.")
-  }
+  # Deprecated. Use get_template(), tflow_spaces(), etc. directly.
 }
 }

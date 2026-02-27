@@ -34,3 +34,4 @@
 ^\.rcmdcheck_result\.rds$
 ^Rplots\.pdf$
 ^plans$
+^tmp$

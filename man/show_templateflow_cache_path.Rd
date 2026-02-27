@@ -10,9 +10,8 @@ show_templateflow_cache_path()
 A character string representing the path to the TemplateFlow cache directory.
 }
 \description{
-Returns the path to the `neuroatlas` package's cache directory used for
-TemplateFlow downloads. This is typically located within the path returned by
-`tools::R_user_dir("neuroatlas", "cache")`, in a subdirectory named "templateflow".
+Returns the path to the TemplateFlow cache directory. With the pure R
+\code{templateflow} package, this is the \code{TEMPLATEFLOW_HOME} directory.
 }
 \examples{
 cat("TemplateFlow cache is at:", show_templateflow_cache_path(), "\n")

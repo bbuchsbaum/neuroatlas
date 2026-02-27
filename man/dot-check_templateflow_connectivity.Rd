@@ -11,6 +11,5 @@ Logical. TRUE if TemplateFlow API is accessible, FALSE otherwise.
 }
 \description{
 Internal function to test if TemplateFlow API is accessible and functioning.
-This helps distinguish between network issues and other problems.
 }
 \keyword{internal}

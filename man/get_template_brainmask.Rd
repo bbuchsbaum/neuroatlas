@@ -27,8 +27,7 @@ Convenience function to retrieve a binary brain mask for a specified template.
 }
 \examples{
 \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_brainmask(), error = function(e) NULL)
 }
 }

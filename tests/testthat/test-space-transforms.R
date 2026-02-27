@@ -1,10 +1,6 @@
 test_that("atlas resampling to TemplateFlow spaces maintains integrity", {
   skip_on_cran()
-  reticulate::py_config()
-  skip_if_not(reticulate::py_available(initialize = FALSE),
-              "Python not available")
-  skip_if_not(reticulate::py_module_available("templateflow"),
-              "templateflow not available")
+  skip_if_not_installed("templateflow")
 
   # Test 1: Resample atlas to TemplateFlow space string
   atlas <- get_schaefer_atlas(parcels = "100", networks = "7", resolution = "2")
@@ -27,8 +23,7 @@ test_that("atlas resampling to TemplateFlow spaces maintains integrity", {
   expect_equal(length(atlas_mni$ids), 100)
   expect_equal(length(atlas_mni$labels), 100)
 
-  # Dimensions should match MNI template (typically 193x229x193 for 1mm)
-  # But actual dimensions depend on the template resolution
+  # Dimensions should match MNI template
   expect_equal(length(dim(atlas_mni$atlas)), 3)
 
   # Test 2: Resample with explicit resolution
@@ -58,19 +53,17 @@ test_that("atlas resampling to TemplateFlow spaces maintains integrity", {
 
   # Test with incompatible space object
   tiny_space <- neuroim2::NeuroSpace(
-    dim = c(10, 10, 10),  # Too small for meaningful atlas
+    dim = c(10, 10, 10),
     spacing = c(10, 10, 10),
     origin = c(0, 0, 0)
-    # axes parameter removed - will use default
   )
 
   atlas_tiny <- get_schaefer_atlas(parcels = "100", networks = "7",
                                   outspace = tiny_space)
 
   # Should complete but likely lose many regions
-  # Use the stored ids which reflect actual regions after resampling
   unique_regions <- length(atlas_tiny$ids)
-  expect_true(unique_regions < 100)  # Some regions will be lost
+  expect_true(unique_regions < 100)
 })
 
 test_that("dilate_atlas handles masks correctly and preserves label integrity", {
@@ -80,14 +73,12 @@ test_that("dilate_atlas handles masks correctly and preserves label integrity", 
   atlas <- get_aseg_atlas()
 
   # Test 1: Dilation with explicit mask
-  # Create a restrictive mask (smaller than full brain)
   atlas_vol <- atlas$atlas
   full_mask <- as.logical(atlas_vol != 0)
 
   # Create mask that excludes some boundary voxels
   restrictive_mask <- full_mask
   dims <- dim(atlas_vol)
-  # Zero out edges
   restrictive_mask[c(1:5, (dims[1]-4):dims[1]), , ] <- FALSE
   restrictive_mask[, c(1:5, (dims[2]-4):dims[2]), ] <- FALSE
   restrictive_mask[, , c(1:5, (dims[3]-4):dims[3])] <- FALSE
@@ -110,27 +101,22 @@ test_that("dilate_atlas handles masks correctly and preserves label integrity", 
   expect_equal(dilated_outside_mask, 0)
 
   # Test 2: Label preservation during dilation
-  # No new labels should be introduced
   original_labels <- sort(unique(as.vector(atlas_vol[atlas_vol != 0])))
   dilated_labels <- sort(unique(as.vector(dilated$atlas[dilated$atlas != 0])))
   expect_true(all(dilated_labels %in% original_labels))
 
-  # If original atlas had a label_map, it should be preserved
   if (inherits(atlas$atlas, "ClusteredNeuroVol") && !is.null(atlas$atlas@label_map)) {
     expect_equal(dilated$atlas@label_map, atlas$atlas@label_map)
   }
 
   # Test 3: Edge cases
-  # Very large radius (should be limited by mask)
   dilated_large <- dilate_atlas(atlas, mask = restrictive_mask_vol,
                                radius = 50, maxn = 100)
 
-  # Still shouldn't exceed mask
   dilated_outside <- sum(dilated_large$atlas != 0 & !restrictive_mask)
   expect_equal(dilated_outside, 0)
 
   # Empty dilation (mask excludes all potential dilation targets)
-  # Create mask that perfectly matches current atlas
   exact_mask <- neuroim2::NeuroVol(
     as.numeric(atlas_vol != 0),
     space = neuroim2::space(atlas_vol)
@@ -139,18 +125,15 @@ test_that("dilate_atlas handles masks correctly and preserves label integrity", 
   dilated_none <- dilate_atlas(atlas, mask = exact_mask,
                               radius = 5, maxn = 50)
 
-  # Should return unchanged atlas
   expect_equal(sum(dilated_none$atlas != 0), sum(atlas_vol != 0))
   expect_equal(class(dilated_none), class(atlas))
 
   # Test with TemplateFlow mask string (if available)
-  if (reticulate::py_available(initialize = FALSE) &&
-      reticulate::py_module_available("templateflow")) {
+  if (requireNamespace("templateflow", quietly = TRUE)) {
     dilated_tf <- tryCatch({
       dilate_atlas(atlas, mask = "MNI152NLin2009cAsym",
                   radius = 1, maxn = 10)
     }, error = function(e) {
-      # Skip if TemplateFlow fails
       NULL
     })
 
@@ -165,18 +148,14 @@ test_that("cross-atlas operations maintain consistency", {
   skip_on_cran()
 
   # Test operations between different atlas types
-  # Load different atlases
   aseg <- get_aseg_atlas()
 
-  # Get a Schaefer atlas and resample to match ASEG space
   schaefer_orig <- get_schaefer_atlas(parcels = "100", networks = "7")
-  
-  # Check if dimensions match
+
   if (!all(dim(aseg$atlas) == dim(schaefer_orig$atlas))) {
     schaefer_resampled <- resample(schaefer_orig$atlas,
                                    neuroim2::space(aseg$atlas))
-    
-    # Create new atlas object with resampled data
+
     schaefer <- list(
       name = schaefer_orig$name,
       atlas = schaefer_resampled,
@@ -195,18 +174,16 @@ test_that("cross-atlas operations maintain consistency", {
   # Test 1: Merge cortical and subcortical
   merged <- merge_atlases(aseg, schaefer)
 
-  # Total regions should be sum of both
   expect_equal(length(merged$ids),
                length(aseg$ids) + length(schaefer$ids))
 
-  # Check spatial overlap (subcortical and cortical should not overlap)
+  # Check spatial overlap
   aseg_mask <- as.logical(as.vector(aseg$atlas != 0))
   schaefer_mask <- as.logical(as.vector(schaefer$atlas != 0))
   overlap <- sum(aseg_mask & schaefer_mask)
 
-  # Some overlap is expected at boundaries, but should be minimal
   overlap_percent <- overlap / sum(aseg_mask) * 100
-  expect_true(overlap_percent < 10)  # Less than 10% overlap
+  expect_true(overlap_percent < 10)
 
   # Test 2: Create test data and reduce with merged atlas
   test_data <- neuroim2::NeuroVol(
@@ -216,31 +193,24 @@ test_that("cross-atlas operations maintain consistency", {
 
   reduced <- reduce_atlas(merged, test_data, mean)
 
-  # Should have values for regions that actually exist in the merged volume
-  # Note: After resampling, some regions might have no voxels
-  # Get actual regions in the merged atlas
   if (inherits(merged$atlas, "ClusteredNeuroVol")) {
     actual_regions <- unique(merged$atlas@clusters)
   } else {
     actual_regions <- unique(as.vector(merged$atlas[merged$atlas != 0]))
   }
-  
+
   expect_equal(nrow(reduced), length(actual_regions))
 
   # Test 3: Map values back to merged atlas
-  # Note: map_atlas expects values for ALL regions in the atlas metadata,
-  # even if some don't exist in the actual volume after resampling
   test_vals <- rnorm(length(merged$orig_labels))
   mapped <- map_atlas(merged, vals = test_vals, thresh = c(0, 0))
 
   expect_equal(nrow(mapped), length(merged$orig_labels))
 
-  # Hemisphere information should be preserved from both atlases
   hemi_table <- table(merged$hemi, useNA = "always")
   expect_true("left" %in% names(hemi_table) || any(merged$hemi == "left", na.rm = TRUE))
   expect_true("right" %in% names(hemi_table) || any(merged$hemi == "right", na.rm = TRUE))
 
-  # ASEG might have some bilateral/midline structures
   na_count <- sum(is.na(merged$hemi))
   expect_equal(na_count, sum(is.na(aseg$hemi)))
 })

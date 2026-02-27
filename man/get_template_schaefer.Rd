@@ -33,8 +33,7 @@ Retrieves Schaefer cortical parcellation mapped to a specified template space.
 }
 \examples{
 \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_schaefer(), error = function(e) NULL)
 }
 }

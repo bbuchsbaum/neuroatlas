@@ -29,8 +29,7 @@ argument).}
 \item{resolution}{Optional resolution string (TemplateFlow \code{res}
 argument), e.g., "06" for fsaverage6.}
 
-\item{...}{Additional arguments forwarded to \code{\link{get_surface_template}},
-such as alternative cache directories.}
+\item{...}{Additional arguments forwarded to \code{\link{get_surface_template}}.}
 }
 \value{
 A \code{neurosurf::SurfaceGeometry} object when \code{hemi} is "L"

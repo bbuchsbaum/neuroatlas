@@ -2,7 +2,7 @@
 % Please edit documentation in R/zzz.R
 \name{install_templateflow}
 \alias{install_templateflow}
-\title{Install Templateflow Python package}
+\title{Install Templateflow (DEPRECATED)}
 \usage{
 install_templateflow(
   method = "auto",
@@ -12,34 +12,27 @@ install_templateflow(
 )
 }
 \arguments{
-\item{method}{Installation method. Options are "auto" (default), "virtualenv", or "conda".
-Using "virtualenv" is recommended for persistent installations.}
+\item{method}{Ignored.}
 
-\item{conda}{Path to a conda executable or \code{"auto"} to let
-\code{reticulate} locate one. Only used if method = "conda".}
+\item{conda}{Ignored.}
 
-\item{envname}{Name of the virtual environment. Defaults to "r-neuroatlas" for persistence.}
+\item{envname}{Ignored.}
 
-\item{force_reinstall}{Logical. If TRUE, forces reinstallation even if packages exist.}
+\item{force_reinstall}{Ignored.}
 }
 \value{
-Invisible \code{NULL} indicating success.
+Invisible \code{NULL}.
 }
 \description{
-Installs the Python packages `scipy` and `templateflow` into a persistent
-virtual environment. This ensures the packages remain available across R sessions.
-}
-\details{
-This function creates a persistent Python environment specifically for neuroatlas,
-preventing the need to reinstall TemplateFlow in each R session. The environment
-is stored in a user-specific directory that persists across sessions.
+**DEPRECATED:** TemplateFlow is now accessed via the pure R `templateflow`
+package. Python is no longer required.
+
+Install the R package instead:
+\code{remotes::install_github("bbuchsbaum/templateflow")}
 }
 \examples{
 \donttest{
-# Install with default settings (recommended)
-install_templateflow()
-
-# Force reinstallation
-install_templateflow(force_reinstall = TRUE)
+# Deprecated. Install the R templateflow package instead:
+# remotes::install_github("bbuchsbaum/templateflow")
 }
 }

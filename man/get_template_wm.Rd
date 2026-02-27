@@ -27,8 +27,7 @@ Convenience function to get white matter probability map.
 }
 \examples{
 \donttest{
-if (reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")) {
+if (requireNamespace("templateflow", quietly = TRUE)) {
   tryCatch(result <- get_template_wm(), error = function(e) NULL)
 }
 }

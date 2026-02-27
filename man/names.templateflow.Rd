@@ -2,7 +2,7 @@
 % Please edit documentation in R/template_flow.R
 \name{names.templateflow}
 \alias{names.templateflow}
-\title{List Attributes of the TemplateFlow API Object}
+\title{List Attributes of the TemplateFlow Object (DEPRECATED)}
 \usage{
 \method{names}{templateflow}(x)
 }
@@ -10,21 +10,9 @@
 \item{x}{An object of class \code{templateflow}.}
 }
 \value{
-A character vector of available attribute and method names.
+A character vector of available element names.
 }
 \description{
-Lists the names of attributes and methods available on the underlying
-Python TemplateFlow API object.
+List Attributes of the TemplateFlow Object (DEPRECATED)
 }
-\examples{
-\dontrun{
-  # Ensure Python and templateflow module are available
-  if (reticulate::py_available(initialize = TRUE) &&
-      reticulate::py_module_available("templateflow")) {
-    tf <- create_templateflow()
-    # print(names(tf))
-  } else {
-    message("Python or templateflow module not available. Skipping example.")
-  }
-}
-}
+\keyword{internal}

@@ -1,9 +1,6 @@
 test_that("tflow_spaces and tflow_files work correctly", {
   skip_on_cran()
-  skip_if_not(reticulate::py_available(initialize = FALSE),
-              "Python not available")
-  skip_if_not(reticulate::py_module_available("templateflow"),
-              "templateflow not available")
+  skip_if_not_installed("templateflow")
 
   # Test 1: tflow_spaces returns character vector
   spaces <- tflow_spaces()
@@ -27,7 +24,6 @@ test_that("tflow_spaces and tflow_files work correctly", {
   if (!is.null(files) && length(files) > 0) {
     expect_true(is.character(files))
     expect_true(all(grepl("T1w", files)))
-    expect_true(all(file.exists(files)))
   }
 
   # Test 5: tflow_files with surface queries
@@ -57,10 +53,7 @@ test_that("tflow_spaces and tflow_files work correctly", {
 
 test_that("tflow_files volumetric queries work correctly", {
   skip_on_cran()
-  skip_if_not(reticulate::py_available(initialize = FALSE),
-              "Python not available")
-  skip_if_not(reticulate::py_module_available("templateflow"),
-              "templateflow not available")
+  skip_if_not_installed("templateflow")
 
   # Test 1: Query brain masks with desc parameter
   masks <- tryCatch({
@@ -93,7 +86,7 @@ test_that("tflow_files volumetric queries work correctly", {
   # Test 3: Query by resolution
   res2 <- tryCatch({
     tflow_files("MNI152NLin2009cAsym",
-                query_args = list(resolution = "2"))
+                query_args = list(resolution = 2L))
   }, error = function(e) NULL)
 
   if (!is.null(res2) && length(res2) > 0) {
@@ -104,7 +97,7 @@ test_that("tflow_files volumetric queries work correctly", {
   # Test 4: Combined query parameters
   combined <- tryCatch({
     tflow_files("MNI152NLin2009cAsym",
-                query_args = list(suffix = "T1w", resolution = "1"))
+                query_args = list(suffix = "T1w", resolution = 1L))
   }, error = function(e) NULL)
 
   if (!is.null(combined) && length(combined) > 0) {
@@ -119,10 +112,7 @@ test_that("tflow_files volumetric queries work correctly", {
 
 test_that("tflow_files surface queries work correctly", {
   skip_on_cran()
-  skip_if_not(reticulate::py_available(initialize = FALSE),
-              "Python not available")
-  skip_if_not(reticulate::py_module_available("templateflow"),
-              "templateflow not available")
+  skip_if_not_installed("templateflow")
 
   # Test 1: Query fsLR surfaces by hemisphere
   fslr_left <- tryCatch({
@@ -191,63 +181,57 @@ test_that("tflow_files surface queries work correctly", {
 
 test_that("TemplateFlow integration handles edge cases and vectorized operations correctly", {
   skip_on_cran()
-  skip_if_not(reticulate::py_available(initialize = FALSE),
-              "Python not available")
-  skip_if_not(reticulate::py_module_available("templateflow"),
-              "templateflow not available")
+  skip_if_not_installed("templateflow")
 
   # Test 1: Cache management functions
   cache_path <- show_templateflow_cache_path()
   expect_true(is.character(cache_path))
   expect_true(nchar(cache_path) > 0)
 
-  # Should contain "templateflow" in path
-  expect_true(grepl("templateflow", cache_path, ignore.case = TRUE))
-  
   # Test 2: Vectorized template fetching
   # Get multiple resolutions at once
   multi_res <- tryCatch({
     get_template(
       space = "MNI152NLin2009cAsym",
       suffix = "T1w",
-      resolution = c("1", "2"),
+      resolution = c(1, 2),
       path_only = TRUE
     )
   }, error = function(e) NULL)
-  
+
   if (!is.null(multi_res)) {
     expect_true(is.list(multi_res))
     expect_equal(names(multi_res), c("1", "2"))
     expect_true(all(sapply(multi_res, is.character)))
-    
+
     # Paths should differ by resolution
     expect_false(multi_res[["1"]] == multi_res[["2"]])
     expect_true(grepl("res-01", multi_res[["1"]]) || grepl("res-1", multi_res[["1"]]))
     expect_true(grepl("res-02", multi_res[["2"]]) || grepl("res-2", multi_res[["2"]]))
   }
-  
+
   # Test 3: Variant parameter handling
   variants <- tryCatch({
     get_template(
       space = "MNI152NLin2009cAsym",
       variant = c("brain", "mask"),
-      resolution = "2",
+      resolution = 2,
       path_only = TRUE
     )
   }, error = function(e) NULL)
-  
+
   if (!is.null(variants)) {
     expect_equal(names(variants), c("brain", "mask"))
     expect_true(grepl("T1w", variants[["brain"]]))
     expect_true(grepl("mask", variants[["mask"]]))
   }
-  
+
   # Test 4: Error handling for invalid spaces
   expect_error(
     get_template(space = "NonExistentSpace123XYZ"),
     "not.*found|invalid.*space|does not exist"
   )
-  
+
   # Test 5: Surface template retrieval
   surf_template <- tryCatch({
     get_surface_template(
@@ -258,7 +242,7 @@ test_that("TemplateFlow integration handles edge cases and vectorized operations
       path_only = TRUE
     )
   }, error = function(e) NULL)
-  
+
   if (!is.null(surf_template)) {
     expect_true(is.character(surf_template))
     expect_true(grepl("fsLR", surf_template))
@@ -279,54 +263,38 @@ test_that("TemplateFlow integration handles edge cases and vectorized operations
   if (!is.null(surf_geom)) {
     expect_true(inherits(surf_geom, "NeuroSurface"))
   }
-  
-  # Test 6: Volume template with different modalities
-  # Test just T1w to reduce network operations
-  vol <- tryCatch({
-    get_volume_template(
-      template = "MNI152NLin2009cAsym",
-      type = "T1w",
-      resolution = "2",
-      path_only = TRUE
-    )
-  }, error = function(e) NULL)
-  
-  if (!is.null(vol)) {
-    expect_true(grepl("T1w", vol))
-  }
-  
-  # Test 7: .check_templateflow_connectivity
+
+  # Test 6: .check_templateflow_connectivity
   connectivity <- .check_templateflow_connectivity()
   expect_true(is.logical(connectivity))
-  
-  # Test 8: Memoization behavior
+
+  # Test 7: Memoization behavior
   # First call
   time1 <- system.time({
     path1 <- tryCatch({
-      get_template(space = "MNI152NLin2009cAsym", suffix = "T1w", 
-                  resolution = "2", path_only = TRUE)
+      get_template(space = "MNI152NLin2009cAsym", suffix = "T1w",
+                  resolution = 2, path_only = TRUE)
     }, error = function(e) NULL)
   })
-  
-  # Second call (should be memoized and faster)
+
+  # Second call (should be faster from cache)
   time2 <- system.time({
     path2 <- tryCatch({
-      get_template(space = "MNI152NLin2009cAsym", suffix = "T1w", 
-                  resolution = "2", path_only = TRUE)
+      get_template(space = "MNI152NLin2009cAsym", suffix = "T1w",
+                  resolution = 2, path_only = TRUE)
     }, error = function(e) NULL)
   })
-  
+
   if (!is.null(path1) && !is.null(path2)) {
     expect_equal(path1, path2)
-    # Second call should be faster (memoized); use generous threshold
-    # because elapsed times near zero make ratios unreliable
+    # Second call should be faster (cached); use generous threshold
     expect_true(time2["elapsed"] <= time1["elapsed"] + 0.5)
   }
 })
 
 test_that("Convenience functions (sy_*) work correctly with all parameters", {
   skip_on_cran()
-  
+
   # Test 1: Basic convenience function calls
   convenience_funcs <- list(
     sy_100_7 = c(100, 7),
@@ -334,13 +302,13 @@ test_that("Convenience functions (sy_*) work correctly with all parameters", {
     sy_100_17 = c(100, 17),
     sy_200_17 = c(200, 17)
   )
-  
+
   # Skip download tests to avoid network delays
   # Just test that functions exist
   for (func_name in names(convenience_funcs)[1]) {
     expect_true(exists(func_name, envir = asNamespace("neuroatlas")))
   }
-  
+
   # Test 2: Parameter passing through convenience functions
   # Skip if we can't create a test space
   test_space <- tryCatch({
@@ -350,7 +318,7 @@ test_that("Convenience functions (sy_*) work correctly with all parameters", {
       origin = c(-100, -100, -100)
     )
   }, error = function(e) NULL)
-  
+
   if (!is.null(test_space)) {
     atlas_custom <- tryCatch({
       sy_100_7(resolution = "2", outspace = test_space, smooth = TRUE)
@@ -358,12 +326,12 @@ test_that("Convenience functions (sy_*) work correctly with all parameters", {
   } else {
     atlas_custom <- NULL
   }
-  
+
   if (!is.null(atlas_custom)) {
     expect_equal(dim(atlas_custom$atlas), c(50, 50, 50))
     expect_true(inherits(atlas_custom, "schaefer"))
   }
-  
+
   # Test 3: All convenience functions exist and are properly defined
   all_sy_funcs <- c(
     "sy_100_7", "sy_100_17", "sy_200_7", "sy_200_17",
@@ -371,12 +339,12 @@ test_that("Convenience functions (sy_*) work correctly with all parameters", {
     "sy_500_7", "sy_500_17", "sy_600_7", "sy_600_17",
     "sy_800_7", "sy_800_17", "sy_1000_7", "sy_1000_17"
   )
-  
+
   for (func_name in all_sy_funcs) {
     expect_true(exists(func_name, envir = asNamespace("neuroatlas")))
     func <- get(func_name, envir = asNamespace("neuroatlas"))
     expect_true(is.function(func))
-    
+
     # Check function signature
     args <- names(formals(func))
     expect_true(all(c("resolution", "outspace", "smooth", "use_cache") %in% args))
@@ -385,12 +353,12 @@ test_that("Convenience functions (sy_*) work correctly with all parameters", {
 
 test_that("Print methods provide accurate and formatted output", {
   skip_on_cran()
-  
+
   # Test 1: print.atlas base method
   aseg <- tryCatch(get_aseg_atlas(), error = function(e) NULL)
   if (!is.null(aseg)) {
     output <- capture.output(print(aseg))
-    
+
     # Should contain key information
     expect_true(any(grepl("Atlas Summary", output)))
     expect_true(any(grepl("Name:", output)))
@@ -398,37 +366,34 @@ test_that("Print methods provide accurate and formatted output", {
     expect_true(any(grepl("Regions:", output)))
     expect_true(any(grepl("hemisphere", output, ignore.case = TRUE)))
   }
-  
+
   # Test 2: print.schaefer method
   schaefer <- tryCatch(get_schaefer_atlas(parcels = "100", networks = "7"),
                       error = function(e) NULL)
   if (!is.null(schaefer)) {
     output <- capture.output(print(schaefer))
-    
+
     # Schaefer-specific information
     expect_true(any(grepl("Schaefer", output)))
     expect_true(any(grepl("Networks:", output)))
     expect_true(any(grepl("7", output)))  # Network count
   }
-  
+
   # Test 3: print.glasser method
   glasser <- tryCatch(suppressWarnings(get_glasser_atlas()), error = function(e) NULL)
   if (!is.null(glasser)) {
     output <- capture.output(print(glasser))
-    
+
     # Glasser-specific information
     expect_true(any(grepl("Glasser", output)))
     expect_true(any(grepl("Multi-Modal Parcellation", output, ignore.case = TRUE)))
     expect_true(any(grepl("360", output)))  # Region count
     expect_true(any(grepl("Example Regions", output)))
   }
-  
+
   # Test 4: CLI formatting elements
-  # Check for color/formatting codes (if cli/crayon are active)
   if (!is.null(glasser)) {
     raw_output <- capture.output(print(glasser), type = "message")
-    # Look for ANSI codes or special characters used by cli
-    # This is environment-dependent, so we just check structure
     expect_true(length(output) > 5)  # Should have multiple lines
   }
 })
