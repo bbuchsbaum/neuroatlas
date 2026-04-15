@@ -37,7 +37,7 @@ debug_surf_atlas.R
 *.Rcheck
 *.tar.gz
 Rplots.pdf
-docs
+docs/
 libs
 output
 renv/library
