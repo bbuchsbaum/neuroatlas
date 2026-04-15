@@ -23,6 +23,10 @@ if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown"
 can_eval <- requireNamespace("neuroatlas", quietly = TRUE) &&
             requireNamespace("neuroim2", quietly = TRUE) &&
             requireNamespace("ggplot2", quietly = TRUE)
+can_surface_plot <- can_eval &&
+                    requireNamespace("neurosurf", quietly = TRUE) &&
+                    requireNamespace("patchwork", quietly = TRUE) &&
+                    requireNamespace("scico", quietly = TRUE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -144,6 +148,40 @@ Use `nslices` to control how many slices appear in the montage:
 
 ```{r nslices}
 plot(atlas, nslices = 4)
+```
+
+## Surface Figures with Layout Control
+
+For cortical surface atlases, `plot_brain()` gives you direct control
+over the static figure layout. You can move the colorbar, add figure
+titles, and replace the default facet labels without assembling the
+figure by hand afterward.
+
+```{r surface-layout, eval = can_surface_plot, fig.width = 8, fig.height = 4.5}
+surf_atl <- schaefer_surf(
+  parcels = 100,
+  networks = 7,
+  space = "fsaverage6",
+  surf = "inflated"
+)
+
+surf_vals <- seq(-1.5, 1.5, length.out = length(surf_atl$ids))
+
+plot_brain(
+  surf_atl,
+  vals = surf_vals,
+  views = "lateral",
+  interactive = FALSE,
+  style = "ggseg_like",
+  colorbar = "bottom",
+  colorbar_title = "Effect size",
+  title = "Schaefer surface map",
+  subtitle = "Static layout controls are built into plot_brain()",
+  panel_labels = c(
+    "Left Lateral" = "Left hemisphere",
+    "Right Lateral" = "Right hemisphere"
+  )
+)
 ```
 
 ## Existing Visualisation Tools

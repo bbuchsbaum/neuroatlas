@@ -200,9 +200,17 @@ test_that("roi_metadata.atlas includes atlas_ref columns when available", {
   expect_true("template_space" %in% names(meta))
   expect_true("coord_space" %in% names(meta))
   expect_true("atlas_family" %in% names(meta))
+  expect_true("atlas_model" %in% names(meta))
+  expect_true("atlas_representation" %in% names(meta))
+  expect_true("atlas_source" %in% names(meta))
+  expect_true("atlas_confidence" %in% names(meta))
   expect_equal(unique(meta$template_space), "MNI152NLin6Asym")
   expect_equal(unique(meta$coord_space), "MNI152")
   expect_equal(unique(meta$atlas_family), "test")
+  expect_equal(unique(meta$atlas_model), "TestAtlas")
+  expect_equal(unique(meta$atlas_representation), "volume")
+  expect_true(is.na(unique(meta$atlas_source)))
+  expect_equal(unique(meta$atlas_confidence), "high")
 })
 
 test_that("roi_metadata.atlas works without atlas_ref", {

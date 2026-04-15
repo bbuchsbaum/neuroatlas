@@ -26,6 +26,10 @@ A tibble with one row per ROI and columns for each attribute.
     \item{template_space}{Template space identifier (e.g., "MNI152NLin6Asym"), when atlas_ref is available}
     \item{coord_space}{Coordinate space (e.g., "MNI152", "MNI305"), when atlas_ref is available}
     \item{atlas_family}{Atlas family identifier (e.g., "schaefer"), when atlas_ref is available}
+    \item{atlas_model}{Atlas model identifier (e.g., "Schaefer2018"), when atlas_ref is available}
+    \item{atlas_representation}{Representation type ("volume", "surface", or "derived"), when atlas_ref is available}
+    \item{atlas_source}{Loader/source key, when atlas_ref is available}
+    \item{atlas_confidence}{Atlas provenance confidence tier, when atlas_ref is available}
   }
   Additional atlas-specific columns may be present (e.g., \code{network} for Schaefer atlases).
 }

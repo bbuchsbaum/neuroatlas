@@ -271,3 +271,66 @@ test_that("plot_brain returns ggplot when interactive = FALSE", {
   p <- plot_brain(atl, interactive = FALSE)
   expect_s3_class(p, "ggplot")
 })
+
+test_that("plot_brain normalizes colorbar position inputs", {
+  expect_equal(neuroatlas:::.normalize_colorbar_position(TRUE), "right")
+  expect_equal(neuroatlas:::.normalize_colorbar_position(FALSE), "none")
+  expect_equal(neuroatlas:::.normalize_colorbar_position("bottom"), "bottom")
+  expect_error(
+    neuroatlas:::.normalize_colorbar_position("left"),
+    "'colorbar' must be TRUE, FALSE"
+  )
+})
+
+test_that("plot_brain applies static annotations and panel label overrides", {
+  skip_on_cran()
+
+  atl <- tryCatch({
+    schaefer_surf(100, 7)
+  }, error = function(e) {
+    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+  })
+
+  p <- plot_brain(
+    atl,
+    views = "lateral",
+    interactive = FALSE,
+    title = "Surface map",
+    panel_labels = c(
+      "Left Lateral" = "LH lateral",
+      "Right Lateral" = "RH lateral"
+    )
+  )
+
+  expect_s3_class(p, "ggplot")
+  expect_equal(p$labels$title, "Surface map")
+
+  strip_labels <- p$facet$params$labeller(data.frame(
+    panel = c("Left Lateral", "Right Lateral")
+  ))
+  expect_equal(unname(strip_labels$panel), c("LH lateral", "RH lateral"))
+})
+
+test_that("plot_brain composes a bottom colorbar when requested", {
+  skip_on_cran()
+  skip_if_not_installed("patchwork")
+
+  atl <- tryCatch({
+    schaefer_surf(100, 7)
+  }, error = function(e) {
+    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+  })
+
+  p <- plot_brain(
+    atl,
+    vals = rnorm(length(atl$ids)),
+    views = "lateral",
+    interactive = FALSE,
+    colorbar = "bottom",
+    colorbar_title = "z-score",
+    title = "Contrast"
+  )
+
+  expect_s3_class(p, "patchwork")
+  expect_s3_class(patchwork::patchworkGrob(p), "gtable")
+})

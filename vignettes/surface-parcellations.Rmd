@@ -36,6 +36,10 @@ can_plot <- requireNamespace("neuroatlas", quietly = TRUE) &&
             requireNamespace("neurosurf", quietly = TRUE) &&
             requireNamespace("ggplot2", quietly = TRUE)
 
+can_layout <- can_plot &&
+              requireNamespace("patchwork", quietly = TRUE) &&
+              requireNamespace("scico", quietly = TRUE)
+
 templateflow_ok <- FALSE
 try({
   templateflow_ok <- reticulate::py_available(initialize = TRUE) &&
@@ -265,6 +269,64 @@ download_surfaces("fsLR", list(density = "32k"), "~/my_surfaces/fsLR_32k")
 - **Parcel summaries:** use volumetric data with `reduce_atlas()` or
   surface atlases with `map_atlas()` to project parcel statistics back onto
   the mesh for visualization.
+
+## Static figure layout and annotations
+
+For publication-style static figures, `plot_brain()` now exposes the
+layout controls that usually require manual patchwork editing: you can
+move the colorbar, relabel panels, and add figure-level annotations
+directly in the plotting call.
+
+```{r layout-single, eval=can_layout, fig.width=8, fig.height=4.5}
+atl_layout <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
+
+parcel_vals <- seq(-2, 2, length.out = length(atl_layout$ids))
+
+plot_brain(
+  atl_layout,
+  vals = parcel_vals,
+  views = c("lateral", "medial"),
+  interactive = FALSE,
+  style = "ggseg_like",
+  colorbar = "bottom",
+  colorbar_title = "Standardized effect",
+  title = "Parcel-level summary on fsaverage6",
+  subtitle = "Bottom colorbar plus custom panel labels",
+  panel_labels = c(
+    "Left Lateral" = "LH lateral",
+    "Right Lateral" = "RH lateral",
+    "Left Medial" = "LH medial",
+    "Right Medial" = "RH medial"
+  )
+)
+```
+
+The same interface carries over to `plot_brain_grid()`, which is useful
+when you want several parcel maps to share a single scale and colorbar.
+
+```{r layout-grid, eval=can_layout, fig.width=9, fig.height=6}
+atl_layout <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
+
+vals_list <- list(
+  Baseline = sin(seq_along(atl_layout$ids) / 15),
+  Follow_up = cos(seq_along(atl_layout$ids) / 18),
+  Difference = sin(seq_along(atl_layout$ids) / 15) -
+    cos(seq_along(atl_layout$ids) / 18)
+)
+
+plot_brain_grid(
+  atl_layout,
+  vals_list,
+  views = "lateral",
+  titles = c("Baseline", "Follow-up", "Difference"),
+  shared_scale = TRUE,
+  colorbar = "right",
+  colorbar_title = "z-score",
+  title = "Comparing parcel maps with a shared legend",
+  subtitle = "Each panel keeps the same color scale",
+  style = "ggseg_like"
+)
+```
 
 ## Dense vertex-wise overlays
 

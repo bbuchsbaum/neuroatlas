@@ -1,6 +1,9 @@
 test_that("plot_brain_grid returns a patchwork object", {
   skip_if_not_installed("patchwork")
   skip_if_not_installed("scico")
+  if (!requireNamespace("mockery", quietly = TRUE)) {
+    skip("Package 'mockery' is not installed")
+  }
 
   # We need a surfatlas. Create a minimal mock.
   mock_surfatlas <- structure(list(
@@ -24,6 +27,9 @@ test_that("plot_brain_grid returns a patchwork object", {
 test_that("plot_brain_grid has correct panel count", {
   skip_if_not_installed("patchwork")
   skip_if_not_installed("scico")
+  if (!requireNamespace("mockery", quietly = TRUE)) {
+    skip("Package 'mockery' is not installed")
+  }
 
   mock_surfatlas <- structure(list(
     ids = 1:4,
@@ -47,6 +53,9 @@ test_that("plot_brain_grid has correct panel count", {
 test_that("plot_brain_grid shared scale passes same lim to all panels", {
   skip_if_not_installed("patchwork")
   skip_if_not_installed("scico")
+  if (!requireNamespace("mockery", quietly = TRUE)) {
+    skip("Package 'mockery' is not installed")
+  }
 
   mock_surfatlas <- structure(list(
     ids = 1:2,
@@ -72,6 +81,9 @@ test_that("plot_brain_grid shared scale passes same lim to all panels", {
 test_that("plot_brain_grid independent scale passes NULL lim", {
   skip_if_not_installed("patchwork")
   skip_if_not_installed("scico")
+  if (!requireNamespace("mockery", quietly = TRUE)) {
+    skip("Package 'mockery' is not installed")
+  }
 
   mock_surfatlas <- structure(list(
     ids = 1:2,
@@ -105,4 +117,48 @@ test_that(".make_colorbar_panel returns ggplot", {
     palette = "cork", lim = c(-1, 1), title = "z-score"
   )
   expect_s3_class(cb, "gg")
+})
+
+test_that(".make_colorbar_panel supports bottom orientation", {
+  skip_if_not_installed("scico")
+  cb <- neuroatlas:::.make_colorbar_panel(
+    palette = "cork",
+    lim = c(-1, 1),
+    title = "z-score",
+    position = "bottom"
+  )
+  expect_s3_class(cb, "gg")
+})
+
+test_that("plot_brain_grid passes titles through plot_brain", {
+  skip_if_not_installed("patchwork")
+  if (!requireNamespace("mockery", quietly = TRUE)) {
+    skip("Package 'mockery' is not installed")
+  }
+
+  mock_surfatlas <- structure(list(
+    ids = 1:2,
+    labels = c("A", "B"),
+    hemi = c("left", "right"),
+    name = "mock"
+  ), class = "surfatlas")
+
+  env <- new.env(parent = emptyenv())
+  env$captured_titles <- character()
+  mock_pb <- function(..., title = NULL) {
+    env$captured_titles <- c(env$captured_titles, title)
+    ggplot2::ggplot() + ggplot2::theme_void()
+  }
+
+  mockery::stub(plot_brain_grid, "plot_brain", mock_pb)
+  vals <- list(A = c(-1, 1), B = c(1, -1))
+
+  plot_brain_grid(
+    mock_surfatlas,
+    vals,
+    titles = c("Contrast A", "Contrast B"),
+    colorbar = FALSE
+  )
+
+  expect_equal(env$captured_titles, c("Contrast A", "Contrast B"))
 })
