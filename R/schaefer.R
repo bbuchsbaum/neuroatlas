@@ -392,6 +392,14 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
   }
 
   labels <- schaefer_metainfo(parcels, networks, use_cache)
+  vol_fname <- paste0(
+    "Schaefer2018_", parcels, "Parcels_",
+    networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz"
+  )
+  label_fname <- paste0(
+    "Schaefer2018_", parcels, "Parcels_",
+    networks, "Networks_order.txt"
+  )
 
   # After resampling, some regions may be lost - filter to only existing regions
   actual_ids <- sort(unique(as.vector(vol[vol != 0])))
@@ -450,7 +458,76 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
     notes = "CBIG filenames use FSLMNI152_*mm naming."
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- dplyr::bind_rows(
+    .new_atlas_artifact(
+      role = "parcellation_volume",
+      family = "schaefer",
+      model = "Schaefer2018",
+      variant = paste0(parcels, " parcels / ", networks, " networks"),
+      source_name = "CBIG",
+      source_url = schaefer_path$rpath,
+      source_ref = vol_fname,
+      citation_doi = "10.1093/cercor/bhx179",
+      file_name = vol_fname,
+      template_space = "MNI152NLin6Asym",
+      coord_space = "MNI152",
+      resolution = paste0(resolution, "mm"),
+      parcels = parcels,
+      networks = networks,
+      lineage = "CBIG-distributed Schaefer2018 volumetric release.",
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "label_table",
+      family = "schaefer",
+      model = "Schaefer2018",
+      variant = paste0(parcels, " parcels / ", networks, " networks"),
+      source_name = "CBIG",
+      source_url = paste0(schaefer_path$rpath, "/freeview_lut/"),
+      source_ref = label_fname,
+      citation_doi = "10.1093/cercor/bhx179",
+      file_name = label_fname,
+      parcels = parcels,
+      networks = networks,
+      lineage = "CBIG Freeview LUT label table.",
+      confidence = "high"
+    )
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "volume",
+    from_template_space = "MNI152NLin6Asym",
+    to_template_space = "MNI152NLin6Asym",
+    from_coord_space = "MNI152",
+    to_coord_space = "MNI152",
+    status = "available",
+    confidence = "high",
+    details = paste0(
+      "Loaded Schaefer2018 volume with ", parcels, " parcels, ",
+      networks, " networks at ", resolution, "mm."
+    )
+  )
+  if (!is.null(outspace)) {
+    history <- dplyr::bind_rows(
+      history,
+      .new_atlas_history(
+        action = "resample",
+        representation = "volume",
+        from_template_space = "MNI152NLin6Asym",
+        to_template_space = template_space,
+        from_coord_space = "MNI152",
+        to_coord_space = "MNI152",
+        status = "available",
+        confidence = "approximate",
+        details = paste0("Resampled atlas with smooth=", smooth, ".")
+      )
+    )
+  }
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }
 
 
@@ -668,7 +745,76 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     confidence = "high"
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- dplyr::bind_rows(
+    .new_atlas_artifact(
+      role = "annotation_lh",
+      family = "schaefer",
+      model = "Schaefer2018",
+      variant = paste0(parcels, " parcels / ", networks, " networks"),
+      source_name = "CBIG",
+      source_url = paste0(
+        "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/",
+        "stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/",
+        "Parcellations/FreeSurfer5.3/fsaverage6/label/"
+      ),
+      source_ref = paste0(
+        "lh.Schaefer2018_", parcels, "Parcels_",
+        networks, "Networks_order.annot"
+      ),
+      citation_doi = "10.1093/cercor/bhx179",
+      template_space = "fsaverage6",
+      coord_space = get_surface_coordinate_space("fsaverage6"),
+      density = "41k",
+      parcels = parcels,
+      networks = networks,
+      hemi = "left",
+      lineage = "Original CBIG fsaverage6 annotation.",
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "annotation_rh",
+      family = "schaefer",
+      model = "Schaefer2018",
+      variant = paste0(parcels, " parcels / ", networks, " networks"),
+      source_name = "CBIG",
+      source_url = paste0(
+        "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/",
+        "stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/",
+        "Parcellations/FreeSurfer5.3/fsaverage6/label/"
+      ),
+      source_ref = paste0(
+        "rh.Schaefer2018_", parcels, "Parcels_",
+        networks, "Networks_order.annot"
+      ),
+      citation_doi = "10.1093/cercor/bhx179",
+      template_space = "fsaverage6",
+      coord_space = get_surface_coordinate_space("fsaverage6"),
+      density = "41k",
+      parcels = parcels,
+      networks = networks,
+      hemi = "right",
+      lineage = "Original CBIG fsaverage6 annotation.",
+      confidence = "high"
+    )
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "surface",
+    from_template_space = "fsaverage6",
+    to_template_space = "fsaverage6",
+    from_coord_space = get_surface_coordinate_space("fsaverage6"),
+    to_coord_space = get_surface_coordinate_space("fsaverage6"),
+    status = "available",
+    confidence = "high",
+    details = paste0(
+      "Loaded Schaefer2018 fsaverage6 surface atlas (", surf, ")."
+    )
+  )
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }
 
 
@@ -791,7 +937,95 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     confidence = "high"
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- dplyr::bind_rows(
+    .new_atlas_artifact(
+      role = "annotation_lh",
+      family = "schaefer",
+      model = "Schaefer2018",
+      variant = paste0(parcels, " parcels / ", networks, " networks"),
+      source_name = "CBIG",
+      source_url = paste0(cbig_base, mapping$cbig_space, "/label"),
+      source_ref = paste0(
+        "lh.Schaefer2018_", parcels, "Parcels_",
+        networks, "Networks_order.annot"
+      ),
+      citation_doi = "10.1093/cercor/bhx179",
+      template_space = mapping$space,
+      coord_space = get_surface_coordinate_space(mapping$space),
+      density = mapping$tf_density,
+      parcels = parcels,
+      networks = networks,
+      hemi = "left",
+      lineage = "CBIG annotation on TemplateFlow geometry.",
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "annotation_rh",
+      family = "schaefer",
+      model = "Schaefer2018",
+      variant = paste0(parcels, " parcels / ", networks, " networks"),
+      source_name = "CBIG",
+      source_url = paste0(cbig_base, mapping$cbig_space, "/label"),
+      source_ref = paste0(
+        "rh.Schaefer2018_", parcels, "Parcels_",
+        networks, "Networks_order.annot"
+      ),
+      citation_doi = "10.1093/cercor/bhx179",
+      template_space = mapping$space,
+      coord_space = get_surface_coordinate_space(mapping$space),
+      density = mapping$tf_density,
+      parcels = parcels,
+      networks = networks,
+      hemi = "right",
+      lineage = "CBIG annotation on TemplateFlow geometry.",
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "geometry_lh",
+      family = "schaefer",
+      model = "Schaefer2018",
+      source_name = "TemplateFlow",
+      source_url = "https://www.templateflow.org",
+      template_space = mapping$space,
+      coord_space = get_surface_coordinate_space(mapping$space),
+      density = mapping$tf_density,
+      hemi = "left",
+      lineage = paste0("TemplateFlow surface geometry (", surf, ")."),
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "geometry_rh",
+      family = "schaefer",
+      model = "Schaefer2018",
+      source_name = "TemplateFlow",
+      source_url = "https://www.templateflow.org",
+      template_space = mapping$space,
+      coord_space = get_surface_coordinate_space(mapping$space),
+      density = mapping$tf_density,
+      hemi = "right",
+      lineage = paste0("TemplateFlow surface geometry (", surf, ")."),
+      confidence = "high"
+    )
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "surface",
+    from_template_space = mapping$space,
+    to_template_space = mapping$space,
+    from_coord_space = get_surface_coordinate_space(mapping$space),
+    to_coord_space = get_surface_coordinate_space(mapping$space),
+    status = "available",
+    confidence = "high",
+    details = paste0(
+      "Loaded CBIG labels on TemplateFlow ", mapping$space,
+      " geometry (", surf, ")."
+    )
+  )
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }
 
 

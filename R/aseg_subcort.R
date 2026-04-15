@@ -146,5 +146,52 @@ get_aseg_atlas <- function(outspace=NULL) {
     )
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- .new_atlas_artifact(
+    role = "parcellation_volume",
+    family = "aseg",
+    model = "FreeSurferASEG",
+    source_name = "neuroatlas",
+    source_url = "inst/extdata/atlas_aparc_aseg_prob33.nii.gz",
+    source_ref = "atlas_aparc_aseg_prob33.nii.gz",
+    citation_doi = "10.1016/S0896-6273(02)00569-X",
+    file_name = "atlas_aparc_aseg_prob33.nii.gz",
+    template_space = "MNI152NLin6Asym",
+    coord_space = "MNI152",
+    resolution = "1mm",
+    lineage = "Bundled neuroatlas volume derived from FreeSurfer ASEG labels.",
+    confidence = "high",
+    notes = "Packaged in inst/extdata."
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "volume",
+    from_template_space = "MNI152NLin6Asym",
+    to_template_space = "MNI152NLin6Asym",
+    from_coord_space = "MNI152",
+    to_coord_space = "MNI152",
+    status = "available",
+    confidence = "high",
+    details = "Loaded bundled ASEG atlas."
+  )
+  if (!is.null(outspace)) {
+    history <- dplyr::bind_rows(
+      history,
+      .new_atlas_history(
+        action = "resample",
+        representation = "volume",
+        from_template_space = "MNI152NLin6Asym",
+        to_template_space = template_space,
+        from_coord_space = "MNI152",
+        to_coord_space = "MNI152",
+        status = "available",
+        confidence = "approximate",
+        details = "Resampled ASEG atlas to requested output space."
+      )
+    )
+  }
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }

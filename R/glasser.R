@@ -173,7 +173,80 @@ get_glasser_atlas <- function(outspace=NULL,
     notes = source_info$notes
   )
 
-  .attach_atlas_ref(ret, ref)
+  native_space <- if (source == "mni2009c") {
+    "MNI152NLin2009cAsym"
+  } else {
+    "MNI152_unspecified"
+  }
+
+  artifacts <- dplyr::bind_rows(
+    .new_atlas_artifact(
+      role = "parcellation_volume",
+      family = "glasser",
+      model = "HCP-MMP1.0",
+      variant = source,
+      source_name = if (source == "mni2009c") {
+        "Raj-Lab-UCSF mirror"
+      } else {
+        "xcpEngine"
+      },
+      source_url = source_info$volume_url,
+      source_ref = source_info$fname,
+      citation_doi = "10.1038/nature18933",
+      file_name = source_info$fname,
+      template_space = native_space,
+      coord_space = "MNI152",
+      resolution = if (source == "mni2009c") "1mm" else NA_character_,
+      lineage = source_info$lineage,
+      confidence = if (source == "mni2009c") "high" else "uncertain",
+      notes = source_info$notes
+    ),
+    .new_atlas_artifact(
+      role = "label_table",
+      family = "glasser",
+      model = "HCP-MMP1.0",
+      variant = "xcpengine_labels",
+      source_name = "xcpEngine",
+      source_url = source_info$label_url,
+      source_ref = "glasser360NodeNames.txt",
+      citation_doi = "10.1038/nature18933",
+      file_name = "glasser360NodeNames.txt",
+      lineage = "Parcel label table used for stable Glasser naming.",
+      confidence = "high"
+    )
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "volume",
+    from_template_space = native_space,
+    to_template_space = native_space,
+    from_coord_space = "MNI152",
+    to_coord_space = "MNI152",
+    status = "available",
+    confidence = if (source == "mni2009c") "high" else "uncertain",
+    details = paste0("Loaded Glasser volume from source='", source, "'.")
+  )
+  if (!is.null(outspace)) {
+    history <- dplyr::bind_rows(
+      history,
+      .new_atlas_history(
+        action = "resample",
+        representation = "volume",
+        from_template_space = native_space,
+        to_template_space = template_space,
+        from_coord_space = "MNI152",
+        to_coord_space = "MNI152",
+        status = "available",
+        confidence = "approximate",
+        details = "Resampled atlas to requested output space."
+      )
+    )
+  }
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }
 
 #' @rdname map_atlas
@@ -397,7 +470,80 @@ glasser_surf <- function(space = "fsaverage",
     confidence = "high"
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- dplyr::bind_rows(
+    .new_atlas_artifact(
+      role = "annotation_lh",
+      family = "glasser",
+      model = "HCP-MMP1.0",
+      source_name = "Figshare",
+      source_url = "https://doi.org/10.6084/m9.figshare.3498446",
+      source_ref = "lh.HCP-MMP1.annot",
+      citation_doi = "10.6084/m9.figshare.3498446",
+      template_space = "fsaverage",
+      coord_space = get_surface_coordinate_space("fsaverage"),
+      density = "164k",
+      hemi = "left",
+      lineage = "Projected Glasser annotation distributed on fsaverage.",
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "annotation_rh",
+      family = "glasser",
+      model = "HCP-MMP1.0",
+      source_name = "Figshare",
+      source_url = "https://doi.org/10.6084/m9.figshare.3498446",
+      source_ref = "rh.HCP-MMP1.annot",
+      citation_doi = "10.6084/m9.figshare.3498446",
+      template_space = "fsaverage",
+      coord_space = get_surface_coordinate_space("fsaverage"),
+      density = "164k",
+      hemi = "right",
+      lineage = "Projected Glasser annotation distributed on fsaverage.",
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "geometry_lh",
+      family = "glasser",
+      model = "HCP-MMP1.0",
+      source_name = "TemplateFlow",
+      source_url = "https://www.templateflow.org",
+      template_space = "fsaverage",
+      coord_space = get_surface_coordinate_space("fsaverage"),
+      density = "164k",
+      hemi = "left",
+      lineage = paste0("TemplateFlow surface geometry (", surf, ")."),
+      confidence = "high"
+    ),
+    .new_atlas_artifact(
+      role = "geometry_rh",
+      family = "glasser",
+      model = "HCP-MMP1.0",
+      source_name = "TemplateFlow",
+      source_url = "https://www.templateflow.org",
+      template_space = "fsaverage",
+      coord_space = get_surface_coordinate_space("fsaverage"),
+      density = "164k",
+      hemi = "right",
+      lineage = paste0("TemplateFlow surface geometry (", surf, ")."),
+      confidence = "high"
+    )
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "surface",
+    from_template_space = "fsaverage",
+    to_template_space = "fsaverage",
+    from_coord_space = get_surface_coordinate_space("fsaverage"),
+    to_coord_space = get_surface_coordinate_space("fsaverage"),
+    status = "available",
+    confidence = "high",
+    details = paste0("Loaded Glasser fsaverage surface atlas (", surf, ").")
+  )
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }
 
 

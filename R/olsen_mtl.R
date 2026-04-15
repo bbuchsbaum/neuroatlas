@@ -128,7 +128,53 @@ get_olsen_mtl <- function(outspace=NULL) {
     )
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- .new_atlas_artifact(
+    role = "parcellation_volume",
+    family = "olsen",
+    model = "OlsenMTL",
+    source_name = "neuroatlas",
+    source_url = "inst/extdata/Olsen_MNI_MTL_prob33.nii.gz",
+    source_ref = "Olsen_MNI_MTL_prob33.nii.gz",
+    file_name = "Olsen_MNI_MTL_prob33.nii.gz",
+    template_space = "MNI152_custom",
+    coord_space = "MNI152",
+    resolution = "1mm",
+    lineage = "Bundled neuroatlas Olsen MTL atlas volume.",
+    confidence = "uncertain",
+    notes = "Packaged in neuroatlas data."
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "volume",
+    from_template_space = "MNI152_custom",
+    to_template_space = "MNI152_custom",
+    from_coord_space = "MNI152",
+    to_coord_space = "MNI152",
+    status = "available",
+    confidence = "uncertain",
+    details = "Loaded bundled Olsen MTL atlas."
+  )
+  if (!is.null(outspace)) {
+    history <- dplyr::bind_rows(
+      history,
+      .new_atlas_history(
+        action = "resample",
+        representation = "volume",
+        from_template_space = "MNI152_custom",
+        to_template_space = template_space,
+        from_coord_space = "MNI152",
+        to_coord_space = "MNI152",
+        status = "available",
+        confidence = "approximate",
+        details = "Resampled Olsen MTL atlas to requested output space."
+      )
+    )
+  }
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }
 
 #' Extract Hippocampal Parcellation
@@ -249,5 +295,64 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
     confidence = if (is.null(outspace)) "uncertain" else "approximate"
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- .new_atlas_artifact(
+    role = "source_atlas",
+    family = "olsen",
+    model = "OlsenMTL",
+    source_name = "neuroatlas",
+    source_url = "inst/extdata/Olsen_MNI_MTL_prob33.nii.gz",
+    source_ref = "Olsen_MNI_MTL_prob33.nii.gz",
+    file_name = "Olsen_MNI_MTL_prob33.nii.gz",
+    template_space = "MNI152_custom",
+    coord_space = "MNI152",
+    resolution = "1mm",
+    lineage = "Bundled Olsen atlas used as source for hippocampal derivation.",
+    confidence = "uncertain"
+  )
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "volume",
+    from_template_space = "MNI152_custom",
+    to_template_space = "MNI152_custom",
+    from_coord_space = "MNI152",
+    to_coord_space = "MNI152",
+    status = "available",
+    confidence = "uncertain",
+    details = "Loaded Olsen MTL source atlas for hippocampal derivation."
+  )
+  if (!is.null(outspace)) {
+    history <- dplyr::bind_rows(
+      history,
+      .new_atlas_history(
+        action = "resample",
+        representation = "volume",
+        from_template_space = "MNI152_custom",
+        to_template_space = template_space,
+        from_coord_space = "MNI152",
+        to_coord_space = "MNI152",
+        status = "available",
+        confidence = "approximate",
+        details = "Resampled Olsen MTL source atlas before derivation."
+      )
+    )
+  }
+  history <- dplyr::bind_rows(
+    history,
+    .new_atlas_history(
+      action = "derive",
+      representation = "derived",
+      from_template_space = template_space,
+      to_template_space = template_space,
+      from_coord_space = "MNI152",
+      to_coord_space = "MNI152",
+      status = "available",
+      confidence = if (is.null(outspace)) "uncertain" else "approximate",
+      details = paste0("Derived hippocampal atlas with apsections=", apsections, ".")
+    )
+  )
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }

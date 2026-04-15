@@ -88,6 +88,7 @@ Collate:
     'atlas_methods.R'
     'atlas_operators.R'
     'atlas_overlap.R'
+    'atlas_provenance.R'
     'atlas_ref.R'
     'atlas_utils.R'
     'batch_reduce.R'

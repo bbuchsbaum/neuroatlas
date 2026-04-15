@@ -15,6 +15,10 @@ plot_brain_grid(
   lim = NULL,
   titles = NULL,
   colorbar = TRUE,
+  colorbar_title = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
   ...
 )
 }
@@ -45,8 +49,14 @@ limits when provided.}
 \item{titles}{Optional character vector of panel titles. If \code{NULL},
 names of \code{vals_list} are used.}
 
-\item{colorbar}{Logical. If \code{TRUE} (default), a standalone colorbar
-panel is appended to the grid.}
+\item{colorbar}{Logical or character. Use \code{TRUE} or \code{"right"}
+(default) for a vertical shared colorbar, \code{"bottom"} for a
+horizontal shared colorbar, or \code{FALSE} / \code{"none"} to omit it.}
+
+\item{colorbar_title}{Optional shared colorbar title.}
+
+\item{title, subtitle, caption}{Optional overall plot annotations applied to
+the composed figure.}
 
 \item{...}{Additional arguments passed to \code{\link{plot_brain}}.}
 }

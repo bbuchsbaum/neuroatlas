@@ -50,6 +50,10 @@ plot_brain(
   overlay_sampling = c("midpoint", "normal_line", "thickness"),
   colorbar = FALSE,
   colorbar_title = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  panel_labels = NULL,
   outline = FALSE,
   bg = "white",
   ...
@@ -218,11 +222,22 @@ Default: \code{"avg"}.}
 \code{NeuroVol}. One of \code{"midpoint"}, \code{"normal_line"}, or
 \code{"thickness"}. Default: \code{"midpoint"}.}
 
-\item{colorbar}{Logical. When \code{vals} is non-NULL and
-\code{interactive = FALSE}, add a standalone colorbar panel composed
-alongside the main plot via \pkg{patchwork}. Default: \code{FALSE}.}
+\item{colorbar}{Logical or character. When \code{vals} is non-NULL and
+\code{interactive = FALSE}, controls whether and where to add a standalone
+colorbar panel. Use \code{TRUE} or \code{"right"} for a vertical colorbar,
+\code{"bottom"} for a horizontal colorbar, or \code{FALSE} /
+\code{"none"} to omit it. Default: \code{FALSE}.}
 
 \item{colorbar_title}{Optional character label for the colorbar.}
+
+\item{title, subtitle, caption}{Optional plot-level annotations for static
+output. When a colorbar is present these are applied to the composed
+figure; otherwise they are added directly to the returned ggplot.}
+
+\item{panel_labels}{Optional panel label override. Use either an unnamed
+character vector matching the number of panels, a named character vector
+keyed by default panel names such as \code{"Left Lateral"}, or a function
+that takes the default panel name and returns a new label.}
 
 \item{outline}{Logical. If \code{TRUE}, draw every triangle edge (mesh
 wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}
@@ -232,8 +247,10 @@ wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}
 \item{...}{Additional arguments (currently unused).}
 }
 \value{
-A \code{ggplot2} object (when \code{interactive = FALSE}) or a
-  \code{ggiraph::girafe} widget (when \code{interactive = TRUE}).
+A \code{ggplot2} object (when \code{interactive = FALSE} and no
+  standalone colorbar is requested), a \code{patchwork} object (when a
+  standalone static colorbar is composed), or a \code{ggiraph::girafe}
+  widget (when \code{interactive = TRUE}).
 }
 \description{
 Renders a triangle-mesh projection of cortical surface parcellations with

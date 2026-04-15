@@ -1362,6 +1362,116 @@ build_surface_polygon_data <- function(surfatlas,
 }
 
 
+.normalize_colorbar_position <- function(colorbar, default = "right") {
+  if (is.logical(colorbar) && length(colorbar) == 1L && !is.na(colorbar)) {
+    return(if (isTRUE(colorbar)) default else "none")
+  }
+
+  if (is.character(colorbar) && length(colorbar) == 1L && !is.na(colorbar)) {
+    colorbar <- tolower(colorbar)
+    if (colorbar %in% c("none", "right", "bottom")) {
+      return(colorbar)
+    }
+  }
+
+  stop(
+    "'colorbar' must be TRUE, FALSE, or one of 'right', 'bottom', 'none'.",
+    call. = FALSE
+  )
+}
+
+.resolve_plot_brain_panel_labels <- function(panel_levels, panel_labels = NULL) {
+  if (is.null(panel_labels)) {
+    return(panel_levels)
+  }
+
+  if (is.function(panel_labels)) {
+    return(vapply(panel_levels, panel_labels, character(1), USE.NAMES = FALSE))
+  }
+
+  if (!is.character(panel_labels)) {
+    stop(
+      "'panel_labels' must be NULL, a character vector, or a function.",
+      call. = FALSE
+    )
+  }
+
+  if (is.null(names(panel_labels))) {
+    if (length(panel_labels) != length(panel_levels)) {
+      stop(
+        "Unnamed 'panel_labels' must have length ", length(panel_levels), ".",
+        call. = FALSE
+      )
+    }
+    return(panel_labels)
+  }
+
+  out <- stats::setNames(panel_levels, panel_levels)
+  matched <- intersect(names(panel_labels), panel_levels)
+  out[matched] <- unname(panel_labels[matched])
+  unname(out)
+}
+
+.compose_plot_brain_figure <- function(main_plot,
+                                       colorbar_plot = NULL,
+                                       colorbar_position = "none",
+                                       title = NULL,
+                                       subtitle = NULL,
+                                       caption = NULL,
+                                       bg = "white") {
+  is_patchwork_plot <- inherits(main_plot, "patchwork")
+  annotation_theme <- ggplot2::theme(
+    plot.background = ggplot2::element_rect(fill = bg, colour = NA),
+    plot.title = ggplot2::element_text(face = "bold",
+                                       margin = ggplot2::margin(b = 6)),
+    plot.subtitle = ggplot2::element_text(margin = ggplot2::margin(b = 8)),
+    plot.caption = ggplot2::element_text(margin = ggplot2::margin(t = 8)),
+    plot.title.position = "plot",
+    plot.caption.position = "plot"
+  )
+
+  if (identical(colorbar_position, "none") || is.null(colorbar_plot)) {
+    if (is_patchwork_plot) {
+      return(main_plot + patchwork::plot_annotation(
+        title = title,
+        subtitle = subtitle,
+        caption = caption,
+        theme = annotation_theme
+      ))
+    }
+
+    return(
+      main_plot +
+        ggplot2::labs(title = title, subtitle = subtitle, caption = caption) +
+        annotation_theme
+    )
+  }
+
+  if (!requireNamespace("patchwork", quietly = TRUE)) {
+    stop(
+      "Package 'patchwork' is required when 'colorbar' is not 'none'. ",
+      "Install it with install.packages('patchwork').",
+      call. = FALSE
+    )
+  }
+
+  combined <- if (identical(colorbar_position, "bottom")) {
+    patchwork::wrap_plots(main_plot, colorbar_plot, ncol = 1,
+                          heights = c(1, 0.16))
+  } else {
+    patchwork::wrap_plots(main_plot, colorbar_plot, ncol = 2,
+                          widths = c(1, 0.12))
+  }
+
+  combined + patchwork::plot_annotation(
+    title = title,
+    subtitle = subtitle,
+    caption = caption,
+    theme = annotation_theme
+  )
+}
+
+
 #' Plot Brain Surface Atlas
 #'
 #' @description
@@ -1488,17 +1598,28 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{"black"}.
 #' @param overlay_border_size Line width for overlay boundaries. Default:
 #'   \code{0.25}.
-#' @param colorbar Logical. When \code{vals} is non-NULL and
-#'   \code{interactive = FALSE}, add a standalone colorbar panel composed
-#'   alongside the main plot via \pkg{patchwork}. Default: \code{FALSE}.
+#' @param colorbar Logical or character. When \code{vals} is non-NULL and
+#'   \code{interactive = FALSE}, controls whether and where to add a standalone
+#'   colorbar panel. Use \code{TRUE} or \code{"right"} for a vertical colorbar,
+#'   \code{"bottom"} for a horizontal colorbar, or \code{FALSE} /
+#'   \code{"none"} to omit it. Default: \code{FALSE}.
 #' @param colorbar_title Optional character label for the colorbar.
+#' @param title,subtitle,caption Optional plot-level annotations for static
+#'   output. When a colorbar is present these are applied to the composed
+#'   figure; otherwise they are added directly to the returned ggplot.
+#' @param panel_labels Optional panel label override. Use either an unnamed
+#'   character vector matching the number of panels, a named character vector
+#'   keyed by default panel names such as \code{"Left Lateral"}, or a function
+#'   that takes the default panel name and returns a new label.
 #' @param outline Logical. If \code{TRUE}, draw every triangle edge (mesh
 #'   wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.
 #' @param bg Character: background colour for the plot. Default: \code{"white"}.
 #' @param ... Additional arguments (currently unused).
 #'
-#' @return A \code{ggplot2} object (when \code{interactive = FALSE}) or a
-#'   \code{ggiraph::girafe} widget (when \code{interactive = TRUE}).
+#' @return A \code{ggplot2} object (when \code{interactive = FALSE} and no
+#'   standalone colorbar is requested), a \code{patchwork} object (when a
+#'   standalone static colorbar is composed), or a \code{ggiraph::girafe}
+#'   widget (when \code{interactive = TRUE}).
 #'
 #' @examples
 #' \dontrun{
@@ -1582,6 +1703,10 @@ plot_brain <- function(surfatlas,
                                             "thickness"),
                        colorbar = FALSE,
                        colorbar_title = NULL,
+                       title = NULL,
+                       subtitle = NULL,
+                       caption = NULL,
+                       panel_labels = NULL,
                        outline = FALSE,
                        bg = "white",
                        ...) {
@@ -1621,6 +1746,7 @@ plot_brain <- function(surfatlas,
   views <- match.arg(views, c("lateral", "medial", "dorsal", "ventral"),
                      several.ok = TRUE)
   hemis <- match.arg(hemis, c("left", "right"), several.ok = TRUE)
+  colorbar_position <- .normalize_colorbar_position(colorbar)
   data_id_mode <- match.arg(data_id_mode)
   panel_layout <- match.arg(panel_layout)
   border_geom <- match.arg(border_geom)
@@ -1799,6 +1925,11 @@ plot_brain <- function(surfatlas,
                         paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v)))
     }
   }
+  panel_display_labels <- .resolve_plot_brain_panel_labels(
+    panel_levels,
+    panel_labels = panel_labels
+  )
+  panel_label_map <- stats::setNames(panel_display_labels, panel_levels)
   poly_data$panel <- factor(poly_data$panel, levels = panel_levels)
 
   # --- Build plot ---
@@ -2120,25 +2251,40 @@ plot_brain <- function(surfatlas,
   }
 
   p <- p +
-    ggplot2::facet_wrap(~ panel, ncol = ncol) +
+    ggplot2::facet_wrap(
+      ~ panel,
+      ncol = ncol,
+      labeller = ggplot2::as_labeller(panel_label_map)
+    ) +
     ggplot2::coord_equal() +
     ggplot2::theme_void() +
     ggplot2::theme(
       plot.background = ggplot2::element_rect(fill = bg, colour = NA),
       strip.text = ggplot2::element_text(size = 11, face = "bold",
-                                         margin = ggplot2::margin(b = 4))
+                                         margin = ggplot2::margin(t = 2, b = 6))
     ) +
     ggplot2::labs(fill = NULL)
 
   if (!interactive) {
-    if (isTRUE(colorbar) && !is.null(vals)) {
-      cb <- .make_colorbar_panel(palette = palette, lim = lim,
-                                 title = colorbar_title, bg = bg)
-      p <- p + patchwork::inset_element(
-        cb, left = 0.85, bottom = 0.15, right = 0.98, top = 0.85
+    cb <- NULL
+    if (!identical(colorbar_position, "none") && !is.null(vals)) {
+      cb <- .make_colorbar_panel(
+        palette = palette,
+        lim = lim,
+        title = colorbar_title,
+        position = colorbar_position,
+        bg = bg
       )
     }
-    return(p)
+    return(.compose_plot_brain_figure(
+      main_plot = p,
+      colorbar_plot = cb,
+      colorbar_position = colorbar_position,
+      title = title,
+      subtitle = subtitle,
+      caption = caption,
+      bg = bg
+    ))
   }
 
   ggiraph::girafe(
@@ -2178,28 +2324,46 @@ plot_brain <- function(surfatlas,
 #' @param palette scico palette name.
 #' @param lim Numeric length-2 colour limits.
 #' @param title Optional title string for the colour guide.
+#' @param position Colorbar placement keyword. One of \code{"right"} or
+#'   \code{"bottom"}.
 #' @param bg Background colour.
 #' @return A \code{ggplot2} object containing only a colour bar.
 #' @keywords internal
 #' @noRd
-.make_colorbar_panel <- function(palette, lim, title = NULL, bg = "white") {
+.make_colorbar_panel <- function(palette,
+                                 lim,
+                                 title = NULL,
+                                 position = c("right", "bottom"),
+                                 bg = "white") {
+  position <- match.arg(position)
+  guide <- if (identical(position, "bottom")) {
+    ggplot2::guide_colorbar(
+      barwidth = ggplot2::unit(10, "lines"),
+      barheight = ggplot2::unit(0.9, "lines"),
+      title.position = "top",
+      title.hjust = 0.5,
+      direction = "horizontal"
+    )
+  } else {
+    ggplot2::guide_colorbar(
+      barwidth = ggplot2::unit(0.9, "lines"),
+      barheight = ggplot2::unit(8, "lines"),
+      title.position = "top",
+      title.hjust = 0.5,
+      direction = "vertical"
+    )
+  }
   dummy <- data.frame(x = 1, y = 1, fill = mean(lim))
   p <- ggplot2::ggplot(dummy, ggplot2::aes(x = x, y = y, fill = fill)) +
     ggplot2::geom_point(alpha = 0, show.legend = TRUE) +
     scico::scale_fill_scico(
       palette = palette, limits = lim, oob = scales::squish,
       name = title,
-      guide = ggplot2::guide_colorbar(
-        barwidth = ggplot2::unit(0.8, "lines"),
-        barheight = ggplot2::unit(6, "lines"),
-        title.position = "top",
-        title.hjust = 0.5,
-        direction = "vertical"
-      )
+      guide = guide
     ) +
     ggplot2::theme_void() +
     ggplot2::theme(
-      legend.position = "right",
+      legend.position = position,
       plot.background = ggplot2::element_rect(fill = NA, colour = NA)
     )
   cowplot_extract <- function(pl) {
@@ -2207,7 +2371,6 @@ plot_brain <- function(surfatlas,
     guide_idx <- grep("guide", gt$layout$name)
     if (length(guide_idx) == 0) return(pl)
     guide_grob <- gt$grobs[[guide_idx[1]]]
-    gridExtra <- requireNamespace("gridExtra", quietly = TRUE)
     ggplot2::ggplot() + ggplot2::theme_void() +
       ggplot2::theme(plot.background = ggplot2::element_rect(fill = NA, colour = NA)) +
       ggplot2::annotation_custom(guide_grob)

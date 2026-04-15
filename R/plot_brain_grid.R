@@ -21,8 +21,12 @@
 #'   limits when provided.
 #' @param titles Optional character vector of panel titles. If \code{NULL},
 #'   names of \code{vals_list} are used.
-#' @param colorbar Logical. If \code{TRUE} (default), a standalone colorbar
-#'   panel is appended to the grid.
+#' @param colorbar Logical or character. Use \code{TRUE} or \code{"right"}
+#'   (default) for a vertical shared colorbar, \code{"bottom"} for a
+#'   horizontal shared colorbar, or \code{FALSE} / \code{"none"} to omit it.
+#' @param colorbar_title Optional shared colorbar title.
+#' @param title,subtitle,caption Optional overall plot annotations applied to
+#'   the composed figure.
 #' @param ... Additional arguments passed to \code{\link{plot_brain}}.
 #'
 #' @return A \code{patchwork} object.
@@ -48,6 +52,10 @@ plot_brain_grid <- function(surfatlas,
                             lim = NULL,
                             titles = NULL,
                             colorbar = TRUE,
+                            colorbar_title = NULL,
+                            title = NULL,
+                            subtitle = NULL,
+                            caption = NULL,
                             ...) {
   if (!requireNamespace("patchwork", quietly = TRUE)) {
     stop("Package 'patchwork' is required for plot_brain_grid(). ",
@@ -58,6 +66,7 @@ plot_brain_grid <- function(surfatlas,
     stop("'vals_list' must be a non-empty named list of numeric vectors.",
          call. = FALSE)
   }
+  colorbar_position <- .normalize_colorbar_position(colorbar)
 
   n_panels <- length(vals_list)
 
@@ -83,29 +92,37 @@ plot_brain_grid <- function(surfatlas,
       palette = palette,
       lim = panel_lim,
       interactive = FALSE,
-      colorbar = FALSE,
+      colorbar = "none",
+      title = titles[i],
       ...
-    ) + ggplot2::ggtitle(titles[i])
+    )
   }
 
   # Arrange panels
   combined <- patchwork::wrap_plots(panels, ncol = ncol)
 
   # Add colorbar
-  if (isTRUE(colorbar)) {
+  cb <- NULL
+  if (!identical(colorbar_position, "none")) {
     final_lim <- if (!is.null(lim)) {
       lim
     } else {
       range(unlist(vals_list), na.rm = TRUE)
     }
-    cb <- .make_colorbar_panel(palette = palette, lim = final_lim)
-    combined <- combined + cb +
-      patchwork::plot_layout(widths = c(rep(1, n_panels), 0.15))
+    cb <- .make_colorbar_panel(
+      palette = palette,
+      lim = final_lim,
+      title = colorbar_title,
+      position = colorbar_position
+    )
   }
 
-  combined + patchwork::plot_annotation(
-    theme = ggplot2::theme(plot.background = ggplot2::element_rect(
-      fill = "white", colour = NA
-    ))
+  .compose_plot_brain_figure(
+    main_plot = combined,
+    colorbar_plot = cb,
+    colorbar_position = colorbar_position,
+    title = title,
+    subtitle = subtitle,
+    caption = caption
   )
 }

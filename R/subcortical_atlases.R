@@ -227,7 +227,72 @@ get_subcortical_atlas <- function(name,
     confidence = if (is.null(outspace)) "high" else "approximate"
   )
 
-  .attach_atlas_ref(ret, ref)
+  artifacts <- .new_atlas_artifact(
+    role = "parcellation_volume",
+    family = "subcortical",
+    model = spec$id,
+    variant = spec$atlas,
+    source_name = "TemplateFlow",
+    source_url = "https://www.templateflow.org",
+    source_ref = spec$atlas,
+    template_space = tf_space,
+    coord_space = "MNI152",
+    resolution = res,
+    lineage = paste0("TemplateFlow atlas=", spec$atlas),
+    confidence = "high"
+  )
+  if (!is.null(label_path)) {
+    artifacts <- dplyr::bind_rows(
+      artifacts,
+      .new_atlas_artifact(
+        role = "label_table",
+        family = "subcortical",
+        model = spec$id,
+        variant = spec$atlas,
+        source_name = "TemplateFlow",
+        source_url = "https://www.templateflow.org",
+        source_ref = basename(label_path),
+        file_name = basename(label_path),
+        lineage = "Label table paired with TemplateFlow atlas.",
+        confidence = "high"
+      )
+    )
+  }
+
+  history <- .new_atlas_history(
+    action = "load",
+    representation = "volume",
+    from_template_space = tf_space,
+    to_template_space = tf_space,
+    from_coord_space = "MNI152",
+    to_coord_space = "MNI152",
+    status = "available",
+    confidence = "high",
+    details = paste0(
+      "Loaded TemplateFlow atlas ", spec$atlas,
+      " (resolution=", res, ")."
+    )
+  )
+  if (!is.null(outspace)) {
+    history <- dplyr::bind_rows(
+      history,
+      .new_atlas_history(
+        action = "resample",
+        representation = "volume",
+        from_template_space = tf_space,
+        to_template_space = .template_space_from_outspace(outspace, tf_space),
+        from_coord_space = "MNI152",
+        to_coord_space = "MNI152",
+        status = "available",
+        confidence = "approximate",
+        details = "Resampled subcortical atlas to requested output space."
+      )
+    )
+  }
+
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret
 }
 
 # Internal specification table -----------------------------------------------

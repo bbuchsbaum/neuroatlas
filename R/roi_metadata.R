@@ -26,6 +26,10 @@ NULL
 #'     \item{template_space}{Template space identifier (e.g., "MNI152NLin6Asym"), when atlas_ref is available}
 #'     \item{coord_space}{Coordinate space (e.g., "MNI152", "MNI305"), when atlas_ref is available}
 #'     \item{atlas_family}{Atlas family identifier (e.g., "schaefer"), when atlas_ref is available}
+#'     \item{atlas_model}{Atlas model identifier (e.g., "Schaefer2018"), when atlas_ref is available}
+#'     \item{atlas_representation}{Representation type ("volume", "surface", or "derived"), when atlas_ref is available}
+#'     \item{atlas_source}{Loader/source key, when atlas_ref is available}
+#'     \item{atlas_confidence}{Atlas provenance confidence tier, when atlas_ref is available}
 #'   }
 #'   Additional atlas-specific columns may be present (e.g., \code{network} for Schaefer atlases).
 #'
@@ -54,11 +58,28 @@ roi_metadata.atlas <- function(x, ...) {
   # If roi_metadata already exists as a field, augment with atlas_ref if needed
   if (!is.null(x$roi_metadata)) {
     meta <- x$roi_metadata
-    if (!is.null(x$atlas_ref) &&
-        !("template_space" %in% names(meta))) {
-      meta$template_space <- x$atlas_ref$template_space
-      meta$coord_space <- x$atlas_ref$coord_space
-      meta$atlas_family <- x$atlas_ref$family
+    if (!is.null(x$atlas_ref)) {
+      if (!("template_space" %in% names(meta))) {
+        meta$template_space <- x$atlas_ref$template_space
+      }
+      if (!("coord_space" %in% names(meta))) {
+        meta$coord_space <- x$atlas_ref$coord_space
+      }
+      if (!("atlas_family" %in% names(meta))) {
+        meta$atlas_family <- x$atlas_ref$family
+      }
+      if (!("atlas_model" %in% names(meta))) {
+        meta$atlas_model <- x$atlas_ref$model
+      }
+      if (!("atlas_representation" %in% names(meta))) {
+        meta$atlas_representation <- x$atlas_ref$representation
+      }
+      if (!("atlas_source" %in% names(meta))) {
+        meta$atlas_source <- x$atlas_ref$source
+      }
+      if (!("atlas_confidence" %in% names(meta))) {
+        meta$atlas_confidence <- x$atlas_ref$confidence
+      }
     }
     return(meta)
   }
@@ -97,6 +118,10 @@ roi_metadata.atlas <- function(x, ...) {
     meta$template_space <- x$atlas_ref$template_space
     meta$coord_space <- x$atlas_ref$coord_space
     meta$atlas_family <- x$atlas_ref$family
+    meta$atlas_model <- x$atlas_ref$model
+    meta$atlas_representation <- x$atlas_ref$representation
+    meta$atlas_source <- x$atlas_ref$source
+    meta$atlas_confidence <- x$atlas_ref$confidence
   }
 
   meta
@@ -272,9 +297,28 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
   if (!is.null(x$atlas_ref)) {
     ret$atlas_ref <- x$atlas_ref
   }
+  if (!is.null(x$atlas_artifacts)) {
+    ret$atlas_artifacts <- x$atlas_artifacts
+  }
+  if (!is.null(x$atlas_history)) {
+    ret$atlas_history <- x$atlas_history
+  }
 
   # Build roi_metadata tibble
   ret$roi_metadata <- .build_roi_metadata(ret)
+
+  ret <- .append_atlas_history(
+    ret,
+    action = "subset",
+    representation = if (inherits(x, "surfatlas")) "surface" else "volume",
+    from_template_space = if (!is.null(x$atlas_ref)) x$atlas_ref$template_space else NA_character_,
+    to_template_space = if (!is.null(x$atlas_ref)) x$atlas_ref$template_space else NA_character_,
+    from_coord_space = if (!is.null(x$atlas_ref)) x$atlas_ref$coord_space else NA_character_,
+    to_coord_space = if (!is.null(x$atlas_ref)) x$atlas_ref$coord_space else NA_character_,
+    status = "available",
+    confidence = if (!is.null(x$atlas_ref)) x$atlas_ref$confidence else "uncertain",
+    details = paste0("Kept ", length(new_ids), " of ", length(x$ids), " ROIs.")
+  )
 
   # Preserve original class
   class(ret) <- class(x)
@@ -366,6 +410,10 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
     meta$template_space <- x$atlas_ref$template_space
     meta$coord_space <- x$atlas_ref$coord_space
     meta$atlas_family <- x$atlas_ref$family
+    meta$atlas_model <- x$atlas_ref$model
+    meta$atlas_representation <- x$atlas_ref$representation
+    meta$atlas_source <- x$atlas_ref$source
+    meta$atlas_confidence <- x$atlas_ref$confidence
   }
 
   meta

@@ -3,12 +3,30 @@
 #' @importFrom cli rule symbol
 #' @export
 print.atlas <- function(x, ...) {
+  ref <- if (!is.null(x$atlas_ref)) atlas_ref(x) else NULL
+
   # Header
   cat(cli::rule(left = crayon::bold("Atlas Summary"), col = "cyan", width = 60), "\n\n")
 
   # Basic info
   cat(crayon::blue(cli::symbol$pointer), " ",
       crayon::bold("Name:   "), crayon::white(x$name), "\n", sep="")
+  if (!is.null(ref)) {
+    cat(crayon::blue(cli::symbol$pointer), " ",
+        crayon::bold("Model:  "), crayon::white(ref$model),
+        crayon::white(paste0(" [", ref$representation, "]")), "\n", sep = "")
+    cat(crayon::blue(cli::symbol$pointer), " ",
+        crayon::bold("Space:  "), crayon::white(ref$template_space), "\n", sep = "")
+    if (!is.na(ref$source) && nzchar(ref$source)) {
+      cat(crayon::blue(cli::symbol$pointer), " ",
+          crayon::bold("Source: "), crayon::white(ref$source), "\n", sep = "")
+    }
+    cat(crayon::blue(cli::symbol$pointer), " ",
+        crayon::bold("Provenance: "),
+        crayon::white(paste0(nrow(atlas_artifacts(x)), " artifacts, ",
+                             nrow(atlas_history(x)), " history steps")),
+        "\n", sep = "")
+  }
 
   # Volume info
   dims <- dim(x$atlas)
