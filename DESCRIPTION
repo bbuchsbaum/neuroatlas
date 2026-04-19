@@ -106,6 +106,7 @@ Collate:
     'plot_brain_polygons.R'
     'plot_brain_overlays.R'
     'plot_brain_layout.R'
+    'plot_brain_render.R'
     'plot_brain.R'
     'ce_shared_exports.R'
     'chart.R'
