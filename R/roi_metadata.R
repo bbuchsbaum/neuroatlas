@@ -89,11 +89,18 @@ roi_metadata.atlas <- function(x, ...) {
 
   # Handle color map - may be matrix, data.frame, or have different column names
   color_r <- color_g <- color_b <- rep(NA_integer_, n)
-  if (!is.null(x$cmap) && nrow(x$cmap) == n) {
-    if (is.data.frame(x$cmap) || is.matrix(x$cmap)) {
-      color_r <- as.integer(x$cmap[[1]])
-      color_g <- as.integer(x$cmap[[2]])
-      color_b <- as.integer(x$cmap[[3]])
+  if (!is.null(x$cmap) && NROW(x$cmap) == n) {
+    cmap_df <- if (is.data.frame(x$cmap)) {
+      x$cmap
+    } else if (is.matrix(x$cmap)) {
+      as.data.frame(x$cmap, stringsAsFactors = FALSE)
+    } else {
+      NULL
+    }
+    if (!is.null(cmap_df) && ncol(cmap_df) >= 3L) {
+      color_r <- as.integer(cmap_df[[1]])
+      color_g <- as.integer(cmap_df[[2]])
+      color_b <- as.integer(cmap_df[[3]])
     }
   }
 
@@ -383,12 +390,21 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
 .build_roi_metadata <- function(x) {
   n <- length(x$ids)
 
-  # Handle color map
+  # Handle color map (tolerate both data.frame and matrix storage).
   color_r <- color_g <- color_b <- rep(NA_integer_, n)
-  if (!is.null(x$cmap) && nrow(x$cmap) == n) {
-    color_r <- as.integer(x$cmap[[1]])
-    color_g <- as.integer(x$cmap[[2]])
-    color_b <- as.integer(x$cmap[[3]])
+  if (!is.null(x$cmap) && NROW(x$cmap) == n) {
+    cmap_df <- if (is.data.frame(x$cmap)) {
+      x$cmap
+    } else if (is.matrix(x$cmap)) {
+      as.data.frame(x$cmap, stringsAsFactors = FALSE)
+    } else {
+      NULL
+    }
+    if (!is.null(cmap_df) && ncol(cmap_df) >= 3L) {
+      color_r <- as.integer(cmap_df[[1]])
+      color_g <- as.integer(cmap_df[[2]])
+      color_b <- as.integer(cmap_df[[3]])
+    }
   }
 
   meta <- tibble::tibble(

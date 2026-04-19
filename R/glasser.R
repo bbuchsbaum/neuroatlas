@@ -67,25 +67,43 @@ get_glasser_atlas <- function(outspace=NULL,
   source <- match.arg(source)
   requested_source <- source
   source_info <- .glasser_volume_source_info(source)
-  vol_path <- tryCatch({
-    .download_glasser_volume(source_info$volume_url, source_info$fname)
-  }, error = function(e) {
-    NULL
-  })
 
-  fallback_needed <- is.null(vol_path) ||
-    .is_lfs_pointer_file(vol_path) ||
-    (file.exists(vol_path) && file.info(vol_path)$size < 1024)
+  status <- .neuroatlas_try_download(
+    url = source_info$volume_url,
+    dest = file.path(tempdir(), source_info$fname),
+    description = paste0("Glasser volume (source='", source, "')")
+  )
 
-  if (fallback_needed && identical(source, "mni2009c")) {
-    warning(
-      "Default source='mni2009c' was unavailable; falling back to ",
-      "source='xcpengine' with confidence='uncertain'.",
-      call. = FALSE
+  if (!status$ok && identical(source, "mni2009c")) {
+    cli::cli_warn(
+      c(
+        "Default Glasser source {.val mni2009c} was unavailable; falling back to {.val xcpengine}.",
+        "i" = "Original error: {conditionMessage(status$error)}",
+        "!" = "Provenance confidence is downgraded to {.val uncertain}."
+      ),
+      class = c("neuroatlas_warn_fallback", "neuroatlas_warn")
     )
     source <- "xcpengine"
     source_info <- .glasser_volume_source_info(source)
-    vol_path <- .download_glasser_volume(source_info$volume_url, source_info$fname)
+    # Hard download: if fallback also fails, surface the error.
+    vol_path <- .neuroatlas_download(
+      url = source_info$volume_url,
+      dest = file.path(tempdir(), source_info$fname),
+      description = "Glasser volume (xcpengine fallback)"
+    )
+  } else if (!status$ok) {
+    # Caller explicitly asked for xcpengine and it failed — surface the error.
+    cli::cli_abort(
+      c(
+        "Failed to download Glasser volume (source={.val {source}}).",
+        "i" = "URL: {.url {source_info$volume_url}}",
+        "x" = "{conditionMessage(status$error)}"
+      ),
+      class = c("neuroatlas_error_download", "neuroatlas_error"),
+      parent = status$error
+    )
+  } else {
+    vol_path <- status$path
   }
 
   template_space <- .template_space_from_outspace(
@@ -105,10 +123,14 @@ get_glasser_atlas <- function(outspace=NULL,
   
   # Download and process labels
   label_name <- "glasser360NodeNames.txt"
-  des2 <- paste0(tempdir(), "/", label_name)
-  ret <- download(source_info$label_url, des2)
-  
-  labels <- read.table(des2, as.is=TRUE)
+  label_path <- .neuroatlas_download(
+    url = source_info$label_url,
+    dest = file.path(tempdir(), label_name),
+    min_size = 16L,
+    description = "Glasser label table"
+  )
+
+  labels <- read.table(label_path, as.is = TRUE)
   cols <- t(col2rgb(rainbow(nrow(labels))))
   colnames(cols) <- c("red", "green", "blue")
   cols <- as.data.frame(cols)
@@ -121,35 +143,11 @@ get_glasser_atlas <- function(outspace=NULL,
   label_map <- as.list(cids)
   names(label_map) <- region
   
-  vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), 
-                                    clusters=vol[vol!=0], 
+  vol <- neuroim2::ClusteredNeuroVol(as.logical(vol),
+                                    clusters=vol[vol!=0],
                                     label_map=label_map)
-  
+
   n <- nrow(labels)
-
-  # Return atlas object
-  ret <- list(
-    name="Glasser360",
-    atlas=vol,
-    cmap=cols,
-    ids=1:n,
-    labels=region,
-    orig_labels=orig_labels,
-    hemi=hemi,
-    network=NULL)
-
-  # Build roi_metadata tibble
-  ret$roi_metadata <- tibble::tibble(
-    id = ret$ids,
-    label = ret$labels,
-    label_full = ret$orig_labels,
-    hemi = ret$hemi,
-    color_r = as.integer(cols$red),
-    color_g = as.integer(cols$green),
-    color_b = as.integer(cols$blue)
-  )
-
-  class(ret) <- c("glasser", "atlas")
 
   ref <- new_atlas_ref(
     family = "glasser",
@@ -244,9 +242,19 @@ get_glasser_atlas <- function(outspace=NULL,
     )
   }
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_atlas(
+    name = "Glasser360",
+    atlas = vol,
+    ids = seq_len(n),
+    labels = region,
+    orig_labels = orig_labels,
+    hemi = hemi,
+    cmap = cols,
+    subclass = "glasser",
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }
 
 #' @rdname map_atlas
@@ -432,31 +440,6 @@ glasser_surf <- function(space = "fsaverage",
   colnames(rgb_mat) <- c("red", "green", "blue")
   cmap <- as.data.frame(rgb_mat)
 
-  ret <- list(
-    surf_type = surf,
-    surface_space = "fsaverage",
-    lh_atlas = lh,
-    rh_atlas = rh,
-    name = "Glasser-MMP1 fsaverage",
-    cmap = cmap,
-    ids = ids,
-    labels = labels,
-    orig_labels = orig_labels,
-    hemi = hemi
-  )
-
-  # Build roi_metadata tibble
-  ret$roi_metadata <- tibble::tibble(
-    id = ret$ids,
-    label = ret$labels,
-    label_full = ret$orig_labels,
-    hemi = ret$hemi,
-    color_r = as.integer(cmap$red),
-    color_g = as.integer(cmap$green),
-    color_b = as.integer(cmap$blue)
-  )
-
-  class(ret) <- c("glasser_surf", "surfatlas", "atlas")
   ref <- new_atlas_ref(
     family = "glasser",
     model = "HCP-MMP1.0",
@@ -541,9 +524,22 @@ glasser_surf <- function(space = "fsaverage",
     details = paste0("Loaded Glasser fsaverage surface atlas (", surf, ").")
   )
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_surfatlas(
+    name = "Glasser-MMP1 fsaverage",
+    lh_atlas = lh,
+    rh_atlas = rh,
+    ids = ids,
+    labels = labels,
+    orig_labels = orig_labels,
+    hemi = hemi,
+    cmap = cmap,
+    surf_type = surf,
+    surface_space = "fsaverage",
+    subclass = "glasser_surf",
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }
 
 
@@ -593,26 +589,6 @@ glasser_surf <- function(space = "fsaverage",
 }
 
 
-#' @keywords internal
-#' @noRd
-.download_glasser_volume <- function(url, fname) {
-  des <- file.path(tempdir(), fname)
-  downloader::download(url, des)
-  des
-}
-
-
-#' @keywords internal
-#' @noRd
-.is_lfs_pointer_file <- function(path) {
-  if (!file.exists(path)) {
-    return(FALSE)
-  }
-  hdr <- tryCatch(readLines(path, n = 1L, warn = FALSE), error = function(e) "")
-  identical(hdr, "version https://git-lfs.github.com/spec/v1")
-}
-
-
 # Internal: Glasser Figshare annotation paths ----------------------------------
 
 #' @keywords internal
@@ -634,11 +610,18 @@ glasser_surf <- function(space = "fsaverage",
   }
 
   tmp <- tempfile(fileext = ".annot")
-  downloader::download(url, tmp)
+  .neuroatlas_download(
+    url = url,
+    dest = tmp,
+    description = paste0("Glasser ", hemi, ".HCP-MMP1.annot")
+  )
 
   ok <- file.copy(tmp, fpath, overwrite = TRUE)
   if (!ok) {
-    stop("Failed to cache Glasser annotation file at ", fpath)
+    cli::cli_abort(
+      "Failed to cache Glasser annotation file at {.path {fpath}}.",
+      class = c("neuroatlas_error_cache", "neuroatlas_error")
+    )
   }
 
   fpath

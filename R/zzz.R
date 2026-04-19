@@ -1,6 +1,16 @@
 #' @importFrom rlang :=
 .onLoad <- function(libname, pkgname) {
-  # No Python environment setup needed - using pure R templateflow package
+  # No Python environment setup needed - using pure R templateflow package.
+  # Populate the built-in atlas registry so get_atlas() / list_atlases() work
+  # without the user needing to call anything first.
+  tryCatch(
+    .register_builtin_atlases(),
+    error = function(e) {
+      # Registry population should never abort package load.
+      warning("neuroatlas: failed to register built-in atlases: ",
+              conditionMessage(e), call. = FALSE)
+    }
+  )
 }
 
 .onAttach <- function(libname, pkgname) {
