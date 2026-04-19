@@ -106,28 +106,6 @@ get_aseg_atlas <- function(outspace=NULL) {
     255, 165, 0,
     165, 42,  42)
 
-  ret <- list(
-    name="ASEG",
-    atlas=atlas,
-    cmap=cmap,
-    ids=ids,
-    labels=labels,
-    orig_labels=labels,
-    hemi=hemi,
-    network=NULL)
-
-  # Build roi_metadata tibble
-  ret$roi_metadata <- tibble::tibble(
-    id = ret$ids,
-    label = ret$labels,
-    label_full = ret$orig_labels,
-    hemi = ret$hemi,
-    color_r = as.integer(cmap$red),
-    color_g = as.integer(cmap$green),
-    color_b = as.integer(cmap$blue)
-  )
-
-  class(ret) <- c("aseg", "atlas")
   ref <- new_atlas_ref(
     family = "aseg",
     model = "FreeSurferASEG",
@@ -191,7 +169,17 @@ get_aseg_atlas <- function(outspace=NULL) {
     )
   }
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_atlas(
+    name = "ASEG",
+    atlas = atlas,
+    ids = ids,
+    labels = labels,
+    orig_labels = labels,
+    hemi = hemi,
+    cmap = cmap,
+    subclass = "aseg",
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }

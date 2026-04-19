@@ -1,5 +1,25 @@
 # neuroatlas 0.1.0.9000
 
+* Added a canonical `new_atlas()` / `new_surfatlas()` constructor that
+  assembles every loader's return value (Schaefer, Glasser, ASEG,
+  Olsen MTL / hippocampus, TemplateFlow subcortical). The constructor
+  validates required fields with a typed `neuroatlas_error_invalid_atlas`
+  condition, normalises RGB colour maps to a data frame, builds
+  `roi_metadata` uniformly, and attaches `atlas_ref` / provenance in one
+  place — removing ~100 lines of per-loader boilerplate.
+* Added a lightweight atlas registry (`register_atlas()`) exposed via two
+  new public helpers: `list_atlases()` enumerates the built-in atlases,
+  and `get_atlas(name, ...)` dispatches to the registered loader by id or
+  alias (e.g. `get_atlas("schaefer2018", parcels="100", networks="7")`).
+* Added centralised download helpers (`.neuroatlas_download()`,
+  `.neuroatlas_try_download()`) used by the Schaefer and Glasser loaders.
+  Failures now raise classed `neuroatlas_error_download` conditions with
+  the upstream URL instead of returning a silent `NULL`; Git LFS pointer
+  stubs are detected and reported explicitly.
+* Atlas loaders now emit `cli::cli_abort()` / `cli::cli_warn()` with
+  structured classes (`neuroatlas_error_*`, `neuroatlas_warn_*`) in place
+  of bare `stop()` / `warning()`, so callers can catch loader errors by
+  class.
 * Added atlas provenance descriptors via new `atlas_ref` infrastructure:
   `new_atlas_ref()`, `atlas_ref()`, `atlas_family()`, `atlas_space()`,
   `atlas_coord_space()`, and `validate_atlas_ref()`.

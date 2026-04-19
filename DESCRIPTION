@@ -76,9 +76,14 @@ LazyData: true
 LazyDataCompression: xz
 RoxygenNote: 7.3.3
 Config/Needs/website: albersdown
-Collate: 
+Collate:
     'alignment_registry.R'
     'all_generic.R'
+    'atlas_ref.R'
+    'atlas_provenance.R'
+    'atlas_constructor.R'
+    'atlas_download.R'
+    'atlas_registry.R'
     'aseg_subcort.R'
     'atlas.R'
     'atlas_colors.R'
@@ -88,8 +93,6 @@ Collate:
     'atlas_methods.R'
     'atlas_operators.R'
     'atlas_overlap.R'
-    'atlas_provenance.R'
-    'atlas_ref.R'
     'atlas_utils.R'
     'batch_reduce.R'
     'ce_atlas.R'

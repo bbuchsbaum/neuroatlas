@@ -256,32 +256,16 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
   # Create return object
   n <- apsections * 2
   cmap_mat <- t(col2rgb(rainbow(n)))
+  colnames(cmap_mat) <- c("red", "green", "blue")
 
-  ret <- list(
-    name = "hippocampus",
-    atlas = atlas,
-    ids = seq(1, n),
-    labels = c(paste0("hippocampus_", seq(1,apsections)),
-              paste0("hippocampus_", seq(1,apsections))),
-    hemi = c(rep("left", apsections), rep("right", apsections)),
-    cmap = cmap_mat,
-    network = NULL
+  hipp_ids <- seq_len(n)
+  hipp_labels <- c(
+    paste0("hippocampus_", seq_len(apsections)),
+    paste0("hippocampus_", seq_len(apsections))
   )
+  hipp_hemi <- c(rep("left", apsections), rep("right", apsections))
+  hipp_orig <- paste0(hipp_hemi, "_", hipp_labels)
 
-  ret$orig_labels <- paste0(ret$hemi, "_", ret$labels)
-
-  # Build roi_metadata tibble
-  ret$roi_metadata <- tibble::tibble(
-    id = ret$ids,
-    label = ret$labels,
-    label_full = ret$orig_labels,
-    hemi = ret$hemi,
-    color_r = as.integer(cmap_mat[, 1]),
-    color_g = as.integer(cmap_mat[, 2]),
-    color_b = as.integer(cmap_mat[, 3])
-  )
-
-  class(ret) <- c("hippocampus", "atlas")
   ref <- new_atlas_ref(
     family = "olsen",
     model = "OlsenMTL-Hippocampus",
@@ -352,7 +336,17 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
     )
   )
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_atlas(
+    name = "hippocampus",
+    atlas = atlas,
+    ids = hipp_ids,
+    labels = hipp_labels,
+    orig_labels = hipp_orig,
+    hemi = hipp_hemi,
+    cmap = cmap_mat,
+    subclass = "hippocampus",
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }

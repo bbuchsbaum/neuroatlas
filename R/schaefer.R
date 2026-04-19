@@ -190,7 +190,10 @@ load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
   if (is.null(vol)) {
     path <- paste0(schaefer_path$rpath, fname)
     des <- paste0(tempdir(), "/", fname)
-    ret <- downloader::download(path, des)
+    .neuroatlas_download(
+      url = path, dest = des,
+      description = paste0("Schaefer volume (", fname, ")")
+    )
     vol <- neuroim2::read_vol(des)
     neuroim2::write_vol(vol, paste0(get_cache_dir(), "/", fname))
   }
@@ -211,11 +214,15 @@ load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
 
   if (is.null(labels)) {
     des2 <- paste0(tempdir(), "/", label_name)
-    #ret <- downloader::download(paste0(schaefer_path$rpath, label_name), des2)
-    message("downloading: ", paste0(schaefer_path$rpath, "/freeview_lut/", label_name))
-    ret <- downloader::download(paste0(schaefer_path$rpath, "/freeview_lut/", label_name), des2)
-    labels <- read.table(des2, header=FALSE, as.is=TRUE)
-    file.copy(des2, paste0(get_cache_dir(), "/", label_name), overwrite=TRUE)
+    url <- paste0(schaefer_path$rpath, "/freeview_lut/", label_name)
+    message("downloading: ", url)
+    .neuroatlas_download(
+      url = url, dest = des2,
+      min_size = 16L,
+      description = paste0("Schaefer labels (", label_name, ")")
+    )
+    labels <- read.table(des2, header = FALSE, as.is = TRUE)
+    file.copy(des2, paste0(get_cache_dir(), "/", label_name), overwrite = TRUE)
   }
 
   labels
@@ -420,30 +427,6 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
   cmap_df <- labels[, 3:5]
   n <- nrow(labels)
 
-  ret <- list(
-    name=paste0("Schaefer-", parcels, "-", networks, "networks"),
-    atlas=vol,
-    cmap=cmap_df,
-    ids=actual_ids,
-    labels=labels$name,
-    orig_labels=labels[,2],
-    network=labels$network,
-    hemi=labels$hemi)
-
-  # Build roi_metadata tibble
-  ret$roi_metadata <- tibble::tibble(
-    id = ret$ids,
-    label = ret$labels,
-    label_full = ret$orig_labels,
-    hemi = ret$hemi,
-    network = ret$network,
-    color_r = as.integer(cmap_df[[1]]),
-    color_g = as.integer(cmap_df[[2]]),
-    color_b = as.integer(cmap_df[[3]])
-  )
-
-  class(ret) <- c("schaefer", "volatlas", "atlas")
-
   ref <- new_atlas_ref(
     family = "schaefer",
     model = "Schaefer2018",
@@ -525,9 +508,20 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
     )
   }
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_atlas(
+    name = paste0("Schaefer-", parcels, "-", networks, "networks"),
+    atlas = vol,
+    ids = actual_ids,
+    labels = labels$name,
+    orig_labels = labels[, 2],
+    hemi = labels$hemi,
+    network = labels$network,
+    cmap = cmap_df,
+    subclass = c("schaefer", "volatlas"),
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }
 
 
@@ -675,7 +669,10 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     path <- paste0(rpath, fname)
 
     des <- paste0(tempdir(), "/", fname)
-    downloader::download(path, des)
+    .neuroatlas_download(
+      url = path, dest = des,
+      description = paste0("Schaefer annotation (", fname, ")")
+    )
 
     geom_name <- paste0(hemi, "_", surf)
     annot <- suppressWarnings(
@@ -703,34 +700,6 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
   cmap_df <- labels[, 3:5]
   n <- nrow(labels)
-
-  ret <- list(
-    surf_type = surf,
-    surface_space = "fsaverage6",
-    lh_atlas = lh_surf,
-    rh_atlas = rh_surf,
-    name = paste0("Schaefer-", parcels, "-", networks, "networks"),
-    cmap = cmap_df,
-    ids = seq_len(n),
-    labels = labels$name,
-    orig_labels = labels[, 2],
-    network = labels$network,
-    hemi = labels$hemi
-  )
-
-  # Build roi_metadata tibble
-  ret$roi_metadata <- tibble::tibble(
-    id = ret$ids,
-    label = ret$labels,
-    label_full = ret$orig_labels,
-    hemi = ret$hemi,
-    network = ret$network,
-    color_r = as.integer(cmap_df[[1]]),
-    color_g = as.integer(cmap_df[[2]]),
-    color_b = as.integer(cmap_df[[3]])
-  )
-
-  class(ret) <- c("schaefer", "surfatlas", "atlas")
 
   ref <- new_atlas_ref(
     family = "schaefer",
@@ -812,9 +781,23 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     )
   )
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_surfatlas(
+    name = paste0("Schaefer-", parcels, "-", networks, "networks"),
+    lh_atlas = lh_surf,
+    rh_atlas = rh_surf,
+    ids = seq_len(n),
+    labels = labels$name,
+    orig_labels = labels[, 2],
+    hemi = labels$hemi,
+    network = labels$network,
+    cmap = cmap_df,
+    surf_type = surf,
+    surface_space = "fsaverage6",
+    subclass = "schaefer",
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }
 
 
@@ -855,7 +838,10 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     path <- file.path(rpath, fname)
 
     des <- paste0(tempdir(), "/", fname)
-    downloader::download(path, des)
+    .neuroatlas_download(
+      url = path, dest = des,
+      description = paste0("Schaefer annotation (", fname, ")")
+    )
 
     hemi_tf <- if (hemi == "lh") "L" else "R"
 
@@ -895,34 +881,6 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 
   cmap_df <- labels[, 3:5]
   n <- nrow(labels)
-
-  ret <- list(
-    surf_type = surf,
-    surface_space = mapping$space,
-    lh_atlas = lh_surf,
-    rh_atlas = rh_surf,
-    name = paste0("Schaefer-", parcels, "-", networks, "networks"),
-    cmap = cmap_df,
-    ids = seq_len(n),
-    labels = labels$name,
-    orig_labels = labels[, 2],
-    network = labels$network,
-    hemi = labels$hemi
-  )
-
-  # Build roi_metadata tibble
-  ret$roi_metadata <- tibble::tibble(
-    id = ret$ids,
-    label = ret$labels,
-    label_full = ret$orig_labels,
-    hemi = ret$hemi,
-    network = ret$network,
-    color_r = as.integer(cmap_df[[1]]),
-    color_g = as.integer(cmap_df[[2]]),
-    color_b = as.integer(cmap_df[[3]])
-  )
-
-  class(ret) <- c("schaefer", "surfatlas", "atlas")
 
   ref <- new_atlas_ref(
     family = "schaefer",
@@ -1023,9 +981,23 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     )
   )
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_surfatlas(
+    name = paste0("Schaefer-", parcels, "-", networks, "networks"),
+    lh_atlas = lh_surf,
+    rh_atlas = rh_surf,
+    ids = seq_len(n),
+    labels = labels$name,
+    orig_labels = labels[, 2],
+    hemi = labels$hemi,
+    network = labels$network,
+    cmap = cmap_df,
+    surf_type = surf,
+    surface_space = mapping$space,
+    subclass = "schaefer",
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }
 
 

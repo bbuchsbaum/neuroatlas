@@ -105,16 +105,26 @@ get_subcortical_atlas <- function(name,
   }
   tf_space <- as.character(tf_space)
   if (!tf_space %in% spec$spaces[[1]]) {
-    stop("TemplateFlow space '", tf_space, "' not supported for atlas '",
-         spec$id, "'. Allowed: ", paste(spec$spaces[[1]], collapse = ", "))
+    cli::cli_abort(
+      c(
+        "TemplateFlow space {.val {tf_space}} is not supported for atlas {.val {spec$id}}.",
+        "i" = "Allowed: {.val {spec$spaces[[1]]}}"
+      ),
+      class = c("neuroatlas_error_bad_space", "neuroatlas_error")
+    )
   }
 
   # Resolve resolution within allowed set
   res <- if (is.null(resolution)) spec$default_resolution else resolution
   res <- as.character(res)
   if (!res %in% spec$resolutions[[1]]) {
-    stop("Resolution '", res, "' not supported for atlas '", spec$id,
-         "'. Allowed: ", paste(spec$resolutions[[1]], collapse = ", "))
+    cli::cli_abort(
+      c(
+        "Resolution {.val {res}} is not supported for atlas {.val {spec$id}}.",
+        "i" = "Allowed: {.val {spec$resolutions[[1]]}}"
+      ),
+      class = c("neuroatlas_error_bad_resolution", "neuroatlas_error")
+    )
   }
 
   tf_desc <- if (is.null(desc)) spec$default_desc else desc
@@ -180,40 +190,6 @@ get_subcortical_atlas <- function(name,
     label_map = label_map
   )
 
-  ret <- list(
-    name = spec$label,
-    atlas = clustered,
-    ids = ids,
-    labels = labels,
-    orig_labels = labels,
-    hemi = hemi,
-    cmap = cmap,
-    network = NULL,
-    space = tf_space,
-    resolution = res,
-    desc = tf_desc,
-    template_atlas = spec$atlas
-  )
-
-  # Build roi_metadata tibble
-  n <- length(ids)
-  color_r <- color_g <- color_b <- rep(NA_integer_, n)
-  if (!is.null(cmap) && nrow(cmap) >= n) {
-    color_r <- as.integer(cmap[[1]][seq_len(n)])
-    color_g <- as.integer(cmap[[2]][seq_len(n)])
-    color_b <- as.integer(cmap[[3]][seq_len(n)])
-  }
-  ret$roi_metadata <- tibble::tibble(
-    id = ids,
-    label = labels,
-    label_full = labels,
-    hemi = hemi,
-    color_r = color_r,
-    color_g = color_g,
-    color_b = color_b
-  )
-
-  class(ret) <- c("subcortical", "atlas")
   ref <- new_atlas_ref(
     family = "subcortical",
     model = spec$id,
@@ -290,9 +266,25 @@ get_subcortical_atlas <- function(name,
     )
   }
 
-  ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
-  ret
+  new_atlas(
+    name = spec$label,
+    atlas = clustered,
+    ids = ids,
+    labels = labels,
+    orig_labels = labels,
+    hemi = hemi,
+    cmap = cmap,
+    subclass = "subcortical",
+    extra = list(
+      space = tf_space,
+      resolution = res,
+      desc = tf_desc,
+      template_atlas = spec$atlas
+    ),
+    ref = ref,
+    artifacts = artifacts,
+    history = history
+  )
 }
 
 # Internal specification table -----------------------------------------------
@@ -339,21 +331,39 @@ get_subcortical_atlas <- function(name,
   }, logical(1))
 
   if (!any(idx)) {
-    stop("Unknown subcortical atlas '", name,
-         "'. Available: ", paste(specs$id, collapse = ", "))
+    cli::cli_abort(
+      c(
+        "Unknown subcortical atlas {.val {name}}.",
+        "i" = "Available: {.val {specs$id}}"
+      ),
+      class = c("neuroatlas_error_unknown_atlas", "neuroatlas_error")
+    )
   }
   specs[idx, ]
 }
 
 .fetch_label_path <- function(tf_query, ...) {
-  tryCatch({
+  # Label tables are optional — a missing one is not fatal. We still surface
+  # the underlying error as a once-per-session warning so users have a clue
+  # when labels are absent because TemplateFlow misbehaved.
+  tryCatch(
     do.call(get_template,
             c(tf_query,
               list(extension = ".tsv", path_only = TRUE),
-              list(...)))
-  }, error = function(e) {
-    NULL
-  })
+              list(...))),
+    error = function(e) {
+      cli::cli_warn(
+        c(
+          "Label table for TemplateFlow atlas {.val {tf_query$atlas}} was not available.",
+          "i" = "{conditionMessage(e)}"
+        ),
+        class = c("neuroatlas_warn_missing_labels", "neuroatlas_warn"),
+        .frequency = "once",
+        .frequency_id = paste0("missing_labels:", tf_query$atlas)
+      )
+      NULL
+    }
+  )
 }
 
 .read_label_table <- function(label_path, ids) {
