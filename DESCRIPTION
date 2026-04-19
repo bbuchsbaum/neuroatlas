@@ -102,6 +102,7 @@ Collate:
     'ce_plot.R'
     'ce_plugins.R'
     'ce_selection.R'
+    'plot_brain_geometry.R'
     'plot_brain.R'
     'ce_shared_exports.R'
     'chart.R'
