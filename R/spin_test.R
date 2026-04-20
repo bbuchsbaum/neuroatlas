@@ -69,6 +69,7 @@ spin_test <- function(map1, map2, atlas,
                       sphere = NULL,
                       seed = NULL) {
 
+  .require_suggest("Rnanoflann", feature = "spin permutation testing")
   cor_method <- match.arg(cor_method)
   n_perm <- as.integer(n_perm)
 

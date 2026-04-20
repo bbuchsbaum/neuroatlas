@@ -348,7 +348,6 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' }
 #'
 #' @importFrom neuroim2 read_vol ClusteredNeuroVol write_vol
-#' @importFrom downloader download
 #' @importFrom assertthat assert_that
 #' @importFrom utils read.table
 #'
@@ -575,7 +574,6 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
 #' \code{\link{get_schaefer_atlas}} for volumetric version
 #'
 #' @importFrom neurosurf read_freesurfer_annot
-#' @importFrom downloader download
 #' @importFrom utils data
 #' @export
 get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600","800","1000"),

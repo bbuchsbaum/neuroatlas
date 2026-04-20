@@ -58,7 +58,6 @@
 #' }
 #'
 #' @importFrom neuroim2 read_vol ClusteredNeuroVol
-#' @importFrom downloader download
 #' @importFrom utils read.table
 #' @importFrom grDevices col2rgb rainbow
 #' @export
@@ -291,7 +290,6 @@ map_atlas.glasser <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
 #' @importFrom dplyr mutate left_join
 #' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection
 #' @importFrom ggplot2 aes
-#' @importFrom scico scale_fill_scico
 #' @export
 plot.glasser <- function(x, y, vals = NULL, thresh = c(0, 0), pos = FALSE,
                          palette = "cork", lim = NULL, ...) {

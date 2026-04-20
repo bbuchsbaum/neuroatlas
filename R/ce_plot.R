@@ -101,6 +101,7 @@
                                  lim = NULL,
                                  interactive = TRUE,
                                  title = "Parcel Layout (Fallback)") {
+  .require_suggest("scico", feature = "cluster explorer brain plot fallback")
   ids <- as.integer(surfatlas$ids)
   if (length(ids) == 0) {
     ids <- seq_len(if (!is.null(vals)) length(vals) else 12L)

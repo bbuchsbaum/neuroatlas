@@ -85,6 +85,7 @@
                                  position = c("right", "bottom"),
                                  bg = "white") {
   position <- match.arg(position)
+  .require_suggest("scico", feature = "colorbar rendering")
   guide <- if (identical(position, "bottom")) {
     ggplot2::guide_colorbar(
       barwidth = ggplot2::unit(10, "lines"),

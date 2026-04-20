@@ -58,10 +58,10 @@
 #' }
 #'
 #' @importFrom neuroim2 space coord_to_grid grid_to_coord
-#' @importFrom Rnanoflann nn
 #' @importFrom tibble tibble
 #' @export
 query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
+  .require_suggest("Rnanoflann", feature = "nearest-parcel point queries")
   # --- Normalise coords to N x 3 matrix ---
   if (is.null(dim(coords))) {
     if (length(coords) != 3L) {

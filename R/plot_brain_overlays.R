@@ -142,6 +142,7 @@
     }
   }
 
+  .require_suggest("scico", feature = "overlay colour mapping")
   pal <- scico::scico(256, palette = palette)
   v <- vals
   v[v < lim[1]] <- lim[1]

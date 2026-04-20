@@ -1,5 +1,13 @@
 # neuroatlas 0.1.0.9000
 
+* Moved `downloader`, `scico`, and `Rnanoflann` from `Imports` to
+  `Suggests`. Features that need these packages (Schaefer / Glasser /
+  subcortical downloads, brain-surface plotting with colour bars,
+  parcel dilation / spin tests / nearest-parcel point queries) are now
+  guarded by a shared `.require_suggest()` helper that raises a classed
+  `neuroatlas_error_missing_suggest` condition pointing users at the
+  right `install.packages()` call. Atlases that don't need these
+  dependencies (ASEG, Olsen MTL) load without them being installed.
 * Added a canonical `new_atlas()` / `new_surfatlas()` constructor that
   assembles every loader's return value (Schaefer, Glasser, ASEG,
   Olsen MTL / hippocampus, TemplateFlow subcortical). The constructor

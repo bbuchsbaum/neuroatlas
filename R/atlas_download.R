@@ -1,7 +1,7 @@
 #' Download Helpers for Atlas Loaders
 #'
 #' @description
-#' Small, centralised wrappers around [downloader::download()] used by atlas
+#' Small, centralised wrappers around the `downloader` package used by atlas
 #' loaders. They replace ad-hoc `tryCatch(..., error = function(e) NULL)` blocks
 #' that silently hid failures, and instead produce typed, informative
 #' conditions via [cli::cli_abort()].
@@ -19,7 +19,12 @@
 #' and treat them as failure modes, so loaders don't silently accept a stub
 #' in place of the real NIfTI.
 #'
-#' @importFrom downloader download
+#' `downloader` is declared in `Suggests`; the helpers call
+#' [.require_suggest()] up front and raise a
+#' `neuroatlas_error_missing_suggest` condition when the package isn't
+#' installed, so atlases that don't need network access (ASEG, Olsen MTL)
+#' still load without the dependency.
+#'
 #' @keywords internal
 #' @name atlas_download
 NULL
@@ -80,6 +85,8 @@ NULL
                                  quiet = TRUE,
                                  min_size = 1024L,
                                  description = "atlas asset") {
+  .require_suggest("downloader", feature = "downloading atlas assets")
+
   if (is.null(dest)) {
     dest <- file.path(tempdir(), basename(url))
   }

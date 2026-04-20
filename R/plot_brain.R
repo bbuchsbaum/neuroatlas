@@ -190,7 +190,6 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @importFrom ggplot2 geom_segment
 #' @importFrom ggiraph geom_polygon_interactive girafe opts_tooltip opts_hover
 #'   opts_hover_inv opts_selection opts_sizing
-#' @importFrom scico scale_fill_scico
 #' @importFrom scales squish
 #' @importFrom tibble tibble
 #' @importFrom dplyr left_join bind_rows
@@ -249,6 +248,7 @@ plot_brain <- function(surfatlas,
                        outline = FALSE,
                        bg = "white",
                        ...) {
+  .require_suggest("scico", feature = "brain surface plotting")
   style <- match.arg(style)
 
   panel_layout_missing <- missing(panel_layout)

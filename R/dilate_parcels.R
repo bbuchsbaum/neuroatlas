@@ -55,9 +55,9 @@
 #'
 #' @importFrom assertthat assert_that
 #' @importFrom neuroim2 index_to_coord index_to_grid ClusteredNeuroVol
-#' @importFrom Rnanoflann nn
 #' @export
 dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
+    .require_suggest("Rnanoflann", feature = "parcel dilation")
     # Validate and resolve inputs
     assertthat::assert_that(inherits(atlas, "atlas"),
                             msg = "`atlas` arg must be an atlas")
