@@ -1,3 +1,71 @@
+test_that("Schaefer surface annotations are cached by CBIG surface space", {
+  cache_root <- tempfile("neuroatlas-schaefer-cache-")
+  dir.create(cache_root, recursive = TRUE, showWarnings = FALSE)
+  on.exit(unlink(cache_root, recursive = TRUE, force = TRUE), add = TRUE)
+
+  download_calls <- new.env(parent = emptyenv())
+  download_calls$n <- 0L
+
+  testthat::local_mocked_bindings(
+    .neuroatlas_cache_dir = function(subdir = NULL) {
+      path <- cache_root
+      if (!is.null(subdir) && nzchar(subdir)) {
+        path <- file.path(cache_root, subdir)
+      }
+      dir.create(path, recursive = TRUE, showWarnings = FALSE)
+      path
+    },
+    .package = "neuroatlas"
+  )
+
+  testthat::local_mocked_bindings(
+    .neuroatlas_download = function(url, dest, ...) {
+      download_calls$n <- download_calls$n + 1L
+      writeBin(as.raw(rep(0L, 2048L)), dest)
+      invisible(dest)
+    },
+    .package = "neuroatlas"
+  )
+
+  fsaverage_path <- neuroatlas:::.schaefer_cbig_annot_path(
+    hemi = "lh",
+    parcels = "100",
+    networks = "7",
+    cbig_space = "fsaverage",
+    use_cache = TRUE
+  )
+
+  fsaverage6_path <- neuroatlas:::.schaefer_cbig_annot_path(
+    hemi = "lh",
+    parcels = "100",
+    networks = "7",
+    cbig_space = "fsaverage6",
+    use_cache = TRUE
+  )
+
+  fsaverage_cached <- neuroatlas:::.schaefer_cbig_annot_path(
+    hemi = "lh",
+    parcels = "100",
+    networks = "7",
+    cbig_space = "fsaverage",
+    use_cache = TRUE
+  )
+
+  expect_true(file.exists(fsaverage_path))
+  expect_true(file.exists(fsaverage6_path))
+  expect_equal(download_calls$n, 2L)
+  expect_equal(fsaverage_cached, fsaverage_path)
+  expect_equal(
+    dirname(fsaverage_path),
+    file.path(cache_root, "schaefer", "fsaverage", "label")
+  )
+  expect_equal(
+    dirname(fsaverage6_path),
+    file.path(cache_root, "schaefer", "fsaverage6", "label")
+  )
+  expect_false(identical(fsaverage_path, fsaverage6_path))
+})
+
 test_that("surface atlas functions maintain hemisphere integrity and handle all surface types", {
   skip_on_cran()
   

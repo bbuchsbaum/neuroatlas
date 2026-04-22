@@ -637,6 +637,59 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
 }
 
 
+#' Resolve a cached Schaefer surface annotation path
+#'
+#' @keywords internal
+#' @noRd
+.schaefer_cbig_annot_path <- function(hemi,
+                                      parcels,
+                                      networks,
+                                      cbig_space,
+                                      use_cache = TRUE) {
+  hemi <- match.arg(hemi, c("lh", "rh"))
+  parcels <- match.arg(as.character(parcels),
+                       c("100", "200", "300", "400",
+                         "500", "600", "800", "1000"))
+  networks <- match.arg(as.character(networks), c("7", "17"))
+  cbig_space <- match.arg(cbig_space, c("fsaverage", "fsaverage5", "fsaverage6"))
+
+  fname <- paste0(
+    hemi, ".",
+    "Schaefer2018_", parcels, "Parcels_",
+    networks, "Networks_order.annot"
+  )
+
+  cache_dir <- .neuroatlas_cache_dir(file.path("schaefer", cbig_space, "label"))
+  fpath <- file.path(cache_dir, fname)
+
+  if (use_cache && file.exists(fpath)) {
+    return(fpath)
+  }
+
+  url <- paste0(
+    "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/",
+    "stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/",
+    "Parcellations/FreeSurfer5.3/",
+    cbig_space, "/label/", fname
+  )
+
+  tmp <- tempfile(fileext = ".annot")
+  on.exit(unlink(tmp), add = TRUE)
+  .neuroatlas_download(
+    url = url,
+    dest = tmp,
+    description = paste0("Schaefer annotation (", fname, ")")
+  )
+
+  ok <- file.copy(tmp, fpath, overwrite = TRUE)
+  if (!ok) {
+    stop("Failed to cache Schaefer annotation file at ", fpath)
+  }
+
+  fpath
+}
+
+
 #' Schaefer surface atlas (fsaverage6 helper)
 #'
 #' This internal helper preserves the existing behaviour of
@@ -655,28 +708,17 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   utils::data("fsaverage", package = "neuroatlas", envir = environment())
 
   get_hemi <- function(hemi) {
-    fname <- paste0(
-      hemi, ".",
-      "Schaefer2018_", parcels, "Parcels_",
-      networks, "Networks_order.annot"
-    )
-
-    rpath <- paste0(
-      "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/",
-      "stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/",
-      "Parcellations/FreeSurfer5.3/fsaverage6/label/"
-    )
-    path <- paste0(rpath, fname)
-
-    des <- paste0(tempdir(), "/", fname)
-    .neuroatlas_download(
-      url = path, dest = des,
-      description = paste0("Schaefer annotation (", fname, ")")
+    annot_path <- .schaefer_cbig_annot_path(
+      hemi = hemi,
+      parcels = parcels,
+      networks = networks,
+      cbig_space = "fsaverage6",
+      use_cache = use_cache
     )
 
     geom_name <- paste0(hemi, "_", surf)
     annot <- suppressWarnings(
-      neurosurf::read_freesurfer_annot(des, fsaverage[[geom_name]])
+      neurosurf::read_freesurfer_annot(annot_path, fsaverage[[geom_name]])
     )
 
     nrois <- as.integer(parcels)
@@ -828,19 +870,12 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
   )
 
   get_hemi <- function(hemi) {
-    fname <- paste0(
-      hemi, ".",
-      "Schaefer2018_", parcels, "Parcels_",
-      networks, "Networks_order.annot"
-    )
-
-    rpath <- file.path(cbig_base, mapping$cbig_space, "label")
-    path <- file.path(rpath, fname)
-
-    des <- paste0(tempdir(), "/", fname)
-    .neuroatlas_download(
-      url = path, dest = des,
-      description = paste0("Schaefer annotation (", fname, ")")
+    annot_path <- .schaefer_cbig_annot_path(
+      hemi = hemi,
+      parcels = parcels,
+      networks = networks,
+      cbig_space = mapping$cbig_space,
+      use_cache = use_cache
     )
 
     hemi_tf <- if (hemi == "lh") "L" else "R"
@@ -857,7 +892,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     geom <- neurosurf::read_surf_geometry(surf_path)
 
     annot <- suppressWarnings(
-      neurosurf::read_freesurfer_annot(des, geom)
+      neurosurf::read_freesurfer_annot(annot_path, geom)
     )
 
     nrois <- as.integer(parcels)
