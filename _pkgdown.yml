@@ -2,3 +2,14 @@ template:
   bootstrap: 5
   light-switch: no
   package: albersdown
+
+articles:
+  - title: Getting Started
+    navbar: ~
+    contents:
+      - neuroatlas-overview
+      - atlas-visualization
+      - surface-panels
+      - surface-parcellations
+      - surface-templates
+      - working-with-templateflow

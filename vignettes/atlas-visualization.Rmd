@@ -184,6 +184,12 @@ plot_brain(
 )
 ```
 
+Because this example shows only lateral views, simplifying the facet
+labels to "Left hemisphere" and "Right hemisphere" is safe here. For a
+dedicated guide to multi-panel layout, shared legends, and the default
+hemisphere-orientation convention, see
+`vignette("surface-panels", package = "neuroatlas")`.
+
 ## Existing Visualisation Tools
 
 For flatmap-style cortical visualisations (not volumetric), neuroatlas also

@@ -1,0 +1,205 @@
+---
+title: Composing Surface Panel Figures
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Composing Surface Panel Figures}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+params:
+  family: red
+css: albers.css
+resource_files:
+- albers.css
+- albers.js
+includes:
+  in_header: |-
+    <script src="albers.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  ggplot2::theme_set(albersdown::theme_albers(params$family))
+}
+
+can_plot <- requireNamespace("neuroatlas", quietly = TRUE) &&
+  requireNamespace("ggplot2", quietly = TRUE) &&
+  requireNamespace("neurosurf", quietly = TRUE)
+
+can_layout <- can_plot &&
+  requireNamespace("patchwork", quietly = TRUE) &&
+  requireNamespace("scico", quietly = TRUE)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  eval = can_layout
+)
+```
+
+```{r}
+library(neuroatlas)
+```
+
+## What problem are we solving?
+
+You often have one or more parcel-level maps and need a figure that is
+already arranged, labeled, and publication-ready. The awkward part is
+usually not the parcel values themselves; it is the repeated patchwork
+work afterward: moving the legend, shortening facet labels, keeping the
+same scale across panels, and making sure left and right hemispheres are
+labeled anatomically rather than by screen position.
+
+`plot_brain()` and `plot_brain_grid()` are the high-level entry points
+for that job. They let you compose static surface figures directly from
+parcel values instead of building the figure by hand after plotting.
+
+## What do you need before you start?
+
+For panel figures, you need a surface atlas and one numeric value per
+parcel.
+
+```{r atlas-and-values}
+atl <- schaefer_surf(
+  parcels = 200,
+  networks = 7,
+  space = "fsaverage6",
+  surf = "inflated"
+)
+
+parcel_vals <- seq(-2, 2, length.out = length(atl$ids))
+```
+
+For comparison figures, `plot_brain_grid()` takes a named list of those
+numeric vectors.
+
+```{r multiple-maps}
+vals_list <- list(
+  Baseline = sin(seq_along(atl$ids) / 15),
+  Follow_up = cos(seq_along(atl$ids) / 18),
+  Difference = sin(seq_along(atl$ids) / 15) -
+    cos(seq_along(atl$ids) / 18)
+)
+```
+
+## How do you build one polished panel figure?
+
+Use `plot_brain()` when you want one figure with a few surface panels
+and a single legend.
+
+```{r single-figure, fig.width=8, fig.height=4.5, fig.alt="Surface panel figure with left and right hemisphere lateral and medial views plus a bottom colorbar"}
+plot_brain(
+  atl,
+  vals = parcel_vals,
+  views = c("lateral", "medial"),
+  interactive = FALSE,
+  style = "ggseg_like",
+  colorbar = "bottom",
+  colorbar_title = "Standardized effect",
+  title = "Parcel-level summary on fsaverage6",
+  subtitle = "Bottom colorbar plus concise panel labels",
+  panel_labels = c(
+    "Left Lateral" = "LH lateral",
+    "Right Lateral" = "RH lateral",
+    "Left Medial" = "LH medial",
+    "Right Medial" = "RH medial"
+  )
+)
+```
+
+This is the default static workflow when you want:
+
+- view-aware facet labels without post-hoc editing
+- one explicit legend instead of an implicit colour mapping
+- a single annotated figure object you can print or save directly
+
+## How do you compare several maps with one legend?
+
+Use `plot_brain_grid()` when each panel is a different map but the
+colour scale should mean the same thing everywhere.
+
+```{r grid-figure, fig.width=10, fig.height=7, fig.alt="Four-panel surface comparison figure with shared right-side colorbar and repeated hemisphere view labels"}
+plot_brain_grid(
+  atl,
+  vals_list,
+  views = c("lateral", "medial"),
+  titles = c("Baseline", "Follow-up", "Difference"),
+  shared_scale = TRUE,
+  colorbar = "right",
+  colorbar_title = "z-score",
+  title = "Comparing parcel maps with a shared legend",
+  subtitle = "Every panel uses the same limits and the same view labels",
+  panel_labels = c(
+    "Left Lateral" = "LH lateral",
+    "Right Lateral" = "RH lateral",
+    "Left Medial" = "LH medial",
+    "Right Medial" = "RH medial"
+  ),
+  style = "ggseg_like",
+  ncol = 2
+)
+```
+
+The arguments that matter most here are:
+
+- `titles`: names each map
+- `shared_scale = TRUE`: enforces one global value range
+- `colorbar`: places a shared legend on the right or bottom
+- `panel_labels`: simplifies the repeated surface-view labels
+
+If you want each panel to optimise its own within-panel contrast, use
+`shared_scale = FALSE`. That can make weak patterns easier to see, but
+you lose strict colour comparability across panels.
+
+## What do the default panel labels mean?
+
+The default panel labels are anatomical hemisphere plus view:
+
+- `Left Lateral`
+- `Right Lateral`
+- `Left Medial`
+- `Right Medial`
+
+Those names describe the surface itself, not where you happen to place
+the panel in a larger composition. A right-hemisphere panel is still a
+right hemisphere if you later move it to the left side of a page.
+
+`plot_brain()` now uses a fixed anatomical convention for lateral and
+medial views:
+
+- left hemispheres are drawn with anterior on the left
+- right hemispheres are drawn with anterior on the right
+
+That means `panel_labels = c("Right Lateral" = "Right hemisphere")` is a
+safe simplification when you are showing one view per hemisphere. If you
+mix lateral and medial views, keep the view in the label unless you have
+a strong reason to collapse it.
+
+## Which layout controls are worth remembering?
+
+These are the arguments you will use repeatedly:
+
+- `style = "ggseg_like"` gives a presentation-oriented default layout
+- `panel_layout = "presentation"` is the explicit layout control behind that style
+- `panel_labels` rewrites facet labels without changing the underlying hemisphere/view mapping
+- `colorbar` and `colorbar_title` control the standalone legend
+- `title`, `subtitle`, and `caption` annotate the composed figure directly
+- `ncol` controls the panel grid for both `plot_brain()` and `plot_brain_grid()`
+
+If you need the raw projected coordinates for a custom workflow, use
+`panel_layout = "native"`. If you want the cleaner, more balanced
+publication layout, use `panel_layout = "presentation"` or
+`style = "ggseg_like"`.
+
+## Where should you go next?
+
+Use this vignette as the reference for figure composition, then branch
+out depending on what you need next:
+
+- `vignette("surface-parcellations", package = "neuroatlas")` for loading surface atlases and overlays
+- `vignette("atlas-visualization", package = "neuroatlas")` for volumetric plotting and palette workflows
+- `?plot_brain` for the full single-figure API
+- `?plot_brain_grid` for the shared-scale multi-panel API

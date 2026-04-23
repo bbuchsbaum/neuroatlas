@@ -698,16 +698,17 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @keywords internal
 #' @noRd
 .project_view <- function(verts, view, hemi) {
-  # Define projection based on view + hemisphere
+  # Keep left hemispheres anterior-left and right hemispheres anterior-right
+  # across both lateral and medial views.
   if (view == "lateral" && hemi == "left") {
     view_dir <- c(-1, 0, 0)
-    xy <- cbind(verts[, 2], verts[, 3])          # (y, z)
+    xy <- cbind(-verts[, 2], verts[, 3])         # (-y, z)
   } else if (view == "medial" && hemi == "left") {
     view_dir <- c(1, 0, 0)
     xy <- cbind(-verts[, 2], verts[, 3])          # (-y, z)
   } else if (view == "lateral" && hemi == "right") {
     view_dir <- c(1, 0, 0)
-    xy <- cbind(-verts[, 2], verts[, 3])          # (-y, z)
+    xy <- cbind(verts[, 2], verts[, 3])           # (y, z)
   } else if (view == "medial" && hemi == "right") {
     view_dir <- c(-1, 0, 0)
     xy <- cbind(verts[, 2], verts[, 3])           # (y, z)
@@ -1423,7 +1424,7 @@ build_surface_polygon_data <- function(surfatlas,
   annotation_theme <- ggplot2::theme(
     plot.background = ggplot2::element_rect(fill = bg, colour = NA),
     plot.title = ggplot2::element_text(face = "bold",
-                                       margin = ggplot2::margin(b = 6)),
+                                       margin = ggplot2::margin(t = 4, b = 6)),
     plot.subtitle = ggplot2::element_text(margin = ggplot2::margin(b = 8)),
     plot.caption = ggplot2::element_text(margin = ggplot2::margin(t = 8)),
     plot.title.position = "plot",

@@ -29,6 +29,51 @@
   }
 })
 
+.synthetic_surface_panel_test_atlas <- local({
+  cache <- new.env(parent = emptyenv())
+
+  function(surf = c("inflated", "white", "pial")) {
+    surf <- match.arg(surf)
+    if (exists(surf, envir = cache, inherits = FALSE)) {
+      return(get(surf, envir = cache, inherits = FALSE))
+    }
+
+    fsaverage <- NULL
+    utils::data("fsaverage", package = "neuroatlas", envir = environment())
+
+    make_hemi <- function(hemi, parcel_id) {
+      geom <- fsaverage[[paste0(hemi, "_", surf)]]
+      n_vert <- ncol(geom@mesh$vb)
+      methods::new(
+        "LabeledNeuroSurface",
+        labels = character(),
+        cols = character(),
+        geometry = geom,
+        indices = seq_len(n_vert),
+        data = rep(as.numeric(parcel_id), n_vert)
+      )
+    }
+
+    atl <- structure(
+      list(
+        name = paste0("synthetic_panel_", surf),
+        ids = c(1L, 2L),
+        labels = c("LeftParcel", "RightParcel"),
+        orig_labels = c("LeftParcel", "RightParcel"),
+        hemi = c("left", "right"),
+        lh_atlas = make_hemi("lh", 1L),
+        rh_atlas = make_hemi("rh", 2L),
+        surf_type = surf,
+        surface_space = "fsaverage6"
+      ),
+      class = c("synthetic_panel_test", "surfatlas", "atlas")
+    )
+
+    assign(surf, atl, envir = cache)
+    atl
+  }
+})
+
 .expected_surface_panels <- function(views = c("lateral", "medial",
                                                 "dorsal", "ventral")) {
   as.vector(outer(c("Left", "Right"), tools::toTitleCase(views), paste))
@@ -140,6 +185,55 @@ test_that("surface polygon data has complete, non-degenerate panel layout", {
       expect_gt(min(ext$height) / max(ext$height), 0.50)
     }
   }
+})
+
+test_that("default panel labels and anterior direction track hemisphere correctly", {
+  atl <- .synthetic_surface_panel_test_atlas("inflated")
+  views <- c("lateral", "medial", "dorsal", "ventral")
+
+  built <- build_surface_polygon_data(
+    atl,
+    views = views,
+    surface = "inflated",
+    merged = TRUE,
+    use_cache = FALSE
+  )
+
+  mapping <- unique(built$polygons[, c("hemi", "view", "panel")])
+  mapping <- mapping[order(mapping$hemi, mapping$view), , drop = FALSE]
+
+  expected_panel <- paste(
+    tools::toTitleCase(mapping$hemi),
+    tools::toTitleCase(mapping$view)
+  )
+
+  expect_equal(mapping$panel, expected_panel)
+  expect_true(all(grepl("^Left ", mapping$panel[mapping$hemi == "left"])))
+  expect_true(all(grepl("^Right ", mapping$panel[mapping$hemi == "right"])))
+
+  orient <- do.call(
+    rbind,
+    lapply(c("left", "right"), function(hemi) {
+      hk <- if (hemi == "left") "lh" else "rh"
+      verts <- t(atl[[paste0(hk, "_atlas")]]@geometry@mesh$vb[1:3, ])
+
+      do.call(
+        rbind,
+        lapply(c("lateral", "medial"), function(view) {
+          proj <- project_surface_view(verts, view = view, hemi = hemi)
+          data.frame(
+            hemi = hemi,
+            view = view,
+            anterior_x_cor = stats::cor(verts[, 2], proj$xy[, 1]),
+            stringsAsFactors = FALSE
+          )
+        })
+      )
+    })
+  )
+
+  expect_true(all(orient$anterior_x_cor[orient$hemi == "left"] < 0))
+  expect_true(all(orient$anterior_x_cor[orient$hemi == "right"] > 0))
 })
 
 test_that("merged and triangle polygon builders preserve panel extents", {

@@ -276,6 +276,9 @@ For publication-style static figures, `plot_brain()` now exposes the
 layout controls that usually require manual patchwork editing: you can
 move the colorbar, relabel panels, and add figure-level annotations
 directly in the plotting call.
+If panel composition is your main task, see
+`vignette("surface-panels", package = "neuroatlas")` for a focused guide
+to multi-panel layout and hemisphere-label conventions.
 
 ```{r layout-single, eval=can_layout, fig.width=8, fig.height=4.5}
 atl_layout <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
@@ -303,6 +306,8 @@ plot_brain(
 
 The same interface carries over to `plot_brain_grid()`, which is useful
 when you want several parcel maps to share a single scale and colorbar.
+This is the easiest way to build a small comparison figure where every
+panel uses the same legend and the same surface view labels.
 
 ```{r layout-grid, eval=can_layout, fig.width=9, fig.height=6}
 atl_layout <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
@@ -311,22 +316,53 @@ vals_list <- list(
   Baseline = sin(seq_along(atl_layout$ids) / 15),
   Follow_up = cos(seq_along(atl_layout$ids) / 18),
   Difference = sin(seq_along(atl_layout$ids) / 15) -
-    cos(seq_along(atl_layout$ids) / 18)
+    cos(seq_along(atl_layout$ids) / 18),
+  Network_shift = 0.5 * sin(seq_along(atl_layout$ids) / 10)
 )
 
 plot_brain_grid(
   atl_layout,
   vals_list,
-  views = "lateral",
-  titles = c("Baseline", "Follow-up", "Difference"),
+  views = c("lateral", "medial"),
+  titles = c(
+    "Baseline map",
+    "Follow-up map",
+    "Difference map",
+    "Network shift"
+  ),
   shared_scale = TRUE,
   colorbar = "right",
   colorbar_title = "z-score",
   title = "Comparing parcel maps with a shared legend",
-  subtitle = "Each panel keeps the same color scale",
-  style = "ggseg_like"
+  subtitle = paste(
+    "Every panel uses the same limits, so colours mean the same thing",
+    "across baseline, follow-up, and derived contrasts."
+  ),
+  caption = paste(
+    "Use titles to name each map, panel_labels to simplify the view labels,",
+    "and shared_scale = TRUE when the legend should be interpreted globally."
+  ),
+  panel_labels = c(
+    "Left Lateral" = "LH lateral",
+    "Right Lateral" = "RH lateral",
+    "Left Medial" = "LH medial",
+    "Right Medial" = "RH medial"
+  ),
+  style = "ggseg_like",
+  ncol = 2
 )
 ```
+
+What this figure is doing:
+
+- `titles` names each parcel map, so the reader can distinguish conditions or contrasts at a glance.
+- `panel_labels` shortens the repeated view labels, which matters once each map has both lateral and medial views.
+- `shared_scale = TRUE` forces one global value range across all panels; this is what makes the single legend interpretable.
+- `colorbar = "right"` and `colorbar_title` turn that shared scale into an explicit legend instead of leaving the viewer to infer it.
+
+If you want each panel to use its own dynamic range, set `shared_scale = FALSE`.
+That can improve within-panel contrast, but the legend no longer supports direct
+comparison across panels.
 
 ## Dense vertex-wise overlays
 

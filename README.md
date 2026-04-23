@@ -112,6 +112,9 @@ ggseg_schaefer(parcels = 200, networks = 7) +
 - [Getting
   Started](https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.html) -
   Introduction and basic usage
+- [Surface Panel
+  Figures](https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.html) -
+  Static panel composition with `plot_brain()` and `plot_brain_grid()`
 - [Working with
   TemplateFlow](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html) -
   Template access and management
@@ -135,6 +138,11 @@ ggseg_schaefer(parcels = 200, networks = 7) +
 MIT © Bradley Buchsbaum
 
 <!-- albersdown:theme-note:start -->
+
 ## Albers theme
-This package uses the albersdown theme. Existing vignette theme hooks are replaced so `albers.css` and local `albers.js` render consistently on CRAN and GitHub Pages. The palette family is provided via `params$family` (default 'red'). The pkgdown site uses `template: { package: albersdown }`.
-<!-- albersdown:theme-note:end -->
+
+This package uses the albersdown theme. Existing vignette theme hooks
+are replaced so `albers.css` and local `albers.js` render consistently
+on CRAN and GitHub Pages. The palette family is provided via
+`params$family` (default ‘red’). The pkgdown site uses
+`template: { package: albersdown }`. <!-- albersdown:theme-note:end -->
