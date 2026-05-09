@@ -136,7 +136,7 @@
       vol = cluster_vol,
       fun = fun,
       sampling = sampling,
-      fill = 0
+      fill = NA_real_
     ),
     error = function(e) NULL
   )
@@ -162,6 +162,39 @@
   }
   if (is.null(vals)) return(NULL)
   as.numeric(vals)
+}
+
+#' Rebuild legacy SurfaceGeometry objects with current slot layout
+#'
+#' Older `data/fsaverage.rda` and bundled atlas geometries were serialized
+#' before `neurosurf::SurfaceGeometry` gained the `label` and
+#' `surf_to_world` slots. Accessing those slots on a legacy object errors
+#' out, which causes `vol_to_surf()` to fail and emits all-NA overlays.
+#' This helper validates an object and, if it is missing slots present in
+#' the current class definition, reconstructs it via the public
+#' constructor so every slot is populated. Returns the input unchanged if
+#' it already validates or cannot be repaired.
+#' @keywords internal
+#' @noRd
+.repair_legacy_surface_geometry <- function(g) {
+  if (is.null(g) || !inherits(g, "SurfaceGeometry")) return(g)
+  ok <- tryCatch({ methods::validObject(g); TRUE },
+                 error = function(e) FALSE)
+  if (ok) return(g)
+
+  mesh <- tryCatch(g@mesh, error = function(e) NULL)
+  if (is.null(mesh) || is.null(mesh$vb) || is.null(mesh$it)) return(g)
+
+  vert <- t(mesh$vb[1:3, , drop = FALSE])
+  faces <- t(mesh$it) - 1L
+  storage.mode(faces) <- "integer"
+  hemi <- tryCatch(g@hemi, error = function(e) NA_character_)
+  if (length(hemi) != 1 || is.na(hemi) || !nzchar(hemi)) hemi <- "left"
+
+  tryCatch(
+    neurosurf::SurfaceGeometry(vert = vert, faces = faces, hemi = hemi),
+    error = function(e) g
+  )
 }
 
 .resolve_overlay_surface_pair <- function(surfatlas,
@@ -206,6 +239,9 @@
 
   if (is.null(white)) white <- current_geom
   if (is.null(pial)) pial <- current_geom
+
+  white <- .repair_legacy_surface_geometry(white)
+  pial <- .repair_legacy_surface_geometry(pial)
 
   list(white = white, pial = pial, surface_space = surface_space)
 }

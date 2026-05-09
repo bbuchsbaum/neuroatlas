@@ -334,3 +334,69 @@ test_that("plot_brain composes a bottom colorbar when requested", {
   expect_s3_class(p, "patchwork")
   expect_s3_class(patchwork::patchworkGrob(p), "gtable")
 })
+
+test_that(".repair_legacy_surface_geometry rebuilds bundled legacy fsaverage", {
+  skip_if_not_installed("neurosurf")
+  e <- new.env()
+  utils::data("fsaverage", package = "neuroatlas", envir = e)
+  fsavg <- e$fsaverage
+  skip_if_not(length(fsavg) > 0, "bundled fsaverage data unavailable")
+  legacy <- fsavg[[1]]
+  # Sanity: bundled data is missing slots added in current SurfaceGeometry.
+  expect_error(methods::validObject(legacy))
+
+  repaired <- neuroatlas:::.repair_legacy_surface_geometry(legacy)
+  expect_silent(methods::validObject(repaired))
+  expect_true(is.matrix(neurosurf::surf_to_world(repaired)))
+  expect_equal(nrow(t(repaired@mesh$vb[1:3, , drop = FALSE])),
+               nrow(t(legacy@mesh$vb[1:3, , drop = FALSE])))
+})
+
+test_that(".resolve_overlay_surface_pair returns geometries with all slots", {
+  skip_on_cran()
+  skip_if_not_installed("neurosurf")
+  skip_if_not_installed("neuroatlas")
+  atl <- tryCatch(
+    neuroatlas::schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated"),
+    error = function(e) skip(paste("schaefer_surf unavailable:", conditionMessage(e)))
+  )
+
+  pair <- neuroatlas:::.resolve_overlay_surface_pair(atl, hemi = "lh")
+  expect_silent(methods::validObject(pair$white))
+  expect_silent(methods::validObject(pair$pial))
+  expect_true(is.matrix(neurosurf::surf_to_world(pair$white)))
+  expect_true(is.matrix(neurosurf::surf_to_world(pair$pial)))
+})
+
+test_that("volume->surface overlay leaves off-coverage vertices NA (transparent)", {
+  skip_if_not_installed("neurosurf")
+  skip_if_not_installed("neuroim2")
+
+  sp <- neuroim2::NeuroSpace(c(10L, 10L, 10L), spacing = c(1, 1, 1))
+  arr <- array(0, dim = c(10, 10, 10))
+  arr[4:6, 4:6, 4:6] <- 1.5
+  vol <- neuroim2::NeuroVol(arr, space = sp)
+
+  verts <- matrix(c(
+    4, 4, 4,
+    50, 50, 50,
+    4, 5, 4,
+    4, 6, 4
+  ), ncol = 3, byrow = TRUE)
+  faces <- matrix(c(0L, 2L, 3L, 1L, 2L, 3L), ncol = 3, byrow = TRUE)
+
+  surf_wm <- neurosurf::SurfaceGeometry(vert = verts,
+                                        faces = faces, hemi = "left")
+  surf_pial <- neurosurf::SurfaceGeometry(vert = verts + 0.1,
+                                          faces = faces, hemi = "left")
+
+  vals <- neuroatlas:::.project_overlay_one_hemi(
+    cluster_vol = vol,
+    surf_wm = surf_wm, surf_pial = surf_pial,
+    target_n = nrow(verts), fun = "avg", sampling = "midpoint"
+  )
+
+  expect_true(is.finite(vals[1]))
+  expect_true(is.na(vals[2]))
+  expect_equal(vals[1], 1.5, tolerance = 1e-6)
+})

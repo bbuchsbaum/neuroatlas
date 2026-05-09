@@ -1,5 +1,23 @@
 # neuroatlas 0.1.0.9000
 
+* `plot_brain(overlay = <NeuroVol>)` now propagates missing data
+  through the volume-to-surface projection: vertices that fall outside
+  the input volume's coverage (or whose neighbourhood contains no
+  finite source voxel) are emitted as `NA` rather than `0`. Faces
+  with no finite vertices are dropped from the polygon set, so
+  uncovered cortex renders as transparent background instead of an
+  opaque dark-palette wash. Faces with partial coverage continue to
+  render using the average of their finite vertices. The internal
+  `vol_to_surf()` `fill` argument changed from `0` to `NA_real_`.
+* `plot_brain(overlay = <NeuroVol>)` now repairs legacy
+  `SurfaceGeometry` objects on the fly. The bundled `data(fsaverage)`
+  artefact and the `@geometry` slots inside packaged surface atlases
+  were serialized before `neurosurf::SurfaceGeometry` gained the
+  `label` and `surf_to_world` slots; accessing those slots on a
+  legacy object errored out and caused `vol_to_surf()` to silently
+  return all-NA overlays. `.resolve_overlay_surface_pair()` now
+  rebuilds any geometry that fails `validObject()` via the current
+  constructor before passing it to `vol_to_surf()`.
 * Added a canonical `new_atlas()` / `new_surfatlas()` constructor that
   assembles every loader's return value (Schaefer, Glasser, ASEG,
   Olsen MTL / hippocampus, TemplateFlow subcortical). The constructor
