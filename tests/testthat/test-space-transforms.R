@@ -1,6 +1,10 @@
 test_that("atlas resampling to TemplateFlow spaces maintains integrity", {
   skip_on_cran()
   skip_if_not_installed("templateflow")
+  skip_if_not(
+    identical(Sys.getenv("NEUROATLAS_RUN_TEMPLATEFLOW_TESTS"), "true"),
+    "TemplateFlow integration tests are opt-in"
+  )
 
   # Test 1: Resample atlas to TemplateFlow space string
   atlas <- get_schaefer_atlas(parcels = "100", networks = "7", resolution = "2")
@@ -129,7 +133,8 @@ test_that("dilate_atlas handles masks correctly and preserves label integrity", 
   expect_equal(class(dilated_none), class(atlas))
 
   # Test with TemplateFlow mask string (if available)
-  if (requireNamespace("templateflow", quietly = TRUE)) {
+  if (requireNamespace("templateflow", quietly = TRUE) &&
+      identical(Sys.getenv("NEUROATLAS_RUN_TEMPLATEFLOW_TESTS"), "true")) {
     dilated_tf <- tryCatch({
       dilate_atlas(atlas, mask = "MNI152NLin2009cAsym",
                   radius = 1, maxn = 10)
