@@ -65,6 +65,7 @@ test_that("roi_colors_embedding maps structured hues", {
     rois,
     feature_cols = c("x", "y", "z", "network", "hemi"),
     hemi_col = "hemi",
+    method = "pca",
     seed = 7,
     C_range = c(40, 70),
     L = 60

@@ -108,11 +108,6 @@
     {
       "type": "list",
       "attributes": {
-        "class": {
-          "type": "character",
-          "attributes": {},
-          "value": ["tbl_df", "tbl", "data.frame"]
-        },
         "row.names": {
           "type": "integer",
           "attributes": {},
@@ -122,6 +117,11 @@
           "type": "character",
           "attributes": {},
           "value": ["roi", "color"]
+        },
+        "class": {
+          "type": "character",
+          "attributes": {},
+          "value": ["tbl_df", "tbl", "data.frame"]
         }
       },
       "value": [
@@ -133,7 +133,7 @@
         {
           "type": "character",
           "attributes": {},
-          "value": ["#B983D4", "#DC7992", "#D17BB5", "#8895D1", "#C78A6C", "#BD88B0", "#0096A6", "#878B52", "#37976F", "#009D88", "#48983F", "#749039"]
+          "value": ["#12AF88", "#12A8C9", "#4AA97E", "#22AA81", "#5C9ECC", "#82A16E", "#998556", "#AC71B5", "#B67662", "#B17A60", "#C166AE", "#C46F64"]
         }
       ]
     }
