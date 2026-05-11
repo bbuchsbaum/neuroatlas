@@ -249,6 +249,42 @@ get_atlas <- function(name, ...) {
     aliases = c("freesurfer_aseg")
   )
   register_atlas(
+    id = "harvard_oxford",
+    label = "Harvard-Oxford cortical/subcortical atlas",
+    family = "harvard_oxford",
+    loader = "get_harvard_oxford_cortical_subcortical_atlas",
+    default_space = "MNI152NLin6Asym",
+    representation = "volume",
+    aliases = c("ho", "harvard-oxford", "hocpal")
+  )
+  register_atlas(
+    id = "harvard_oxford_cortical",
+    label = "Harvard-Oxford cortical atlas",
+    family = "harvard_oxford",
+    loader = "get_harvard_oxford_cortical_atlas",
+    default_space = "MNI152NLin6Asym",
+    representation = "volume",
+    aliases = c("ho_cortical", "hocpa")
+  )
+  register_atlas(
+    id = "harvard_oxford_subcortical",
+    label = "Harvard-Oxford subcortical atlas",
+    family = "harvard_oxford",
+    loader = "get_harvard_oxford_subcortical_atlas",
+    default_space = "MNI152NLin6Asym",
+    representation = "volume",
+    aliases = c("ho_subcortical", "hospa")
+  )
+  register_atlas(
+    id = "julich_brain",
+    label = "Julich-Brain cytoarchitectonic atlas (FSL)",
+    family = "julich_brain",
+    loader = "get_julich_brain_atlas",
+    default_space = "MNI152",
+    representation = "volume",
+    aliases = c("juelich", "julich", "brodmann")
+  )
+  register_atlas(
     id = "olsen_mtl",
     label = "Olsen MTL atlas",
     family = "olsen",

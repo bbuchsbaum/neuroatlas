@@ -10,10 +10,12 @@ Provides a unified interface to access and work with various neuroimaging atlase
 
 The neuroatlas package provides a unified interface to access and work with
 various neuroimaging atlases and parcellations. It includes support for
-cortical atlases (Schaefer, Glasser), subcortical segmentations (FreeSurfer ASEG),
-and specialized atlases (Olsen MTL). The package integrates with TemplateFlow
-for standardized template access and supports interactive brain surface
-visualisation via triangle-mesh rendering.
+cortical atlases (Schaefer, Glasser), subcortical segmentations
+(FreeSurfer ASEG), FSL/TemplateFlow structural atlases
+(Harvard-Oxford, Julich-Brain), and specialized atlases (Olsen MTL).
+The package integrates with TemplateFlow for standardized template access
+and supports interactive brain surface visualisation via triangle-mesh
+rendering.
 }
 \section{Main Functions}{
 
@@ -21,6 +23,8 @@ visualisation via triangle-mesh rendering.
   \item{\code{\link{get_schaefer_atlas}}}{Access Schaefer cortical parcellations}
   \item{\code{\link{get_glasser_atlas}}}{Access Glasser multi-modal parcellation}
   \item{\code{\link{get_aseg_atlas}}}{Access FreeSurfer subcortical segmentation}
+  \item{\code{\link{get_harvard_oxford_atlas}}}{Access Harvard-Oxford structural atlases}
+  \item{\code{\link{get_fsl_atlas}}}{Access FSL XML-described atlases}
   \item{\code{\link{get_olsen_mtl}}}{Access Olsen medial temporal lobe atlas}
   \item{\code{\link{get_template}}}{Fetch templates from TemplateFlow}
 }

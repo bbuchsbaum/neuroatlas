@@ -85,6 +85,13 @@ new_atlas <- function(name,
   } else {
     hemi <- as.character(hemi)
   }
+  .validate_atlas_field_lengths(
+    ids = ids,
+    labels = labels,
+    orig_labels = orig_labels,
+    hemi = hemi,
+    network = network
+  )
 
   ret <- list(
     name = as.character(name),
@@ -157,6 +164,13 @@ new_surfatlas <- function(name,
   } else {
     hemi <- as.character(hemi)
   }
+  .validate_atlas_field_lengths(
+    ids = ids,
+    labels = labels,
+    orig_labels = orig_labels,
+    hemi = hemi,
+    network = network
+  )
 
   ret <- list(
     surf_type = as.character(surf_type),
@@ -263,6 +277,36 @@ validate_atlas <- function(x) {
   }
 
   invisible(x)
+}
+
+#' @keywords internal
+#' @noRd
+.validate_atlas_field_lengths <- function(ids,
+                                          labels,
+                                          orig_labels = NULL,
+                                          hemi = NULL,
+                                          network = NULL) {
+  n <- length(ids)
+  length_checks <- list(
+    labels = labels,
+    orig_labels = orig_labels,
+    hemi = hemi,
+    network = network
+  )
+  for (nm in names(length_checks)) {
+    val <- length_checks[[nm]]
+    if (!is.null(val) && length(val) != n) {
+      cli::cli_abort(
+        c(
+          "Inconsistent field lengths in atlas object.",
+          "i" = "{.field ids} has length {n}.",
+          "x" = "{.field {nm}} has length {length(val)}."
+        ),
+        class = c("neuroatlas_error_invalid_atlas", "neuroatlas_error")
+      )
+    }
+  }
+  invisible(TRUE)
 }
 
 

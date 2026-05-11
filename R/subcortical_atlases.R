@@ -375,7 +375,7 @@ get_subcortical_atlas <- function(name,
   tbl <- tryCatch({
     utils::read.table(label_path, header = TRUE, sep = "\t",
                       stringsAsFactors = FALSE, comment.char = "",
-                      check.names = FALSE)
+                      check.names = FALSE, quote = "")
   }, error = function(e) {
     NULL
   })

@@ -1,5 +1,16 @@
 # neuroatlas 0.1.0.9000
 
+* Added `get_harvard_oxford_atlas()` and registry entries for
+  Harvard-Oxford cortical, subcortical, and combined structural
+  parcellations. The default source is TemplateFlow, with threshold and
+  resolution options for maximum-probability `dseg` images.
+* Added `get_fsl_atlas()` for FSL XML-described atlases, including the
+  documented offset between probabilistic XML label indices and
+  max-probability summary image label values. Added a thin FSL-backed
+  wrapper for Julich-Brain / Brodmann-style cytoarchitectonic labels
+  (`get_julich_brain_atlas()`), which now downloads the Nilearn/NITRC
+  `Juelich.tgz` archive into a local FSL-style cache when `FSLDIR` is
+  unset.
 * `plot_brain(overlay = <NeuroVol>)` now propagates missing data
   through the volume-to-surface projection: vertices that fall outside
   the input volume's coverage (or whose neighbourhood contains no
