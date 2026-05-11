@@ -42,9 +42,9 @@ in millimetres. Multiple atlases can be queried simultaneously.
 \details{
 World coordinates are converted to voxel grid positions via
 \code{\link[neuroim2]{coord_to_grid}} and rounded to the nearest integer.
-When `radius > 0`, a nearest-neighbour search is performed in world
-coordinates using \code{\link[Rnanoflann]{nn}} to find all labelled atlas
-voxels within `radius` mm.
+When `radius > 0`, candidate voxel centres in a local grid neighbourhood
+are tested in world coordinates to find all labelled atlas voxels within
+`radius` mm.
 
 If the atlas carries a coordinate-space annotation
 (`atlas$atlas_ref$coord_space`) that differs from `from_space`, the input

@@ -31,9 +31,9 @@
 #' @details
 #' World coordinates are converted to voxel grid positions via
 #' \code{\link[neuroim2]{coord_to_grid}} and rounded to the nearest integer.
-#' When `radius > 0`, a nearest-neighbour search is performed in world
-#' coordinates using \code{\link[Rnanoflann]{nn}} to find all labelled atlas
-#' voxels within `radius` mm.
+#' When `radius > 0`, candidate voxel centres in a local grid neighbourhood
+#' are tested in world coordinates to find all labelled atlas voxels within
+#' `radius` mm.
 #'
 #' If the atlas carries a coordinate-space annotation
 #' (`atlas$atlas_ref$coord_space`) that differs from `from_space`, the input
@@ -58,10 +58,14 @@
 #' }
 #'
 #' @importFrom neuroim2 space coord_to_grid grid_to_coord
-#' @importFrom Rnanoflann nn
 #' @importFrom tibble tibble
 #' @export
 query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
+  if (!is.numeric(radius) || length(radius) != 1L ||
+      is.na(radius) || radius < 0) {
+    stop("'radius' must be a non-negative numeric scalar")
+  }
+
   # --- Normalise coords to N x 3 matrix ---
   if (is.null(dim(coords))) {
     if (length(coords) != 3L) {
@@ -97,6 +101,57 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
   do.call(rbind, result_parts)
 }
 
+#' Query Atlas Labels by Coordinate
+#'
+#' @description
+#' Atlas-first convenience wrappers for label lookup. `query_coord()` queries
+#' world/mm coordinates, while `query_vox()` queries R-style 1-based voxel
+#' grid indices and converts them to world coordinates before dispatching to
+#' `query_point()`.
+#'
+#' @param x A single atlas object or a named list of atlas objects.
+#' @param coords Numeric vector of length 3 or an N x 3 matrix of world/mm
+#'   coordinates.
+#' @param ijk Numeric/integer vector of length 3 or an N x 3 matrix of R-style
+#'   1-based voxel grid indices.
+#' @param ... Additional arguments passed to `query_point()`, such as
+#'   `radius` or `from_space`.
+#'
+#' @return A tibble with atlas labels at the requested locations.
+#' @export
+query_coord <- function(x, coords, ...) {
+  query_point(coords, x, ...)
+}
+
+#' @rdname query_coord
+#' @export
+query_vox <- function(x, ijk, ...) {
+  if (inherits(x, "atlas")) {
+    vol <- .get_atlas_volume(x)
+  } else if (is.list(x) && !inherits(x, "atlas")) {
+    if (length(x) == 0L || !inherits(x[[1]], "atlas")) {
+      stop("'x' must be an atlas object or a named list of atlas objects")
+    }
+    vol <- .get_atlas_volume(x[[1]])
+  } else {
+    stop("'x' must be an atlas object or a named list of atlas objects")
+  }
+
+  if (is.null(dim(ijk))) {
+    if (length(ijk) != 3L) {
+      stop("'ijk' must be a length-3 vector or an N x 3 matrix")
+    }
+    ijk <- matrix(ijk, nrow = 1L)
+  }
+  ijk <- as.matrix(ijk)
+  if (ncol(ijk) != 3L) {
+    stop("'ijk' must have exactly 3 columns (i, j, k)")
+  }
+
+  coords <- neuroim2::grid_to_coord(neuroim2::space(vol), ijk)
+  query_point(coords, x, ...)
+}
+
 
 # Internal: query a single atlas for all points
 # Returns a tibble
@@ -121,90 +176,111 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
     )
   }
 
-  # --- Densify atlas volume to an array ---
-  vol_dims <- dim(vol)
-  if (methods::is(vol, "ClusteredNeuroVol")) {
-    arr <- array(0L, dim = vol_dims)
-    arr[which(vol@mask)] <- vol@clusters
-  } else {
-    arr <- as.integer(vol[, , ])
-    dim(arr) <- vol_dims
-  }
-
   if (radius == 0) {
-    .query_exact(query_coords, vol, arr, atlas_obj, atlas_name)
+    .query_exact(query_coords, coords, vol, atlas_obj, atlas_name)
   } else {
-    .query_radius(query_coords, vol, arr, atlas_obj, atlas_name, radius)
+    .query_radius(query_coords, coords, vol, atlas_obj, atlas_name, radius)
   }
 }
 
 
 # Internal: exact voxel lookup (radius == 0)
 #' @noRd
-.query_exact <- function(coords, vol, arr, atlas_obj, atlas_name) {
-  n_points <- nrow(coords)
+.query_exact <- function(query_coords, output_coords, vol, atlas_obj,
+                         atlas_name) {
+  n_points <- nrow(query_coords)
   sp <- neuroim2::space(vol)
-  vol_dims <- dim(vol)
 
-  grid <- neuroim2::coord_to_grid(sp, coords)
+  grid <- neuroim2::coord_to_grid(sp, query_coords)
   if (is.null(dim(grid))) {
     grid <- matrix(grid, nrow = 1L)
   }
   grid <- round(grid)
 
-  # Build results row-by-row
-  ids <- rep(NA_integer_, n_points)
-  for (i in seq_len(n_points)) {
-    gi <- grid[i, ]
-    if (all(gi >= 1L) && gi[1] <= vol_dims[1] &&
-        gi[2] <= vol_dims[2] && gi[3] <= vol_dims[3]) {
-      val <- arr[gi[1], gi[2], gi[3]]
-      if (!is.na(val) && val != 0L) {
-        ids[i] <- val
-      }
-    }
-  }
+  vals <- .atlas_values_at_grid(vol, grid)
+  ids <- ifelse(!is.na(vals) & vals != 0L, vals, NA_integer_)
 
-  .ids_to_tibble(ids, coords, atlas_obj, atlas_name)
+  .ids_to_tibble(
+    ids,
+    output_coords,
+    atlas_obj,
+    atlas_name,
+    point = seq_len(n_points)
+  )
 }
 
 
 # Internal: radius-based fuzzy search
 #' @noRd
-.query_radius <- function(coords, vol, arr, atlas_obj, atlas_name, radius) {
-  n_points <- nrow(coords)
+.query_radius <- function(query_coords, output_coords, vol, atlas_obj,
+                          atlas_name, radius) {
+  n_points <- nrow(query_coords)
   sp <- neuroim2::space(vol)
+  vol_dims <- dim(vol)
+  offsets <- .radius_grid_offsets(radius, sp)
 
-  # Get world coordinates of all nonzero voxels
-  nz <- which(arr != 0L, arr.ind = TRUE)
-  if (nrow(nz) == 0L) {
-    # No labelled voxels at all
-    empty_ids <- rep(NA_integer_, n_points)
-    return(.ids_to_tibble(empty_ids, coords, atlas_obj, atlas_name))
+  center_grid <- neuroim2::coord_to_grid(sp, query_coords)
+  if (is.null(dim(center_grid))) {
+    center_grid <- matrix(center_grid, nrow = 1L)
   }
-  nz_world <- neuroim2::grid_to_coord(sp, nz)
-  nz_labels <- arr[nz]
-
-  # For each query point, find all labelled voxels within radius
-  k_max <- min(nrow(nz), 200L)
-  nn_res <- Rnanoflann::nn(data = nz_world, points = coords,
-                           k = k_max)
+  center_grid <- round(center_grid)
 
   rows <- vector("list", n_points)
   for (i in seq_len(n_points)) {
-    dists <- nn_res$distances[i, ]
-    idxs <- nn_res$indices[i, ]
-    within <- which(dists <= radius & dists < .Machine$double.xmax)
-    if (length(within) == 0L) {
-      rows[[i]] <- .ids_to_tibble(NA_integer_, coords[i, , drop = FALSE],
-                                  atlas_obj, atlas_name)
+    cand_grid <- sweep(offsets, 2L, center_grid[i, ], "+")
+    in_bounds <- .grid_in_bounds(cand_grid, vol_dims)
+    cand_grid <- cand_grid[in_bounds, , drop = FALSE]
+
+    if (nrow(cand_grid) == 0L) {
+      rows[[i]] <- .ids_to_tibble(
+        NA_integer_,
+        output_coords[i, , drop = FALSE],
+        atlas_obj,
+        atlas_name,
+        point = i
+      )
+      next
+    }
+
+    cand_world <- neuroim2::grid_to_coord(sp, cand_grid)
+    dists <- sqrt(rowSums(
+      (cand_world -
+         matrix(query_coords[i, ], nrow(cand_world), 3L,
+                byrow = TRUE))^2
+    ))
+    within <- dists <= radius + sqrt(.Machine$double.eps)
+    cand_grid <- cand_grid[within, , drop = FALSE]
+
+    if (nrow(cand_grid) == 0L) {
+      rows[[i]] <- .ids_to_tibble(
+        NA_integer_,
+        output_coords[i, , drop = FALSE],
+        atlas_obj,
+        atlas_name,
+        point = i
+      )
+      next
+    }
+
+    vals <- .atlas_values_at_grid(vol, cand_grid)
+    hit_labels <- unique(vals[!is.na(vals) & vals != 0L])
+
+    if (length(hit_labels) == 0L) {
+      rows[[i]] <- .ids_to_tibble(
+        NA_integer_,
+        output_coords[i, , drop = FALSE],
+        atlas_obj,
+        atlas_name,
+        point = i
+      )
     } else {
-      hit_labels <- unique(nz_labels[idxs[within]])
-      # One row per unique region found
-      rows[[i]] <- .ids_to_tibble(hit_labels,
-                                  coords[rep(i, length(hit_labels)), ,
-                                         drop = FALSE],
-                                  atlas_obj, atlas_name)
+      rows[[i]] <- .ids_to_tibble(
+        hit_labels,
+        output_coords[rep(i, length(hit_labels)), , drop = FALSE],
+        atlas_obj,
+        atlas_name,
+        point = rep(i, length(hit_labels))
+      )
     }
   }
 
@@ -212,43 +288,97 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
 }
 
 
+# Internal: local voxel offsets large enough to contain a world-space sphere.
+#' @noRd
+.radius_grid_offsets <- function(radius, sp) {
+  spacing <- tryCatch(neuroim2::spacing(sp), error = function(e) NULL)
+  spacing <- as.numeric(spacing)
+  if (length(spacing) != 3L || any(!is.finite(spacing)) ||
+      any(spacing <= 0)) {
+    spacing <- rep(1, 3)
+  }
+
+  radius_vox <- as.integer(ceiling(radius / spacing)) + 1L
+  grid <- expand.grid(
+    i = seq.int(-radius_vox[1], radius_vox[1]),
+    j = seq.int(-radius_vox[2], radius_vox[2]),
+    k = seq.int(-radius_vox[3], radius_vox[3])
+  )
+  as.matrix(grid)
+}
+
+
+# Internal: values at R-style 1-based voxel grid coordinates.
+#' @noRd
+.atlas_values_at_grid <- function(vol, grid) {
+  if (is.null(dim(grid))) {
+    grid <- matrix(grid, nrow = 1L)
+  }
+
+  grid <- round(grid)
+  vals <- rep(NA_integer_, nrow(grid))
+  in_bounds <- .grid_in_bounds(grid, dim(vol))
+  if (!any(in_bounds)) {
+    return(vals)
+  }
+
+  query_grid <- grid[in_bounds, , drop = FALSE]
+  vals[in_bounds] <- as.integer(vol[query_grid])
+
+  vals
+}
+
+
+# Internal: in-bounds mask for R-style 1-based voxel grid coordinates.
+#' @noRd
+.grid_in_bounds <- function(grid, vol_dims) {
+  if (nrow(grid) == 0L) {
+    return(logical(0))
+  }
+
+  grid[, 1] >= 1L & grid[, 1] <= vol_dims[1] &
+    grid[, 2] >= 1L & grid[, 2] <= vol_dims[2] &
+    grid[, 3] >= 1L & grid[, 3] <= vol_dims[3]
+}
+
+
 # Internal: map integer IDs to label/hemi/network and build tibble
 #' @noRd
-.ids_to_tibble <- function(ids, coords, atlas_obj, atlas_name) {
+.ids_to_tibble <- function(ids, coords, atlas_obj, atlas_name, point = NULL) {
   if (is.null(dim(coords))) {
     coords <- matrix(coords, nrow = 1L)
   }
   n <- length(ids)
+  if (is.null(point)) {
+    point <- seq_len(nrow(coords))
+  }
+  if (length(point) != n) {
+    stop("'point' must have the same length as 'ids'")
+  }
 
   # Map IDs to metadata
   labels <- rep(NA_character_, n)
   hemis <- rep(NA_character_, n)
   networks <- rep(NA_character_, n)
 
-  for (i in seq_len(n)) {
-    if (!is.na(ids[i])) {
-      idx <- match(ids[i], atlas_obj$ids)
-      if (!is.na(idx)) {
-        labels[i] <- atlas_obj$labels[idx]
-        if (!is.null(atlas_obj$hemi) && length(atlas_obj$hemi) >= idx) {
-          hemis[i] <- atlas_obj$hemi[idx]
-        }
-        if (!is.null(atlas_obj$network) && length(atlas_obj$network) >= idx) {
-          networks[i] <- atlas_obj$network[idx]
-        }
-      }
+  idx <- match(ids, atlas_obj$ids)
+  valid <- !is.na(ids) & !is.na(idx)
+  if (any(valid)) {
+    labels[valid] <- atlas_obj$labels[idx[valid]]
+
+    if (!is.null(atlas_obj$hemi)) {
+      hemi_valid <- valid & idx <= length(atlas_obj$hemi)
+      hemis[hemi_valid] <- atlas_obj$hemi[idx[hemi_valid]]
+    }
+
+    if (!is.null(atlas_obj$network)) {
+      network_valid <- valid & idx <= length(atlas_obj$network)
+      networks[network_valid] <- atlas_obj$network[idx[network_valid]]
     }
   }
 
-  # Determine point indices from coords matrix
-  # For radius results that repeat the same point, use the row from the
-
-  # original coords matrix (handled by caller via rep(i, ...))
-  point_idx <- seq_len(nrow(coords))
-
-
   tibble::tibble(
-    point = point_idx,
+    point = point,
     x = coords[, 1],
     y = coords[, 2],
     z = coords[, 3],
