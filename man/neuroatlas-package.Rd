@@ -6,7 +6,7 @@
 \alias{neuroatlas}
 \title{neuroatlas: Neuroimaging Atlases and Parcellations}
 \description{
-Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with 'ggplot2' and 'ggiraph'.
+Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Brainnetome, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with 'ggplot2' and 'ggiraph'.
 
 The neuroatlas package provides a unified interface to access and work with
 various neuroimaging atlases and parcellations. It includes support for

@@ -240,6 +240,15 @@ get_atlas <- function(name, ...) {
     representation = "surface"
   )
   register_atlas(
+    id = "brainnetome",
+    label = "Brainnetome 246-region atlas",
+    family = "brainnetome",
+    loader = "get_brainnetome_atlas",
+    default_space = "MNI152",
+    representation = "volume",
+    aliases = c("bna", "brainnetome246")
+  )
+  register_atlas(
     id = "aseg",
     label = "FreeSurfer ASEG subcortical atlas",
     family = "aseg",

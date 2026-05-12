@@ -21,7 +21,8 @@ consistent, user-friendly functions.
 ## Features
 
 - **Multiple Atlas Support**: Access Schaefer (100-1000 parcels),
-  Glasser (360 regions), FreeSurfer ASEG, and Olsen MTL atlases
+  Brainnetome (246 regions), Glasser (360 regions), FreeSurfer ASEG, and
+  Olsen MTL atlases
 - **Flexible Resampling**: Transform atlases to different spaces and
   resolutions
 - **ROI Analysis**: Extract and analyze specific regions of interest
@@ -103,8 +104,11 @@ ggseg_schaefer(parcels = 200, networks = 7) +
 | Atlas | Function | Description |
 |----|----|----|
 | Schaefer | `get_schaefer_atlas()` | Cortical parcellations (100-1000 regions, 7 or 17 networks) |
+| Brainnetome | `get_brainnetome_atlas()` | 246-region connectional atlas with Yeo network and cytoarchitectonic metadata |
 | Glasser | `get_glasser_atlas()` | 360-region multi-modal cortical parcellation |
 | ASEG | `get_aseg_atlas()` | FreeSurfer subcortical segmentation |
+| Harvard-Oxford | `get_harvard_oxford_atlas()` | Cortical/subcortical structural atlases via TemplateFlow or FSL |
+| Julich-Brain | `get_julich_brain_atlas()` | FSL Julich-Brain cytoarchitectonic atlas |
 | Olsen MTL | `get_olsen_mtl()` | Medial temporal lobe atlas with hippocampal subfields |
 
 ## Documentation

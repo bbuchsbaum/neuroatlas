@@ -377,7 +377,7 @@ query_vox <- function(x, ijk, ...) {
     }
   }
 
-  tibble::tibble(
+  out <- tibble::tibble(
     point = point,
     x = coords[, 1],
     y = coords[, 2],
@@ -388,4 +388,24 @@ query_vox <- function(x, ijk, ...) {
     hemi = hemis,
     network = networks
   )
+
+  meta <- tryCatch(roi_metadata(atlas_obj), error = function(e) NULL)
+  if (!is.null(meta)) {
+    skip <- c(
+      "id", "label", "label_full", "hemi", "network",
+      "color_r", "color_g", "color_b",
+      "template_space", "coord_space", "atlas_family", "atlas_model",
+      "atlas_representation", "atlas_source", "atlas_confidence"
+    )
+    extra_cols <- setdiff(names(meta), skip)
+    for (col in extra_cols) {
+      vals <- rep(meta[[col]][NA_integer_], n)
+      if (any(valid)) {
+        vals[valid] <- meta[[col]][idx[valid]]
+      }
+      out[[col]] <- vals
+    }
+  }
+
+  out
 }

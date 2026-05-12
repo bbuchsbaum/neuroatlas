@@ -5,8 +5,8 @@ Authors@R:
     person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1108-4866"))
 Description: Provides a unified interface to access and work with various
-    neuroimaging atlases and parcellations including Schaefer, Glasser,
-    FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow
+    neuroimaging atlases and parcellations including Schaefer, Brainnetome,
+    Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow
     for standardized template access and supports interactive brain surface
     visualisation via triangle-mesh rendering with 'ggplot2' and 'ggiraph'.
 License: MIT + file LICENSE
@@ -81,6 +81,7 @@ Collate:
     'all_generic.R'
     'aseg_subcort.R'
     'atlas.R'
+    'atlas_brainnetome.R'
     'atlas_colors.R'
     'atlas_connectivity.R'
     'atlas_constructor.R'

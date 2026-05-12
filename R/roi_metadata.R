@@ -300,6 +300,21 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
     ret$network <- new_network
   }
 
+  # Preserve atlas-specific per-ROI vectors (e.g., Brainnetome lobe/gyrus).
+  reserved <- c(
+    "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
+    "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
+    "atlas_history", "space", "template_space", "coord_space", "confidence"
+  )
+  extra_names <- setdiff(names(x), reserved)
+  n_old <- length(x$ids)
+  for (nm in extra_names) {
+    val <- x[[nm]]
+    if (is.atomic(val) && length(val) == n_old) {
+      ret[[nm]] <- val[keep_idx]
+    }
+  }
+
   # Preserve atlas_ref if present
   if (!is.null(x$atlas_ref)) {
     ret$atlas_ref <- x$atlas_ref
@@ -419,6 +434,19 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
 
   if (!is.null(x$network)) {
     meta$network <- x$network
+  }
+
+  reserved <- c(
+    "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
+    "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
+    "atlas_history", "space", "template_space", "coord_space", "confidence"
+  )
+  extra_names <- setdiff(names(x), reserved)
+  for (nm in extra_names) {
+    val <- x[[nm]]
+    if (is.atomic(val) && length(val) == n) {
+      meta[[nm]] <- val
+    }
   }
 
   # Add atlas_ref provenance if available
