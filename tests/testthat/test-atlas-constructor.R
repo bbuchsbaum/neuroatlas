@@ -135,6 +135,10 @@ test_that(".is_lfs_pointer detects pointer stubs", {
   writeLines("version https://git-lfs.github.com/spec/v1", f)
   expect_true(.is_lfs_pointer(f))
 
+  f_annex <- tempfile(fileext = ".ptr")
+  writeLines(".git/annex/objects/5P/Zw/file.nii.gz/file.nii.gz", f_annex)
+  expect_true(.is_lfs_pointer(f_annex))
+
   f2 <- tempfile(fileext = ".bin")
   writeLines(paste(rep("x", 2048), collapse = ""), f2)
   expect_false(.is_lfs_pointer(f2))

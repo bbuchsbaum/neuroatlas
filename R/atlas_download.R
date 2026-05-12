@@ -15,7 +15,7 @@
 #'   describing the outcome (path, success, error, lfs_pointer). Use this when
 #'   the caller wants to implement a fallback strategy.
 #'
-#' Both helpers detect Git LFS pointer files (text stubs of size ~133 bytes)
+#' Both helpers detect Git LFS/git-annex pointer files (small text stubs)
 #' and treat them as failure modes, so loaders don't silently accept a stub
 #' in place of the real NIfTI.
 #'
@@ -38,12 +38,12 @@ NULL
 }
 
 
-#' Detect a Git LFS pointer file.
+#' Detect a Git LFS or git-annex pointer file.
 #'
 #' LFS pointer files begin with `version https://git-lfs.github.com/spec/v1`
-#' and are ~133 bytes. Atlas loaders treat these as a failure mode because
-#' `downloader::download()` returns without error even when the real binary
-#' blob wasn't delivered.
+#' and git-annex pointer files often begin with `.git/annex/objects/`. Atlas
+#' loaders treat these as a failure mode because `downloader::download()` can
+#' return without error even when the real binary blob wasn't delivered.
 #'
 #' @keywords internal
 #' @noRd
@@ -55,7 +55,9 @@ NULL
     readLines(path, n = 1L, warn = FALSE),
     error = function(e) ""
   )
-  identical(hdr, "version https://git-lfs.github.com/spec/v1")
+  length(hdr) > 0L &&
+    (identical(hdr, "version https://git-lfs.github.com/spec/v1") ||
+       grepl("^\\.git/annex/objects/", hdr))
 }
 
 
@@ -116,9 +118,9 @@ NULL
   if (.is_lfs_pointer(dest)) {
     cli::cli_abort(
       c(
-        "Downloaded {description} is a Git LFS pointer stub, not the real file.",
+        "Downloaded {description} is a Git LFS/git-annex pointer stub, not the real file.",
         "i" = "URL:  {.url {url}}",
-        "i" = "The upstream mirror may be serving an unresolved LFS pointer."
+        "i" = "The upstream mirror may be serving an unresolved pointer."
       ),
       class = c("neuroatlas_error_lfs_pointer",
                 "neuroatlas_error_download",
@@ -151,7 +153,8 @@ NULL
 #'   * `ok`: `TRUE` on success.
 #'   * `path`: path to the downloaded file (or `NULL`).
 #'   * `error`: the captured error condition on failure (or `NULL`).
-#'   * `lfs_pointer`: `TRUE` if the file looked like a Git LFS pointer stub.
+#'   * `lfs_pointer`: `TRUE` if the file looked like a Git LFS/git-annex
+#'     pointer stub.
 #' @keywords internal
 .neuroatlas_try_download <- function(url,
                                      dest = NULL,

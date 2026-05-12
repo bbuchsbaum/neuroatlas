@@ -7,14 +7,14 @@
 Source-specific links are recorded in \code{atlas_ref(atlas)$provenance}.
 }
 \usage{
-get_glasser_atlas(outspace = NULL, source = c("mni2009c", "xcpengine"))
+get_glasser_atlas(outspace = NULL, source = c("xcpengine", "mni2009c"))
 }
 \arguments{
 \item{outspace}{Optional \code{NeuroSpace} object specifying desired output space.
 If provided, the atlas will be resampled to this space. Default: NULL}
 
-\item{source}{Volume source to use. One of \code{"mni2009c"} (default) or
-\code{"xcpengine"}.}
+\item{source}{Volume source to use. One of \code{"xcpengine"} (default) or
+\code{"mni2009c"}.}
 }
 \value{
 A list with class 'glasser' and 'atlas' containing:
@@ -37,15 +37,18 @@ cortical architecture, function, connectivity, and topography.
 
 Supported sources:
 \itemize{
-  \item \code{"mni2009c"} (default): MNI152NLin2009cAsym-provenance volume
-    file (\code{MMP_in_MNI_corr.nii.gz}).
-  \item \code{"xcpengine"}: legacy xcpEngine Glasser360 volume
-    (\code{glasser360MNI.nii.gz}) with less explicit template provenance.
+  \item \code{"xcpengine"} (default): xcpEngine Glasser360 volume
+    (\code{glasser360MNI.nii.gz}) with stable runtime availability but less
+    explicit template provenance.
+  \item \code{"mni2009c"}: MNI152NLin2009cAsym-provenance volume file
+    (\code{MMP_in_MNI_corr.nii.gz}). This source is attempted only when
+    requested.
 }
 
 If \code{source = "mni2009c"} is unavailable at runtime, the loader
 automatically falls back to \code{"xcpengine"} and marks confidence as
-\code{"uncertain"}.
+\code{"uncertain"}. In practice, some GitHub mirrors for this source may
+serve a small git-annex pointer stub rather than the real NIfTI payload.
 
 Region labels are read from the xcpEngine node-name table to provide stable
 parcel naming across sources.

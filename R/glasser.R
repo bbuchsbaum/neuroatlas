@@ -10,23 +10,26 @@
 #'
 #' Supported sources:
 #' \itemize{
-#'   \item \code{"mni2009c"} (default): MNI152NLin2009cAsym-provenance volume
-#'     file (\code{MMP_in_MNI_corr.nii.gz}).
-#'   \item \code{"xcpengine"}: legacy xcpEngine Glasser360 volume
-#'     (\code{glasser360MNI.nii.gz}) with less explicit template provenance.
+#'   \item \code{"xcpengine"} (default): xcpEngine Glasser360 volume
+#'     (\code{glasser360MNI.nii.gz}) with stable runtime availability but less
+#'     explicit template provenance.
+#'   \item \code{"mni2009c"}: MNI152NLin2009cAsym-provenance volume file
+#'     (\code{MMP_in_MNI_corr.nii.gz}). This source is attempted only when
+#'     requested.
 #' }
 #'
 #' If \code{source = "mni2009c"} is unavailable at runtime, the loader
 #' automatically falls back to \code{"xcpengine"} and marks confidence as
-#' \code{"uncertain"}.
+#' \code{"uncertain"}. In practice, some GitHub mirrors for this source may
+#' serve a small git-annex pointer stub rather than the real NIfTI payload.
 #'
 #' Region labels are read from the xcpEngine node-name table to provide stable
 #' parcel naming across sources.
 #'
 #' @param outspace Optional \code{NeuroSpace} object specifying desired output space.
 #'   If provided, the atlas will be resampled to this space. Default: NULL
-#' @param source Volume source to use. One of \code{"mni2009c"} (default) or
-#'   \code{"xcpengine"}.
+#' @param source Volume source to use. One of \code{"xcpengine"} (default) or
+#'   \code{"mni2009c"}.
 #'
 #' @return A list with class 'glasser' and 'atlas' containing:
 #' \describe{
@@ -63,7 +66,7 @@
 #' @importFrom grDevices col2rgb rainbow
 #' @export
 get_glasser_atlas <- function(outspace=NULL,
-                              source = c("mni2009c", "xcpengine")) {
+                              source = c("xcpengine", "mni2009c")) {
   source <- match.arg(source)
   requested_source <- source
   source_info <- .glasser_volume_source_info(source)
@@ -77,7 +80,7 @@ get_glasser_atlas <- function(outspace=NULL,
   if (!status$ok && identical(source, "mni2009c")) {
     cli::cli_warn(
       c(
-        "Default Glasser source {.val mni2009c} was unavailable; falling back to {.val xcpengine}.",
+        "Requested Glasser source {.val mni2009c} was unavailable; falling back to {.val xcpengine}.",
         "i" = "Original error: {conditionMessage(status$error)}",
         "!" = "Provenance confidence is downgraded to {.val uncertain}."
       ),
@@ -554,7 +557,7 @@ glasser_surf <- function(space = "fsaverage",
         "Human_Brain_Atlases-glasser/master/MMP_in_MNI_corr.nii.gz"
       ),
       label_url = paste0(
-        "https://github.com/PennBBL/xcpEngine/raw/master/atlas/",
+        "https://raw.githubusercontent.com/PennLINC/xcpEngine/master/atlas/",
         "glasser360/glasser360NodeNames.txt"
       ),
       provenance = paste(
@@ -562,27 +565,24 @@ glasser_surf <- function(space = "fsaverage",
         "https://github.com/Raj-Lab-UCSF/Human_Brain_Atlases-glasser"
       ),
       lineage = "Surface reconstruction/projection to MNI152NLin2009cAsym volume.",
-      notes = "Default source with explicit 2009c provenance."
+      notes = paste(
+        "Opt-in source with explicit 2009c provenance.",
+        "Some mirrors may serve only a git-annex pointer stub."
+      )
     ))
   }
-
-  warning(
-    "Using legacy source='xcpengine' with uncertain template provenance. ",
-    "Prefer source='mni2009c' for explicit 2009c alignment.",
-    call. = FALSE
-  )
 
   list(
     fname = "glasser360MNI.nii.gz",
     volume_url = paste0(
-      "https://github.com/PennBBL/xcpEngine/raw/master/atlas/",
+      "https://raw.githubusercontent.com/PennLINC/xcpEngine/master/atlas/",
       "glasser360/glasser360MNI.nii.gz"
     ),
     label_url = paste0(
-      "https://github.com/PennBBL/xcpEngine/raw/master/atlas/",
+      "https://raw.githubusercontent.com/PennLINC/xcpEngine/master/atlas/",
       "glasser360/glasser360NodeNames.txt"
     ),
-    provenance = "https://github.com/PennBBL/xcpEngine/tree/master/atlas/glasser360",
+    provenance = "https://github.com/PennLINC/xcpEngine/tree/master/atlas/glasser360",
     lineage = "xcpEngine-distributed volumetric derivative.",
     notes = "Template identity is not explicitly documented by the source."
   )
