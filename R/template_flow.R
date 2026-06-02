@@ -831,7 +831,7 @@ load_surface_template <- function(template_id, surface_type,
       load_as_path = TRUE
     )
 
-    neurosurf::read_surf_geometry(surf_path)
+    .read_surface_template_geometry(surf_path, hemi = h)
   }
 
   if (identical(hemi, "both")) {
@@ -841,6 +841,96 @@ load_surface_template <- function(template_id, surface_type,
   }
 
   fetch_one(hemi)
+}
+
+.read_surface_template_geometry <- function(surf_path,
+                                            hemi,
+                                            geometry_reader = neurosurf::read_surf_geometry,
+                                            gifti_reader = NULL) {
+  primary <- tryCatch(
+    geometry_reader(surf_path),
+    error = function(e) e
+  )
+
+  if (!inherits(primary, "error")) {
+    return(primary)
+  }
+
+  if (is.null(gifti_reader)) {
+    if (!requireNamespace("gifti", quietly = TRUE)) {
+      cli::cli_abort(
+        c(
+          "Failed to read surface template geometry.",
+          "x" = conditionMessage(primary),
+          "i" = paste(
+            "Install the {.pkg gifti} package or call",
+            "{.code get_surface_template(..., load_as_path = TRUE)}",
+            "to inspect the cached file path."
+          )
+        ),
+        class = "neuroatlas_error_surface_template",
+        parent = primary
+      )
+    }
+    gifti_reader <- gifti::readgii
+  }
+
+  fallback <- tryCatch(
+    .surface_geometry_from_gifti(gifti_reader(surf_path), hemi = hemi),
+    error = function(e) e
+  )
+
+  if (!inherits(fallback, "error")) {
+    return(fallback)
+  }
+
+  cli::cli_abort(
+    c(
+      "Failed to read surface template geometry.",
+      "x" = paste("neurosurf reader:", conditionMessage(primary)),
+      "x" = paste("GIFTI fallback:", conditionMessage(fallback)),
+      "i" = paste(
+        "Call {.code get_surface_template(..., load_as_path = TRUE)}",
+        "to inspect the cached file path."
+      )
+    ),
+    class = "neuroatlas_error_surface_template",
+    parent = fallback
+  )
+}
+
+.surface_geometry_from_gifti <- function(gii, hemi) {
+  arrays <- gii$data
+  if (is.null(arrays) || length(arrays) < 2L) {
+    cli::cli_abort(
+      "GIFTI surface does not contain pointset and triangle arrays.",
+      class = "neuroatlas_error_surface_template"
+    )
+  }
+
+  pointset <- if (!is.null(arrays$pointset)) arrays$pointset else arrays[[1]]
+  triangle <- if (!is.null(arrays$triangle)) arrays$triangle else arrays[[2]]
+
+  neurosurf::SurfaceGeometry(
+    vert = pointset,
+    faces = triangle,
+    hemi = .surface_template_hemi_label(hemi)
+  )
+}
+
+.surface_template_hemi_label <- function(hemi) {
+  switch(
+    as.character(hemi),
+    L = "left",
+    LH = "left",
+    lh = "left",
+    left = "left",
+    R = "right",
+    RH = "right",
+    rh = "right",
+    right = "right",
+    as.character(hemi)
+  )
 }
 
 # ---- Cache Management Functions ----
