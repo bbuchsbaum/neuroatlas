@@ -240,6 +240,11 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
     }
   }
 
+  # Dense per-voxel label vector. Computed once here so the same indexing works
+  # for both dense NeuroVol and ClusteredNeuroVol atlases (the latter does not
+  # support `%in%` or linear `[` extraction directly).
+  atlas_vals <- as.vector(x$atlas)
+
   if (!is.null(label)) {
     ret <- lapply(label, function(l) {
       # Find matching labels, filtered by hemisphere if specified
@@ -258,10 +263,10 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
       }
 
       roi_ids <- x$ids[match_idx]
-      rind <- which(x$atlas %in% roi_ids)
+      rind <- which(atlas_vals %in% roi_ids)
       neuroim2::ROIVol(neuroim2::space(x$atlas),
                        coords = neuroim2::index_to_grid(x$atlas, rind),
-                       data=x$atlas[rind])
+                       data = atlas_vals[rind])
     })
 
     names(ret) <- label
@@ -278,10 +283,10 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
     }
 
     ret <- lapply(id, function(i) {
-      rind <- which(x$atlas %in% i)
+      rind <- which(atlas_vals %in% i)
       neuroim2::ROIVol(neuroim2::space(x$atlas),
                        coords = neuroim2::index_to_grid(x$atlas, rind),
-                       data = x$atlas[rind])
+                       data = atlas_vals[rind])
     })
     names(ret) <- id
     ret

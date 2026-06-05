@@ -128,4 +128,7 @@ Collate:
     'subcortical_atlases.R'
     'template_flow.R'
     'transform_registry.R'
+    'visfatlas.R'
+    'visual_atlas.R'
+    'wang_atlas.R'
     'zzz.R'

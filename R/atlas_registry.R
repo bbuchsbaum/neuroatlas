@@ -294,6 +294,33 @@ get_atlas <- function(name, ...) {
     aliases = c("juelich", "julich", "brodmann")
   )
   register_atlas(
+    id = "wang",
+    label = "Wang 2015 probabilistic visual topography (surface)",
+    family = "wang",
+    loader = "get_wang_atlas",
+    default_space = "fsaverage",
+    representation = "surface",
+    aliases = c("wang2015", "wang_visual", "visual_topography", "probatlas")
+  )
+  register_atlas(
+    id = "visfatlas",
+    label = "visfAtlas probabilistic functional visual atlas (volume)",
+    family = "visfatlas",
+    loader = "get_visfatlas",
+    default_space = "MNI152",
+    representation = "volume",
+    aliases = c("rosenke", "visf", "rosenke2021")
+  )
+  register_atlas(
+    id = "visual",
+    label = "Early visual cortex V1-V5 (Julich-derived)",
+    family = "visual",
+    loader = "get_visual_atlas",
+    default_space = "MNI152",
+    representation = "derived",
+    aliases = c("early_visual", "v1v2v3v4", "visual_cortex")
+  )
+  register_atlas(
     id = "olsen_mtl",
     label = "Olsen MTL atlas",
     family = "olsen",
