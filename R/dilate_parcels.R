@@ -8,9 +8,14 @@
 #' @details
 #' The dilation process:
 #' \itemize{
-#'   \item Identifies unassigned voxels within the mask that are adjacent to existing parcels
-#'   \item For each unassigned voxel, finds nearby assigned voxels within the specified radius
-#'   \item Assigns the unassigned voxel to the nearest parcel
+#'   \item Identifies unassigned voxels that lie within the mask
+#'   \item For each unassigned voxel, finds assigned voxels within \code{radius}
+#'     (Euclidean distance, in voxel units)
+#'   \item Assigns the voxel to a parcel by inverse-distance-weighted voting over
+#'     those neighbours (up to \code{maxn} of them)
+#'   \item Leaves a voxel unassigned when no parcel lies within \code{radius},
+#'     so distant in-mask voxels (e.g. cerebellar grey matter for a cortical
+#'     atlas) are not absorbed
 #'   \item Respects mask boundaries to prevent dilation into unwanted regions
 #' }
 #'
@@ -98,8 +103,14 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     mask_idx <- which(as.logical(mask))
     diff_idx <- setdiff(mask_idx, atlas_idx)
 
-    # Early return if there's nothing to dilate
-    if (length(diff_idx) == 0) {
+    # Parcel label for each labeled voxel, aligned with the rows of grid_atlas
+    # below. Indexed as a plain vector to avoid the S4 `[` slice semantics of
+    # NeuroVol (a single index would otherwise return a whole slice).
+    atlas_label_vec <- as.vector(atlas2)[atlas_idx]
+
+    # Early return if there's nothing to dilate, or nothing to dilate *from*
+    # (an atlas with no labeled voxels has no parcels to grow).
+    if (length(diff_idx) == 0 || length(atlas_idx) == 0) {
         return(atlas)
     }
 
@@ -123,43 +134,63 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     # Helper to process a chunk without retaining full neighbor matrices
     process_chunk <- function(start, end) {
         chunk_points <- grid_diff[start:end, , drop = FALSE]
+        n_pts <- nrow(chunk_points)
 
+        # Use a standard k-nearest-neighbour search and apply the radius cutoff
+        # ourselves. Rnanoflann's "radius" search mode does not actually enforce
+        # `radius` when `k` is fixed (it returns the k nearest points regardless
+        # of distance, with unreliable distance values), so the standard search
+        # is the only mode that yields correct Euclidean distances to filter on.
+        k_use <- min(maxn, nrow(grid_atlas))
         chunk_ret <- Rnanoflann::nn(
             data   = grid_atlas,
             points = chunk_points,
-            k      = maxn,
-            search = "radius",
-            radius = search_radius,
+            k      = k_use,
+            search = "standard",
+            square = FALSE,  # return Euclidean (not squared) distances to compare against `radius`
             sorted = TRUE
         )
 
-        valid <- which(chunk_ret$indices[, 1] != 0)
-        if (length(valid) == 0) return(NULL)
+        # Coerce to matrices so single-column (k == 1) results index uniformly.
+        ind <- chunk_ret$indices
+        dst <- chunk_ret$distances
+        if (is.null(dim(ind))) ind <- matrix(ind, ncol = 1)
+        if (is.null(dim(dst))) dst <- matrix(dst, ncol = 1)
 
-        # For each valid row, choose label by inverse-distance voting
-        chosen_labels <- integer(length(valid))
-        lin_indices   <- integer(length(valid))
+        chosen_labels <- integer(n_pts)
+        lin_indices   <- integer(n_pts)
+        keep_n <- 0L
 
-        for (j in seq_along(valid)) {
-            row_idx <- valid[j]
-            neighbors <- chunk_ret$indices[row_idx, ]
-            neighbors <- neighbors[neighbors != 0]
+        for (j in seq_len(n_pts)) {
+            neighbors <- ind[j, ]
+            dists     <- dst[j, ]
 
-            dists <- chunk_ret$distances[row_idx, ]
-            dists <- dists[seq_along(neighbors)]
+            # Keep only real neighbours that fall within `radius` voxel units.
+            # A voxel with no parcel inside the radius is left unassigned.
+            in_rad <- neighbors > 0 & dists <= search_radius
+            if (!any(in_rad)) next
 
-            neighbor_lin_idx <- atlas_idx[neighbors]
-            neighbor_labels  <- atlas2[neighbor_lin_idx]
+            neighbors <- neighbors[in_rad]
+            dists     <- dists[in_rad]
+
+            # `neighbors` are row indices into grid_atlas, i.e. positions in
+            # atlas_idx, so the aligned label vector maps them directly.
+            neighbor_labels <- atlas_label_vec[neighbors]
 
             weights <- 1 / (dists + .Machine$double.eps)
             label_votes <- tapply(weights, neighbor_labels, sum)
-            chosen_labels[j] <- as.numeric(names(which.max(label_votes)))
+            lbl <- as.numeric(names(which.max(label_votes)))
 
-            g2 <- grid_diff[start + row_idx - 1, , drop = FALSE]
-            lin_indices[j] <- (g2[,3] - 1) * dims[1] * dims[2] + (g2[,2] - 1) * dims[1] + g2[,1]
+            g2 <- grid_diff[start + j - 1, , drop = FALSE]
+            keep_n <- keep_n + 1L
+            chosen_labels[keep_n] <- lbl
+            lin_indices[keep_n]   <- (g2[, 3] - 1) * dims[1] * dims[2] +
+                                     (g2[, 2] - 1) * dims[1] + g2[, 1]
         }
 
-        list(idx = lin_indices, lbl = chosen_labels)
+        if (keep_n == 0L) return(NULL)
+        list(idx = lin_indices[seq_len(keep_n)],
+             lbl = chosen_labels[seq_len(keep_n)])
     }
 
     if (n_diff > chunk_size) {

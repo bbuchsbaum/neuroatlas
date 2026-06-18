@@ -1,5 +1,16 @@
 # neuroatlas 0.1.0.9000
 
+* `dilate_atlas()` now genuinely honours its `radius` argument. The
+  previous implementation passed a fixed `k` to `Rnanoflann::nn(search =
+  "radius")`, which returns the `k` nearest neighbours regardless of
+  distance, so `radius` had no effect and dilation filled the entire
+  mask (absorbing, for a cortical atlas, distant cerebellar and deep
+  subcortical grey matter). Dilation now uses a standard k-NN search
+  with an explicit Euclidean radius cutoff: in-mask voxels with no
+  parcel within `radius` voxels are left unassigned. This is a
+  behaviour change --- callers that relied on the old whole-mask fill
+  will now get radius-limited results. See the new "Dilating an Atlas to
+  Cover Grey Matter" vignette.
 * Added `get_harvard_oxford_atlas()` and registry entries for
   Harvard-Oxford cortical, subcortical, and combined structural
   parcellations. The default source is TemplateFlow, with threshold and
