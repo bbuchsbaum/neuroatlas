@@ -268,9 +268,21 @@ automatically:
 
 Both return standard volume `atlas` objects. To put them on an anatomical
 background, resample onto an MNI `T1w` template and overlay with
-`neuroim2::plot_overlay()` — the same recipe as the Wang maps above, but with
-a dataset that downloads automatically, so the figure below is fully
-reproducible:
+`neuroim2::plot_overlay()` — the same recipe as the Wang maps above.
+
+The Julich-derived early visual atlas can also be rendered directly with the
+atlas `plot()` method:
+
+```{r visual-atlas-code, eval = FALSE}
+visual <- get_visual_atlas()       # Julich-Brain visual subset, relabelled V1-V5
+plot(visual, nslices = 8, title = "Julich-derived V1-V5 visual atlas")
+```
+
+```{r visual-atlas-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the Julich-Brain visual subset relabelled as V1 through V5, shown as discrete volume atlas regions in MNI space."}
+knitr::include_graphics("figures/visual-atlas-mni.png")
+```
+
+For the larger functional `visfAtlas`, here is the MNI anatomical overlay:
 
 ```{r visf-code, eval = FALSE}
 bg   <- get_template("MNI152NLin2009cAsym", suffix = "T1w", resolution = "2")
@@ -296,9 +308,28 @@ For a quick look without an anatomical backdrop, the volume `atlas` objects
 also work with the package's own `plot()` (montage or orthogonal view with
 automatic discrete ROI colours):
 
-```{r visf-plot, eval = FALSE}
-plot(get_visfatlas(), view = "ortho")   # three orthogonal planes
-plot(get_visfatlas(), nslices = 8)      # axial montage
+```{r visfatlas-ortho-code, eval = FALSE}
+visf <- get_visfatlas()
+
+# Fix the crosshair at the centre of the labelled voxels so all three planes
+# pass through visual cortex.
+plot(visf, view = "ortho", coord = c(91, 54, 74), unit = "index")
+```
+
+```{r visfatlas-ortho-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Three orthogonal planes through the visfAtlas labels in MNI index space, showing axial, coronal, and sagittal views with discrete ROI colours."}
+knitr::include_graphics("figures/visfatlas-ortho.png")
+```
+
+```{r visfatlas-montage-code, eval = FALSE}
+plot(
+  get_visfatlas(),
+  nslices = 8,
+  title = "visfAtlas axial montage"
+)
+```
+
+```{r visfatlas-montage-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the visfAtlas labels rendered directly with plot.atlas and discrete ROI colours."}
+knitr::include_graphics("figures/visfatlas-montage.png")
 ```
 
 ## Choosing the right plotting entry point
