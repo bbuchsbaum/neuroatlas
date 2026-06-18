@@ -422,6 +422,27 @@ test_that("plot_brain composes a bottom colorbar when requested", {
   expect_s3_class(patchwork::patchworkGrob(p), "gtable")
 })
 
+test_that("plot_brain suppresses the built-in fill guide for static maps", {
+  skip_on_cran()
+
+  atl <- tryCatch({
+    schaefer_surf(100, 7)
+  }, error = function(e) {
+    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+  })
+
+  p <- plot_brain(
+    atl,
+    vals = rnorm(length(atl$ids)),
+    views = "lateral",
+    interactive = FALSE,
+    colorbar = FALSE
+  )
+
+  fill_scale <- p$scales$get_scales("fill")
+  expect_equal(fill_scale$guide, "none")
+})
+
 test_that(".repair_legacy_surface_geometry rebuilds bundled legacy fsaverage", {
   skip_if_not_installed("neurosurf")
   e <- new.env()

@@ -15,6 +15,8 @@
   method = "rule_hcl",
   colors = NULL,
   nslices = 12L,
+  legend = FALSE,
+  legend_max = 30L,
   ...
 )
 
@@ -48,6 +50,17 @@ One of \code{"rule_hcl"} (default), \code{"network_harmony"},
 colours keyed by region ID.}
 
 \item{nslices}{Number of slices for montage view (default 12).}
+
+\item{legend}{Logical. If \code{TRUE}, draw a region colour legend
+(label -> colour) below the \code{"montage"} view. Default \code{FALSE}. A
+legend is only useful for small atlases, so it is suppressed (with a
+warning) when the atlas has more than \code{legend_max} regions; it is also
+omitted for \code{view = "ortho"} (each plane shows a different subset of
+regions). Labels occurring in both hemispheres are disambiguated with
+\code{(L)}/\code{(R)}.}
+
+\item{legend_max}{Integer. Maximum number of regions for which a legend is
+drawn when \code{legend = TRUE}. Default \code{30}.}
 
 \item{...}{Additional arguments passed to \code{neuroim2::plot_montage()} or
 \code{neuroim2::plot_ortho()}.}

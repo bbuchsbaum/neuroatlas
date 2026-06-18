@@ -2403,7 +2403,8 @@ plot_brain <- function(surfatlas,
     p <- p + ggplot2::scale_fill_identity()
   } else {
     p <- p + scico::scale_fill_scico(
-      palette = palette, limits = lim, oob = scales::squish, na.value = bg
+      palette = palette, limits = lim, oob = scales::squish, na.value = bg,
+      guide = if (interactive) ggplot2::waiver() else "none"
     )
   }
 
@@ -2696,6 +2697,16 @@ plot_brain <- function(surfatlas,
     ggplot2::theme_void() +
     ggplot2::theme(
       plot.background = ggplot2::element_rect(fill = bg, colour = NA),
+      panel.spacing.x = if (identical(style, "ggseg_like")) {
+        ggplot2::unit(2, "lines")
+      } else {
+        ggplot2::unit(0.5, "lines")
+      },
+      panel.spacing.y = if (identical(style, "ggseg_like")) {
+        ggplot2::unit(0.6, "lines")
+      } else {
+        ggplot2::unit(0.5, "lines")
+      },
       strip.text = ggplot2::element_text(size = 11, face = "bold",
                                          margin = ggplot2::margin(t = 2, b = 6))
     ) +
@@ -2800,16 +2811,9 @@ plot_brain <- function(surfatlas,
     ggplot2::theme_void() +
     ggplot2::theme(
       legend.position = position,
-      plot.background = ggplot2::element_rect(fill = NA, colour = NA)
+      plot.background = ggplot2::element_rect(fill = bg, colour = NA),
+      panel.background = ggplot2::element_rect(fill = bg, colour = NA),
+      legend.background = ggplot2::element_rect(fill = bg, colour = NA)
     )
-  cowplot_extract <- function(pl) {
-    gt <- ggplot2::ggplotGrob(pl)
-    guide_idx <- grep("guide", gt$layout$name)
-    if (length(guide_idx) == 0) return(pl)
-    guide_grob <- gt$grobs[[guide_idx[1]]]
-    ggplot2::ggplot() + ggplot2::theme_void() +
-      ggplot2::theme(plot.background = ggplot2::element_rect(fill = NA, colour = NA)) +
-      ggplot2::annotation_custom(guide_grob)
-  }
-  cowplot_extract(p)
+  p
 }

@@ -161,6 +161,47 @@ test_that("plot.atlas respects nslices", {
   expect_true(inherits(p, "ggplot"))
 })
 
+test_that("plot.atlas draws a legend for small atlases", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  atlas <- make_toy_atlas()  # 3 regions
+
+  p <- plot(atlas, nslices = 2, legend = TRUE)
+  expect_true(inherits(p, "ggplot"))
+  # The fill scale legend is on (not "none").
+  fill_scale <- p$scales$get_scales("fill")
+  expect_false(identical(fill_scale$guide, "none"))
+})
+
+test_that("plot.atlas legend is capped by legend_max with a warning", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  atlas <- make_toy_atlas()  # 3 regions
+
+  expect_warning(
+    p <- plot(atlas, nslices = 2, legend = TRUE, legend_max = 2),
+    "Not drawing a legend"
+  )
+  expect_true(inherits(p, "ggplot"))
+  expect_identical(p$scales$get_scales("fill")$guide, "none")
+})
+
+test_that("plot.atlas legend is omitted (with a message) for ortho", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  atlas <- make_toy_atlas()
+  expect_message(
+    plot(atlas, view = "ortho", legend = TRUE),
+    "only drawn for"
+  )
+})
+
+test_that("plot.atlas validates the legend argument", {
+  atlas <- make_toy_atlas()
+  expect_error(plot(atlas, legend = "yes"), "'legend' must be TRUE or FALSE")
+  expect_error(plot(atlas, legend = NA), "'legend' must be TRUE or FALSE")
+})
+
 test_that("plot.atlas accepts custom colors tibble", {
   atlas <- make_toy_atlas()
   cols <- atlas_roi_colors(atlas)
