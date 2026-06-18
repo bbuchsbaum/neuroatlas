@@ -55,6 +55,9 @@ plot_brain(
   caption = NULL,
   panel_labels = NULL,
   outline = FALSE,
+  background = FALSE,
+  background_color = "grey80",
+  depth_cull = TRUE,
   bg = "white",
   ...
 )
@@ -241,6 +244,22 @@ that takes the default panel name and returns a new label.}
 
 \item{outline}{Logical. If \code{TRUE}, draw every triangle edge (mesh
 wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}
+
+\item{background}{Logical. If \code{TRUE}, draw the full cortical surface
+beneath the parcellation, so sparse atlases (e.g. the Wang visual areas,
+which label only part of cortex) are shown in anatomical context rather
+than floating on the page. The backdrop is given sulcal/gyral depth via
+normal-based shading (controlled by \code{shading_strength}/
+\code{shading_gamma}), so it reads as a folded surface rather than a flat
+silhouette. Default: \code{FALSE}.}
+
+\item{background_color}{Fill colour for the cortex backdrop when
+\code{background = TRUE}. Default: \code{"grey80"}.}
+
+\item{depth_cull}{Logical. If \code{TRUE} (default), remove faces hidden
+behind nearer cortical surface faces in each projected view. This makes
+static medial/lateral panels read as opaque cortex instead of showing
+far-side folds through the mesh.}
 
 \item{bg}{Character: background colour for the plot. Default: \code{"white"}.}
 

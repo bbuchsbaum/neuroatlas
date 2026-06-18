@@ -19,12 +19,17 @@
 #'
 #' Surface geometry is obtained from TemplateFlow via
 #' \code{\link{get_surface_template}}, so a working TemplateFlow setup is
-#' required (mirroring \code{\link{glasser_surf}}). The full per-area
-#' probability maps are also available from the original Princeton
-#' distribution and may be added in a future release.
+#' required (mirroring \code{\link{glasser_surf}}). The volumetric counterparts
+#' (maximum-probability and per-area probability maps in MNI space) are served
+#' by \code{\link{get_wang_prob_atlas}}.
 #'
-#' @param surf Surface type. One of \code{"inflated"} (default),
-#'   \code{"pial"}, \code{"white"}, or \code{"midthickness"}.
+#' TemplateFlow does not currently distribute an \emph{inflated} \code{fsaverage}
+#' mesh, so the available surfaces are \code{"midthickness"} (default),
+#' \code{"pial"}, and \code{"white"}.
+#'
+#' @param surf Surface type. One of \code{"midthickness"} (default),
+#'   \code{"pial"}, or \code{"white"}. (TemplateFlow does not provide an
+#'   inflated fsaverage surface.)
 #' @param space Surface space / mesh template. Only \code{"fsaverage"}
 #'   (164k vertices) is supported, matching the native atlas resolution.
 #' @param use_cache Logical. Whether to use cached downloads. Default
@@ -50,16 +55,18 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Wang 2015 visual topography atlas on the fsaverage inflated surface
-#' wang <- get_wang_atlas(surf = "inflated")
+#' # Wang 2015 visual topography atlas on the fsaverage midthickness surface
+#' wang <- get_wang_atlas(surf = "midthickness")
 #' wang$labels
+#' # Extract an area as ROISurface objects (one per hemisphere)
 #' get_roi(wang, label = "hV4")
+#' get_roi(wang, label = "V1v", hemi = "left")
 #' }
 #'
 #' @importFrom methods new
 #' @importFrom grDevices rainbow col2rgb
 #' @export
-get_wang_atlas <- function(surf = c("inflated", "pial", "white", "midthickness"),
+get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
                            space = "fsaverage",
                            use_cache = TRUE) {
   surf <- match.arg(surf)
@@ -249,7 +256,7 @@ get_wang_atlas <- function(surf = c("inflated", "pial", "white", "midthickness")
 #' @keywords internal
 #' @noRd
 .wang_surface_hemi <- function(hemi,
-                               surf = c("inflated", "pial", "white", "midthickness"),
+                               surf = c("midthickness", "pial", "white"),
                                use_cache = TRUE) {
   hemi <- match.arg(hemi, c("lh", "rh"))
   surf <- match.arg(surf)
@@ -310,17 +317,22 @@ get_wang_atlas <- function(surf = c("inflated", "pial", "white", "midthickness")
     )
   }
 
-  # Surface colour table: index 1 is the unlabeled background ("???"),
-  # indices 2..26 are the 25 topographic areas. Per-vertex codes are the
-  # overlay value + 1 so that overlay value 0 maps to background.
-  labs <- c("???", .wang_visual_labels()$label)
-  cols <- c("#7F7F7F", grDevices::rainbow(25))
+  # Encode per-vertex codes to match the package surfatlas convention shared by
+  # plot_brain() and the other surface atlases (see schaefer_surf): 0 is the
+  # unlabeled background and area codes equal the global atlas ids -- 1..25 for
+  # the left hemisphere and 26..50 for the right. The raw overlay uses 0 for
+  # background and 1..25 for the areas within each hemisphere.
+  id_offset <- if (hemi == "rh") 25L else 0L
+  codes <- ifelse(vertex_labels == 0L, 0L, vertex_labels + id_offset)
+
+  labs <- .wang_visual_labels()$label
+  cols <- grDevices::rainbow(25)
 
   methods::new(
     "LabeledNeuroSurface",
     geometry = geom,
     indices = as.integer(seq_len(n_vertices)),
-    data = as.numeric(vertex_labels + 1L),
+    data = as.numeric(codes),
     labels = as.character(labs),
     cols = as.character(cols)
   )
@@ -386,39 +398,57 @@ get_wang_atlas <- function(surf = c("inflated", "pial", "white", "midthickness")
 #' (\code{maxprob_vol_<hemi>.nii.gz}).
 #'
 #' @details
-#' The Princeton server (\code{scholar.princeton.edu} / \code{napl}) blocks
-#' automated downloads of the binary archive (it returns HTTP 403 to scripted
-#' requests), so this function does \strong{not} download the data. Instead it
-#' defaults to \code{path_only = TRUE} and returns a manifest describing the
-#' expected files, the manual download URL, and the canonical ROI labels.
+#' On first load the volumes (~0.7 MB) are downloaded from the neuroatlas
+#' GitHub release and cached under the neuroatlas Wang cache directory, after
+#' which they resolve offline. They originate from the Princeton ProbAtlas_v4
+#' distribution (Wang et al. 2015), whose original host
+#' (\code{napl.scholar.princeton.edu}) blocks scripted downloads and is no
+#' longer reliably available; the archive carried no licence and the maps are
+#' widely redistributed as an open-science resource, so they are re-hosted on
+#' the package's own release for programmatic access.
 #'
-#' To work with the actual volumes, download \code{ProbAtlas_v4.zip} once in a
-#' browser from the Princeton resources page, unzip it, and pass the resulting
-#' directory (or its \code{subj_vol_all} subfolder) via \code{prob_dir}. With a
-#' valid \code{prob_dir} you can set \code{path_only = FALSE} to read the
-#' requested volumes as \code{NeuroVol} objects.
+#' To use a local copy instead (e.g. an updated release), download/unzip
+#' \code{ProbAtlas_v4} and pass the resulting directory (or its
+#' \code{subj_vol_all} subfolder) via \code{prob_dir}; it takes precedence and
+#' is never mixed with the cache or download. Set \code{path_only = FALSE} to
+#' read the requested volumes as \code{NeuroVol} objects.
+#'
+#' The resolution order on a load is \code{prob_dir} -> cache -> download. A
+#' read-only manifest (\code{path_only = TRUE}) resolves from
+#' \code{prob_dir}/cache only and never downloads or writes to the cache.
+#' When \code{path_only = FALSE} and \code{use_cache = TRUE}, volumes read from
+#' a user-supplied \code{prob_dir} are also copied (best-effort, atomically)
+#' into the cache.
+#'
+#' Note on naming: the volume coding (\code{ROIfiles_Labeling.txt}) labels areas
+#' 12/13 as \code{MST}/\code{hMT}, which correspond to \code{TO2}/\code{TO1} in
+#' the surface (\pkg{neuropythy}) naming used by \code{\link{get_wang_atlas}()};
+#' the numeric ids are identical.
 #'
 #' @param prob_dir Optional path to a locally-extracted ProbAtlas_v4 directory
-#'   (the folder containing \code{subj_vol_all}, or that subfolder itself).
-#'   When supplied, file paths are resolved and existence-checked.
+#'   (the folder containing \code{subj_vol_all}, or that subfolder itself). When
+#'   supplied it is used exclusively; otherwise the cached/downloaded data is
+#'   used.
 #' @param image One of \code{"probability"} (per-area \code{perc_VTPM} maps,
 #'   the default) or \code{"maxprob"} (the maximum-probability summary volume).
 #' @param hemi One of \code{"both"} (default), \code{"lh"}, or \code{"rh"}.
 #' @param rois Optional subset of areas, given as labels (e.g.
 #'   \code{c("V1v", "hV4")}) or integer ids (1-25). \code{NULL} selects all 25.
 #' @param path_only Logical. When \code{TRUE} (default), return a manifest of
-#'   paths/metadata without reading image data. When \code{FALSE}, read the
-#'   resolved volumes (requires a valid \code{prob_dir}).
-#' @param use_cache Logical. Also look for files under the neuroatlas Wang cache
-#'   directory when \code{prob_dir} is not supplied.
+#'   paths/metadata without downloading or reading image data. When
+#'   \code{FALSE}, read the resolved volumes as \code{NeuroVol} objects,
+#'   downloading them to the cache on first use if needed.
+#' @param use_cache Logical. Look for (and download into) the neuroatlas Wang
+#'   cache directory when \code{prob_dir} is not supplied. \code{FALSE} forces a
+#'   fresh download on load.
 #'
 #' @return
 #' When \code{path_only = TRUE}, an object of class \code{wang_prob_paths}: a
-#' list with the requested \code{image}/\code{hemi}, the manual download
-#' \code{zip_url}, a \code{files} tibble (\code{id}, \code{label}, \code{hemi},
-#' \code{member}, \code{path}, \code{exists}), and the canonical \code{labels}.
-#' When \code{path_only = FALSE}, a \code{wang_prob_volumes} list whose
-#' \code{volumes} element holds the loaded \code{NeuroVol} objects.
+#' list with the requested \code{image}/\code{hemi}, the \code{resources_url}
+#' and \code{download_url}, a \code{files} tibble (\code{id}, \code{label},
+#' \code{hemi}, \code{member}, \code{path}, \code{exists}), and the canonical
+#' \code{labels}. When \code{path_only = FALSE}, a \code{wang_prob_volumes} list
+#' whose \code{volumes} element holds the loaded \code{NeuroVol} objects.
 #'
 #' @references
 #' Wang, L., Mruczek, R. E. B., Arcaro, M. J., & Kastner, S. (2015).
@@ -431,15 +461,16 @@ get_wang_atlas <- function(surf = c("inflated", "pial", "white", "midthickness")
 #'
 #' @examples
 #' \dontrun{
-#' # Manifest only (no download): see which files are needed and where to get them
+#' # Manifest only (no download): what is available and where it comes from
 #' manifest <- get_wang_prob_atlas()
 #' manifest
 #' head(manifest$files)
 #'
-#' # After manually downloading + unzipping ProbAtlas_v4.zip:
-#' paths <- get_wang_prob_atlas(prob_dir = "~/atlases/ProbAtlas_v4")
-#' v1v_lh <- get_wang_prob_atlas(prob_dir = "~/atlases/ProbAtlas_v4",
-#'                               rois = "V1v", hemi = "lh", path_only = FALSE)
+#' # Load the maximum-probability volumes (downloaded + cached on first use)
+#' wp <- get_wang_prob_atlas(image = "maxprob", path_only = FALSE)
+#'
+#' # Load a single area's probability map
+#' v1v_lh <- get_wang_prob_atlas(rois = "V1v", hemi = "lh", path_only = FALSE)
 #' }
 #'
 #' @importFrom neuroim2 read_vol
@@ -455,39 +486,86 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
 
   files <- .wang_prob_files(image, hemi, rois)
 
-  subj_vol_all <- NULL
+  user_subj_vol_all <- NULL
   if (!is.null(prob_dir)) {
-    subj_vol_all <- .wang_prob_resolve_subjvol(prob_dir)
-  }
-  if (is.null(subj_vol_all) && isTRUE(use_cache)) {
-    subj_vol_all <- .wang_prob_resolve_subjvol(.neuroatlas_cache_dir("wang"))
+    user_subj_vol_all <- .wang_prob_resolve_subjvol(prob_dir)
+    if (is.null(user_subj_vol_all)) {
+      # An explicit prob_dir must resolve; never silently fall back to the
+      # cache or bundled data when the user pointed somewhere specific.
+      cli::cli_abort(
+        c(
+          "No {.path subj_vol_all} directory found under the supplied {.arg prob_dir}.",
+          "x" = "{.path {prob_dir}}",
+          "i" = paste(
+            "Point {.arg prob_dir} at an extracted ProbAtlas_v4 folder (or its",
+            "{.path subj_vol_all} subfolder), or omit it to download/cache it."
+          )
+        ),
+        class = c("neuroatlas_error_wang_prob", "neuroatlas_error")
+      )
+    }
   }
 
-  files$path <- vapply(files$member, function(m) {
-    .wang_prob_resolve_file(subj_vol_all, m)
-  }, character(1))
+  # Build the directory search order. An explicit prob_dir is authoritative
+  # (used alone). Otherwise read from the cache; on an actual load, download
+  # the volumes into the cache when they are not already present.
+  resolve_paths <- function(dirs) {
+    vapply(files$member, function(m) {
+      for (d in dirs) {
+        p <- .wang_prob_resolve_file(d, m)
+        if (!is.na(p)) return(p)
+      }
+      NA_character_
+    }, character(1))
+  }
+
+  if (!is.null(user_subj_vol_all)) {
+    cand_dirs <- user_subj_vol_all
+  } else {
+    cand_dirs <- character(0)
+    if (isTRUE(use_cache)) {
+      # Read-only lookup: never create the cache dir merely to inspect it, so a
+      # manifest (path_only = TRUE) call stays free of home-directory writes.
+      cd <- .wang_prob_resolve_subjvol(
+        .neuroatlas_cache_dir("wang", create = FALSE)
+      )
+      if (!is.null(cd)) cand_dirs <- c(cand_dirs, cd)
+    }
+  }
+
+  files$path <- resolve_paths(cand_dirs)
+
+  # On a load (not a manifest) without an explicit prob_dir, fetch the volumes
+  # from the neuroatlas GitHub release into the cache if any are missing.
+  if (!isTRUE(path_only) && is.null(user_subj_vol_all) && any(is.na(files$path))) {
+    dl <- .wang_prob_download(use_cache = use_cache)
+    if (!is.null(dl)) {
+      cand_dirs <- unique(c(cand_dirs, dl))
+      files$path <- resolve_paths(cand_dirs)
+    }
+  }
   files$exists <- !is.na(files$path)
+  subj_vol_all <- if (length(cand_dirs) >= 1L) cand_dirs[[1]] else NULL
 
-  zip_url <- paste0(
-    "https://napl.scholar.princeton.edu/sites/g/files/toruqf3751/files/",
-    "napl/files/ProbAtlas_v4.zip"
-  )
+  resources_url <- "https://napl.scholar.princeton.edu/resources"
 
   if (isTRUE(path_only)) {
     ret <- list(
       dataset = "Wang2015 ProbAtlas_v4 (probability volumes)",
       image = image,
       hemi = hemi,
-      zip_url = zip_url,
-      resources_url = "https://napl.scholar.princeton.edu/resources",
+      resources_url = resources_url,
+      download_url = .wang_prob_release_url(),
       prob_dir = prob_dir %||% NA_character_,
       subj_vol_all = subj_vol_all %||% NA_character_,
       labels = .wang_visual_labels(),
       files = tibble::as_tibble(files),
       note = paste(
-        "Princeton blocks automated downloads (HTTP 403).",
-        "Download ProbAtlas_v4.zip in a browser, unzip it, and pass the",
-        "folder via 'prob_dir' to resolve/load these volumes."
+        "Volumes are downloaded on first load from the neuroatlas GitHub",
+        "release and cached; pass path_only = FALSE to fetch them, or supply",
+        "'prob_dir' to use a local copy.",
+        "Original source: Wang et al. (2015) ProbAtlas_v4,",
+        resources_url
       )
     )
     class(ret) <- c("wang_prob_paths", "list")
@@ -496,10 +574,12 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
 
   if (is.null(subj_vol_all) || any(!files$exists)) {
     missing_members <- files$member[!files$exists]
+    rel_url <- .wang_prob_release_url()
     cli::cli_abort(
       c(
         "Could not resolve Wang probability volumes for {.code path_only = FALSE}.",
-        "i" = "Download {.url {zip_url}} in a browser, unzip it, and pass {.arg prob_dir}.",
+        "i" = "They are fetched from {.url {rel_url}} on first load; check your network connection.",
+        "i" = "Alternatively pass {.arg prob_dir} pointing at a local ProbAtlas_v4 directory.",
         "x" = if (is.null(subj_vol_all)) {
           "No {.path subj_vol_all} directory was found."
         } else {
@@ -510,11 +590,33 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
     )
   }
 
-  vols <- lapply(files$path, neuroim2::read_vol)
+  vols <- tryCatch(
+    lapply(files$path, neuroim2::read_vol),
+    error = function(e) {
+      cli::cli_abort(
+        c(
+          "Failed to read a Wang volume file.",
+          "x" = conditionMessage(e),
+          "i" = "A cached file may be corrupt; re-run with {.code use_cache = FALSE} to refetch it."
+        ),
+        class = c("neuroatlas_error_wang_prob", "neuroatlas_error"),
+        parent = e
+      )
+    }
+  )
   names(vols) <- if (identical(image, "maxprob")) {
     files$hemi
   } else {
     paste0(files$label, "_", files$hemi)
+  }
+
+  # Persist the successfully-read volumes into the neuroatlas cache so later
+  # calls resolve offline without `prob_dir`, mirroring the other downloadable
+  # volume atlases (e.g. visfAtlas). Seeding runs only after a successful read
+  # from a user-supplied directory, copies atomically, and is best-effort: a
+  # failed copy never disrupts the current load.
+  if (isTRUE(use_cache) && !is.null(user_subj_vol_all)) {
+    try(.wang_prob_cache_seed(files$path), silent = TRUE)
   }
 
   ret <- list(
@@ -623,6 +725,123 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
 }
 
 
+#' Stable download URL for the bundled-and-rehosted Wang volume archive.
+#' @keywords internal
+#' @noRd
+.wang_prob_release_url <- function() {
+  paste0(
+    "https://github.com/bbuchsbaum/neuroatlas/releases/download/",
+    "wang-probatlas-v4/wang_probatlas_v4_volumes.tar.gz"
+  )
+}
+
+#' Download + extract the Wang ProbAtlas_v4 volumes into the neuroatlas cache.
+#'
+#' Fetches the (~0.7 MB) volume archive from the neuroatlas GitHub release and
+#' unpacks \code{subj_vol_all} into \code{<cache>/wang/subj_vol_all/}. The
+#' original Princeton host blocks scripted downloads, so the volumes are
+#' re-hosted on the package's own release for programmatic access.
+#'
+#' @param use_cache Logical. When \code{TRUE}, reuse cached files if already
+#'   complete (the caller checks this); the download always targets the cache.
+#' @return The cache \code{subj_vol_all} path, or \code{NULL}.
+#' @keywords internal
+#' @noRd
+.wang_prob_download <- function(use_cache = TRUE) {
+  cache_dir <- .neuroatlas_cache_dir("wang")
+  cache_subj <- file.path(cache_dir, "subj_vol_all")
+  tar_path <- file.path(cache_dir, "wang_probatlas_v4_volumes.tar.gz")
+
+  .neuroatlas_download(
+    url = .wang_prob_release_url(),
+    dest = tar_path,
+    min_size = 100000L,
+    description = "Wang ProbAtlas_v4 volumes"
+  )
+  on.exit(unlink(tar_path), add = TRUE)
+
+  exdir <- tempfile("wang-extract-")
+  dir.create(exdir)
+  on.exit(unlink(exdir, recursive = TRUE), add = TRUE)
+  if (!identical(utils::untar(tar_path, exdir = exdir), 0L)) {
+    cli::cli_abort(
+      "Failed to unpack the downloaded Wang volume archive.",
+      class = c("neuroatlas_error_wang_prob", "neuroatlas_error")
+    )
+  }
+
+  src_subj <- .wang_prob_resolve_subjvol(exdir)
+  if (is.null(src_subj)) {
+    cli::cli_abort(
+      "Downloaded Wang archive did not contain a {.path subj_vol_all} directory.",
+      class = c("neuroatlas_error_wang_prob", "neuroatlas_error")
+    )
+  }
+
+  dir.create(cache_subj, recursive = TRUE, showWarnings = FALSE)
+  src_files <- list.files(src_subj, full.names = TRUE)
+  copied <- file.copy(src_files, cache_subj, overwrite = TRUE)
+  if (!all(copied)) {
+    cli::cli_abort(
+      "Failed to populate the Wang cache from the downloaded archive.",
+      class = c("neuroatlas_error_wang_prob", "neuroatlas_error")
+    )
+  }
+  normalizePath(cache_subj)
+}
+
+#' Persist successfully-read ProbAtlas volume files into the Wang cache.
+#'
+#' Copies the given (already-resolved, already-read) volume files into
+#' \code{<cache>/wang/subj_vol_all/} so subsequent calls resolve offline
+#' without \code{prob_dir}. Copies are atomic (temp file then
+#' \code{file.rename()}) to avoid leaving truncated NIfTIs behind, and a
+#' cached file whose size disagrees with the source is replaced so a poisoned
+#' cache entry can be repaired. Files already living in the cache are skipped
+#' (no self-copy). Best-effort: individual copy failures are ignored.
+#'
+#' @param file_paths Character vector of resolved source file paths.
+#' @return The cache \code{subj_vol_all} path (invisibly), or \code{NULL}.
+#' @keywords internal
+#' @noRd
+.wang_prob_cache_seed <- function(file_paths) {
+  file_paths <- file_paths[!is.na(file_paths) & file.exists(file_paths)]
+  if (length(file_paths) == 0L) {
+    return(invisible(NULL))
+  }
+  cache_subj <- file.path(.neuroatlas_cache_dir("wang"), "subj_vol_all")
+  dir.create(cache_subj, showWarnings = FALSE, recursive = TRUE)
+  cache_norm <- normalizePath(cache_subj, mustWork = FALSE)
+
+  for (src in file_paths) {
+    # Skip files that already live in the cache (no self-copy).
+    if (identical(normalizePath(dirname(src), mustWork = FALSE), cache_norm)) {
+      next
+    }
+    dest <- file.path(cache_subj, basename(src))
+    src_size <- file.size(src)
+    # A good copy already exists -> nothing to do; otherwise (re)write it.
+    if (file.exists(dest) && isTRUE(file.size(dest) == src_size)) {
+      next
+    }
+    tmp <- tempfile(tmpdir = cache_subj, fileext = ".part")
+    ok <- file.copy(src, tmp, overwrite = TRUE)
+    if (isTRUE(ok) && isTRUE(file.size(tmp) == src_size)) {
+      # Publish atomically. Remove any (corrupt) existing file first so the
+      # rename succeeds cross-platform; fall back to copy across devices.
+      if (file.exists(dest)) unlink(dest)
+      if (!isTRUE(file.rename(tmp, dest))) {
+        file.copy(tmp, dest, overwrite = TRUE)
+        unlink(tmp)
+      }
+    } else {
+      unlink(tmp)
+    }
+  }
+  invisible(cache_subj)
+}
+
+
 #' @rdname get_wang_prob_atlas
 #' @param x A \code{wang_prob_paths} object.
 #' @param ... Unused.
@@ -635,8 +854,8 @@ print.wang_prob_paths <- function(x, ...) {
   cat("  files:    ", nrow(x$files), " (", n_present, " present locally)\n",
       sep = "")
   if (is.na(x$subj_vol_all)) {
-    cat("  prob_dir: <not set> -- download manually:\n")
-    cat("            ", x$zip_url, "\n", sep = "")
+    cat("  subj_vol_all: <not cached> -- downloaded on load from:\n")
+    cat("            ", x$download_url %||% x$resources_url %||% "", "\n", sep = "")
   } else {
     cat("  subj_vol_all: ", x$subj_vol_all, "\n", sep = "")
   }

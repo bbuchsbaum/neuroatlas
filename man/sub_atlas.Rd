@@ -2,10 +2,13 @@
 % Please edit documentation in R/all_generic.R, R/atlas.R
 \name{sub_atlas}
 \alias{sub_atlas}
+\alias{sub_atlas.surfatlas}
 \alias{sub_atlas.atlas}
 \title{Select a Subset of Atlas Regions}
 \usage{
 sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, ...)
+
+\method{sub_atlas}{surfatlas}(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...)
 
 \method{sub_atlas}{atlas}(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...)
 }

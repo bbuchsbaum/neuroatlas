@@ -425,6 +425,21 @@ glasser_surf <- function(space = "fsaverage",
   lh <- .glasser_fsaverage_surface_hemi("lh", surf, use_cache = use_cache)
   rh <- .glasser_fsaverage_surface_hemi("rh", surf, use_cache = use_cache)
 
+  # read_freesurfer_annot() returns the unlabeled medial wall as the first
+  # label ("???", per-vertex code 1) with the 180 areas coded 2..181. Re-encode
+  # to the package surfatlas convention shared by plot_brain()/get_roi() (and
+  # used by schaefer_surf): 0 = background, left ids 1..n, right ids n+1..2n.
+  # Otherwise "???" is treated as a region (giving 362 ids) and the medial wall
+  # renders/extracts as a parcel.
+  n_lh <- length(lh@labels) - 1L
+  lh@data <- pmax(0L, as.integer(lh@data) - 1L)
+  if (length(lh@cols) == length(lh@labels)) lh@cols <- lh@cols[-1]
+  lh@labels <- lh@labels[-1]
+  rh@data <- pmax(0L, as.integer(rh@data) - 1L)
+  rh@data[rh@data > 0] <- rh@data[rh@data > 0] + n_lh
+  if (length(rh@cols) == length(rh@labels)) rh@cols <- rh@cols[-1]
+  rh@labels <- rh@labels[-1]
+
   # Extract label information from hemispheres
   lh_labels <- lh@labels
   rh_labels <- rh@labels

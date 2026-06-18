@@ -9,14 +9,15 @@ original distribution at \url{https://scholar.princeton.edu/napl/resources}.
 }
 \usage{
 get_wang_atlas(
-  surf = c("inflated", "pial", "white", "midthickness"),
+  surf = c("midthickness", "pial", "white"),
   space = "fsaverage",
   use_cache = TRUE
 )
 }
 \arguments{
-\item{surf}{Surface type. One of \code{"inflated"} (default),
-\code{"pial"}, \code{"white"}, or \code{"midthickness"}.}
+\item{surf}{Surface type. One of \code{"midthickness"} (default),
+\code{"pial"}, or \code{"white"}. (TemplateFlow does not provide an
+inflated fsaverage surface.)}
 
 \item{space}{Surface space / mesh template. Only \code{"fsaverage"}
 (164k vertices) is supported, matching the native atlas resolution.}
@@ -49,16 +50,22 @@ repository and cached under the neuroatlas user cache directory.
 
 Surface geometry is obtained from TemplateFlow via
 \code{\link{get_surface_template}}, so a working TemplateFlow setup is
-required (mirroring \code{\link{glasser_surf}}). The full per-area
-probability maps are also available from the original Princeton
-distribution and may be added in a future release.
+required (mirroring \code{\link{glasser_surf}}). The volumetric counterparts
+(maximum-probability and per-area probability maps in MNI space) are served
+by \code{\link{get_wang_prob_atlas}}.
+
+TemplateFlow does not currently distribute an \emph{inflated} \code{fsaverage}
+mesh, so the available surfaces are \code{"midthickness"} (default),
+\code{"pial"}, and \code{"white"}.
 }
 \examples{
 \dontrun{
-# Wang 2015 visual topography atlas on the fsaverage inflated surface
-wang <- get_wang_atlas(surf = "inflated")
+# Wang 2015 visual topography atlas on the fsaverage midthickness surface
+wang <- get_wang_atlas(surf = "midthickness")
 wang$labels
+# Extract an area as ROISurface objects (one per hemisphere)
 get_roi(wang, label = "hV4")
+get_roi(wang, label = "V1v", hemi = "left")
 }
 
 }

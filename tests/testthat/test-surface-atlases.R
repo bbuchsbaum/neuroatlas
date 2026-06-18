@@ -228,6 +228,17 @@ test_that("glasser_surf returns valid fsaverage surface atlas", {
   
   # Hemispheres should both be represented
   expect_true(all(c("left", "right") %in% unique(glas$hemi)))
+
+  # get_roi() must work for BOTH hemispheres even though Glasser stores
+  # within-hemisphere vertex codes (not global ids) in the surface data.
+  lid <- glas$ids[glas$hemi == "left"][2]
+  rid <- glas$ids[glas$hemi == "right"][2]
+  roi_l <- get_roi(glas, id = lid)
+  roi_r <- get_roi(glas, id = rid)
+  expect_s4_class(roi_l[[1]], "ROISurface")
+  expect_s4_class(roi_r[[1]], "ROISurface")
+  expect_true(length(neurosurf::indices(roi_l[[1]])) > 0)
+  expect_true(length(neurosurf::indices(roi_r[[1]])) > 0) # was empty before fix
 })
 
 test_that("glasser_surf rejects unsupported spaces", {

@@ -293,6 +293,137 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
   }
 }
 
+#' Extract regions of interest from a surface atlas
+#'
+#' @description
+#' \code{get_roi()} method for surface atlases (class \code{surfatlas}, e.g.
+#' from \code{\link{get_wang_atlas}}, \code{\link{glasser_surf}}, or
+#' \code{schaefer_surf}). It returns one \code{\link[neurosurf]{ROISurface}} per
+#' matched region, carrying the mesh vertices of that area on the appropriate
+#' hemisphere.
+#'
+#' Because a surface atlas stores each hemisphere on its own mesh, a \code{label}
+#' present in both hemispheres yields one ROI per hemisphere, named
+#' \code{"<label>_left"} / \code{"<label>_right"}; pass \code{hemi} to restrict.
+#' When selecting by \code{id}, results are named by id (ids are unique across
+#' hemispheres: 1..K left, K+1..2K right).
+#'
+#' @param x A surface atlas (class \code{surfatlas}).
+#' @param label,id Character labels or integer ids identifying regions; supply
+#'   exactly one.
+#' @param hemi Optional \code{"left"} / \code{"right"} filter.
+#' @return A named list of \code{\link[neurosurf]{ROISurface}} objects.
+#' @seealso \code{\link{get_roi}}
+#' @rdname get_roi-surfatlas
+#' @importFrom neurosurf ROISurface
+#' @export
+#' @method get_roi surfatlas
+get_roi.surfatlas <- function(x, label = NULL, id = NULL, hemi = NULL) {
+  if (!is.null(label) && !is.null(id)) {
+    stop("must supply one of 'id' or 'label' but not both")
+  }
+  if (is.null(label) && is.null(id)) {
+    stop("must supply either 'id' or 'label'")
+  }
+
+  valid_idx <- seq_along(x$ids)
+  if (!is.null(hemi)) {
+    hemi <- match.arg(hemi, c("left", "right"), several.ok = TRUE)
+    valid_idx <- which(x$hemi %in% hemi)
+    if (length(valid_idx) == 0) {
+      stop("no ROIs found for hemisphere: ", paste(hemi, collapse = ", "))
+    }
+  }
+
+  # Resolve the matching indices into x$ids.
+  if (!is.null(label)) {
+    sel_idx <- integer(0)
+    for (l in label) {
+      m <- which(x$labels == l)
+      if (!is.null(hemi)) m <- intersect(m, valid_idx)
+      if (length(m) == 0) {
+        stop(if (!is.null(hemi)) {
+          paste0("label '", l, "' not found in atlas for hemisphere: ",
+                 paste(hemi, collapse = ", "))
+        } else {
+          paste0("label '", l, "' not found in atlas")
+        })
+      }
+      sel_idx <- c(sel_idx, m)
+    }
+  } else {
+    m <- match(id, x$ids)
+    if (anyNA(m)) {
+      stop("IDs not found in atlas: ", paste(id[is.na(m)], collapse = ", "))
+    }
+    if (!is.null(hemi)) {
+      bad <- setdiff(m, valid_idx)
+      if (length(bad) > 0) {
+        stop("IDs not found in specified hemisphere(s): ",
+             paste(x$ids[bad], collapse = ", "))
+      }
+    }
+    sel_idx <- m
+  }
+
+  hemi_key <- c(left = "lh", right = "rh")
+  ret <- lapply(sel_idx, function(ix) {
+    roi_id <- x$ids[ix]
+    h <- x$hemi[ix]
+    surf <- x[[paste0(hemi_key[[h]], "_atlas")]]
+    vox <- as.integer(surf@data)
+
+    # Per-vertex code conventions differ across surface atlases: some
+    # (e.g. Wang, Schaefer) store the global id in the surface data, others
+    # (e.g. Glasser) store a within-hemisphere code. Prefer the global id and
+    # fall back to the within-hemisphere ordinal, then error if neither hits.
+    vidx <- which(vox == roi_id)
+    if (length(vidx) == 0L) {
+      local_code <- match(ix, which(x$hemi == h))
+      vidx <- which(vox == local_code)
+    }
+    if (length(vidx) == 0L) {
+      cli::cli_abort(
+        c(
+          "No surface vertices found for region {.val {x$labels[ix]}} (id {roi_id}).",
+          "i" = "The surface data uses a vertex coding get_roi() could not map."
+        ),
+        class = c("neuroatlas_error_get_roi", "neuroatlas_error")
+      )
+    }
+
+    neurosurf::ROISurface(
+      geometry = surf@geometry,
+      indices = vidx,
+      data = vox[vidx]
+    )
+  })
+  names(ret) <- if (!is.null(label)) {
+    paste0(x$labels[sel_idx], "_", x$hemi[sel_idx])
+  } else {
+    as.character(x$ids[sel_idx])
+  }
+  ret
+}
+
+#' @rdname sub_atlas
+#' @export
+#' @method sub_atlas surfatlas
+sub_atlas.surfatlas <- function(x, ids = NULL, labels = NULL, hemi = NULL,
+                                network = NULL, ...) {
+  # The volume-oriented subsetter relies on x$atlas (a NeuroVol) which surface
+  # atlases do not have, and cannot subset the per-hemisphere meshes, so it
+  # would silently produce a broken object. Fail clearly instead.
+  cli::cli_abort(
+    c(
+      "{.fn sub_atlas} is not supported for surface atlases.",
+      "i" = "Use {.fn get_roi} to pull out individual regions, or operate on
+             {.field lh_atlas} / {.field rh_atlas} directly."
+    ),
+    class = c("neuroatlas_error_unsupported", "neuroatlas_error")
+  )
+}
+
 #' @rdname sub_atlas
 #' @export
 #' @method sub_atlas atlas

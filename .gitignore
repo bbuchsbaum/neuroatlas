@@ -44,3 +44,6 @@ renv/library
 .rcmdcheck_result.rds
 tmp/
 vignettes/figures/
+
+# Local Wang ProbAtlas_v4 download (not redistributable; ~21MB)
+prob4/

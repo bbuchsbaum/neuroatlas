@@ -10,7 +10,8 @@ build_surface_polygon_data(
   surface = "inflated",
   merged = TRUE,
   projection_smooth = 0L,
-  use_cache = TRUE
+  use_cache = TRUE,
+  depth_cull = TRUE
 )
 }
 \arguments{
@@ -32,6 +33,10 @@ polygon and boundary construction. \code{0} (default) keeps native mesh
 coordinates.}
 
 \item{use_cache}{Logical. If \code{TRUE} (default), use memoized builders.}
+
+\item{depth_cull}{Logical. If \code{TRUE} (default), remove faces hidden
+behind nearer cortical surface faces in the projected view. This prevents
+far-side folds from shining through medial/lateral panels.}
 }
 \value{
 A list with components:
