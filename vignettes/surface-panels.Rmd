@@ -1,26 +1,28 @@
 ---
 title: Composing Surface Panel Figures
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Composing Surface Panel Figures}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2.0
+    css: albers.css
+    includes:
+      in_header: albers-header.html
 params:
   family: red
-css: albers.css
+  preset: homage
 resource_files:
 - albers.css
 - albers.js
-includes:
-  in_header: |-
-    <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+- albers-header.html
+
+vignette: |
+  %\VignetteIndexEntry{Composing Surface Panel Figures} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("albersdown", quietly = TRUE)) {
-  ggplot2::theme_set(albersdown::theme_albers(params$family))
+  if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 }
 
 can_plot <- requireNamespace("neuroatlas", quietly = TRUE) &&
@@ -38,6 +40,19 @@ knitr::opts_chunk$set(
   warning = FALSE,
   eval = can_layout
 )
+```
+
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    '});</script>'
+  ),
+  params$family,
+  params$preset
+))
 ```
 
 ```{r}
@@ -90,7 +105,7 @@ vals_list <- list(
 Use `plot_brain()` when you want one figure with a few surface panels
 and a single legend.
 
-```{r single-figure, fig.width=8, fig.height=4.5, fig.alt="Surface panel figure with left and right hemisphere lateral and medial views plus a bottom colorbar"}
+```{r single-figure, fig.width=8, fig.height=5, fig.alt="Surface panel figure with left and right hemisphere lateral and medial views plus a bottom colorbar"}
 plot_brain(
   atl,
   vals = parcel_vals,
@@ -114,7 +129,7 @@ This is the default static workflow when you want:
 
 - view-aware facet labels without post-hoc editing
 - one explicit legend instead of an implicit colour mapping
-- a single annotated figure object you can print or save directly
+- a single annotated figure object you can render or save directly
 
 ## How do you compare several maps with one legend?
 
@@ -154,45 +169,32 @@ If you want each panel to optimise its own within-panel contrast, use
 `shared_scale = FALSE`. That can make weak patterns easier to see, but
 you lose strict colour comparability across panels.
 
-## What do the default panel labels mean?
+## How should you label the panels?
 
-The default panel labels are anatomical hemisphere plus view:
+Panel labels name the surface being shown: hemisphere plus view, such as
+`Left Lateral` or `Right Medial`. They do not describe where the panel
+sits in the final grid.
 
-- `Left Lateral`
-- `Right Lateral`
-- `Left Medial`
-- `Right Medial`
+In lateral and medial views, `plot_brain()` uses a fixed anatomical
+orientation: left hemispheres have anterior on the left, and right
+hemispheres have anterior on the right.
 
-Those names describe the surface itself, not where you happen to place
-the panel in a larger composition. A right-hemisphere panel is still a
-right hemisphere if you later move it to the left side of a page.
+Use `panel_labels` when the default labels are too long. Keep both the
+hemisphere and the view when a figure mixes lateral and medial views; use
+shorter labels such as `LH` and `RH` only when each hemisphere appears in
+one view.
 
-`plot_brain()` now uses a fixed anatomical convention for lateral and
-medial views:
+## What should you remember?
 
-- left hemispheres are drawn with anterior on the left
-- right hemispheres are drawn with anterior on the right
+For most figures, start with `style = "ggseg_like"`. Then adjust:
 
-That means `panel_labels = c("Right Lateral" = "Right hemisphere")` is a
-safe simplification when you are showing one view per hemisphere. If you
-mix lateral and medial views, keep the view in the label unless you have
-a strong reason to collapse it.
+- `panel_labels` for shorter facet labels
+- `colorbar` and `colorbar_title` for the shared legend
+- `title`, `subtitle`, and `caption` for figure annotations
+- `ncol` for the panel grid
 
-## Which layout controls are worth remembering?
-
-These are the arguments you will use repeatedly:
-
-- `style = "ggseg_like"` gives a presentation-oriented default layout
-- `panel_layout = "presentation"` is the explicit layout control behind that style
-- `panel_labels` rewrites facet labels without changing the underlying hemisphere/view mapping
-- `colorbar` and `colorbar_title` control the standalone legend
-- `title`, `subtitle`, and `caption` annotate the composed figure directly
-- `ncol` controls the panel grid for both `plot_brain()` and `plot_brain_grid()`
-
-If you need the raw projected coordinates for a custom workflow, use
-`panel_layout = "native"`. If you want the cleaner, more balanced
-publication layout, use `panel_layout = "presentation"` or
-`style = "ggseg_like"`.
+Use `panel_layout = "native"` only when you need the raw projected
+coordinates for a custom workflow.
 
 ## Where should you go next?
 

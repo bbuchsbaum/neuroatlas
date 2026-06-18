@@ -107,6 +107,24 @@ covered_pct <- function(code) {
   sprintf("%.1f%%", 100 * mean((code > 0)[gmv]))
 }
 
+label_panel <- function(label) {
+  ggplot2::ggplot() +
+    ggplot2::theme_void() +
+    ggplot2::annotate("text", x = 0.5, y = 0.5, label = label,
+                      fontface = "bold", size = 4.3) +
+    ggplot2::coord_cartesian(xlim = c(0, 1), ylim = c(0, 1))
+}
+
+roi_panel <- function(code, label) {
+  img <- plot_overlay(t1_rs, roi_vol(code), zlevels = roi_compare_z,
+                      along = 3L, ov_cmap = "viridis",
+                      ov_range = roi_range, ov_alpha = 0.9,
+                      ov_thresh = 0, ncol = 1, colorbar = FALSE,
+                      draw = FALSE)
+  patchwork::wrap_plots(label_panel(label), img, ncol = 1,
+                        heights = c(0.14, 1))
+}
+
 # --- figure 1: original parcels + dilated additions ------------------------
 add_code <- ifelse(dv > 0 & av == 0, 2, ifelse(av > 0, 1, 0))
 png(file.path(out_dir, "dilation-additions.png"),
@@ -114,43 +132,40 @@ png(file.path(out_dir, "dilation-additions.png"),
 plot_overlay(t1_rs, code_vol(add_code), zlevels = zlevels, along = 3L,
              ov_cmap = "viridis", ov_range = c(0, 2), ov_alpha = 0.85,
              ov_thresh = 0, ncol = 3,
-             title = "GM-only dilation: cortical rim plus nearby non-cortical spillover, radius = 4")
+             title = paste(
+               "GM-only dilation: cortical rim plus nearby",
+               "non-cortical spillover, radius = 4"
+             ))
 dev.off()
 
 # --- figure 2: ROI labels before and after increasing dilation radii --------
 roi_range <- c(1, max(av, unlist(d$dv_by_radius), na.rm = TRUE))
 roi_panels <- list(
-  plot_overlay(t1_rs, roi_vol(av), zlevels = roi_compare_z, along = 3L,
-               ov_cmap = "viridis", ov_range = roi_range, ov_alpha = 0.9,
-               ov_thresh = 0, ncol = 1, colorbar = FALSE, draw = FALSE,
-               title = paste0("Original\n", covered_pct(av))),
-  plot_overlay(t1_rs, roi_vol(d$dv_by_radius[["1"]]), zlevels = roi_compare_z,
-               along = 3L, ov_cmap = "viridis", ov_range = roi_range,
-               ov_alpha = 0.9, ov_thresh = 0, ncol = 1, colorbar = FALSE,
-               draw = FALSE, title = paste0("radius = 1\n",
-                                             covered_pct(d$dv_by_radius[["1"]]))),
-  plot_overlay(t1_rs, roi_vol(d$dv_by_radius[["4"]]), zlevels = roi_compare_z,
-               along = 3L, ov_cmap = "viridis", ov_range = roi_range,
-               ov_alpha = 0.9, ov_thresh = 0, ncol = 1, colorbar = FALSE,
-               draw = FALSE, title = paste0("radius = 4\n",
-                                             covered_pct(d$dv_by_radius[["4"]]))),
-  plot_overlay(t1_rs, roi_vol(d$dv_by_radius[["6"]]), zlevels = roi_compare_z,
-               along = 3L, ov_cmap = "viridis", ov_range = roi_range,
-               ov_alpha = 0.9, ov_thresh = 0, ncol = 1, colorbar = FALSE,
-               draw = FALSE, title = paste0("radius = 6\n",
-                                             covered_pct(d$dv_by_radius[["6"]])))
+  roi_panel(av, paste0("Original\n", covered_pct(av), " covered")),
+  roi_panel(d$dv_by_radius[["1"]],
+            paste0("radius = 1\n",
+                   covered_pct(d$dv_by_radius[["1"]]), " covered")),
+  roi_panel(d$dv_by_radius[["4"]],
+            paste0("radius = 4\n",
+                   covered_pct(d$dv_by_radius[["4"]]), " covered")),
+  roi_panel(d$dv_by_radius[["6"]],
+            paste0("radius = 6\n",
+                   covered_pct(d$dv_by_radius[["6"]]), " covered"))
 )
 roi_plot <- patchwork::wrap_plots(roi_panels, ncol = 4) +
   patchwork::plot_annotation(
     title = paste0("Schaefer ROIs before and after dilation (z = ",
                    roi_compare_z, ")"),
-    subtitle = "Same parcel labels, increasing radius; percentages are coverage of the p > 0.33 mask"
+    subtitle = paste(
+      "Same parcel labels, increasing radius;",
+      "percentages are coverage of the p > 0.33 mask"
+    )
   )
 ggplot2::ggsave(file.path(out_dir, "dilation-radius-rois.png"), roi_plot,
                 width = 1500 / 130, height = 520 / 130, dpi = 130,
                 bg = "white")
 
-# --- figure 2: the proximity guard (GM left unassigned) --------------------
+# --- figure 3: the proximity guard (GM left unassigned) --------------------
 guard_code <- ifelse(gmv & dv == 0, 1, 0)
 png(file.path(out_dir, "dilation-guard.png"),
     width = 1500, height = 560, res = 130)

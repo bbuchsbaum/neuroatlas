@@ -2,26 +2,27 @@
 title: Getting Started with neuroatlas
 author: neuroatlas Dev Team
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Getting Started with neuroatlas}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2.0
+    css: albers.css
+    includes:
+      in_header: albers-header.html
 params:
   family: red
-css: albers.css
+  preset: homage
 resource_files:
 - albers.css
 - albers.js
-includes:
-  in_header: |-
-    <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+- albers-header.html
 
+vignette: |
+  %\VignetteIndexEntry{Getting Started with neuroatlas} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -29,6 +30,19 @@ knitr::opts_chunk$set(
   eval = FALSE # Set to FALSE to avoid downloads during vignette build
 )
 library(neuroatlas)
+```
+
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    '});</script>'
+  ),
+  params$family,
+  params$preset
+))
 ```
 
 ## Introduction
@@ -52,7 +66,7 @@ The Schaefer atlas provides cortical parcellations organized by functional netwo
 ```{r schaefer_basic, eval = FALSE}
 # Load Schaefer atlas with 200 parcels and 7 networks
 atlas_200_7 <- get_schaefer_atlas(parcels = "200", networks = "7")
-print(atlas_200_7)
+atlas_200_7
 #> ══ Schaefer Atlas ══════════════════════════════════════════════════════════════
 #> Name: Schaefer-200-7networks
 #> Dimensions: 182 x 218 x 182
@@ -80,7 +94,7 @@ The Glasser atlas provides 360 cortical areas defined using multi-modal MRI data
 ```{r glasser, eval = FALSE}
 # Load the Glasser atlas
 glasser <- get_glasser_atlas()
-print(glasser)
+glasser
 #> ── Glasser Atlas Summary ────────────────────────────────────────
 #>
 #> ℹ Atlas Type: Glasser Multi-Modal Parcellation
@@ -108,7 +122,7 @@ For subcortical structures, use the ASEG (Automatic Segmentation) atlas:
 ```{r aseg, eval = FALSE}
 # Load ASEG subcortical atlas
 aseg <- get_aseg_atlas()
-print(aseg)
+aseg
 #> ── Atlas Summary ───────────────────────────────────────────
 #>
 #> ❯ Name:   ASEG
@@ -130,7 +144,7 @@ For detailed MTL parcellations:
 ```{r olsen, eval = FALSE}
 # Load Olsen MTL atlas
 mtl <- get_olsen_mtl()
-print(mtl)
+mtl
 #> ── Atlas Summary ───────────────────────────────────────────
 #>
 #> ❯ Name:   Olsen_MTL
@@ -208,7 +222,7 @@ brain_data <- neuroim2::NeuroVol(
 
 # Calculate mean values within each region
 region_means <- reduce_atlas(atlas_200_7, brain_data, mean)
-print(head(region_means))
+head(region_means)
 #> # A tibble: 6 × 2
 #>   region      value
 #>   <chr>       <dbl>
@@ -311,7 +325,17 @@ subcortical_resampled <- get_aseg_atlas(outspace = neuroim2::space(cortical$atla
 
 # Merge atlases
 combined <- merge_atlases(cortical, subcortical_resampled)
-print(combined)
+combined
+#> ── Atlas Summary ───────────────────────────────────────────
+#>
+#> ❯ Name:   Schaefer-100-7networks::ASEG
+#> ❯ Dimensions: 182 x 218 x 182
+#> ❯ Regions: 117
+#>
+#> Structure Distribution:
+#> |- Left hemisphere:     57
+#> |- Right hemisphere:    58
+#> \- Bilateral/Midline:   2
 ```
 
 ### Dilating Atlas Parcels
@@ -438,7 +462,7 @@ network_summary <- roi_values %>%
     n_regions = n()
   )
 
-print(network_summary)
+network_summary
 ```
 
 ## Tips and Best Practices

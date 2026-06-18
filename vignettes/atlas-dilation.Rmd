@@ -212,6 +212,16 @@ Coverage of the `p > 0.33` mask (which starts at 70.7% before dilation):
 | 4 *(default)*  | 8          |       23,965 |        85.8%        |          22,432 |
 | 6              | 12         |       30,775 |        90.1%        |          15,622 |
 
+The same sweep is easier to understand if you look at the ROIs themselves. On
+this axial slice, white voxels are still unlabelled and coloured voxels carry
+their Schaefer parcel label. As the radius increases, parcels fill more of the
+nearby grey matter, including the same subcortical-adjacent territory that makes
+large-radius whole-GM dilation risky.
+
+```{r fig-radius-rois, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Four axial panels comparing Schaefer parcel labels before dilation and after radius-one, radius-four, and radius-six dilation on the same z equals 40 slice."}
+knitr::include_graphics("figures/dilation-radius-rois.png")
+```
+
 The unassigned remainder stays dominated by distant subcortical and cerebellar
 grey matter in this range. The added set, however, can already include nearby
 non-cortical voxels by `radius = 4`.

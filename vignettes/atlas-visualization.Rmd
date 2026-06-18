@@ -1,25 +1,26 @@
 ---
 title: Atlas Visualization with Optimal Colours
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Atlas Visualization with Optimal Colours}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2.0
+    css: albers.css
+    includes:
+      in_header: albers-header.html
 params:
   family: red
-css: albers.css
+  preset: homage
 resource_files:
 - albers.css
 - albers.js
-includes:
-  in_header: |-
-    <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+- albers-header.html
 
+vignette: |
+  %\VignetteIndexEntry{Atlas Visualization with Optimal Colours} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 can_eval <- requireNamespace("neuroatlas", quietly = TRUE) &&
             requireNamespace("neuroim2", quietly = TRUE) &&
             requireNamespace("ggplot2", quietly = TRUE)
@@ -34,6 +35,19 @@ knitr::opts_chunk$set(
   fig.height = 4,
   eval = can_eval
 )
+```
+
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    '});</script>'
+  ),
+  params$family,
+  params$preset
+))
 ```
 
 ## Introduction
@@ -63,6 +77,22 @@ For a three-plane **orthogonal** view:
 ```{r quick-ortho}
 plot(atlas, view = "ortho")
 ```
+
+### Region legends
+
+By default no legend is drawn --- for a 400-region cortical parcellation it
+would be useless. But for small atlases (subcortical, MTL, a handful of ROIs)
+a colour legend is genuinely helpful. Pass `legend = TRUE` to add one below a
+montage; labels appearing in both hemispheres are disambiguated with
+`(L)`/`(R)`:
+
+```{r quick-legend, fig.height = 5}
+plot(atlas, legend = TRUE)   # ASEG has 17 regions
+```
+
+The legend is capped by `legend_max` (default 30), so it is silently skipped
+for large parcellations; raise `legend_max` to override. It is drawn for the
+montage view (each orthogonal plane shows a different subset of regions).
 
 ## Colour Algorithms
 
