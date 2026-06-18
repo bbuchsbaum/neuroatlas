@@ -209,42 +209,46 @@ glasser_mapped <- map_atlas(glasser, glasser_vals, thresh = c(2, 5))
 
 ## Visualization
 
-### Using ggseg for 2D Brain Plots
+`neuroatlas` renders **surface** parcellations with `plot_brain()` and
+**volume** atlases with `plot()`. (The older `ggseg_schaefer()` and
+`plot_glasser()` helpers are deprecated in favour of `plot_brain()`.)
 
-The package integrates with ggseg for publication-quality visualizations:
+### Surface parcellations
 
-```{r ggseg_viz}
-# Visualize Schaefer atlas with random values
-vals <- rnorm(200)
-ggseg_schaefer(
-  atlas_200_7, 
-  vals = vals,
-  thresh = c(-2, 2),     # Threshold values
-  palette = "RdBu",      # Color palette
-  interactive = TRUE     # Interactive plot with tooltips
+Map one value per parcel onto a surface atlas. `plot_brain(interactive = TRUE)`
+returns a hover-tooltip widget; `interactive = FALSE` returns a static ggplot.
+
+```{r viz_surface_code, eval = FALSE}
+sa <- schaefer_surf(parcels = 200, networks = 7, space = "fsaverage6")
+plot_brain(
+  sa,
+  vals     = rnorm(length(sa$ids)),  # one value per parcel
+  palette  = "vik",
+  colorbar = "bottom"
 )
-
-# Visualize Glasser atlas
-plot(glasser, vals = rnorm(360), thresh = c(-1, 1))
 ```
 
-### Interactive 3D Visualization (Glasser)
-
-For the Glasser atlas, use the echarts-based 3D visualization:
-
-```{r echarts_viz}
-# Create random data for visualization
-glasser_data <- data.frame(
-  label = glasser$labels,
-  value = rnorm(360, sd = 2)
-)
-
-# Create interactive 3D plot
-plot_glasser(vals = glasser_data, value_col = "value")
-
-# Uniform coloring (no data)
-plot_glasser()  # All regions colored uniformly
+```{r viz_surface_fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Schaefer-200 (7-network) parcellation on the fsaverage6 surface, lateral and medial views, parcels coloured by a per-parcel value with a diverging palette and a bottom colorbar."}
+knitr::include_graphics("figures/overview-schaefer-surface.png")
 ```
+
+### Volume atlases
+
+`plot()` draws a volume atlas as a multi-slice montage (or three orthogonal
+planes with `view = "ortho"`), colouring each region automatically.
+
+```{r viz_volume_code, eval = FALSE}
+aseg <- get_aseg_atlas()
+plot(aseg, nslices = 8)      # axial montage
+plot(aseg, view = "ortho")   # three orthogonal planes
+```
+
+```{r viz_volume_fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the FreeSurfer ASEG subcortical atlas with each structure in a distinct colour."}
+knitr::include_graphics("figures/overview-aseg-volume.png")
+```
+
+See the *Atlas Visualization* and *Surface Parcellations* articles for colour
+algorithms, panel layouts, and statistical overlays.
 
 ## Combining and Dilating Atlases
 
@@ -344,10 +348,10 @@ roi_values <- reduce_atlas(atlas, brain_data, mean)
 # Identify significant regions
 sig_regions <- roi_values$value[abs(roi_values$value) > 2]
 
-# 5. Visualize results
+# 5. Visualize results on the matching surface parcellation
 viz_vals <- rep(0, length(atlas$labels))
 viz_vals[abs(roi_values$value) > 2] <- roi_values$value[abs(roi_values$value) > 2]
-ggseg_schaefer(atlas, vals = viz_vals, interactive = TRUE)
+plot_brain(schaefer_surf(parcels = 200, networks = 7), vals = viz_vals)
 ```
 
 ### Multi-Atlas Comparison
