@@ -28,9 +28,12 @@ NULL
 #'
 #' @param subdir Optional character string. If provided, a subdirectory named
 #'   `subdir` will be created/used within the main neuroatlas cache directory.
+#' @param create Logical. If `TRUE` (default), create the directory if it does
+#'   not exist. If `FALSE`, return the path without creating it (for read-only
+#'   lookups that must not write to the user's home cache).
 #' @return A character string representing the path to the cache directory.
 #' @keywords internal
-.neuroatlas_cache_dir <- function(subdir = NULL) {
+.neuroatlas_cache_dir <- function(subdir = NULL, create = TRUE) {
   base_cache_dir <- tools::R_user_dir("neuroatlas", "cache")
 
   cache_path <- base_cache_dir
@@ -38,7 +41,10 @@ NULL
     cache_path <- file.path(base_cache_dir, subdir)
   }
 
-  if (!dir.exists(cache_path)) {
+  # Only materialise the directory when asked to. Read-only lookups (e.g.
+  # side-effect-free manifest resolution) pass create = FALSE so they never
+  # write to the user's home cache.
+  if (isTRUE(create) && !dir.exists(cache_path)) {
     dir.create(cache_path, recursive = TRUE, showWarnings = FALSE)
   }
 

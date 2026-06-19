@@ -43,4 +43,12 @@ output
 renv/library
 .rcmdcheck_result.rds
 tmp/
-vignettes/figures/
+vignettes/figures/*
+!vignettes/figures/dilation-radius-rois.png
+
+# Local Wang ProbAtlas_v4 download (not redistributable; ~21MB)
+prob4/
+
+# Local working dirs (rendered-vignette backups, planning scratch)
+.albersdown.bak/
+plans/

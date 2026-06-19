@@ -70,6 +70,57 @@ test_that(".face_parcel_ids assigns by majority vote", {
   expect_true(result[3] %in% c(1L, 2L, 3L))
 })
 
+test_that(".face_depth computes mean depth along a view direction", {
+  verts <- matrix(c(
+    0, 0, 1,
+    0, 0, 2,
+    0, 0, 3,
+    0, 0, 6,
+    0, 0, 7,
+    0, 0, 8
+  ), ncol = 3, byrow = TRUE)
+  faces <- matrix(c(
+    1L, 2L, 3L,
+    4L, 5L, 6L
+  ), ncol = 3, byrow = TRUE)
+
+  depth <- neuroatlas:::.face_depth(verts, faces, c(0, 0, 1))
+
+  expect_equal(depth, c(2, 7))
+})
+
+test_that(".depth_cull_faces removes far faces at the same projected location", {
+  faces <- matrix(c(
+    1L, 2L, 3L,
+    4L, 5L, 6L,
+    7L, 8L, 9L
+  ), ncol = 3, byrow = TRUE)
+  proj_xy <- matrix(c(
+    0, 0,
+    1, 0,
+    0, 1,
+    0, 0,
+    1, 0,
+    0, 1,
+    5, 5,
+    6, 5,
+    5, 6
+  ), ncol = 2, byrow = TRUE)
+  face_depth <- c(10, 1, 0)
+
+  kept <- neuroatlas:::.depth_cull_faces(
+    faces,
+    proj_xy,
+    face_depth,
+    candidates = seq_len(nrow(faces)),
+    resolution = 32L,
+    tolerance = 0,
+    neighborhood = 0L
+  )
+
+  expect_equal(kept, c(1L, 3L))
+})
+
 test_that(".merge_parcel_polygons is robust to inconsistent face winding", {
   # Square split into two triangles, with the second triangle deliberately
   # reversed (inconsistent winding). Boundary detection should be
@@ -272,6 +323,42 @@ test_that("plot_brain returns ggplot when interactive = FALSE", {
   expect_s3_class(p, "ggplot")
 })
 
+test_that("plot_brain validates the 'background' argument before any rendering", {
+  # Runs offline: the check fires before the surfatlas/network path.
+  expect_error(plot_brain(NULL, background = "yes"),
+               "'background' must be TRUE or FALSE")
+  expect_error(plot_brain(NULL, background = NA),
+               "'background' must be TRUE or FALSE")
+  expect_error(plot_brain(NULL, depth_cull = NA),
+               "'depth_cull' must be TRUE or FALSE")
+})
+
+test_that("plot_brain draws a cortex backdrop when background = TRUE", {
+  skip_on_cran()
+
+  atl <- tryCatch({
+    schaefer_surf(100, 7)
+  }, error = function(e) {
+    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+  })
+
+  p_bg <- plot_brain(atl, views = "lateral", interactive = FALSE,
+                     background = TRUE)
+  p_no <- plot_brain(atl, views = "lateral", interactive = FALSE,
+                     background = FALSE)
+  expect_s3_class(p_bg, "ggplot")
+  # The backdrop adds one extra geom_polygon layer beneath the parcels.
+  expect_gt(length(p_bg$layers), length(p_no$layers))
+
+  # The silhouette builder yields one or more filled polygons per panel.
+  sil <- neuroatlas:::.build_surface_silhouette_data(
+    atl, views = "lateral", hemis = c("left", "right"),
+    surface = "inflated", projection_smooth = 0L
+  )
+  expect_true(is.data.frame(sil) && nrow(sil) > 0)
+  expect_true(all(c("x", "y", "poly_id", "panel") %in% names(sil)))
+})
+
 test_that("plot_brain normalizes colorbar position inputs", {
   expect_equal(neuroatlas:::.normalize_colorbar_position(TRUE), "right")
   expect_equal(neuroatlas:::.normalize_colorbar_position(FALSE), "none")
@@ -333,6 +420,27 @@ test_that("plot_brain composes a bottom colorbar when requested", {
 
   expect_s3_class(p, "patchwork")
   expect_s3_class(patchwork::patchworkGrob(p), "gtable")
+})
+
+test_that("plot_brain suppresses the built-in fill guide for static maps", {
+  skip_on_cran()
+
+  atl <- tryCatch({
+    schaefer_surf(100, 7)
+  }, error = function(e) {
+    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+  })
+
+  p <- plot_brain(
+    atl,
+    vals = rnorm(length(atl$ids)),
+    views = "lateral",
+    interactive = FALSE,
+    colorbar = FALSE
+  )
+
+  fill_scale <- p$scales$get_scales("fill")
+  expect_equal(fill_scale$guide, "none")
 })
 
 test_that(".repair_legacy_surface_geometry rebuilds bundled legacy fsaverage", {

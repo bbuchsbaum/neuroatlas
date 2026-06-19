@@ -7,6 +7,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
                          "xmin", "xmax", "ymin", "ymax",
                          "rotate", "height", "width"))
 
+.plot_brain_depth_resolution <- 240L
+.plot_brain_depth_neighborhood <- 0L
+
 #' Compute face normals for a triangle mesh
 #'
 #' @param verts N x 3 matrix of vertex coordinates (x, y, z).
@@ -55,6 +58,121 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   # equals p3 when agree23 is TRUE), and truly all-different falls back to p1
   # via the first branch. This is acceptable for atlas parcels.
   result
+}
+
+#' Compute mean face depth along a view direction
+#'
+#' @param verts N x 3 matrix of vertex coordinates.
+#' @param faces F x 3 integer matrix of vertex indices per face.
+#' @param view_dir Length-3 numeric view direction vector.
+#' @return Numeric vector of length F.
+#' @keywords internal
+#' @noRd
+.face_depth <- function(verts, faces, view_dir) {
+  depth <- as.numeric(verts %*% as.numeric(view_dir))
+  (depth[faces[, 1]] + depth[faces[, 2]] + depth[faces[, 3]]) / 3
+}
+
+#' Cull faces hidden behind nearer projected surface faces
+#'
+#' Normal-based backface culling is not enough for folded cortical meshes: a
+#' far-side sulcus can still project into the same 2D panel as the near cortex.
+#' This helper builds a coarse view-space depth buffer from all mesh faces and
+#' keeps only candidate faces close to the nearest surface at their projected
+#' location.
+#'
+#' @param faces F x 3 integer matrix of vertex indices.
+#' @param proj_xy N x 2 matrix of projected vertex coordinates.
+#' @param face_depth Numeric vector of per-face depths.
+#' @param candidates Integer face indices eligible for drawing.
+#' @param resolution Depth-buffer grid resolution.
+#' @param tolerance Optional depth tolerance. Defaults to a small fraction of
+#'   the view-depth range.
+#' @param neighborhood Integer radius, in grid cells, used when comparing a
+#'   face against nearby depth-buffer samples.
+#' @return Integer vector of retained face indices in candidate order.
+#' @keywords internal
+#' @noRd
+.depth_cull_faces <- function(faces, proj_xy, face_depth, candidates,
+                              resolution = .plot_brain_depth_resolution,
+                              tolerance = NULL,
+                              neighborhood = .plot_brain_depth_neighborhood) {
+  candidates <- as.integer(candidates)
+  candidates <- candidates[
+    !is.na(candidates) & candidates >= 1L & candidates <= nrow(faces)
+  ]
+  if (length(candidates) <= 1L) return(candidates)
+
+  if (!is.matrix(faces) || ncol(faces) != 3 ||
+      !is.matrix(proj_xy) || ncol(proj_xy) != 2 ||
+      length(face_depth) != nrow(faces)) {
+    return(candidates)
+  }
+
+  resolution <- as.integer(resolution)
+  if (is.na(resolution) || resolution < 8L) return(candidates)
+
+  neighborhood <- as.integer(neighborhood)
+  if (is.na(neighborhood) || neighborhood < 0L) neighborhood <- 0L
+
+  cx <- (proj_xy[faces[, 1], 1] +
+         proj_xy[faces[, 2], 1] +
+         proj_xy[faces[, 3], 1]) / 3
+  cy <- (proj_xy[faces[, 1], 2] +
+         proj_xy[faces[, 2], 2] +
+         proj_xy[faces[, 3], 2]) / 3
+  finite_face <- is.finite(cx) & is.finite(cy) & is.finite(face_depth)
+  if (!any(finite_face)) return(candidates)
+
+  xr <- range(cx[finite_face])
+  yr <- range(cy[finite_face])
+  if (!is.finite(diff(xr)) || !is.finite(diff(yr)) ||
+      diff(xr) <= 0 || diff(yr) <= 0) {
+    return(candidates)
+  }
+
+  to_cell <- function(v, lo, span) {
+    out <- floor((v - lo) / span * (resolution - 1L)) + 1L
+    pmin(resolution, pmax(1L, as.integer(out)))
+  }
+
+  col <- to_cell(cx, xr[[1]], diff(xr))
+  row <- to_cell(cy, yr[[1]], diff(yr))
+  cell <- row + (col - 1L) * resolution
+
+  valid_faces <- which(finite_face)
+  by_cell <- tapply(face_depth[valid_faces], cell[valid_faces], max)
+  zbuf <- rep(-Inf, resolution * resolution)
+  zbuf[as.integer(names(by_cell))] <- as.numeric(by_cell)
+
+  if (is.null(tolerance)) {
+    zrange <- diff(range(face_depth[finite_face]))
+    tolerance <- max(zrange * 0.015, sqrt(.Machine$double.eps))
+  }
+
+  keep <- rep(TRUE, length(candidates))
+  valid_candidate_pos <- which(finite_face[candidates])
+  if (length(valid_candidate_pos) == 0L) return(candidates)
+
+  cand <- candidates[valid_candidate_pos]
+  local_max <- rep(-Inf, length(cand))
+
+  offsets <- seq.int(-neighborhood, neighborhood)
+  for (dc in offsets) {
+    cc <- col[cand] + dc
+    ok_c <- cc >= 1L & cc <= resolution
+    if (!any(ok_c)) next
+    for (dr in offsets) {
+      rr <- row[cand] + dr
+      ok <- ok_c & rr >= 1L & rr <= resolution
+      if (!any(ok)) next
+      ncell <- rr[ok] + (cc[ok] - 1L) * resolution
+      local_max[ok] <- pmax(local_max[ok], zbuf[ncell])
+    }
+  }
+
+  keep[valid_candidate_pos] <- face_depth[cand] >= local_max - tolerance
+  candidates[keep]
 }
 
 #' Compute boundary edges from visible faces
@@ -596,7 +714,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @keywords internal
 #' @noRd
 .build_merged_polygon_data <- function(surfatlas, views, surface,
-                                       projection_smooth = 0L) {
+                                       projection_smooth = 0L,
+                                       depth_cull = TRUE) {
   hemis <- c("left", "right")
   hemi_keys <- c(left = "lh", right = "rh")
 
@@ -632,6 +751,7 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 
     for (v in views) {
       proj <- .project_view(verts, v, h)
+      cull_xy <- proj$xy
       if (projection_smooth > 0L) {
         proj$xy <- .smooth_projected_xy(
           proj$xy,
@@ -644,7 +764,16 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       dots <- fnormals[, 1] * vdir[1] +
               fnormals[, 2] * vdir[2] +
               fnormals[, 3] * vdir[3]
-      visible <- which(dots > 0 & fparcel != 0)
+      visible <- which(dots > 0)
+      if (isTRUE(depth_cull)) {
+        visible <- .depth_cull_faces(
+          faces = faces,
+          proj_xy = cull_xy,
+          face_depth = .face_depth(verts, faces, vdir),
+          candidates = visible
+        )
+      }
+      visible <- visible[fparcel[visible] != 0]
       if (length(visible) == 0) next
 
       vis_faces  <- faces[visible, , drop = FALSE]
@@ -684,6 +813,190 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @keywords internal
 #' @noRd
 .build_merged_polygon_data_memo <- memoise::memoise(.build_merged_polygon_data)
+
+#' Build a filled cortex silhouette per panel (grey background underlay)
+#'
+#' Projects every visible (front-facing) face of each hemisphere and merges
+#' them into one silhouette polygon per panel, ignoring parcel identity. Used
+#' to draw the whole cortical surface as a flat backdrop under a (possibly
+#' sparse) parcellation, so labelled regions are seen in anatomical context
+#' instead of floating on the page.
+#'
+#' @param surfatlas A surfatlas object.
+#' @param views Character vector of views.
+#' @param hemis Character vector of hemispheres.
+#' @param surface Character: surface type (unused; kept for signature parity).
+#' @param projection_smooth Non-negative integer smoothing iterations.
+#' @return A tibble with columns \code{x, y, poly_id, panel}, or \code{NULL}.
+#' @keywords internal
+#' @noRd
+.build_surface_silhouette_data <- function(surfatlas, views, hemis, surface,
+                                           projection_smooth = 0L,
+                                           depth_cull = TRUE) {
+  hemi_keys <- c(left = "lh", right = "rh")
+  out <- list()
+  global_offset <- 0L
+
+  for (h in hemis) {
+    hk <- hemi_keys[[h]]
+    atlas_hemi <- surfatlas[[paste0(hk, "_atlas")]]
+    geom <- atlas_hemi@geometry
+    verts <- t(geom@mesh$vb[1:3, ])
+    faces <- t(geom@mesh$it)
+    neighbors <- if (projection_smooth > 0L) {
+      .mesh_vertex_neighbors(faces, nrow(verts))
+    } else {
+      NULL
+    }
+    fnormals <- .face_normals(verts, faces)
+
+    for (v in views) {
+      proj <- .project_view(verts, v, h)
+      cull_xy <- proj$xy
+      if (projection_smooth > 0L) {
+        proj$xy <- .smooth_projected_xy(
+          proj$xy,
+          neighbors = neighbors,
+          n_iter = projection_smooth
+        )
+      }
+      vdir <- proj$view_dir
+      dots <- fnormals[, 1] * vdir[1] +
+        fnormals[, 2] * vdir[2] +
+        fnormals[, 3] * vdir[3]
+      visible <- which(dots > 0)
+      if (isTRUE(depth_cull)) {
+        visible <- .depth_cull_faces(
+          faces = faces,
+          proj_xy = cull_xy,
+          face_depth = .face_depth(verts, faces, vdir),
+          candidates = visible
+        )
+      }
+      if (length(visible) == 0) next
+
+      vis_faces <- faces[visible, , drop = FALSE]
+      vis_parcel <- rep(1L, length(visible))
+      panel_label <- paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v))
+
+      merged <- .merge_parcel_polygons(
+        vis_faces, vis_parcel, proj$xy,
+        id_to_label = c("1" = "")
+      )
+      if (!is.null(merged) && nrow(merged) > 0) {
+        merged$poly_id <- merged$poly_id + global_offset
+        global_offset <- max(merged$poly_id)
+        merged$panel <- panel_label
+        out[[length(out) + 1L]] <- merged[, c("x", "y", "poly_id", "panel")]
+      }
+    }
+  }
+
+  if (length(out) == 0) return(NULL)
+  dplyr::bind_rows(out)
+}
+
+#' Memoised version of .build_surface_silhouette_data
+#' @keywords internal
+#' @noRd
+.build_surface_silhouette_data_memo <- memoise::memoise(
+  .build_surface_silhouette_data
+)
+
+#' Build per-face shading data for the whole visible cortex
+#'
+#' Returns one triangle per visible (front-facing) face of each hemisphere with
+#' its lambertian shading term (\code{shade} = normal . view direction). Used to
+#' give the grey cortex backdrop real sulcal/gyral depth instead of a flat fill:
+#' oblique faces (sulcal walls) shade darker, crowns stay light. Unlike
+#' [.build_brain_polygon_data()] it keeps \emph{all} faces, not just labelled
+#' parcels.
+#'
+#' @param surfatlas A surfatlas object.
+#' @param views Character vector of views.
+#' @param hemis Character vector of hemispheres.
+#' @param surface Character: surface type (unused; signature parity).
+#' @param projection_smooth Non-negative integer smoothing iterations.
+#' @return A tibble with columns \code{x, y, face_id, shade, panel}, or
+#'   \code{NULL}.
+#' @keywords internal
+#' @noRd
+.build_surface_background_data <- function(surfatlas, views, hemis, surface,
+                                           projection_smooth = 0L,
+                                           depth_cull = TRUE) {
+  hemi_keys <- c(left = "lh", right = "rh")
+  out <- list()
+  global_face_id <- 0L
+
+  for (h in hemis) {
+    atlas_hemi <- surfatlas[[paste0(hemi_keys[[h]], "_atlas")]]
+    geom <- atlas_hemi@geometry
+    verts <- t(geom@mesh$vb[1:3, ])
+    faces <- t(geom@mesh$it)
+    neighbors <- if (projection_smooth > 0L) {
+      .mesh_vertex_neighbors(faces, nrow(verts))
+    } else {
+      NULL
+    }
+    fnormals <- .face_normals(verts, faces)
+
+    for (v in views) {
+      proj <- .project_view(verts, v, h)
+      cull_xy <- proj$xy
+      if (projection_smooth > 0L) {
+        proj$xy <- .smooth_projected_xy(
+          proj$xy,
+          neighbors = neighbors,
+          n_iter = projection_smooth
+        )
+      }
+      vdir <- proj$view_dir
+      dots <- fnormals[, 1] * vdir[1] +
+        fnormals[, 2] * vdir[2] +
+        fnormals[, 3] * vdir[3]
+      visible <- which(dots > 0)
+      face_depth <- .face_depth(verts, faces, vdir)
+      if (isTRUE(depth_cull)) {
+        visible <- .depth_cull_faces(
+          faces = faces,
+          proj_xy = cull_xy,
+          face_depth = face_depth,
+          candidates = visible
+        )
+      }
+      if (length(visible) == 0) next
+
+      visible <- visible[order(face_depth[visible])]
+
+      vis_faces <- faces[visible, , drop = FALSE]
+      vis_shade <- dots[visible]
+      n_vis <- length(visible)
+      fids <- global_face_id + seq_len(n_vis)
+      global_face_id <- global_face_id + n_vis
+      panel_label <- paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v))
+
+      out[[length(out) + 1L]] <- tibble::tibble(
+        x = c(proj$xy[vis_faces[, 1], 1], proj$xy[vis_faces[, 2], 1],
+              proj$xy[vis_faces[, 3], 1]),
+        y = c(proj$xy[vis_faces[, 1], 2], proj$xy[vis_faces[, 2], 2],
+              proj$xy[vis_faces[, 3], 2]),
+        face_id = rep(fids, 3),
+        shade = rep(vis_shade, 3),
+        panel = panel_label
+      )
+    }
+  }
+
+  if (length(out) == 0) return(NULL)
+  dplyr::bind_rows(out)
+}
+
+#' Memoised version of .build_surface_background_data
+#' @keywords internal
+#' @noRd
+.build_surface_background_data_memo <- memoise::memoise(
+  .build_surface_background_data
+)
 
 #' Project 3D vertices to 2D for a given view
 #'
@@ -877,7 +1190,8 @@ project_surface_view <- function(verts,
 #' @keywords internal
 #' @noRd
 .build_brain_polygon_data <- function(surfatlas, views, surface,
-                                      projection_smooth = 0L) {
+                                      projection_smooth = 0L,
+                                      depth_cull = TRUE) {
   hemis <- c("left", "right")
   hemi_keys <- c(left = "lh", right = "rh")
 
@@ -918,6 +1232,7 @@ project_surface_view <- function(verts,
 
     for (v in views) {
       proj <- .project_view(verts, v, h)
+      cull_xy <- proj$xy
       if (projection_smooth > 0L) {
         proj$xy <- .smooth_projected_xy(
           proj$xy,
@@ -929,9 +1244,20 @@ project_surface_view <- function(verts,
 
       # Backface culling: keep faces whose normal dots positively with view dir
       dots <- fnormals[, 1] * vdir[1] + fnormals[, 2] * vdir[2] + fnormals[, 3] * vdir[3]
-      visible <- which(dots > 0 & fparcel != 0)
+      face_depth <- .face_depth(verts, faces, vdir)
+      visible <- which(dots > 0)
+      if (isTRUE(depth_cull)) {
+        visible <- .depth_cull_faces(
+          faces = faces,
+          proj_xy = cull_xy,
+          face_depth = face_depth,
+          candidates = visible
+        )
+      }
+      visible <- visible[fparcel[visible] != 0]
 
       if (length(visible) == 0) next
+      visible <- visible[order(face_depth[visible])]
 
       n_vis <- length(visible)
       fids <- global_face_id + seq_len(n_vis)
@@ -1008,6 +1334,9 @@ project_surface_view <- function(verts,
 #'   smoothing iterations applied to projected vertex coordinates before
 #'   polygon and boundary construction. \code{0} (default) keeps native mesh
 #'   coordinates.
+#' @param depth_cull Logical. If \code{TRUE} (default), remove faces hidden
+#'   behind nearer cortical surface faces in the projected view. This prevents
+#'   far-side folds from shining through medial/lateral panels.
 #' @param use_cache Logical. If \code{TRUE} (default), use memoized builders.
 #'
 #' @return A list with components:
@@ -1021,7 +1350,8 @@ build_surface_polygon_data <- function(surfatlas,
                                        surface = "inflated",
                                        merged = TRUE,
                                        projection_smooth = 0L,
-                                       use_cache = TRUE) {
+                                       use_cache = TRUE,
+                                       depth_cull = TRUE) {
   if (!inherits(surfatlas, "surfatlas")) {
     stop("'surfatlas' must inherit from class 'surfatlas'.", call. = FALSE)
   }
@@ -1037,6 +1367,10 @@ build_surface_polygon_data <- function(surfatlas,
   }
   if (!is.logical(use_cache) || length(use_cache) != 1 || is.na(use_cache)) {
     stop("'use_cache' must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.logical(depth_cull) || length(depth_cull) != 1 ||
+      is.na(depth_cull)) {
+    stop("'depth_cull' must be TRUE or FALSE.", call. = FALSE)
   }
   if (!is.numeric(projection_smooth) || length(projection_smooth) != 1 ||
       is.na(projection_smooth) || projection_smooth < 0 ||
@@ -1064,7 +1398,8 @@ build_surface_polygon_data <- function(surfatlas,
     surfatlas = surfatlas,
     views = views,
     surface = surface,
-    projection_smooth = projection_smooth
+    projection_smooth = projection_smooth,
+    depth_cull = depth_cull
   )
 }
 
@@ -1085,7 +1420,8 @@ build_surface_polygon_data <- function(surfatlas,
                                         views,
                                         hemis,
                                         projection_smooth = 0L,
-                                        threshold = NULL) {
+                                        threshold = NULL,
+                                        depth_cull = TRUE) {
   hemi_keys <- c(left = "lh", right = "rh")
   poly_list <- list()
   boundary_list <- list()
@@ -1110,6 +1446,7 @@ build_surface_polygon_data <- function(surfatlas,
 
     for (v in views) {
       proj <- .project_view(verts, v, h)
+      cull_xy <- proj$xy
       if (projection_smooth > 0L) {
         proj$xy <- .smooth_projected_xy(
           proj$xy,
@@ -1122,8 +1459,18 @@ build_surface_polygon_data <- function(surfatlas,
         fnormals[, 2] * vdir[2] +
         fnormals[, 3] * vdir[3]
 
+      face_depth <- .face_depth(verts, faces, vdir)
       visible <- which(dots > 0)
+      if (isTRUE(depth_cull)) {
+        visible <- .depth_cull_faces(
+          faces = faces,
+          proj_xy = cull_xy,
+          face_depth = face_depth,
+          candidates = visible
+        )
+      }
       if (length(visible) == 0) next
+      visible <- visible[order(face_depth[visible])]
 
       vis_faces <- faces[visible, , drop = FALSE]
       fvals <- rowMeans(
@@ -1537,6 +1884,10 @@ build_surface_polygon_data <- function(surfatlas,
 #'   polygons are constructed. This smooths filled parcel edges while
 #'   preserving shared boundaries across parcels. \code{0} (default) keeps raw
 #'   projected coordinates.
+#' @param depth_cull Logical. If \code{TRUE} (default), remove faces hidden
+#'   behind nearer cortical surface faces in each projected view. This makes
+#'   static medial/lateral panels read as opaque cortex instead of showing
+#'   far-side folds through the mesh.
 #' @param border_color Colour for parcel boundary lines. Default:
 #'   \code{"grey30"}.
 #' @param border_size Line width for parcel boundaries. Default: \code{0.15}.
@@ -1614,6 +1965,15 @@ build_surface_polygon_data <- function(surfatlas,
 #'   that takes the default panel name and returns a new label.
 #' @param outline Logical. If \code{TRUE}, draw every triangle edge (mesh
 #'   wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.
+#' @param background Logical. If \code{TRUE}, draw the full cortical surface
+#'   beneath the parcellation, so sparse atlases (e.g. the Wang visual areas,
+#'   which label only part of cortex) are shown in anatomical context rather
+#'   than floating on the page. The backdrop is given sulcal/gyral depth via
+#'   normal-based shading (controlled by \code{shading_strength}/
+#'   \code{shading_gamma}), so it reads as a folded surface rather than a flat
+#'   silhouette. Default: \code{FALSE}.
+#' @param background_color Fill colour for the cortex backdrop when
+#'   \code{background = TRUE}. Default: \code{"grey80"}.
 #' @param bg Character: background colour for the plot. Default: \code{"white"}.
 #' @param ... Additional arguments (currently unused).
 #'
@@ -1709,9 +2069,19 @@ plot_brain <- function(surfatlas,
                        caption = NULL,
                        panel_labels = NULL,
                        outline = FALSE,
+                       background = FALSE,
+                       background_color = "grey80",
+                       depth_cull = TRUE,
                        bg = "white",
                        ...) {
   style <- match.arg(style)
+
+  if (!is.logical(background) || length(background) != 1 || is.na(background)) {
+    stop("'background' must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.logical(depth_cull) || length(depth_cull) != 1 || is.na(depth_cull)) {
+    stop("'depth_cull' must be TRUE or FALSE.", call. = FALSE)
+  }
 
   panel_layout_missing <- missing(panel_layout)
   border_color_missing <- missing(border_color)
@@ -1809,14 +2179,16 @@ plot_brain <- function(surfatlas,
       surfatlas,
       views,
       surface,
-      projection_smooth = projection_smooth
+      projection_smooth = projection_smooth,
+      depth_cull = depth_cull
     )
   } else {
     build_result <- .build_merged_polygon_data_memo(
       surfatlas,
       views,
       surface,
-      projection_smooth = projection_smooth
+      projection_smooth = projection_smooth,
+      depth_cull = depth_cull
     )
   }
   poly_data <- build_result$polygons
@@ -1933,6 +2305,45 @@ plot_brain <- function(surfatlas,
   panel_label_map <- stats::setNames(panel_display_labels, panel_levels)
   poly_data$panel <- factor(poly_data$panel, levels = panel_levels)
 
+  # Optional grey cortex backdrop: the full hemisphere silhouette drawn under
+  # the parcellation, so sparse atlases (e.g. Wang visual areas) are shown in
+  # anatomical context rather than floating on the page.
+  base_data <- NULL
+  bg_shade_data <- NULL
+  if (isTRUE(background)) {
+    base_data <- .build_surface_silhouette_data_memo(
+      surfatlas, views, hemis, surface,
+      projection_smooth = projection_smooth,
+      depth_cull = depth_cull
+    )
+    if (!is.null(base_data) && nrow(base_data) > 0) {
+      if (!is.null(panel_transforms)) {
+        base_data <- .apply_panel_layout_to_points(base_data, panel_transforms)
+      }
+      base_data$panel <- factor(base_data$panel, levels = panel_levels)
+    } else {
+      base_data <- NULL
+    }
+
+    # Per-face lambertian shading over the whole cortex gives the grey backdrop
+    # real sulcal/gyral depth (otherwise it reads as a flat silhouette).
+    bg_shade_data <- .build_surface_background_data_memo(
+      surfatlas, views, hemis, surface,
+      projection_smooth = projection_smooth,
+      depth_cull = depth_cull
+    )
+    if (!is.null(bg_shade_data) && nrow(bg_shade_data) > 0) {
+      if (!is.null(panel_transforms)) {
+        bg_shade_data <- .apply_panel_layout_to_points(
+          bg_shade_data, panel_transforms
+        )
+      }
+      bg_shade_data$panel <- factor(bg_shade_data$panel, levels = panel_levels)
+    } else {
+      bg_shade_data <- NULL
+    }
+  }
+
   # --- Build plot ---
   # When outline is disabled, paint polygon borders the same colour as fill
   # to eliminate anti-aliasing seams between adjacent same-parcel triangles.
@@ -1940,6 +2351,18 @@ plot_brain <- function(surfatlas,
 
   p <- ggplot2::ggplot(poly_data,
                        ggplot2::aes(x = x, y = y, group = .data[[group_col]]))
+
+  # Grey cortex backdrop must be drawn first so the parcellation sits on top.
+  if (!is.null(base_data)) {
+    p <- p + ggplot2::geom_polygon(
+      data = base_data,
+      mapping = ggplot2::aes(x = x, y = y, group = poly_id),
+      fill = background_color,
+      colour = background_color,
+      linewidth = poly_lwd,
+      inherit.aes = FALSE
+    )
+  }
 
   # Build fixed geom params — only include colour when outline is on
   geom_params <- list(linewidth = poly_lwd, alpha = fill_alpha)
@@ -1980,7 +2403,8 @@ plot_brain <- function(surfatlas,
     p <- p + ggplot2::scale_fill_identity()
   } else {
     p <- p + scico::scale_fill_scico(
-      palette = palette, limits = lim, oob = scales::squish, na.value = bg
+      palette = palette, limits = lim, oob = scales::squish, na.value = bg,
+      guide = if (interactive) ggplot2::waiver() else "none"
     )
   }
 
@@ -2013,7 +2437,8 @@ plot_brain <- function(surfatlas,
       views = views,
       hemis = hemis,
       projection_smooth = projection_smooth,
-      threshold = overlay_threshold
+      threshold = overlay_threshold,
+      depth_cull = depth_cull
     )
 
     ov_poly <- ov_build$polygons
@@ -2088,26 +2513,37 @@ plot_brain <- function(surfatlas,
     }
   }
 
-  # Optional shading overlay (static polygons; uses triangle mesh data)
-  if (isTRUE(shading) && !is.null(shading_strength) && shading_strength > 0) {
-    if (!outline) {
-      shade_build <- .build_brain_polygon_data_memo(surfatlas, views, surface)
+  # Optional shading overlay (static polygons; uses triangle mesh data).
+  # `background = TRUE` shades the whole cortex (so the grey backdrop gets
+  # sulcal depth); otherwise `shading = TRUE` shades just the labelled parcels.
+  do_shading <- (isTRUE(shading) || isTRUE(background)) &&
+    !is.null(shading_strength) && shading_strength > 0
+  if (do_shading) {
+    if (isTRUE(background) && !is.null(bg_shade_data)) {
+      # Already panel-transformed and factored above.
+      shade_data <- bg_shade_data
+    } else if (!outline) {
+      shade_build <- .build_brain_polygon_data_memo(
+        surfatlas, views, surface,
+        projection_smooth = projection_smooth,
+        depth_cull = depth_cull
+      )
       shade_data <- shade_build$polygons
       shade_data <- shade_data[shade_data$hemi %in% hemis, , drop = FALSE]
       shade_data <- shade_data[shade_data$panel %in% levels(poly_data$panel), ,
                                drop = FALSE]
+      if (!is.null(panel_transforms)) {
+        shade_data <- .apply_panel_layout_to_points(shade_data, panel_transforms)
+      }
+      shade_data$panel <- factor(shade_data$panel,
+                                 levels = levels(poly_data$panel))
     } else {
       shade_data <- poly_data
     }
 
     if (!is.null(shade_data) && nrow(shade_data) > 0 &&
         "shade" %in% names(shade_data)) {
-      if (!is.null(panel_transforms)) {
-        shade_data <- .apply_panel_layout_to_points(shade_data, panel_transforms)
-      }
-      shade_data$panel <- factor(shade_data$panel,
-                                 levels = levels(poly_data$panel))
-
+      # shade_data is already panel-transformed and factored by each branch.
       shade_data$alpha <- shading_strength *
         (pmax(0, 1 - shade_data$shade) ^ shading_gamma)
 
@@ -2261,6 +2697,16 @@ plot_brain <- function(surfatlas,
     ggplot2::theme_void() +
     ggplot2::theme(
       plot.background = ggplot2::element_rect(fill = bg, colour = NA),
+      panel.spacing.x = if (identical(style, "ggseg_like")) {
+        ggplot2::unit(2, "lines")
+      } else {
+        ggplot2::unit(0.5, "lines")
+      },
+      panel.spacing.y = if (identical(style, "ggseg_like")) {
+        ggplot2::unit(0.6, "lines")
+      } else {
+        ggplot2::unit(0.5, "lines")
+      },
       strip.text = ggplot2::element_text(size = 11, face = "bold",
                                          margin = ggplot2::margin(t = 2, b = 6))
     ) +
@@ -2365,16 +2811,9 @@ plot_brain <- function(surfatlas,
     ggplot2::theme_void() +
     ggplot2::theme(
       legend.position = position,
-      plot.background = ggplot2::element_rect(fill = NA, colour = NA)
+      plot.background = ggplot2::element_rect(fill = bg, colour = NA),
+      panel.background = ggplot2::element_rect(fill = bg, colour = NA),
+      legend.background = ggplot2::element_rect(fill = bg, colour = NA)
     )
-  cowplot_extract <- function(pl) {
-    gt <- ggplot2::ggplotGrob(pl)
-    guide_idx <- grep("guide", gt$layout$name)
-    if (length(guide_idx) == 0) return(pl)
-    guide_grob <- gt$grobs[[guide_idx[1]]]
-    ggplot2::ggplot() + ggplot2::theme_void() +
-      ggplot2::theme(plot.background = ggplot2::element_rect(fill = NA, colour = NA)) +
-      ggplot2::annotation_custom(guide_grob)
-  }
-  cowplot_extract(p)
+  p
 }

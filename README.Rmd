@@ -61,9 +61,16 @@ library(neuroatlas)
 # Get a Schaefer atlas (200 parcels, 7 networks)
 schaefer <- get_schaefer_atlas(parcels = 200, networks = 7)
 print(schaefer)
+#> ══ Schaefer Atlas ══════════════════════════════════════════════════════════════
+#> Name: Schaefer-200-7networks
+#> Dimensions: 182 x 218 x 182
+#> Regions: 200
+#> Networks: 7
+#> Hemispheres: left: 100, right: 100
+#> Unique networks: 7
 
-# Extract specific ROIs
-roi <- get_roi(schaefer, "DefaultA")
+# Extract a specific ROI by label (e.g. the first visual parcel)
+roi <- get_roi(schaefer, "Vis_1")
 
 # Get Glasser atlas
 glasser <- get_glasser_atlas()
@@ -84,29 +91,33 @@ schaefer <- get_atlas("schaefer2018", parcels = "100", networks = "7")
 
 ## Palette demos
 
-`neuroatlas` now includes perceptually-optimised palettes for atlas ROIs. For
+`neuroatlas` includes perceptually-optimised palettes for atlas ROIs. For
 instance, you can generate a slice-aware palette for the Schaefer 200×7 atlas
-and feed it directly into `ggseg`:
+and feed it directly into `plot_brain()`:
 
 ```{r roi-palette, eval = FALSE}
 library(neuroatlas)
-library(dplyr)
-library(ggseg)
 
 schaefer <- get_schaefer_atlas(parcels = 200, networks = 7)
-meta <- roi_metadata(schaefer)
 
-pal <- roi_colors_maximin_view(
-  meta,
-  hemi_col = "hemi",
-  network_col = "network",
-  pair_col = "pair_id",
+colors <- atlas_roi_colors(
+  schaefer,
+  method = "maximin_view",
   seed = 1
 )
 
-ggseg_schaefer(parcels = 200, networks = 7) +
-  geom_sf(aes(fill = pal$color[match(label, pal$roi)])) +
-  scale_fill_identity()
+schaefer_surface <- schaefer_surf(parcels = 200, networks = 7)
+
+plot_brain(
+  schaefer_surface,
+  colors = colors,
+  interactive = FALSE,
+  style = "ggseg_like"
+)
+```
+
+```{r roi-palette-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Schaefer-200 (7-network) parcellation on the fsaverage6 surface with a perceptually-optimised maximin colour palette; lateral and medial views of both hemispheres."}
+knitr::include_graphics("man/figures/README-roi-palette.png")
 ```
 
 ## Available Atlases

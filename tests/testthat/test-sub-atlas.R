@@ -205,3 +205,17 @@ test_that("sub_atlas can be applied iteratively", {
   expect_equal(sub2$ids, 1L)
   expect_equal(sub2$labels, "RegionA")
 })
+
+test_that("sub_atlas errors clearly on surface atlases (unsupported)", {
+  # Surface atlases have no $atlas volume; sub_atlas must fail loudly rather
+  # than silently produce a broken object.
+  fake_surf <- structure(
+    list(name = "fake", ids = 1:4, labels = letters[1:4],
+         hemi = rep(c("left", "right"), 2)),
+    class = c("fake", "surfatlas", "atlas")
+  )
+  expect_error(
+    sub_atlas(fake_surf, ids = 1:2),
+    class = "neuroatlas_error_unsupported"
+  )
+})

@@ -20,6 +20,8 @@ NULL
 #'   \code{"white"}).
 #' @param projection_smooth Integer: number of Laplacian smoothing iterations
 #'   on projected coordinates (default \code{0L}).
+#' @param depth_cull Logical. If \code{TRUE} (default), remove faces hidden
+#'   behind nearer cortical surface faces in the projected view.
 #' @return A list with two elements:
 #'   \describe{
 #'     \item{\code{polygons}}{Tibble of 2D projected polygon vertices with
@@ -29,6 +31,13 @@ NULL
 #'   }
 #' @export
 build_brain_polygon_data <- function(surfatlas, views, surface,
-                                     projection_smooth = 0L) {
-  .build_merged_polygon_data_memo(surfatlas, views, surface, projection_smooth)
+                                     projection_smooth = 0L,
+                                     depth_cull = TRUE) {
+  .build_merged_polygon_data_memo(
+    surfatlas = surfatlas,
+    views = views,
+    surface = surface,
+    projection_smooth = projection_smooth,
+    depth_cull = depth_cull
+  )
 }

@@ -2,26 +2,27 @@
 title: Working with TemplateFlow in neuroatlas
 author: neuroatlas Dev Team
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Working with TemplateFlow in neuroatlas}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2.0
+    css: albers.css
+    includes:
+      in_header: albers-header.html
 params:
   family: red
-css: albers.css
+  preset: homage
 resource_files:
 - albers.css
 - albers.js
-includes:
-  in_header: |-
-    <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+- albers-header.html
 
+vignette: |
+  %\VignetteIndexEntry{Working with TemplateFlow in neuroatlas} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE, eval = TRUE}
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -42,6 +43,19 @@ try({
 }, silent = TRUE)
 ```
 
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    '});</script>'
+  ),
+  params$family,
+  params$preset
+))
+```
+
 ## Introduction
 
 [TemplateFlow](https://www.templateflow.org/) is a repository of curated neuroimaging templates and atlases, accessible via a Python client. The `neuroatlas` package provides an R interface to TemplateFlow, allowing you to easily discover, download, and use these resources within your R workflows.
@@ -55,7 +69,7 @@ The main entry point for interacting with TemplateFlow is by creating a `templat
 ```{r create_tf_object, eval = FALSE}
 # Create a templateflow interface object
 tf <- create_templateflow()
-print(tf)
+tf
 ```
 
 If Python or the templateflow module are not available, you'll need to install them first:
@@ -65,7 +79,7 @@ If Python or the templateflow module are not available, you'll need to install t
 install_templateflow()
 ```
 
-Running `print(tf)` (if `tf` is successfully created) will show you:
+Inspecting `tf` after it is successfully created will show you:
 - The local cache path where TemplateFlow files will be stored. `neuroatlas` sets this up in a user-specific directory (e.g., `~/.cache/neuroatlas/templateflow` on Linux).
 - The status of the connection to the Python API.
 - A few examples of available templates and their total count.
@@ -92,10 +106,10 @@ Use `tflow_spaces()` to get a list of all top-level template space identifiers:
 ```{r list_templates, eval = templateflow_ok}
 # List all available template spaces
 all_templates <- tflow_spaces()
-print(head(all_templates))
+head(all_templates)
 cat("Total templates available:", length(all_templates), "\n")
 ```
-(If nothing prints here during build, see the note below.)
+(If the template list does not appear during build, see the note below.)
 
 ```{r list_templates_note, eval = !templateflow_ok}
 cat("TemplateFlow was not available during vignette build.\n")
@@ -106,7 +120,7 @@ You can also filter this list with a pattern (regular expression):
 ```{r list_templates_pattern, eval = templateflow_ok}
 # Find all MNI templates
 mni_templates <- tflow_spaces(pattern = "MNI")
-print(mni_templates)
+mni_templates
 ```
 ```{r list_templates_pattern_note, eval = !templateflow_ok}
 cat("TemplateFlow was not available during vignette build.\n")
@@ -123,35 +137,35 @@ mni_t1w_files <- tflow_files(
   space = "MNI152NLin2009cAsym",
   query_args = list(suffix = "T1w")
 )
-print(mni_t1w_files)
+mni_t1w_files
 
 # Find brain masks at specific resolution
 mni_masks <- tflow_files(
   space = "MNI152NLin2009cAsym",
   query_args = list(suffix = "mask", desc = "brain", resolution = "1")
 )
-print(mni_masks)
+mni_masks
 
 # Find tissue probability maps (GM, WM, CSF)
 mni_probseg <- tflow_files(
   space = "MNI152NLin2009cAsym",
   query_args = list(suffix = "probseg")
 )
-print(mni_probseg)
+mni_probseg
 
 # Find all files at 2mm resolution
 mni_2mm <- tflow_files(
   space = "MNI152NLin2009cAsym",
   query_args = list(resolution = "2")
 )
-print(mni_2mm)
+mni_2mm
 
 # Find atlas/parcellation files
 mni_atlases <- tflow_files(
   space = "MNI152NLin2009cAsym",
   query_args = list(suffix = "dseg")  # discrete segmentation
 )
-print(mni_atlases)
+mni_atlases
 ```
 
 Common volumetric query parameters:
@@ -175,7 +189,7 @@ tflow_spaces(pattern = "fs")
 # List available surface files for fsLR
 # Filter by hemisphere
 fslr_left <- tflow_files("fsLR", query_args = list(hemi = "L"))
-print(head(fslr_left))
+head(fslr_left)
 
 # Filter by surface type and density
 fslr_midthick <- tflow_files("fsLR", query_args = list(
@@ -183,14 +197,14 @@ fslr_midthick <- tflow_files("fsLR", query_args = list(
   hemi = "L",
   density = "32k"
 ))
-print(fslr_midthick)
+fslr_midthick
 
 # List fsaverage surfaces
 fsavg_pial <- tflow_files("fsaverage", query_args = list(
   suffix = "pial",
   hemi = "L"
 ))
-print(fsavg_pial)
+fsavg_pial
 ```
 
 Common surface query parameters:
@@ -227,12 +241,12 @@ To get the default MNI T1-weighted brain template (1mm resolution):
 ```{r get_default_template, eval = FALSE}
 # Get the default template (MNI152NLin2009cAsym T1w brain at 1mm)
 mni_t1w <- get_template() 
-print(mni_t1w)
+mni_t1w
 ```
 For this vignette, we'll simulate the object:
 ```{r get_default_template_mock, echo=FALSE, eval=TRUE}
 mni_t1w <- mock_neurovol("MNI152NLin2009cAsym_T1w")
-print(mni_t1w$name) # Printing just name for brevity
+mni_t1w$name
 ```
 
 To fetch a specific template space, suffix, and resolution:
@@ -243,7 +257,7 @@ mni_t1w_res2 <- get_template(
   suffix = "T1w", 
   resolution = "2" # or 2
 )
-print(mni_t1w_res2)
+mni_t1w_res2
 ```
 
 ### Fetching Other Variants (e.g., Masks)
@@ -257,7 +271,7 @@ mni_brain_mask <- get_template(
   suffix = "mask",
   resolution = "1"
 )
-print(mni_brain_mask)
+mni_brain_mask
 ```
 
 ### Tissue Probability (GM/WM/CSF)
@@ -273,7 +287,7 @@ mni_gm_prob <- get_template(
   label = "GM",
   resolution = "1"
 )
-print(mni_gm_prob)
+mni_gm_prob
 
 # File path only
 gm_path <- get_template(
@@ -282,7 +296,7 @@ gm_path <- get_template(
   label = "GM",
   path_only = TRUE
 )
-print(gm_path)
+gm_path
 ```
 
 ### Getting File Paths Only
@@ -295,7 +309,7 @@ mni_t1w_path <- get_template(
   suffix = "T1w", 
   path_only = TRUE
 )
-print(mni_t1w_path)
+mni_t1w_path
 ```
 Example output (path will vary):
 ```
@@ -312,10 +326,10 @@ t1_multi_res <- get_template(
   suffix = "T1w",
   resolution = c("1", "2") # Get both 1mm and 2mm
 )
-print(names(t1_multi_res))
+names(t1_multi_res)
 # Access individual resolutions
-print(t1_multi_res[["1"]]) # The 1mm NeuroVol
-print(t1_multi_res[["2"]]) # The 2mm NeuroVol
+t1_multi_res[["1"]] # The 1mm NeuroVol
+t1_multi_res[["2"]] # The 2mm NeuroVol
 ```
 
 ### Key Parameters for `get_template()`
@@ -333,19 +347,36 @@ The function performs pre-flight validation checks for `space` and `resolution` 
 
 ## Typed Helper Functions
 
-For common tasks, `neuroatlas` provides convenient wrappers:
+For common tasks, use `get_template()` for volumes and
+`get_surface_template()` for surface file paths:
 
-### Volumetric Data with `get_volume_template()`
+### Volumetric Data with `get_template()`
 ```{r get_volume_helper, eval = FALSE}
-# Get T1-weighted volume using the convenience function
-t1_vol <- get_volume_template(
-  template = "MNI152NLin2009cAsym", 
-  type = "T1w", 
+# Get a T1-weighted brain volume
+t1_vol <- get_template(
+  space = "MNI152NLin2009cAsym",
+  variant = "brain",
+  modality = "T1w",
   resolution = "1"
 )
-print(t1_vol)
+t1_vol
 ```
-Supported `type`s include "T1w", "T2w", "bold", "probseg", "dseg".
+
+Example output is abbreviated here because the exact path, data range, and
+cache state depend on your local TemplateFlow installation:
+
+```
+#> <NeuroVol> ...
+#> -- Spatial ---------------------------------------------------------------
+#> Dimensions: 193 x 229 x 193
+#> Spacing: 1 x 1 x 1 mm
+#> Orientation: RAS
+#> -- Data ------------------------------------------------------------------
+#> Range: [0.000, ...]
+```
+
+For masks, probability maps, segmentations, or other modalities, change
+`variant`, `modality`, `label`, or `suffix` as shown above.
 
 ### Surface Data with `get_surface_template()`
 This helper typically returns file paths, as surfaces are often handled by specialized geometry software.
@@ -357,7 +388,7 @@ fslr_pial_L_path <- get_surface_template(
   hemi = "L",                 # "L" or "R"
   density = "32k"             # e.g., "32k", "164k" (for fsLR)
 )
-print(fslr_pial_L_path)
+fslr_pial_L_path
 ```
 Example output (path will vary):
 ```
@@ -435,7 +466,7 @@ You can inspect and manage the `neuroatlas`-specific TemplateFlow cache:
 ```{r cache_management, eval = FALSE}
 # Show the path to the cache directory
 cache_loc <- show_templateflow_cache_path()
-print(cache_loc)
+cache_loc
 
 # Clear the disk cache and R-level memoisation for TemplateFlow paths
 # clear_templateflow_cache()                 # Asks for confirmation if interactive
@@ -459,7 +490,7 @@ schaefer_in_mni_res2 <- get_schaefer_atlas(
   networks = "7",
   outspace = list(space = "MNI152NLin2009cAsym", resolution = "2")
 )
-print(schaefer_in_mni_res2)
+schaefer_in_mni_res2
 ```
 This uses an internal helper `.resolve_template_input()` to fetch the template and extract its `NeuroSpace` information.
 

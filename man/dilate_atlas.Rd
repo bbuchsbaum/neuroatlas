@@ -33,9 +33,14 @@ between parcels or extending parcels into neighboring regions.
 \details{
 The dilation process:
 \itemize{
-  \item Identifies unassigned voxels within the mask that are adjacent to existing parcels
-  \item For each unassigned voxel, finds nearby assigned voxels within the specified radius
-  \item Assigns the unassigned voxel to the nearest parcel
+  \item Identifies unassigned voxels that lie within the mask
+  \item For each unassigned voxel, finds assigned voxels within \code{radius}
+    (Euclidean distance, in voxel units)
+  \item Assigns the voxel to a parcel by inverse-distance-weighted voting over
+    those neighbours (up to \code{maxn} of them)
+  \item Leaves a voxel unassigned when no parcel lies within \code{radius},
+    so distant in-mask voxels (e.g. cerebellar grey matter for a cortical
+    atlas) are not absorbed
   \item Respects mask boundaries to prevent dilation into unwanted regions
 }
 

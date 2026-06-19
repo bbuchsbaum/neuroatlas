@@ -2,26 +2,27 @@
 title: 'Surface Templates: Geometry vs. Data'
 author: neuroatlas Dev Team
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Surface Templates: Geometry vs. Data}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2.0
+    css: albers.css
+    includes:
+      in_header: albers-header.html
 params:
   family: red
-css: albers.css
+  preset: homage
 resource_files:
 - albers.css
 - albers.js
-includes:
-  in_header: |-
-    <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+- albers-header.html
 
+vignette: |
+  %\VignetteIndexEntry{Surface Templates: Geometry vs. Data} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -36,6 +37,19 @@ try({
   templateflow_ok <- reticulate::py_available(initialize = TRUE) &&
     reticulate::py_module_available("templateflow")
 }, silent = TRUE)
+```
+
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    '});</script>'
+  ),
+  params$family,
+  params$preset
+))
 ```
 
 ## Why this vignette
@@ -175,7 +189,8 @@ neurosurf::snapshot_surface(geom_l, file = png_path)
 png_path
 ```
 
-```{r snapshot-show, echo=FALSE, eval=FALSE, fig.alt="fsLR 32k inflated left hemisphere surface snapshot"}
+```{r snapshot-show, echo=FALSE, eval=TRUE, fig.alt="fsLR 32k inflated left hemisphere surface snapshot"}
+# Committed snapshot, so it renders even when TemplateFlow is unavailable.
 knitr::include_graphics(file.path("figures", "fslr32k_inflated_L.png"))
 ```
 

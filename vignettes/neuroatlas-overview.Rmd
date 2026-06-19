@@ -2,26 +2,27 @@
 title: Getting Started with neuroatlas
 author: neuroatlas Dev Team
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Getting Started with neuroatlas}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2.0
+    css: albers.css
+    includes:
+      in_header: albers-header.html
 params:
   family: red
-css: albers.css
+  preset: homage
 resource_files:
 - albers.css
 - albers.js
-includes:
-  in_header: |-
-    <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+- albers-header.html
 
+vignette: |
+  %\VignetteIndexEntry{Getting Started with neuroatlas} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -29,6 +30,19 @@ knitr::opts_chunk$set(
   eval = FALSE # Set to FALSE to avoid downloads during vignette build
 )
 library(neuroatlas)
+```
+
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    '});</script>'
+  ),
+  params$family,
+  params$preset
+))
 ```
 
 ## Introduction
@@ -49,10 +63,17 @@ Key features include:
 
 The Schaefer atlas provides cortical parcellations organized by functional networks. It's available in multiple resolutions (100-1000 parcels) and network configurations (7 or 17 networks).
 
-```{r schaefer_basic}
+```{r schaefer_basic, eval = FALSE}
 # Load Schaefer atlas with 200 parcels and 7 networks
 atlas_200_7 <- get_schaefer_atlas(parcels = "200", networks = "7")
-print(atlas_200_7)
+atlas_200_7
+#> ══ Schaefer Atlas ══════════════════════════════════════════════════════════════
+#> Name: Schaefer-200-7networks
+#> Dimensions: 182 x 218 x 182
+#> Regions: 200
+#> Networks: 7
+#> Hemispheres: left: 100, right: 100
+#> Unique networks: 7
 
 # Use convenience functions for common configurations
 atlas_400_17 <- sy_400_17()  # 400 parcels, 17 networks
@@ -70,38 +91,67 @@ The atlas object contains:
 
 The Glasser atlas provides 360 cortical areas defined using multi-modal MRI data:
 
-```{r glasser}
+```{r glasser, eval = FALSE}
 # Load the Glasser atlas
 glasser <- get_glasser_atlas()
-print(glasser)
+glasser
+#> ── Glasser Atlas Summary ────────────────────────────────────────
+#>
+#> ℹ Atlas Type: Glasser Multi-Modal Parcellation
+#> ℹ Resolution: MNI Space
+#> ℹ Dimensions: 97 x 115 x 97
+#>
+#> ◉ Region Summary:
+#> |- Total Regions:      360
+#> |- Left Hemisphere:    180
+#> \- Right Hemisphere:   180
 
 # Check the number of regions
 length(glasser$labels)  # 360 regions
+#> [1] 360
 table(glasser$hemi)     # 180 per hemisphere
+#>
+#>  left right
+#>   180   180
 ```
 
 ### FreeSurfer ASEG Subcortical Atlas
 
 For subcortical structures, use the ASEG (Automatic Segmentation) atlas:
 
-```{r aseg}
+```{r aseg, eval = FALSE}
 # Load ASEG subcortical atlas
 aseg <- get_aseg_atlas()
-print(aseg)
+aseg
+#> ── Atlas Summary ───────────────────────────────────────────
+#>
+#> ❯ Name:   ASEG
+#> ❯ Model:  FreeSurferASEG [volume]
+#> ❯ Space:  MNI152NLin6Asym
+#> ❯ Dimensions: 193 x 229 x 193
+#> ❯ Regions: 17
 
 # View available subcortical structures
 head(aseg$labels)
-# [1] "Thalamus" "Caudate" "Putamen" "Pallidum" "Hippocampus" "Amygdala"
+#> [1] "Thalamus"   "Caudate"    "Putamen"    "Pallidum"   "Brainstem"
+#> [6] "Hippocampus"
 ```
 
 ### Olsen Medial Temporal Lobe Atlas
 
 For detailed MTL parcellations:
 
-```{r olsen}
+```{r olsen, eval = FALSE}
 # Load Olsen MTL atlas
 mtl <- get_olsen_mtl()
-print(mtl)
+mtl
+#> ── Atlas Summary ───────────────────────────────────────────
+#>
+#> ❯ Name:   Olsen_MTL
+#> ❯ Model:  OlsenMTL [volume]
+#> ❯ Space:  MNI152_custom
+#> ❯ Dimensions: 182 x 218 x 182
+#> ❯ Regions: 16
 
 # Get hippocampus-specific parcellation with anterior-posterior divisions
 hipp <- get_hipp_atlas(apsections = 3)  # Divide into 3 A-P sections
@@ -172,7 +222,16 @@ brain_data <- neuroim2::NeuroVol(
 
 # Calculate mean values within each region
 region_means <- reduce_atlas(atlas_200_7, brain_data, mean)
-print(head(region_means))
+head(region_means)
+#> # A tibble: 6 × 2
+#>   region      value
+#>   <chr>       <dbl>
+#> 1 LH_Vis_1 -0.00183
+#> 2 LH_Vis_2 -0.00873
+#> 3 LH_Vis_3  0.0141
+#> 4 LH_Vis_4 -0.0129
+#> 5 LH_Vis_5 -0.0278
+#> 6 LH_Vis_6 -0.0443
 
 # Calculate other statistics
 region_sds <- reduce_atlas(atlas_200_7, brain_data, sd, na.rm = TRUE)
@@ -209,42 +268,46 @@ glasser_mapped <- map_atlas(glasser, glasser_vals, thresh = c(2, 5))
 
 ## Visualization
 
-### Using ggseg for 2D Brain Plots
+`neuroatlas` renders **surface** parcellations with `plot_brain()` and
+**volume** atlases with `plot()`. (The older `ggseg_schaefer()` and
+`plot_glasser()` helpers are deprecated in favour of `plot_brain()`.)
 
-The package integrates with ggseg for publication-quality visualizations:
+### Surface parcellations
 
-```{r ggseg_viz}
-# Visualize Schaefer atlas with random values
-vals <- rnorm(200)
-ggseg_schaefer(
-  atlas_200_7, 
-  vals = vals,
-  thresh = c(-2, 2),     # Threshold values
-  palette = "RdBu",      # Color palette
-  interactive = TRUE     # Interactive plot with tooltips
+Map one value per parcel onto a surface atlas. `plot_brain(interactive = TRUE)`
+returns a hover-tooltip widget; `interactive = FALSE` returns a static ggplot.
+
+```{r viz_surface_code, eval = FALSE}
+sa <- schaefer_surf(parcels = 200, networks = 7, space = "fsaverage6")
+plot_brain(
+  sa,
+  vals     = rnorm(length(sa$ids)),  # one value per parcel
+  palette  = "vik",
+  colorbar = "bottom"
 )
-
-# Visualize Glasser atlas
-plot(glasser, vals = rnorm(360), thresh = c(-1, 1))
 ```
 
-### Interactive 3D Visualization (Glasser)
-
-For the Glasser atlas, use the echarts-based 3D visualization:
-
-```{r echarts_viz}
-# Create random data for visualization
-glasser_data <- data.frame(
-  label = glasser$labels,
-  value = rnorm(360, sd = 2)
-)
-
-# Create interactive 3D plot
-plot_glasser(vals = glasser_data, value_col = "value")
-
-# Uniform coloring (no data)
-plot_glasser()  # All regions colored uniformly
+```{r viz_surface_fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Schaefer-200 (7-network) parcellation on the fsaverage6 surface, lateral and medial views, parcels coloured by a per-parcel value with a diverging palette and a bottom colorbar."}
+knitr::include_graphics("figures/overview-schaefer-surface.png")
 ```
+
+### Volume atlases
+
+`plot()` draws a volume atlas as a multi-slice montage (or three orthogonal
+planes with `view = "ortho"`), colouring each region automatically.
+
+```{r viz_volume_code, eval = FALSE}
+aseg <- get_aseg_atlas()
+plot(aseg, nslices = 8)      # axial montage
+plot(aseg, view = "ortho")   # three orthogonal planes
+```
+
+```{r viz_volume_fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the FreeSurfer ASEG subcortical atlas with each structure in a distinct colour."}
+knitr::include_graphics("figures/overview-aseg-volume.png")
+```
+
+See the *Atlas Visualization* and *Surface Parcellations* articles for colour
+algorithms, panel layouts, and statistical overlays.
 
 ## Combining and Dilating Atlases
 
@@ -262,7 +325,17 @@ subcortical_resampled <- get_aseg_atlas(outspace = neuroim2::space(cortical$atla
 
 # Merge atlases
 combined <- merge_atlases(cortical, subcortical_resampled)
-print(combined)
+combined
+#> ── Atlas Summary ───────────────────────────────────────────
+#>
+#> ❯ Name:   Schaefer-100-7networks::ASEG
+#> ❯ Dimensions: 182 x 218 x 182
+#> ❯ Regions: 117
+#>
+#> Structure Distribution:
+#> |- Left hemisphere:     57
+#> |- Right hemisphere:    58
+#> \- Bilateral/Midline:   2
 ```
 
 ### Dilating Atlas Parcels
@@ -344,10 +417,10 @@ roi_values <- reduce_atlas(atlas, brain_data, mean)
 # Identify significant regions
 sig_regions <- roi_values$value[abs(roi_values$value) > 2]
 
-# 5. Visualize results
+# 5. Visualize results on the matching surface parcellation
 viz_vals <- rep(0, length(atlas$labels))
 viz_vals[abs(roi_values$value) > 2] <- roi_values$value[abs(roi_values$value) > 2]
-ggseg_schaefer(atlas, vals = viz_vals, interactive = TRUE)
+plot_brain(schaefer_surf(parcels = 200, networks = 7), vals = viz_vals)
 ```
 
 ### Multi-Atlas Comparison
@@ -389,7 +462,7 @@ network_summary <- roi_values %>%
     n_regions = n()
   )
 
-print(network_summary)
+network_summary
 ```
 
 ## Tips and Best Practices

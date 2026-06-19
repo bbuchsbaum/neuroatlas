@@ -4,7 +4,13 @@
 \alias{build_brain_polygon_data}
 \title{Build brain polygon render data for a surface atlas}
 \usage{
-build_brain_polygon_data(surfatlas, views, surface, projection_smooth = 0L)
+build_brain_polygon_data(
+  surfatlas,
+  views,
+  surface,
+  projection_smooth = 0L,
+  depth_cull = TRUE
+)
 }
 \arguments{
 \item{surfatlas}{A surfatlas object (e.g. from \code{\link{schaefer_surf}()}).}
@@ -17,6 +23,9 @@ build_brain_polygon_data(surfatlas, views, surface, projection_smooth = 0L)
 
 \item{projection_smooth}{Integer: number of Laplacian smoothing iterations
 on projected coordinates (default \code{0L}).}
+
+\item{depth_cull}{Logical. If \code{TRUE} (default), remove faces hidden
+behind nearer cortical surface faces in the projected view.}
 }
 \value{
 A list with two elements:

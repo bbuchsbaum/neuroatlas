@@ -21,8 +21,9 @@ get_wang_prob_atlas(
 }
 \arguments{
 \item{prob_dir}{Optional path to a locally-extracted ProbAtlas_v4 directory
-(the folder containing \code{subj_vol_all}, or that subfolder itself).
-When supplied, file paths are resolved and existence-checked.}
+(the folder containing \code{subj_vol_all}, or that subfolder itself). When
+supplied it is used exclusively; otherwise the cached/downloaded data is
+used.}
 
 \item{image}{One of \code{"probability"} (per-area \code{perc_VTPM} maps,
 the default) or \code{"maxprob"} (the maximum-probability summary volume).}
@@ -33,11 +34,13 @@ the default) or \code{"maxprob"} (the maximum-probability summary volume).}
 \code{c("V1v", "hV4")}) or integer ids (1-25). \code{NULL} selects all 25.}
 
 \item{path_only}{Logical. When \code{TRUE} (default), return a manifest of
-paths/metadata without reading image data. When \code{FALSE}, read the
-resolved volumes (requires a valid \code{prob_dir}).}
+paths/metadata without downloading or reading image data. When
+\code{FALSE}, read the resolved volumes as \code{NeuroVol} objects,
+downloading them to the cache on first use if needed.}
 
-\item{use_cache}{Logical. Also look for files under the neuroatlas Wang cache
-directory when \code{prob_dir} is not supplied.}
+\item{use_cache}{Logical. Look for (and download into) the neuroatlas Wang
+cache directory when \code{prob_dir} is not supplied. \code{FALSE} forces a
+fresh download on load.}
 
 \item{x}{A \code{wang_prob_paths} object.}
 
@@ -45,11 +48,11 @@ directory when \code{prob_dir} is not supplied.}
 }
 \value{
 When \code{path_only = TRUE}, an object of class \code{wang_prob_paths}: a
-list with the requested \code{image}/\code{hemi}, the manual download
-\code{zip_url}, a \code{files} tibble (\code{id}, \code{label}, \code{hemi},
-\code{member}, \code{path}, \code{exists}), and the canonical \code{labels}.
-When \code{path_only = FALSE}, a \code{wang_prob_volumes} list whose
-\code{volumes} element holds the loaded \code{NeuroVol} objects.
+list with the requested \code{image}/\code{hemi}, the \code{resources_url}
+and \code{download_url}, a \code{files} tibble (\code{id}, \code{label},
+\code{hemi}, \code{member}, \code{path}, \code{exists}), and the canonical
+\code{labels}. When \code{path_only = FALSE}, a \code{wang_prob_volumes} list
+whose \code{volumes} element holds the loaded \code{NeuroVol} objects.
 }
 \description{
 Resolve (and optionally load) the full per-area probability maps and
@@ -62,29 +65,45 @@ MNI volume space, plus a maximum-probability summary
 (\code{maxprob_vol_<hemi>.nii.gz}).
 }
 \details{
-The Princeton server (\code{scholar.princeton.edu} / \code{napl}) blocks
-automated downloads of the binary archive (it returns HTTP 403 to scripted
-requests), so this function does \strong{not} download the data. Instead it
-defaults to \code{path_only = TRUE} and returns a manifest describing the
-expected files, the manual download URL, and the canonical ROI labels.
+On first load the volumes (~0.7 MB) are downloaded from the neuroatlas
+GitHub release and cached under the neuroatlas Wang cache directory, after
+which they resolve offline. They originate from the Princeton ProbAtlas_v4
+distribution (Wang et al. 2015), whose original host
+(\code{napl.scholar.princeton.edu}) blocks scripted downloads and is no
+longer reliably available; the archive carried no licence and the maps are
+widely redistributed as an open-science resource, so they are re-hosted on
+the package's own release for programmatic access.
 
-To work with the actual volumes, download \code{ProbAtlas_v4.zip} once in a
-browser from the Princeton resources page, unzip it, and pass the resulting
-directory (or its \code{subj_vol_all} subfolder) via \code{prob_dir}. With a
-valid \code{prob_dir} you can set \code{path_only = FALSE} to read the
-requested volumes as \code{NeuroVol} objects.
+To use a local copy instead (e.g. an updated release), download/unzip
+\code{ProbAtlas_v4} and pass the resulting directory (or its
+\code{subj_vol_all} subfolder) via \code{prob_dir}; it takes precedence and
+is never mixed with the cache or download. Set \code{path_only = FALSE} to
+read the requested volumes as \code{NeuroVol} objects.
+
+The resolution order on a load is \code{prob_dir} -> cache -> download. A
+read-only manifest (\code{path_only = TRUE}) resolves from
+\code{prob_dir}/cache only and never downloads or writes to the cache.
+When \code{path_only = FALSE} and \code{use_cache = TRUE}, volumes read from
+a user-supplied \code{prob_dir} are also copied (best-effort, atomically)
+into the cache.
+
+Note on naming: the volume coding (\code{ROIfiles_Labeling.txt}) labels areas
+12/13 as \code{MST}/\code{hMT}, which correspond to \code{TO2}/\code{TO1} in
+the surface (\pkg{neuropythy}) naming used by \code{\link{get_wang_atlas}()};
+the numeric ids are identical.
 }
 \examples{
 \dontrun{
-# Manifest only (no download): see which files are needed and where to get them
+# Manifest only (no download): what is available and where it comes from
 manifest <- get_wang_prob_atlas()
 manifest
 head(manifest$files)
 
-# After manually downloading + unzipping ProbAtlas_v4.zip:
-paths <- get_wang_prob_atlas(prob_dir = "~/atlases/ProbAtlas_v4")
-v1v_lh <- get_wang_prob_atlas(prob_dir = "~/atlases/ProbAtlas_v4",
-                              rois = "V1v", hemi = "lh", path_only = FALSE)
+# Load the maximum-probability volumes (downloaded + cached on first use)
+wp <- get_wang_prob_atlas(image = "maxprob", path_only = FALSE)
+
+# Load a single area's probability map
+v1v_lh <- get_wang_prob_atlas(rois = "V1v", hemi = "lh", path_only = FALSE)
 }
 
 }
