@@ -41,9 +41,11 @@ plot_brain(
   overlay = NULL,
   overlay_threshold = NULL,
   overlay_alpha = 0.45,
+  overlay_alpha_mode = c("constant", "threshold"),
+  overlay_alpha_ramp = NULL,
   overlay_palette = "vik",
   overlay_lim = NULL,
-  overlay_border = TRUE,
+  overlay_border = FALSE,
   overlay_border_color = "black",
   overlay_border_size = 0.25,
   overlay_fun = c("avg", "nn", "mode"),
@@ -200,6 +202,18 @@ before rendering.}
 \item{overlay_alpha}{Numeric in \code{[0, 1]}. Opacity of overlay polygons.
 Default: \code{0.45}.}
 
+\item{overlay_alpha_mode}{Character. \code{"constant"} uses
+\code{overlay_alpha} for all rendered overlay faces. \code{"threshold"}
+fades overlay faces from transparent at \code{overlay_threshold} to
+\code{overlay_alpha}, avoiding hard threshold edges for dense surface maps.
+Default: \code{"constant"}.}
+
+\item{overlay_alpha_ramp}{Optional positive numeric scalar controlling the
+absolute-value distance above \code{overlay_threshold} over which
+\code{overlay_alpha_mode = "threshold"} reaches full opacity. If
+\code{NULL}, a small data-driven ramp is chosen from the rendered overlay
+values. Use \code{0} to disable ramping while keeping the threshold mode.}
+
 \item{overlay_palette}{scico palette for overlay colour mapping. Default:
 \code{"vik"}.}
 
@@ -207,7 +221,7 @@ Default: \code{0.45}.}
 mapping.}
 
 \item{overlay_border}{Logical. If \code{TRUE}, draw cluster overlay
-boundaries. Default: \code{TRUE}.}
+boundaries. Default: \code{FALSE}.}
 
 \item{overlay_border_color}{Colour for overlay boundaries. Default:
 \code{"black"}.}

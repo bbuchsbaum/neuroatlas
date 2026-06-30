@@ -284,6 +284,122 @@ test_that(".smooth_projected_xy smooths coordinates while preserving shape", {
   expect_true(any(abs(sm1 - xy) > 1e-8))
 })
 
+test_that(".overlay_alpha_values supports soft threshold ramps", {
+  vals <- c(0.5, 1, 1.5, 2, NA_real_)
+
+  constant <- neuroatlas:::.overlay_alpha_values(
+    vals, threshold = 1, alpha = 0.8, mode = "constant", ramp = 1
+  )
+  expect_equal(constant, rep(0.8, length(vals)))
+
+  ramped <- neuroatlas:::.overlay_alpha_values(
+    vals, threshold = 1, alpha = 0.8, mode = "threshold", ramp = 1
+  )
+
+  expect_equal(ramped[1], 0)
+  expect_equal(ramped[2], 0)
+  expect_gt(ramped[3], 0)
+  expect_lt(ramped[3], 0.8)
+  expect_equal(ramped[4], 0.8)
+  expect_equal(ramped[5], 0)
+})
+
+.make_plot_brain_overlay_test_atlas <- function() {
+  skip_if_not_installed("neurosurf")
+
+  verts <- matrix(
+    c(-1, 0, 0,
+      -1, 0, 1,
+      -1, 1, 0,
+      -1, 1, 1),
+    ncol = 3,
+    byrow = TRUE
+  )
+  faces <- matrix(
+    c(0L, 1L, 2L,
+      1L, 3L, 2L),
+    ncol = 3,
+    byrow = TRUE
+  )
+  geom <- neurosurf::SurfaceGeometry(vert = verts, faces = faces, hemi = "lh")
+  hemi_surf <- methods::new(
+    "LabeledNeuroSurface",
+    labels = character(),
+    cols = character(),
+    geometry = geom,
+    indices = seq_len(nrow(verts)),
+    data = rep(1, nrow(verts))
+  )
+
+  structure(
+    list(
+      name = "overlay-test",
+      ids = 1L,
+      labels = "toy",
+      orig_labels = "toy",
+      hemi = "left",
+      cmap = data.frame(r = 180, g = 180, b = 180),
+      lh_atlas = hemi_surf,
+      rh_atlas = hemi_surf,
+      surf_type = "inflated",
+      surface_space = "toy"
+    ),
+    class = c("overlay_test", "surfatlas", "atlas")
+  )
+}
+
+test_that("plot_brain leaves overlay threshold borders off by default", {
+  atl <- .make_plot_brain_overlay_test_atlas()
+  overlay <- list(lh = c(0, 2, 0, 2), rh = c(0, 2, 0, 2))
+
+  p_default <- plot_brain(
+    atl,
+    views = "lateral",
+    hemis = "left",
+    overlay = overlay,
+    overlay_threshold = 1,
+    interactive = FALSE,
+    border = FALSE
+  )
+  p_border <- plot_brain(
+    atl,
+    views = "lateral",
+    hemis = "left",
+    overlay = overlay,
+    overlay_threshold = 1,
+    overlay_border = TRUE,
+    interactive = FALSE,
+    border = FALSE
+  )
+
+  expect_equal(length(p_default$layers), 2L)
+  expect_gt(length(p_border$layers), length(p_default$layers))
+})
+
+test_that("plot_brain can soften thresholded overlay opacity", {
+  atl <- .make_plot_brain_overlay_test_atlas()
+  overlay <- list(lh = c(1, 1.5, 1.5, 4), rh = c(1, 1.5, 1.5, 4))
+
+  p <- plot_brain(
+    atl,
+    views = "lateral",
+    hemis = "left",
+    overlay = overlay,
+    overlay_threshold = 1,
+    overlay_alpha = 0.8,
+    overlay_alpha_mode = "threshold",
+    overlay_alpha_ramp = 1,
+    interactive = FALSE,
+    border = FALSE
+  )
+
+  overlay_layer <- ggplot2::layer_data(p, 2)
+  alpha <- unique(overlay_layer$alpha)
+
+  expect_true(any(alpha > 0 & alpha < 0.8))
+  expect_true(any(abs(alpha - 0.8) < 1e-8))
+})
+
 test_that(".encode_plot_brain_data_id creates stable polygon keys", {
   key <- neuroatlas:::.encode_plot_brain_data_id(
     panel = "Left Lateral",

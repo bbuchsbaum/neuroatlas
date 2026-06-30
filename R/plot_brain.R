@@ -1535,6 +1535,56 @@ build_surface_polygon_data <- function(surfatlas,
 }
 
 
+#' Map numeric overlay values to alpha values
+#' @keywords internal
+#' @noRd
+.overlay_alpha_values <- function(values,
+                                  threshold = NULL,
+                                  alpha = 0.45,
+                                  mode = c("constant", "threshold"),
+                                  ramp = NULL) {
+  mode <- match.arg(mode)
+  values <- as.numeric(values)
+  out <- rep(alpha, length(values))
+  if (length(out) == 0L || identical(mode, "constant")) {
+    return(out)
+  }
+
+  if (is.null(threshold) || length(threshold) != 1L ||
+      !is.finite(threshold)) {
+    return(out)
+  }
+
+  threshold <- abs(as.numeric(threshold))
+  abs_values <- abs(values)
+
+  if (is.null(ramp)) {
+    above <- abs_values[is.finite(abs_values) & abs_values > threshold]
+    if (length(above) == 0L) {
+      ramp <- sqrt(.Machine$double.eps)
+    } else {
+      span <- max(above, na.rm = TRUE) - threshold
+      ramp <- max(span * 0.10, threshold * 0.25,
+                  sqrt(.Machine$double.eps))
+    }
+  }
+  ramp <- as.numeric(ramp)
+
+  if (!is.finite(ramp) || ramp <= 0) {
+    out[!is.finite(abs_values) | abs_values < threshold] <- 0
+    return(out)
+  }
+
+  t <- (abs_values - threshold) / ramp
+  t[!is.finite(t)] <- 0
+  t <- pmin(1, pmax(0, t))
+
+  # Smoothstep avoids a visible opacity kink at the threshold edge.
+  out <- alpha * (t * t * (3 - 2 * t))
+  out[!is.finite(abs_values) | abs_values < threshold] <- 0
+  out
+}
+
 #' Map numeric overlay values to hex colours
 #' @keywords internal
 #' @noRd
@@ -1932,6 +1982,16 @@ build_surface_polygon_data <- function(surfatlas,
 #'   before rendering.
 #' @param overlay_alpha Numeric in \code{[0, 1]}. Opacity of overlay polygons.
 #'   Default: \code{0.45}.
+#' @param overlay_alpha_mode Character. \code{"constant"} uses
+#'   \code{overlay_alpha} for all rendered overlay faces. \code{"threshold"}
+#'   fades overlay faces from transparent at \code{overlay_threshold} to
+#'   \code{overlay_alpha}, avoiding hard threshold edges for dense surface maps.
+#'   Default: \code{"constant"}.
+#' @param overlay_alpha_ramp Optional positive numeric scalar controlling the
+#'   absolute-value distance above \code{overlay_threshold} over which
+#'   \code{overlay_alpha_mode = "threshold"} reaches full opacity. If
+#'   \code{NULL}, a small data-driven ramp is chosen from the rendered overlay
+#'   values. Use \code{0} to disable ramping while keeping the threshold mode.
 #' @param overlay_palette scico palette for overlay colour mapping. Default:
 #'   \code{"vik"}.
 #' @param overlay_lim Optional numeric length-2 limits for overlay colour
@@ -1945,7 +2005,7 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{NeuroVol}. One of \code{"midpoint"}, \code{"normal_line"}, or
 #'   \code{"thickness"}. Default: \code{"midpoint"}.
 #' @param overlay_border Logical. If \code{TRUE}, draw cluster overlay
-#'   boundaries. Default: \code{TRUE}.
+#'   boundaries. Default: \code{FALSE}.
 #' @param overlay_border_color Colour for overlay boundaries. Default:
 #'   \code{"black"}.
 #' @param overlay_border_size Line width for overlay boundaries. Default:
@@ -2054,9 +2114,11 @@ plot_brain <- function(surfatlas,
                        overlay = NULL,
                        overlay_threshold = NULL,
                        overlay_alpha = 0.45,
+                       overlay_alpha_mode = c("constant", "threshold"),
+                       overlay_alpha_ramp = NULL,
                        overlay_palette = "vik",
                        overlay_lim = NULL,
-                       overlay_border = TRUE,
+                       overlay_border = FALSE,
                        overlay_border_color = "black",
                        overlay_border_size = 0.25,
                        overlay_fun = c("avg", "nn", "mode"),
@@ -2119,6 +2181,7 @@ plot_brain <- function(surfatlas,
   hemis <- match.arg(hemis, c("left", "right"), several.ok = TRUE)
   colorbar_position <- .normalize_colorbar_position(colorbar)
   data_id_mode <- match.arg(data_id_mode)
+  overlay_alpha_mode <- match.arg(overlay_alpha_mode)
   panel_layout <- match.arg(panel_layout)
   border_geom <- match.arg(border_geom)
   if (!is.numeric(boundary_smooth) || length(boundary_smooth) != 1 ||
@@ -2146,6 +2209,18 @@ plot_brain <- function(surfatlas,
   if (!is.numeric(overlay_alpha) || length(overlay_alpha) != 1 ||
       is.na(overlay_alpha) || overlay_alpha < 0 || overlay_alpha > 1) {
     stop("'overlay_alpha' must be a numeric scalar in [0, 1].", call. = FALSE)
+  }
+  if (!is.null(overlay_threshold) &&
+      (!is.numeric(overlay_threshold) || length(overlay_threshold) != 1 ||
+       is.na(overlay_threshold) || overlay_threshold < 0)) {
+    stop("'overlay_threshold' must be NULL or a non-negative numeric scalar.",
+         call. = FALSE)
+  }
+  if (!is.null(overlay_alpha_ramp) &&
+      (!is.numeric(overlay_alpha_ramp) || length(overlay_alpha_ramp) != 1 ||
+       is.na(overlay_alpha_ramp) || overlay_alpha_ramp < 0)) {
+    stop("'overlay_alpha_ramp' must be NULL or a non-negative numeric scalar.",
+         call. = FALSE)
   }
 
   if (!is.numeric(shading_strength) || length(shading_strength) != 1 ||
@@ -2351,6 +2426,7 @@ plot_brain <- function(surfatlas,
 
   p <- ggplot2::ggplot(poly_data,
                        ggplot2::aes(x = x, y = y, group = .data[[group_col]]))
+  use_alpha_identity <- FALSE
 
   # Grey cortex backdrop must be drawn first so the parcellation sits on top.
   if (!is.null(base_data)) {
@@ -2454,14 +2530,22 @@ plot_brain <- function(surfatlas,
         palette = overlay_palette,
         lim = overlay_lim
       )
+      ov_poly$overlay_alpha <- .overlay_alpha_values(
+        ov_poly$overlay_value,
+        threshold = overlay_threshold,
+        alpha = overlay_alpha,
+        mode = overlay_alpha_mode,
+        ramp = overlay_alpha_ramp
+      )
+      use_alpha_identity <- TRUE
 
       p <- p + ggplot2::geom_polygon(
         data = ov_poly,
         ggplot2::aes(
           x = x, y = y, group = face_id,
-          fill = I(overlay_color)
+          fill = I(overlay_color),
+          alpha = overlay_alpha
         ),
-        alpha = overlay_alpha,
         colour = NA,
         inherit.aes = FALSE
       )
@@ -2554,8 +2638,8 @@ plot_brain <- function(surfatlas,
           fill = shading_color,
           colour = NA,
           inherit.aes = FALSE
-        ) +
-        ggplot2::scale_alpha_identity(guide = "none")
+        )
+      use_alpha_identity <- TRUE
     }
   }
 
@@ -2685,6 +2769,10 @@ plot_brain <- function(surfatlas,
         }
       }
     }
+  }
+
+  if (use_alpha_identity) {
+    p <- p + ggplot2::scale_alpha_identity(guide = "none")
   }
 
   p <- p +
