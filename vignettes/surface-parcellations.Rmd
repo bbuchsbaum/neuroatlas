@@ -69,7 +69,7 @@ This guide focuses on loading **surface parcellations** as actual meshes
 - Discovering available surface templates in TemplateFlow
 - Schaefer on fsaverage6 (packaged geometry)
 - Schaefer on fsaverage5/fsaverage (via TemplateFlow, when available)
-- Glasser MMP1.0 (via TemplateFlow, when available)
+- Glasser MMP1.0 loading and visualization with `plot_brain()`
 - Loading raw surface geometry from TemplateFlow
 - Downloading surfaces to a local folder
 - What files are fetched, what the `data` slot contains, and how labels map.
@@ -153,25 +153,57 @@ mapped <- map_atlas(atl, vals)        # returns LabeledNeuroSurface per hemi wit
 `map_atlas()` writes your parcel values into the `data` slot of each
 hemisphere surface.
 
-## Glasser MMP1.0 surface atlas (when available)
+## Glasser MMP1.0 surface atlas
 
-Note: Like Schaefer TemplateFlow surfaces, Glasser surface support requires the
-`fsaverage` template in TemplateFlow. Check availability before using.
+Glasser surface support uses the 164k `fsaverage` geometry distributed by
+TemplateFlow. The current TemplateFlow archive provides `pial`, `white`, and
+`midthickness` meshes at this density; it does not provide an `inflated`
+`fsaverage` mesh. The first call may download geometry and annotations, while
+subsequent calls use the TemplateFlow and neuroatlas caches.
 
-```{r glasser, eval=FALSE}
-# Requires fsaverage template in TemplateFlow
+```{r glasser-load, eval=FALSE}
+# Requires TemplateFlow; downloads and validates annotations on first use
 glas <- glasser_surf(space = "fsaverage", surf = "pial")
 
 slot(glas$lh_atlas, "data")[1:5]  # parcel IDs
 glas$labels[1:5]                  # names for those IDs
 ```
 
-If available, geometry comes from TemplateFlow (fsaverage pial/white/inflated/midthickness);
-labels come from the HCP-MMP1.0 fsaverage annotations published on Figshare as
-the "HCP-MMP1_0 projected on fsaverage" dataset (ID 3498446; DOI:
-10.6084/m9.figshare.3498446).
+Geometry comes from TemplateFlow. Labels come from the HCP-MMP1.0 fsaverage
+annotations published on Figshare as the "HCP-MMP1_0 projected on fsaverage"
+dataset (ID 3498446, version 2; DOI: 10.6084/m9.figshare.3498446). neuroatlas
+checks each annotation against Figshare's published file size and MD5 checksum
+before caching or loading it. A corrupt cache entry is replaced on the next
+networked call, and download or geometry failures report the exact asset that
+could not be obtained.
 The `data` vector length equals the vertex count of the mesh; each entry is
 the parcel ID at that vertex.
+
+### Visualizing Glasser parcels with `plot_brain()`
+
+Call `plot_brain()` without `vals` to display the atlas as a categorical
+parcellation. Each parcel receives a distinct ROI color. Setting
+`interactive = FALSE` returns a static ggplot suitable for reports and
+vignettes.
+
+```{r glasser-plot-code, eval=FALSE}
+plot_brain(
+  glas,
+  views = c("lateral", "medial"),
+  interactive = FALSE,
+  style = "ggseg_like",
+  border = TRUE,
+  title = "Glasser HCP-MMP1.0 cortical parcellation",
+  subtitle = "360 parcels on fsaverage pial geometry"
+)
+```
+
+```{r glasser-plot-fig, echo=FALSE, eval=TRUE, out.width="100%", fig.alt="Glasser HCP-MMP1.0 parcellation on the fsaverage pial surface. Four panels show lateral and medial views of the left and right hemispheres, with distinct colors and borders for 360 cortical parcels."}
+knitr::include_graphics("figures/glasser-surface-parcellation.png")
+```
+
+The lateral views show parcels across the outer cortical surface. The medial
+views also show the annotation-defined medial wall as unlabelled background.
 
 ## What’s in the `data` slot?
 

@@ -6,7 +6,7 @@
 \usage{
 glasser_surf(
   space = "fsaverage",
-  surf = c("pial", "white", "inflated", "midthickness"),
+  surf = c("pial", "white", "midthickness"),
   use_cache = TRUE
 )
 }
@@ -14,11 +14,12 @@ glasser_surf(
 \item{space}{Surface space / mesh template. Only \code{"fsaverage"} is
 supported at present.}
 
-\item{surf}{Surface type. One of \code{"pial"}, \code{"white"},
-\code{"inflated"}, or \code{"midthickness"}.}
+\item{surf}{Surface type. One of \code{"pial"}, \code{"white"}, or
+\code{"midthickness"}.}
 
 \item{use_cache}{Logical. Whether to cache downloaded annotation files in
-the neuroatlas cache directory. Default: \code{TRUE}.}
+the neuroatlas cache directory. TemplateFlow manages the geometry cache
+independently. Default: \code{TRUE}.}
 }
 \value{
 A list with classes \code{c("glasser_surf","surfatlas","atlas")}
@@ -43,11 +44,16 @@ atlas metadata.
 This function uses:
 \itemize{
   \item fsaverage surface geometry from TemplateFlow via
-        \code{\link{get_surface_template}}
+        \code{\link{load_surface_template}}
   \item fsaverage \code{.annot} files from the Mills Figshare distribution
         (\code{lh.HCP-MMP1.annot}, \code{rh.HCP-MMP1.annot})
 }
-Currently only the \code{"fsaverage"} surface space is supported.
+Annotation downloads are checked against the file sizes and MD5 checksums
+published by Figshare before they enter or leave the neuroatlas cache.
+Currently only the \code{"fsaverage"} surface space is supported. TemplateFlow
+provides \code{"pial"}, \code{"white"}, and \code{"midthickness"} geometry
+at the required 164k density; it does not provide an \code{"inflated"}
+fsaverage surface.
 }
 \examples{
 \dontrun{

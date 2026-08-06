@@ -381,18 +381,24 @@ print.glasser <- function(x, ...) {
 #' This function uses:
 #' \itemize{
 #'   \item fsaverage surface geometry from TemplateFlow via
-#'         \code{\link{get_surface_template}}
+#'         \code{\link{load_surface_template}}
 #'   \item fsaverage \code{.annot} files from the Mills Figshare distribution
 #'         (\code{lh.HCP-MMP1.annot}, \code{rh.HCP-MMP1.annot})
 #' }
-#' Currently only the \code{"fsaverage"} surface space is supported.
+#' Annotation downloads are checked against the file sizes and MD5 checksums
+#' published by Figshare before they enter or leave the neuroatlas cache.
+#' Currently only the \code{"fsaverage"} surface space is supported. TemplateFlow
+#' provides \code{"pial"}, \code{"white"}, and \code{"midthickness"} geometry
+#' at the required 164k density; it does not provide an \code{"inflated"}
+#' fsaverage surface.
 #'
 #' @param space Surface space / mesh template. Only \code{"fsaverage"} is
 #'   supported at present.
-#' @param surf Surface type. One of \code{"pial"}, \code{"white"},
-#'   \code{"inflated"}, or \code{"midthickness"}.
+#' @param surf Surface type. One of \code{"pial"}, \code{"white"}, or
+#'   \code{"midthickness"}.
 #' @param use_cache Logical. Whether to cache downloaded annotation files in
-#'   the neuroatlas cache directory. Default: \code{TRUE}.
+#'   the neuroatlas cache directory. TemplateFlow manages the geometry cache
+#'   independently. Default: \code{TRUE}.
 #'
 #' @return A list with classes \code{c("glasser_surf","surfatlas","atlas")}
 #'   containing:
@@ -413,10 +419,10 @@ print.glasser <- function(x, ...) {
 #'
 #' @export
 glasser_surf <- function(space = "fsaverage",
-                         surf = c("pial", "white", "inflated", "midthickness"),
+                         surf = c("pial", "white", "midthickness"),
                          use_cache = TRUE) {
   space <- match.arg(space, c("fsaverage", "fsaverage5", "fsaverage6"))
-  surf <- match.arg(surf, c("pial", "white", "inflated", "midthickness"))
+  surf <- match.arg(surf, c("pial", "white", "midthickness"))
 
   if (!identical(space, "fsaverage")) {
     stop("Glasser surface atlas is currently only available in 'fsaverage' space.")
@@ -617,107 +623,210 @@ glasser_surf <- function(space = "fsaverage",
 
 # Internal: Glasser Figshare annotation paths ----------------------------------
 
+#' Pinned Figshare metadata for a Glasser annotation.
+#'
+#' Figshare article 3498446, version 2, publishes immutable file ids, sizes,
+#' and MD5 checksums for both FreeSurfer annotations. Keeping those values
+#' together makes cache validation deterministic and avoids trusting a file
+#' merely because it exists.
+#'
+#' @keywords internal
+#' @noRd
+.glasser_figshare_annot_info <- function(hemi) {
+  hemi <- match.arg(hemi, c("lh", "rh"))
+
+  if (identical(hemi, "lh")) {
+    return(list(
+      fname = "lh.HCP-MMP1.annot",
+      file_id = 5528816L,
+      size = 1316983,
+      md5 = "46a102b59b2fb1bb4bd62d51bf02e975"
+    ))
+  }
+
+  list(
+    fname = "rh.HCP-MMP1.annot",
+    file_id = 5528819L,
+    size = 1316984,
+    md5 = "75e96b331940227bbcb07c1c791c2463"
+  )
+}
+
+
+#' Test a Glasser annotation against its pinned Figshare metadata.
+#'
+#' @keywords internal
+#' @noRd
+.glasser_annot_is_valid <- function(path, info) {
+  if (!file.exists(path) || is.na(file.info(path)$size) ||
+      file.info(path)$size != info$size) {
+    return(FALSE)
+  }
+
+  identical(unname(tools::md5sum(path)), info$md5)
+}
+
+
 #' @keywords internal
 .glasser_figshare_annot_path <- function(hemi, use_cache = TRUE) {
   hemi <- match.arg(hemi, c("lh", "rh"))
+  info <- .glasser_figshare_annot_info(hemi)
 
-  cache_dir <- .neuroatlas_cache_dir("glasser")
-  fname <- if (hemi == "lh") "lh.HCP-MMP1.annot" else "rh.HCP-MMP1.annot"
-  fpath <- file.path(cache_dir, fname)
+  cache_dir <- .neuroatlas_cache_dir("glasser", create = use_cache)
+  fpath <- file.path(cache_dir, info$fname)
 
-  if (use_cache && file.exists(fpath)) {
+  if (use_cache && .glasser_annot_is_valid(fpath, info)) {
     return(fpath)
   }
 
-  url <- if (hemi == "lh") {
-    "https://ndownloader.figshare.com/files/5528816"
-  } else {
-    "https://ndownloader.figshare.com/files/5528819"
-  }
+  url <- paste0("https://ndownloader.figshare.com/files/", info$file_id)
+  tmp_dir <- if (use_cache) cache_dir else tempdir()
+  tmp <- tempfile(
+    pattern = paste0(info$fname, "-"),
+    tmpdir = tmp_dir,
+    fileext = ".part"
+  )
+  remove_tmp <- TRUE
+  on.exit(if (remove_tmp && file.exists(tmp)) unlink(tmp), add = TRUE)
 
-  tmp <- tempfile(fileext = ".annot")
   .neuroatlas_download(
     url = url,
     dest = tmp,
-    description = paste0("Glasser ", hemi, ".HCP-MMP1.annot")
+    min_size = info$size,
+    description = paste0("Glasser ", info$fname)
   )
 
-  ok <- file.copy(tmp, fpath, overwrite = TRUE)
-  if (!ok) {
+  if (!.glasser_annot_is_valid(tmp, info)) {
     cli::cli_abort(
-      "Failed to cache Glasser annotation file at {.path {fpath}}.",
-      class = c("neuroatlas_error_cache", "neuroatlas_error")
+      c(
+        "Downloaded Glasser annotation failed its integrity check.",
+        "x" = "File: {.file {info$fname}}",
+        "i" = "Expected {info$size} bytes with MD5 {info$md5}.",
+        "i" = "Source: {.url {url}}"
+      ),
+      class = c(
+        "neuroatlas_error_annotation_integrity",
+        "neuroatlas_error_download",
+        "neuroatlas_error"
+      )
     )
   }
 
+  if (!use_cache) {
+    remove_tmp <- FALSE
+    return(tmp)
+  }
+
+  # The temporary file is in the cache directory, so rename publishes a
+  # fully validated artifact atomically on the same filesystem. A stale or
+  # corrupt target is removed only after its replacement has been validated.
+  if (file.exists(fpath) && unlink(fpath) != 0L) {
+    cli::cli_abort(
+      "Failed to replace invalid Glasser cache file at {.path {fpath}}.",
+      class = c("neuroatlas_error_cache", "neuroatlas_error")
+    )
+  }
+  if (!file.rename(tmp, fpath)) {
+    cli::cli_abort(
+      "Failed to publish Glasser annotation cache at {.path {fpath}}.",
+      class = c("neuroatlas_error_cache", "neuroatlas_error")
+    )
+  }
+  remove_tmp <- FALSE
   fpath
 }
 
 
 # Internal: Glasser fsaverage surface loader -----------------------------------
 
+#' Load required full-resolution fsaverage geometry with a typed diagnostic.
+#'
 #' @keywords internal
-.glasser_fsaverage_surface_hemi <- function(hemi,
-                                            surf = c("pial", "white", "inflated", "midthickness"),
-                                            use_cache = TRUE) {
+#' @noRd
+.glasser_fsaverage_geometry <- function(hemi,
+                                        surf,
+                                        template_loader = load_surface_template) {
   hemi <- match.arg(hemi, c("lh", "rh"))
-  surf <- match.arg(surf, c("pial", "white", "inflated", "midthickness"))
-
-  annot_path <- .glasser_figshare_annot_path(hemi, use_cache = use_cache)
-
   hemi_tf <- if (hemi == "lh") "L" else "R"
 
-  surf_path <- tryCatch({
-    get_surface_template(
+  tryCatch(
+    template_loader(
       template_id = "fsaverage",
       surface_type = surf,
       hemi = hemi_tf,
-      density = "164k",
-      load_as_path = TRUE
-    )
-  }, error = function(e) {
-    NULL
-  })
-
-  geom <- NULL
-  if (!is.null(surf_path) && file.exists(surf_path)) {
-    geom <- tryCatch(
-      neurosurf::read_surf_geometry(surf_path),
-      error = function(e) NULL
-    )
-    # Fallback: read GIFTI directly if neurosurf parser fails
-    if (is.null(geom) && requireNamespace("gifti", quietly = TRUE)) {
-      geom <- tryCatch({
-        gii <- gifti::readgii(surf_path)
-        hemi_label <- if (hemi == "lh") "left" else "right"
-        neurosurf::SurfaceGeometry(
-          vert = gii$data[[1]], faces = gii$data[[2]], hemi = hemi_label
-        )
-      }, error = function(e) NULL)
+      density = "164k"
+    ),
+    error = function(e) {
+      cli::cli_abort(
+        c(
+          "Could not obtain fsaverage (164k) geometry for the Glasser atlas.",
+          "x" = conditionMessage(e),
+          "i" = paste0(
+            "Required asset: tpl-fsaverage_hemi-", hemi_tf,
+            "_den-164k_", surf, ".surf.gii"
+          ),
+          "i" = "Check the TemplateFlow cache and network access, then retry."
+        ),
+        class = c(
+          "neuroatlas_error_surface_geometry",
+          "neuroatlas_error"
+        ),
+        parent = e
+      )
     }
-  }
-  if (is.null(geom)) {
-    # Fallback to packaged fsaverage surfaces (low-res, may cause vertex
-    # mismatch with full-resolution annotation files)
-    data("fsaverage", package = "neuroatlas", envir = environment())
-    fsavg_obj <- get("fsaverage", envir = environment())
-    surf_name <- paste0(hemi, "_", surf)
-    if (is.null(fsavg_obj[[surf_name]])) {
-      stop("Failed to load fsaverage surface geometry for hemisphere ", hemi, " (", surf, ")")
-    }
-    geom <- fsavg_obj[[surf_name]]
-  }
+  )
+}
 
-  annot <- suppressWarnings(
-    neurosurf::read_freesurfer_annot(annot_path, geom)
+
+#' @keywords internal
+.glasser_fsaverage_surface_hemi <- function(hemi,
+                                            surf = c("pial", "white", "midthickness"),
+                                            use_cache = TRUE) {
+  hemi <- match.arg(hemi, c("lh", "rh"))
+  surf <- match.arg(surf, c("pial", "white", "midthickness"))
+
+  annot_path <- .glasser_figshare_annot_path(hemi, use_cache = use_cache)
+  if (!use_cache) {
+    on.exit(if (file.exists(annot_path)) unlink(annot_path), add = TRUE)
+  }
+  geom <- .glasser_fsaverage_geometry(hemi, surf)
+
+  annot <- tryCatch(
+    suppressWarnings(neurosurf::read_freesurfer_annot(annot_path, geom)),
+    error = function(e) {
+      cli::cli_abort(
+        c(
+          "Failed to read the Glasser surface annotation.",
+          "x" = conditionMessage(e),
+          "i" = "Annotation: {.path {annot_path}}"
+        ),
+        class = c(
+          "neuroatlas_error_surface_annotation",
+          "neuroatlas_error"
+        ),
+        parent = e
+      )
+    }
   )
 
-  # Basic sanity check: number of vertices should match
+  # The Figshare projection and TemplateFlow geometry must both be the native
+  # fsaverage density (163842 vertices per hemisphere).
   n_vertices <- ncol(geom@mesh$vb)
-  if (length(annot@data) != n_vertices) {
-    stop("Vertex mismatch between Glasser annotation (", length(annot@data),
-         " vertices) and fsaverage surface (", n_vertices,
-         " vertices) for hemisphere ", hemi)
+  if (n_vertices != 163842L || length(annot@data) != n_vertices) {
+    cli::cli_abort(
+      c(
+        "Vertex mismatch between Glasser annotation and fsaverage geometry.",
+        "x" = paste0(
+          "Annotation has ", length(annot@data), " vertices; geometry has ",
+          n_vertices, "."
+        ),
+        "i" = "Glasser requires fsaverage 164k geometry (163842 vertices)."
+      ),
+      class = c(
+        "neuroatlas_error_surface_geometry",
+        "neuroatlas_error"
+      )
+    )
   }
 
   annot

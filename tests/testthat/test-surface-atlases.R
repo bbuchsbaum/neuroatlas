@@ -251,6 +251,155 @@ test_that("glasser_surf rejects unsupported spaces", {
                "only available in 'fsaverage' space")
 })
 
+test_that("Glasser Figshare metadata pins both annotations", {
+  lh <- neuroatlas:::.glasser_figshare_annot_info("lh")
+  rh <- neuroatlas:::.glasser_figshare_annot_info("rh")
+
+  expect_identical(lh$fname, "lh.HCP-MMP1.annot")
+  expect_identical(lh$file_id, 5528816L)
+  expect_identical(lh$size, 1316983)
+  expect_identical(lh$md5, "46a102b59b2fb1bb4bd62d51bf02e975")
+
+  expect_identical(rh$fname, "rh.HCP-MMP1.annot")
+  expect_identical(rh$file_id, 5528819L)
+  expect_identical(rh$size, 1316984)
+  expect_identical(rh$md5, "75e96b331940227bbcb07c1c791c2463")
+})
+
+test_that("Glasser annotation cache replaces corrupt files atomically", {
+  cache_root <- tempfile("neuroatlas-glasser-cache-")
+  cache_dir <- file.path(cache_root, "glasser")
+  dir.create(cache_dir, recursive = TRUE)
+  on.exit(unlink(cache_root, recursive = TRUE, force = TRUE), add = TRUE)
+
+  payload <- as.raw(rep(c(1L, 7L, 19L, 31L), 512L))
+  payload_file <- tempfile(fileext = ".annot")
+  writeBin(payload, payload_file)
+  on.exit(unlink(payload_file), add = TRUE)
+
+  info <- list(
+    fname = "lh.HCP-MMP1.annot",
+    file_id = 123L,
+    size = file.info(payload_file)$size,
+    md5 = unname(tools::md5sum(payload_file))
+  )
+  cached <- file.path(cache_dir, info$fname)
+  writeBin(as.raw(rep(0L, info$size)), cached)
+
+  calls <- new.env(parent = emptyenv())
+  calls$n <- 0L
+  testthat::local_mocked_bindings(
+    .neuroatlas_cache_dir = function(subdir = NULL, create = TRUE) {
+      if (create) dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+      cache_dir
+    },
+    .glasser_figshare_annot_info = function(hemi) info,
+    .neuroatlas_download = function(url, dest, ...) {
+      calls$n <- calls$n + 1L
+      file.copy(payload_file, dest)
+      invisible(dest)
+    },
+    .package = "neuroatlas"
+  )
+
+  path <- neuroatlas:::.glasser_figshare_annot_path("lh", use_cache = TRUE)
+  expect_identical(path, cached)
+  expect_true(neuroatlas:::.glasser_annot_is_valid(path, info))
+  expect_identical(calls$n, 1L)
+  expect_false(any(grepl("\\.part$", list.files(cache_dir))))
+
+  cached_path <- neuroatlas:::.glasser_figshare_annot_path(
+    "lh", use_cache = TRUE
+  )
+  expect_identical(cached_path, cached)
+  expect_identical(calls$n, 1L)
+})
+
+test_that("Glasser annotation cache rejects checksum mismatches", {
+  cache_root <- tempfile("neuroatlas-glasser-cache-")
+  cache_dir <- file.path(cache_root, "glasser")
+  dir.create(cache_dir, recursive = TRUE)
+  on.exit(unlink(cache_root, recursive = TRUE, force = TRUE), add = TRUE)
+
+  info <- list(
+    fname = "lh.HCP-MMP1.annot",
+    file_id = 123L,
+    size = 2048,
+    md5 = paste(rep("a", 32L), collapse = "")
+  )
+  testthat::local_mocked_bindings(
+    .neuroatlas_cache_dir = function(subdir = NULL, create = TRUE) cache_dir,
+    .glasser_figshare_annot_info = function(hemi) info,
+    .neuroatlas_download = function(url, dest, ...) {
+      writeBin(as.raw(rep(0L, info$size)), dest)
+      invisible(dest)
+    },
+    .package = "neuroatlas"
+  )
+
+  expect_error(
+    neuroatlas:::.glasser_figshare_annot_path("lh", use_cache = TRUE),
+    class = "neuroatlas_error_annotation_integrity"
+  )
+  expect_false(file.exists(file.path(cache_dir, info$fname)))
+  expect_false(any(grepl("\\.part$", list.files(cache_dir))))
+})
+
+test_that("Glasser annotation use_cache false leaves cache untouched", {
+  cache_root <- tempfile("neuroatlas-glasser-cache-")
+  cache_dir <- file.path(cache_root, "glasser")
+  dir.create(cache_dir, recursive = TRUE)
+  on.exit(unlink(cache_root, recursive = TRUE, force = TRUE), add = TRUE)
+
+  payload_file <- tempfile(fileext = ".annot")
+  writeBin(as.raw(rep(c(2L, 5L), 1024L)), payload_file)
+  on.exit(unlink(payload_file), add = TRUE)
+  info <- list(
+    fname = "lh.HCP-MMP1.annot",
+    file_id = 123L,
+    size = file.info(payload_file)$size,
+    md5 = unname(tools::md5sum(payload_file))
+  )
+  cached <- file.path(cache_dir, info$fname)
+  writeBin(as.raw(rep(9L, info$size)), cached)
+  cached_md5 <- unname(tools::md5sum(cached))
+
+  testthat::local_mocked_bindings(
+    .neuroatlas_cache_dir = function(subdir = NULL, create = TRUE) cache_dir,
+    .glasser_figshare_annot_info = function(hemi) info,
+    .neuroatlas_download = function(url, dest, ...) {
+      file.copy(payload_file, dest)
+      invisible(dest)
+    },
+    .package = "neuroatlas"
+  )
+
+  path <- neuroatlas:::.glasser_figshare_annot_path("lh", use_cache = FALSE)
+  on.exit(unlink(path), add = TRUE)
+  expect_false(identical(path, cached))
+  expect_true(neuroatlas:::.glasser_annot_is_valid(path, info))
+  expect_identical(unname(tools::md5sum(cached)), cached_md5)
+})
+
+test_that("Glasser geometry errors identify the required TemplateFlow asset", {
+  expect_error(
+    neuroatlas:::.glasser_fsaverage_geometry(
+      hemi = "rh",
+      surf = "white",
+      template_loader = function(...) stop("cache fetch failed", call. = FALSE)
+    ),
+    regexp = "tpl-fsaverage_hemi-R_den-164k_white.surf.gii",
+    class = "neuroatlas_error_surface_geometry"
+  )
+})
+
+test_that("glasser_surf rejects geometry absent from TemplateFlow", {
+  expect_error(
+    glasser_surf(surf = "inflated"),
+    regexp = "should be one of.*pial.*white.*midthickness"
+  )
+})
+
 test_that("network-specific functionality works correctly in Schaefer atlases", {
   skip_on_cran()
   
