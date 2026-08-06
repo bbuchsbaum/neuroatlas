@@ -11,25 +11,31 @@ on:
 
 jobs:
   publish:
+    if: >-
+      github.event_name == 'push' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          fetch-tags: true
+          fetch-depth: 0
+          ref: >-
+            ${{ github.event_name == 'workflow_run' &&
+                github.event.workflow_run.head_sha || github.ref }}
       - name: Get tag
         id: get_tag
         run: |
           git fetch --tags --force
-          TAG=$(git tag --contains $(git rev-parse HEAD) | head -n1)
-          echo "tag=$TAG" >> $GITHUB_ENV
-          echo "has_tag=$( [ -n \"$TAG\" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          TAG=$(git tag --points-at HEAD --list 'v*' | head -n1)
           if [ -n "$TAG" ]; then
-            TAG_BODY=$(git tag -l "$TAG" --format='%(contents)')
-            echo "$TAG_BODY" > body.md
+            echo "tag=$TAG" >> "$GITHUB_ENV"
+            echo "has_tag=true" >> "$GITHUB_OUTPUT"
+            git tag -l "$TAG" --format='%(contents)' > body.md
           else
-            echo "No tag on this commit — skipping release." > body.md
+            echo "has_tag=false" >> "$GITHUB_OUTPUT"
+            echo "No tag on this commit - skipping release." > body.md
           fi
       - uses: ncipollo/release-action@v1
         if: steps.get_tag.outputs.has_tag == 'true'

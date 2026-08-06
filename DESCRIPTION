@@ -68,7 +68,8 @@ VignetteBuilder:
 Remotes:
     bbuchsbaum/neurosurf,
     bbuchsbaum/albersdown,
-    bbuchsbaum/templateflow
+    bbuchsbaum/templateflow,
+    ggsegverse/ggsegSchaefer
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB
