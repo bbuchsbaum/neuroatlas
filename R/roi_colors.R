@@ -873,6 +873,8 @@ roi_colors_rule_hcl <- function(rois,
 #' @param feature_cols Character vector of numeric or categorical columns that
 #'   will be embedded (passed to `stats::model.matrix()`).
 #' @param method Either `"umap"` (requires the `uwot` package) or `"pca"`.
+#'   PCA component signs are canonicalized from the first non-negligible
+#'   loading so the resulting hues are stable across LAPACK implementations.
 #' @param C_range Chroma range mapped from radial distance in the embedding.
 #' @param L Lightness value used for all ROIs before hemispheric adjustments.
 #'
@@ -918,7 +920,10 @@ roi_colors_embedding <- function(rois,
     )
   } else {
     pc <- stats::prcomp(X, rank. = 2)
-    E <- pc$x[, 1:2, drop = FALSE]
+    E <- .canonicalize_pca_scores(
+      pc$x[, 1:2, drop = FALSE],
+      pc$rotation[, 1:2, drop = FALSE]
+    )
   }
 
   e1 <- E[, 1]
@@ -936,4 +941,27 @@ roi_colors_embedding <- function(rois,
   }
 
   tibble::tibble(!!id_col := rois[[id_col]], color = cols)
+}
+
+.canonicalize_pca_scores <- function(scores, rotation) {
+  stopifnot(
+    is.matrix(scores),
+    is.matrix(rotation),
+    ncol(scores) == ncol(rotation)
+  )
+
+  for (j in seq_len(ncol(scores))) {
+    loading <- rotation[, j]
+    scale <- max(abs(loading), na.rm = TRUE)
+    if (!is.finite(scale) || scale == 0) {
+      next
+    }
+
+    first <- which(abs(loading) > scale * sqrt(.Machine$double.eps))[1]
+    if (!is.na(first) && loading[[first]] < 0) {
+      scores[, j] <- -scores[, j]
+    }
+  }
+
+  scores
 }

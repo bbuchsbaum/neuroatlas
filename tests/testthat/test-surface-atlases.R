@@ -169,6 +169,10 @@ test_that("schaefer_surf matches wrapper and handles numeric inputs", {
   
   expect_true(inherits(atl_numeric, "surfatlas"))
   expect_equal(atl_numeric$surface_space, "fsaverage6")
+  expect_true(is.list(atl_numeric$cortex_mask))
+  expect_equal(length(atl_numeric$cortex_mask$lh),
+               length(atl_numeric$lh_atlas@data))
+  expect_match(atl_numeric$cortex_mask_source, "annotation-defined medial wall")
   expect_true(inherits(atl_numeric$lh_atlas, "LabeledNeuroSurface"))
   expect_true(inherits(atl_numeric$rh_atlas, "LabeledNeuroSurface"))
   

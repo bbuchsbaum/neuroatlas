@@ -61,12 +61,12 @@ library(neuroatlas)
 
 ## What problem are we solving?
 
-You often have one or more parcel-level maps and need a figure that is
-already arranged, labeled, and publication-ready. The awkward part is
-usually not the parcel values themselves; it is the repeated patchwork
-work afterward: moving the legend, shortening facet labels, keeping the
-same scale across panels, and making sure left and right hemispheres are
-labeled anatomically rather than by screen position.
+You often have either parcel-level estimates or a continuous statistic on the
+cortical surface and need a figure that is already arranged, labelled, and
+publication-ready. The awkward part is not only panel composition. The figure
+must also preserve what the values mean: parcel maps may show atlas boundaries,
+whereas a continuous field should appear on a quiet anatomical substrate with
+no parcel or occlusion lines drawn over it.
 
 `plot_brain()` and `plot_brain_grid()` are the high-level entry points
 for that job. They let you compose static surface figures directly from
@@ -74,8 +74,10 @@ parcel values instead of building the figure by hand after plotting.
 
 ## What do you need before you start?
 
-For panel figures, you need a surface atlas and one numeric value per
-parcel.
+For a parcel figure, you need a surface atlas and one numeric value per parcel.
+For a continuous figure, you use the same atlas to supply geometry, cortex
+mask, and anatomical provenance, then provide one value per surface vertex (or
+a `NeuroVol` that can be projected to the surface).
 
 ```{r atlas-and-values}
 atl <- schaefer_surf(
@@ -130,6 +132,83 @@ This is the default static workflow when you want:
 - view-aware facet labels without post-hoc editing
 - one explicit legend instead of an implicit colour mapping
 - a single annotated figure object you can render or save directly
+
+## How do you show a continuous statistic instead?
+
+Use `style = "stat_publication"` when the colour represents a continuous
+vertex-wise field rather than parcels. The preset selects a neutral cortex,
+removes parcel and culling-derived silhouette lines, keeps anatomy below the
+statistic, and obtains the legend from the overlay rather than from a dummy
+base map.
+
+This example derives a smooth synthetic field from the inflated coordinates.
+Replace `stat_overlay` with your own `list(lh = ..., rh = ...)`, or pass a
+`NeuroVol` as `overlay` and let `plot_brain()` project it.
+
+```{r continuous-overlay-data, include=FALSE}
+surface_statistic <- function(geometry) {
+  xyz <- neurosurf::vertices(geometry)
+  value <- sin(xyz[, 2] / 20) + cos(xyz[, 3] / 16)
+  as.numeric(scale(value))
+}
+
+stat_overlay <- list(
+  lh = surface_statistic(atl$lh_atlas@geometry),
+  rh = surface_statistic(atl$rh_atlas@geometry)
+)
+
+stopifnot(
+  length(stat_overlay$lh) == nrow(neurosurf::vertices(atl$lh_atlas@geometry)),
+  length(stat_overlay$rh) == nrow(neurosurf::vertices(atl$rh_atlas@geometry)),
+  all(is.finite(unlist(stat_overlay))),
+  stats::sd(stat_overlay$lh) > 0,
+  stats::sd(stat_overlay$rh) > 0
+)
+```
+
+```{r continuous-figure, fig.width=10, fig.height=6.25, fig.alt="Four-view cortical surface figure showing a continuous signed statistic over subtle anatomy, with a neutral medial wall, orientation marks, and an overlay-derived bottom colorbar"}
+stat_figure <- plot_brain(
+  atl,
+  overlay = stat_overlay,
+  overlay_threshold = 1,
+  overlay_lim = c(-2.5, 2.5),
+  overlay_title = "z-score",
+  style = "stat_publication",
+  static_backend = "cpu",
+  interactive = FALSE,
+  colorbar = "bottom",
+  medial_wall = "shade",
+  camera = "canonical",
+  title = "Continuous statistic on fsaverage6"
+)
+
+stat_figure
+```
+
+```{r validate-continuous-figure, include=FALSE}
+legend_meta <- attr(stat_figure, "plot_brain_colorbar")
+anatomy_meta <- attr(stat_figure, "plot_brain_anatomy")
+stopifnot(
+  identical(attr(stat_figure, "plot_brain_backend"), "cpu_barycentric"),
+  identical(legend_meta$source, "overlay"),
+  identical(legend_meta$lim, c(-2.5, 2.5)),
+  identical(legend_meta$breaks, c(-2.5, -1, 0, 1, 2.5)),
+  anatomy_meta$anatomy$lh$topology_verified,
+  anatomy_meta$anatomy$rh$topology_verified
+)
+```
+
+Notice that the threshold appears as marks at `-1` and `1`, while the colour
+limits remain exactly `[-2.5, 2.5]`. The cortex mask is independent of parcel
+values, so the medial wall cannot acquire overlay colour merely because an
+atlas uses label zero. Curvature is resolved from matched white geometry and
+transferred only after vertex correspondence is checked.
+
+When `overlay` is a volume, the publication preset uses trilinear sampling at
+five fractions from 0.1 through 0.9 of the white-to-pial ribbon, averages those
+depth samples, and applies no tangential smoothing unless you request it. The
+effective projection, mask, anatomy, camera, and legend sources are retained as
+attributes on the returned figure.
 
 ## How do you compare several maps with one legend?
 
@@ -186,12 +265,24 @@ one view.
 
 ## What should you remember?
 
-For most figures, start with `style = "ggseg_like"`. Then adjust:
+Choose the style from the scientific object you are displaying:
+
+- use `style = "ggseg_like"` for parcel identities or parcel-valued estimates;
+- use `style = "stat_publication"` for a continuous vertex field or projected
+  statistic volume;
+- keep the CPU backend for deterministic static reports and use the existing
+  interactive route for atlas exploration and hover behaviour.
+
+Then adjust:
 
 - `panel_labels` for shorter facet labels
 - `colorbar` and `colorbar_title` for the shared legend
 - `title`, `subtitle`, and `caption` for figure annotations
 - `ncol` for the panel grid
+
+For a continuous field, prefer `overlay_threshold`, `overlay_lim`,
+`medial_wall`, and `camera` over low-level line-width controls. Parcel
+boundaries and internal depth discontinuities are not activation contours.
 
 Use `panel_layout = "native"` only when you need the raw projected
 coordinates for a custom workflow.

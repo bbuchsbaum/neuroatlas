@@ -835,6 +835,17 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     cmap = cmap_df,
     surf_type = surf,
     surface_space = "fsaverage6",
+    extra = list(
+      cortex_mask = list(
+        lh = as.integer(lh_surf@data) != 0L,
+        rh = as.integer(rh_surf@data) != 0L
+      ),
+      cortex_mask_source = paste0(
+        "CBIG Schaefer fsaverage6 annotation coverage; label 0 is the ",
+        "annotation-defined medial wall"
+      ),
+      density = "41k"
+    ),
     subclass = "schaefer",
     ref = ref,
     artifacts = artifacts,
@@ -1028,6 +1039,17 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
     cmap = cmap_df,
     surf_type = surf,
     surface_space = mapping$space,
+    extra = list(
+      cortex_mask = list(
+        lh = as.integer(lh_surf@data) != 0L,
+        rh = as.integer(rh_surf@data) != 0L
+      ),
+      cortex_mask_source = paste0(
+        "CBIG Schaefer annotation coverage on ", mapping$space,
+        "; label 0 is the annotation-defined medial wall"
+      ),
+      density = mapping$tf_density
+    ),
     subclass = "schaefer",
     ref = ref,
     artifacts = artifacts,

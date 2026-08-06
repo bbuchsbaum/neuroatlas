@@ -553,6 +553,17 @@ glasser_surf <- function(space = "fsaverage",
     cmap = cmap,
     surf_type = surf,
     surface_space = "fsaverage",
+    extra = list(
+      cortex_mask = list(
+        lh = as.integer(lh@data) != 0L,
+        rh = as.integer(rh@data) != 0L
+      ),
+      cortex_mask_source = paste0(
+        "HCP-MMP1 FreeSurfer annotation coverage; label 0 is the ",
+        "annotation-defined medial wall"
+      ),
+      density = "164k"
+    ),
     subclass = "glasser_surf",
     ref = ref,
     artifacts = artifacts,

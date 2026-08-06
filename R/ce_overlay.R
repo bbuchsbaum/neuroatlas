@@ -31,9 +31,16 @@
                                      fun = c("avg", "nn", "mode"),
                                      sampling = c("midpoint",
                                                   "normal_line",
-                                                  "thickness")) {
+                                                  "thickness"),
+                                     interpolation = c("legacy", "nearest",
+                                                       "linear"),
+                                     aggregate = NULL,
+                                     n_samples = NULL,
+                                     depth = NULL,
+                                     surface_smooth_fwhm = 0) {
   fun <- match.arg(fun)
   sampling <- match.arg(sampling)
+  interpolation <- match.arg(interpolation)
 
   out <- list(lh = NULL, rh = NULL)
   meta <- list(surface_space = NULL, hemis = list())
@@ -58,14 +65,25 @@
       surf_pial = pair$pial,
       target_n = target_n,
       fun = fun,
-      sampling = sampling
+      sampling = sampling,
+      interpolation = interpolation,
+      aggregate = aggregate,
+      n_samples = n_samples,
+      depth = depth,
+      surface_smooth_fwhm = surface_smooth_fwhm
     )
 
     out[[hemi]] <- vals
     meta$hemis[[hemi]] <- list(
       target_vertices = target_n,
       projected_vertices = length(vals),
-      finite_vertices = sum(is.finite(vals))
+      finite_vertices = sum(is.finite(vals)),
+      interpolation = interpolation,
+      aggregate = aggregate,
+      sampling = sampling,
+      n_samples = n_samples,
+      depth = depth,
+      surface_smooth_fwhm = surface_smooth_fwhm
     )
   }
 
@@ -128,7 +146,12 @@
                                       surf_pial,
                                       target_n,
                                       fun,
-                                      sampling) {
+                                      sampling,
+                                      interpolation = "legacy",
+                                      aggregate = NULL,
+                                      n_samples = NULL,
+                                      depth = NULL,
+                                      surface_smooth_fwhm = 0) {
   proj <- tryCatch(
     neurosurf::vol_to_surf(
       surf_wm = surf_wm,
@@ -136,6 +159,11 @@
       vol = cluster_vol,
       fun = fun,
       sampling = sampling,
+      interpolation = interpolation,
+      aggregate = aggregate,
+      n_samples = n_samples,
+      depth = depth,
+      surface_smooth_fwhm = surface_smooth_fwhm,
       fill = NA_real_
     ),
     error = function(e) NULL

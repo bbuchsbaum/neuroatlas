@@ -5,7 +5,7 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
                          "path_id", "v1", "v2", "alpha", "shade",
                          "overlay_color",
                          "xmin", "xmax", "ymin", "ymax",
-                         "rotate", "height", "width"))
+                         "rotate", "height", "width", "contour_id"))
 
 .plot_brain_depth_resolution <- 240L
 .plot_brain_depth_neighborhood <- 0L
@@ -1778,6 +1778,63 @@ build_surface_polygon_data <- function(surfatlas,
   )
 }
 
+.resolve_colorbar_source <- function(colorbar_source = c("auto", "base",
+                                                          "overlay", "none"),
+                                     vals = NULL,
+                                     overlay_values = NULL,
+                                     overlay_present = !is.null(overlay_values)) {
+  colorbar_source <- match.arg(colorbar_source)
+  if (!identical(colorbar_source, "auto")) return(colorbar_source)
+  if (isTRUE(overlay_present)) return("overlay")
+  if (!is.null(vals) && any(is.finite(vals))) return("base")
+  "none"
+}
+
+.colorbar_break_values <- function(lim, threshold = NULL) {
+  if (!is.numeric(lim) || length(lim) != 2L || any(!is.finite(lim))) {
+    return(NULL)
+  }
+  out <- as.numeric(lim)
+  if (lim[[1]] <= 0 && lim[[2]] >= 0) out <- c(out, 0)
+  if (!is.null(threshold) && length(threshold) == 1L &&
+      is.finite(threshold) && threshold > 0) {
+    marks <- c(-abs(threshold), abs(threshold))
+    out <- c(out, marks[marks >= lim[[1]] & marks <= lim[[2]]])
+  }
+  sort(unique(out))
+}
+
+.polygon_signed_area <- function(x, y) {
+  if (length(x) < 3L || length(y) != length(x)) return(0)
+  j <- c(seq.int(2L, length(x)), 1L)
+  0.5 * sum(x * y[j] - x[j] * y)
+}
+
+.surface_outer_contour_data <- function(base_data) {
+  needed <- c("x", "y", "poly_id", "panel")
+  if (is.null(base_data) || nrow(base_data) == 0L ||
+      !all(needed %in% names(base_data))) return(NULL)
+
+  groups <- split(base_data, interaction(base_data$panel, base_data$poly_id,
+                                         drop = TRUE))
+  areas <- vapply(groups, function(g) {
+    abs(.polygon_signed_area(g$x, g$y))
+  }, numeric(1))
+  panels <- vapply(groups, function(g) as.character(g$panel[[1]]), character(1))
+  keep <- unlist(lapply(split(seq_along(groups), panels), function(idx) {
+    idx[[which.max(areas[idx])]]
+  }), use.names = FALSE)
+
+  out <- lapply(seq_along(keep), function(k) {
+    g <- groups[[keep[[k]]]]
+    g <- g[, c("x", "y", "panel"), drop = FALSE]
+    g <- rbind(g, g[1L, , drop = FALSE])
+    g$contour_id <- k
+    g
+  })
+  dplyr::bind_rows(out)
+}
+
 .resolve_plot_brain_panel_labels <- function(panel_levels, panel_labels = NULL) {
   if (is.null(panel_labels)) {
     return(panel_levels)
@@ -1889,7 +1946,9 @@ build_surface_polygon_data <- function(surfatlas,
 #' @param hemis Character vector of hemispheres to include.
 #'   Default: \code{c("left", "right")}.
 #' @param surface Surface type. One of \code{"inflated"}, \code{"pial"},
-#'   \code{"white"}. Must match the surface type of \code{surfatlas}.
+#'   \code{"white"}, or \code{"midthickness"}. When omitted, it is read from
+#'   \code{surfatlas$surf_type}; an explicitly requested type must match the
+#'   geometry carried by \code{surfatlas}.
 #' @param color_method Colour algorithm for discrete parcel colouring (when
 #'   \code{vals} is \code{NULL}). Passed to \code{\link{atlas_roi_colors}()}.
 #'   Default: \code{"rule_hcl"}.
@@ -1904,6 +1963,10 @@ build_surface_polygon_data <- function(surfatlas,
 #' @param interactive Logical. If \code{TRUE} (default), returns a
 #'   \code{ggiraph::girafe} widget with hover tooltips. If \code{FALSE},
 #'   returns a static \code{ggplot2} object.
+#' @param static_backend Static renderer: the existing \code{"ggplot"} polygon
+#'   path or deterministic \code{"cpu"} barycentric rasterization. The CPU
+#'   path is intended for continuous publication overlays and requires no
+#'   OpenGL or browser.
 #' @param data_id_mode Interactive data-id granularity (when
 #'   \code{interactive = TRUE}): \code{"parcel"} (default) uses parcel ids;
 #'   \code{"polygon"} encodes panel + parcel + polygon/face id for
@@ -1918,7 +1981,10 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{"ggseg_like"} enables a cleaner publication style and, unless
 #'   explicitly overridden, switches \code{panel_layout} to
 #'   \code{"presentation"} with softer border defaults and light projection
-#'   smoothing.
+#'   smoothing. \code{"stat_publication"} treats the surface as an anatomical
+#'   substrate for a continuous overlay: parcel and culling-derived silhouette
+#'   lines are disabled, weak shading is drawn below the overlay, and a clean
+#'   outer contour is enabled.
 #' @param border Logical. If \code{TRUE} (default), draw thin lines at parcel
 #'   boundaries (edges between different parcels). Gives a clean ggseg-like
 #'   appearance.
@@ -1956,6 +2022,11 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{border_color}.
 #' @param silhouette_size Line width for silhouette lines. Default:
 #'   \code{border_size}.
+#' @param outer_contour Logical. If \code{TRUE}, draw the largest projected
+#'   exterior loop in each panel. Unlike \code{silhouette}, this excludes
+#'   internal visibility and sulcal edge fragments.
+#' @param outer_contour_color Colour for the exterior contour.
+#' @param outer_contour_size Line width for the exterior contour.
 #' @param network_border Logical. If \code{TRUE}, highlight boundaries between
 #'   different networks (requires \code{surfatlas$network}). Default:
 #'   \code{FALSE}.
@@ -2004,18 +2075,34 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{neurosurf::vol_to_surf()} when \code{overlay} is a
 #'   \code{NeuroVol}. One of \code{"midpoint"}, \code{"normal_line"}, or
 #'   \code{"thickness"}. Default: \code{"midpoint"}.
+#' @param overlay_interpolation Voxel interpolation passed to
+#'   \code{neurosurf::vol_to_surf()}: \code{"legacy"}, \code{"nearest"}, or
+#'   \code{"linear"}. The publication preset defaults to linear interpolation.
+#' @param overlay_aggregate Optional explicit aggregation across depth samples:
+#'   \code{"mean"}, \code{"mode"}, or \code{"closest"}.
+#' @param overlay_n_samples Optional number of sampling depths.
+#' @param overlay_depth Optional explicit thickness fractions or normal-line
+#'   offsets. The publication preset uses five fractions from 0.1 through 0.9.
+#' @param overlay_surface_smooth_fwhm Tangential surface smoothing in mm.
+#'   Defaults to zero; it is separate from voxel interpolation.
 #' @param overlay_border Logical. If \code{TRUE}, draw cluster overlay
 #'   boundaries. Default: \code{FALSE}.
 #' @param overlay_border_color Colour for overlay boundaries. Default:
 #'   \code{"black"}.
 #' @param overlay_border_size Line width for overlay boundaries. Default:
 #'   \code{0.25}.
-#' @param colorbar Logical or character. When \code{vals} is non-NULL and
-#'   \code{interactive = FALSE}, controls whether and where to add a standalone
-#'   colorbar panel. Use \code{TRUE} or \code{"right"} for a vertical colorbar,
+#' @param colorbar Logical or character. When \code{interactive = FALSE},
+#'   controls whether and where to add a standalone colorbar panel. Use
+#'   \code{TRUE} or \code{"right"} for a vertical colorbar,
 #'   \code{"bottom"} for a horizontal colorbar, or \code{FALSE} /
 #'   \code{"none"} to omit it. Default: \code{FALSE}.
+#' @param colorbar_source Which mapped quantity supplies the static colorbar:
+#'   \code{"auto"}, \code{"base"}, \code{"overlay"}, or \code{"none"}.
+#'   \code{"auto"} chooses the overlay whenever one was supplied, even if all
+#'   of its values are removed by thresholding; otherwise it chooses \code{vals}.
 #' @param colorbar_title Optional character label for the colorbar.
+#' @param overlay_title Optional character label used when the colorbar source
+#'   is the overlay. Defaults to \code{colorbar_title}.
 #' @param title,subtitle,caption Optional plot-level annotations for static
 #'   output. When a colorbar is present these are applied to the composed
 #'   figure; otherwise they are added directly to the returned ggplot.
@@ -2023,6 +2110,19 @@ build_surface_polygon_data <- function(surfatlas,
 #'   character vector matching the number of panels, a named character vector
 #'   keyed by default panel names such as \code{"Left Lateral"}, or a function
 #'   that takes the default panel name and returns a new label.
+#' @param cortex_mask Optional logical vertex-domain mask or lh/rh list.
+#' @param cortex_mask_source Provenance label for an explicit cortex mask.
+#' @param anatomy_metric Optional anatomy metric or lh/rh list. A declared
+#'   sulcal metric is preferred; otherwise the CPU backend computes curvature
+#'   on matched white geometry and verifies vertex correspondence.
+#' @param anatomy_metric_source Provenance label for an explicit metric.
+#' @param medial_wall Explicit medial-wall policy: neutral shade, mask, or
+#'   independent outline.
+#' @param camera Strict canonical orthographic or slightly oblique presentation
+#'   camera.
+#' @param orientation_labels Draw small anterior/posterior marks in CPU panels.
+#' @param render_width,render_height Per-panel CPU raster dimensions.
+#' @param render_antialias CPU supersampling factor.
 #' @param outline Logical. If \code{TRUE}, draw every triangle edge (mesh
 #'   wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.
 #' @param background Logical. If \code{TRUE}, draw the full cortical surface
@@ -2088,10 +2188,11 @@ plot_brain <- function(surfatlas,
                        palette = "cork",
                        lim = NULL,
                        interactive = TRUE,
+                       static_backend = c("ggplot", "cpu"),
                        data_id_mode = c("parcel", "polygon"),
                        ncol = 2L,
                        panel_layout = c("native", "presentation"),
-                       style = c("default", "ggseg_like"),
+                       style = c("default", "ggseg_like", "stat_publication"),
                        border = TRUE,
                        border_geom = c("path", "segment"),
                        boundary_smooth = 0L,
@@ -2103,6 +2204,9 @@ plot_brain <- function(surfatlas,
                        silhouette = border,
                        silhouette_color = border_color,
                        silhouette_size = border_size,
+                       outer_contour = FALSE,
+                       outer_contour_color = "grey35",
+                       outer_contour_size = 0.3,
                        network_border = FALSE,
                        network_border_color = border_color,
                        network_border_size = border_size * 2,
@@ -2124,12 +2228,29 @@ plot_brain <- function(surfatlas,
                        overlay_fun = c("avg", "nn", "mode"),
                        overlay_sampling = c("midpoint", "normal_line",
                                             "thickness"),
+                       overlay_interpolation = c("legacy", "nearest", "linear"),
+                       overlay_aggregate = NULL,
+                       overlay_n_samples = NULL,
+                       overlay_depth = NULL,
+                       overlay_surface_smooth_fwhm = 0,
                        colorbar = FALSE,
+                       colorbar_source = c("auto", "base", "overlay", "none"),
                        colorbar_title = NULL,
+                       overlay_title = colorbar_title,
                        title = NULL,
                        subtitle = NULL,
                        caption = NULL,
                        panel_labels = NULL,
+                       cortex_mask = NULL,
+                       cortex_mask_source = NULL,
+                       anatomy_metric = NULL,
+                       anatomy_metric_source = NULL,
+                       medial_wall = c("shade", "mask", "outline"),
+                       camera = c("canonical", "presentation"),
+                       orientation_labels = TRUE,
+                       render_width = 1200L,
+                       render_height = 750L,
+                       render_antialias = 2L,
                        outline = FALSE,
                        background = FALSE,
                        background_color = "grey80",
@@ -2137,6 +2258,7 @@ plot_brain <- function(surfatlas,
                        bg = "white",
                        ...) {
   style <- match.arg(style)
+  overlay_present <- !is.null(overlay)
 
   if (!is.logical(background) || length(background) != 1 || is.na(background)) {
     stop("'background' must be TRUE or FALSE.", call. = FALSE)
@@ -2144,8 +2266,18 @@ plot_brain <- function(surfatlas,
   if (!is.logical(depth_cull) || length(depth_cull) != 1 || is.na(depth_cull)) {
     stop("'depth_cull' must be TRUE or FALSE.", call. = FALSE)
   }
+  if (!is.logical(outer_contour) || length(outer_contour) != 1 ||
+      is.na(outer_contour)) {
+    stop("'outer_contour' must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.numeric(outer_contour_size) || length(outer_contour_size) != 1L ||
+      !is.finite(outer_contour_size) || outer_contour_size < 0) {
+    stop("'outer_contour_size' must be a non-negative numeric scalar.",
+         call. = FALSE)
+  }
 
   panel_layout_missing <- missing(panel_layout)
+  border_missing <- missing(border)
   border_color_missing <- missing(border_color)
   border_size_missing <- missing(border_size)
   boundary_smooth_missing <- missing(boundary_smooth)
@@ -2154,6 +2286,17 @@ plot_brain <- function(surfatlas,
   silhouette_color_missing <- missing(silhouette_color)
   network_border_missing <- missing(network_border)
   shading_missing <- missing(shading)
+  shading_strength_missing <- missing(shading_strength)
+  shading_gamma_missing <- missing(shading_gamma)
+  fill_alpha_missing <- missing(fill_alpha)
+  overlay_alpha_missing <- missing(overlay_alpha)
+  overlay_alpha_mode_missing <- missing(overlay_alpha_mode)
+  overlay_sampling_missing <- missing(overlay_sampling)
+  overlay_interpolation_missing <- missing(overlay_interpolation)
+  overlay_depth_missing <- missing(overlay_depth)
+  background_missing <- missing(background)
+  background_color_missing <- missing(background_color)
+  outer_contour_missing <- missing(outer_contour)
   bg_missing <- missing(bg)
 
   if (identical(style, "ggseg_like")) {
@@ -2169,6 +2312,28 @@ plot_brain <- function(surfatlas,
     if (bg_missing) bg <- "#f7f7f7"
   }
 
+  if (identical(style, "stat_publication")) {
+    if (panel_layout_missing) panel_layout <- "presentation"
+    if (border_missing) border <- FALSE
+    if (silhouette_missing) silhouette <- FALSE
+    if (network_border_missing) network_border <- FALSE
+    if (shading_missing) shading <- TRUE
+    if (shading_strength_missing) shading_strength <- 0.08
+    if (shading_gamma_missing) shading_gamma <- 1.5
+    if (fill_alpha_missing) fill_alpha <- 0
+    if (overlay_alpha_missing) overlay_alpha <- 0.85
+    if (overlay_alpha_mode_missing) overlay_alpha_mode <- "threshold"
+    if (overlay_sampling_missing) overlay_sampling <- "thickness"
+    if (overlay_interpolation_missing) overlay_interpolation <- "linear"
+    if (overlay_depth_missing) {
+      overlay_depth <- seq(0.1, 0.9, length.out = 5L)
+    }
+    if (background_missing) background <- TRUE
+    if (background_color_missing) background_color <- "#D8D9D6"
+    if (outer_contour_missing) outer_contour <- TRUE
+    if (bg_missing) bg <- "#FBFBF8"
+  }
+
   # Input validation
   if (!inherits(surfatlas, "surfatlas")) {
     stop("'surfatlas' must be a surface atlas object of class 'surfatlas'.\n",
@@ -2176,14 +2341,59 @@ plot_brain <- function(surfatlas,
          call. = FALSE)
   }
 
+  surface_missing <- missing(surface)
+  if (surface_missing && !is.null(surfatlas$surf_type) &&
+      length(surfatlas$surf_type) == 1L && nzchar(surfatlas$surf_type)) {
+    surface <- surfatlas$surf_type
+  }
+  surface <- match.arg(surface, c("inflated", "pial", "white", "midthickness"))
+  if (!is.null(surfatlas$surf_type) && length(surfatlas$surf_type) == 1L &&
+      nzchar(surfatlas$surf_type) && !identical(surface, surfatlas$surf_type)) {
+    stop(
+      "Requested surface '", surface, "' does not match surfatlas$surf_type '",
+      surfatlas$surf_type, "'. Construct or resolve an atlas with the requested geometry.",
+      call. = FALSE
+    )
+  }
+
   views <- match.arg(views, c("lateral", "medial", "dorsal", "ventral"),
                      several.ok = TRUE)
   hemis <- match.arg(hemis, c("left", "right"), several.ok = TRUE)
   colorbar_position <- .normalize_colorbar_position(colorbar)
+  static_backend <- match.arg(static_backend)
+  colorbar_source <- match.arg(colorbar_source)
+  medial_wall <- match.arg(medial_wall)
+  camera <- match.arg(camera)
   data_id_mode <- match.arg(data_id_mode)
   overlay_alpha_mode <- match.arg(overlay_alpha_mode)
+  overlay_interpolation <- match.arg(overlay_interpolation)
   panel_layout <- match.arg(panel_layout)
   border_geom <- match.arg(border_geom)
+  if (!interactive && identical(static_backend, "cpu")) {
+    return(.plot_brain_cpu(
+      surfatlas = surfatlas, overlay = overlay, views = views, hemis = hemis,
+      overlay_threshold = overlay_threshold, overlay_alpha = overlay_alpha,
+      overlay_alpha_ramp = overlay_alpha_ramp,
+      overlay_palette = overlay_palette, overlay_lim = overlay_lim,
+      overlay_fun = match.arg(overlay_fun),
+      overlay_sampling = match.arg(overlay_sampling),
+      overlay_interpolation = overlay_interpolation,
+      overlay_aggregate = overlay_aggregate,
+      overlay_n_samples = overlay_n_samples, overlay_depth = overlay_depth,
+      overlay_surface_smooth_fwhm = overlay_surface_smooth_fwhm,
+      colorbar_position = colorbar_position,
+      colorbar_source = colorbar_source, overlay_title = overlay_title,
+      title = title, subtitle = subtitle, caption = caption,
+      panel_labels = panel_labels, bg = bg,
+      cortex_mask = cortex_mask, cortex_mask_source = cortex_mask_source,
+      anatomy_metric = anatomy_metric,
+      anatomy_metric_source = anatomy_metric_source,
+      medial_wall = medial_wall, camera = camera,
+      orientation_labels = orientation_labels,
+      render_width = render_width, render_height = render_height,
+      render_antialias = render_antialias
+    ))
+  }
   if (!is.numeric(boundary_smooth) || length(boundary_smooth) != 1 ||
       is.na(boundary_smooth) || boundary_smooth < 0 ||
       boundary_smooth != as.integer(boundary_smooth)) {
@@ -2489,7 +2699,50 @@ plot_brain <- function(surfatlas,
     p <- p + ggplot2::scale_colour_identity()
   }
 
+  # Anatomy shading is deliberately composed before the statistical overlay.
+  # This preserves fold cues without darkening or recolouring the statistic.
+  do_shading <- (isTRUE(shading) || isTRUE(background)) &&
+    !is.null(shading_strength) && shading_strength > 0
+  if (do_shading) {
+    if (isTRUE(background) && !is.null(bg_shade_data)) {
+      shade_data <- bg_shade_data
+    } else if (!outline) {
+      shade_build <- .build_brain_polygon_data_memo(
+        surfatlas, views, surface,
+        projection_smooth = projection_smooth,
+        depth_cull = depth_cull
+      )
+      shade_data <- shade_build$polygons
+      shade_data <- shade_data[shade_data$hemi %in% hemis, , drop = FALSE]
+      shade_data <- shade_data[shade_data$panel %in% levels(poly_data$panel), ,
+                               drop = FALSE]
+      if (!is.null(panel_transforms)) {
+        shade_data <- .apply_panel_layout_to_points(shade_data, panel_transforms)
+      }
+      shade_data$panel <- factor(shade_data$panel,
+                                 levels = levels(poly_data$panel))
+    } else {
+      shade_data <- poly_data
+    }
+
+    if (!is.null(shade_data) && nrow(shade_data) > 0 &&
+        "shade" %in% names(shade_data)) {
+      shade_data$alpha <- shading_strength *
+        (pmax(0, 1 - shade_data$shade) ^ shading_gamma)
+      p <- p + ggplot2::geom_polygon(
+        data = shade_data,
+        ggplot2::aes(x = x, y = y, group = face_id, alpha = alpha),
+        fill = shading_color,
+        colour = NA,
+        inherit.aes = FALSE
+      )
+      use_alpha_identity <- TRUE
+    }
+  }
+
   # Optional projected cluster overlay
+  overlay_values_rendered <- NULL
+  overlay_lim_effective <- overlay_lim
   if (!is.null(overlay)) {
     if (inherits(overlay, "NeuroVol")) {
       overlay_fun <- match.arg(overlay_fun)
@@ -2498,7 +2751,12 @@ plot_brain <- function(surfatlas,
         cluster_vol = overlay,
         surfatlas = surfatlas,
         fun = overlay_fun,
-        sampling = overlay_sampling
+        sampling = overlay_sampling,
+        interpolation = overlay_interpolation,
+        aggregate = overlay_aggregate,
+        n_samples = overlay_n_samples,
+        depth = overlay_depth,
+        surface_smooth_fwhm = overlay_surface_smooth_fwhm
       )
       overlay <- proj$overlay
     }
@@ -2525,10 +2783,19 @@ plot_brain <- function(surfatlas,
         ov_poly <- .apply_panel_layout_to_points(ov_poly, panel_transforms)
       }
       ov_poly$panel <- factor(ov_poly$panel, levels = levels(poly_data$panel))
+      overlay_values_rendered <- ov_poly$overlay_value[
+        is.finite(ov_poly$overlay_value)
+      ]
+      if (is.null(overlay_lim_effective) && length(overlay_values_rendered)) {
+        overlay_lim_effective <- range(overlay_values_rendered)
+        if (overlay_lim_effective[[1]] == overlay_lim_effective[[2]]) {
+          overlay_lim_effective <- overlay_lim_effective + c(-1e-6, 1e-6)
+        }
+      }
       ov_poly$overlay_color <- .overlay_value_to_hex(
         ov_poly$overlay_value,
         palette = overlay_palette,
-        lim = overlay_lim
+        lim = overlay_lim_effective
       )
       ov_poly$overlay_alpha <- .overlay_alpha_values(
         ov_poly$overlay_value,
@@ -2594,52 +2861,6 @@ plot_brain <- function(surfatlas,
           )
         }
       }
-    }
-  }
-
-  # Optional shading overlay (static polygons; uses triangle mesh data).
-  # `background = TRUE` shades the whole cortex (so the grey backdrop gets
-  # sulcal depth); otherwise `shading = TRUE` shades just the labelled parcels.
-  do_shading <- (isTRUE(shading) || isTRUE(background)) &&
-    !is.null(shading_strength) && shading_strength > 0
-  if (do_shading) {
-    if (isTRUE(background) && !is.null(bg_shade_data)) {
-      # Already panel-transformed and factored above.
-      shade_data <- bg_shade_data
-    } else if (!outline) {
-      shade_build <- .build_brain_polygon_data_memo(
-        surfatlas, views, surface,
-        projection_smooth = projection_smooth,
-        depth_cull = depth_cull
-      )
-      shade_data <- shade_build$polygons
-      shade_data <- shade_data[shade_data$hemi %in% hemis, , drop = FALSE]
-      shade_data <- shade_data[shade_data$panel %in% levels(poly_data$panel), ,
-                               drop = FALSE]
-      if (!is.null(panel_transforms)) {
-        shade_data <- .apply_panel_layout_to_points(shade_data, panel_transforms)
-      }
-      shade_data$panel <- factor(shade_data$panel,
-                                 levels = levels(poly_data$panel))
-    } else {
-      shade_data <- poly_data
-    }
-
-    if (!is.null(shade_data) && nrow(shade_data) > 0 &&
-        "shade" %in% names(shade_data)) {
-      # shade_data is already panel-transformed and factored by each branch.
-      shade_data$alpha <- shading_strength *
-        (pmax(0, 1 - shade_data$shade) ^ shading_gamma)
-
-      p <- p +
-        ggplot2::geom_polygon(
-          data = shade_data,
-          ggplot2::aes(x = x, y = y, group = face_id, alpha = alpha),
-          fill = shading_color,
-          colour = NA,
-          inherit.aes = FALSE
-        )
-      use_alpha_identity <- TRUE
     }
   }
 
@@ -2771,6 +2992,26 @@ plot_brain <- function(surfatlas,
     }
   }
 
+  # A publication outer contour comes from the largest exterior loop of the
+  # projected cortex, not from every edge exposed by face culling.
+  outer_data <- if (isTRUE(outer_contour)) {
+    .surface_outer_contour_data(base_data)
+  } else {
+    NULL
+  }
+  if (!is.null(outer_data) && nrow(outer_data) > 0L) {
+    outer_data$panel <- factor(outer_data$panel, levels = levels(poly_data$panel))
+    p <- p + ggplot2::geom_path(
+      data = outer_data,
+      ggplot2::aes(x = x, y = y, group = contour_id),
+      colour = outer_contour_color,
+      linewidth = outer_contour_size,
+      lineend = "round",
+      linejoin = "round",
+      inherit.aes = FALSE
+    )
+  }
+
   if (use_alpha_identity) {
     p <- p + ggplot2::scale_alpha_identity(guide = "none")
   }
@@ -2802,7 +3043,18 @@ plot_brain <- function(surfatlas,
 
   if (!interactive) {
     cb <- NULL
-    if (!identical(colorbar_position, "none") && !is.null(vals)) {
+    resolved_colorbar_source <- .resolve_colorbar_source(
+      colorbar_source,
+      vals = vals,
+      overlay_values = overlay_values_rendered,
+      overlay_present = overlay_present
+    )
+    if (identical(colorbar_source, "none")) {
+      colorbar_position <- "none"
+    }
+    colorbar_meta <- list(source = resolved_colorbar_source)
+    if (!identical(colorbar_position, "none") &&
+        identical(resolved_colorbar_source, "base") && !is.null(vals)) {
       cb <- .make_colorbar_panel(
         palette = palette,
         lim = lim,
@@ -2810,8 +3062,31 @@ plot_brain <- function(surfatlas,
         position = colorbar_position,
         bg = bg
       )
+      colorbar_meta <- c(colorbar_meta, list(
+        palette = palette, lim = lim, title = colorbar_title,
+        breaks = .colorbar_break_values(lim)
+      ))
+    } else if (!identical(colorbar_position, "none") &&
+               identical(resolved_colorbar_source, "overlay") &&
+               !is.null(overlay_lim_effective)) {
+      overlay_breaks <- .colorbar_break_values(
+        overlay_lim_effective,
+        threshold = overlay_threshold
+      )
+      cb <- .make_colorbar_panel(
+        palette = overlay_palette,
+        lim = overlay_lim_effective,
+        title = overlay_title,
+        position = colorbar_position,
+        bg = bg,
+        breaks = overlay_breaks
+      )
+      colorbar_meta <- c(colorbar_meta, list(
+        palette = overlay_palette, lim = overlay_lim_effective,
+        title = overlay_title, breaks = overlay_breaks
+      ))
     }
-    return(.compose_plot_brain_figure(
+    out <- .compose_plot_brain_figure(
       main_plot = p,
       colorbar_plot = cb,
       colorbar_position = colorbar_position,
@@ -2819,7 +3094,17 @@ plot_brain <- function(surfatlas,
       subtitle = subtitle,
       caption = caption,
       bg = bg
-    ))
+    )
+    attr(out, "plot_brain_colorbar") <- colorbar_meta
+    attr(out, "plot_brain_projection") <- list(
+      interpolation = overlay_interpolation,
+      sampling = overlay_sampling,
+      aggregate = overlay_aggregate,
+      n_samples = overlay_n_samples,
+      depth = overlay_depth,
+      surface_smooth_fwhm = overlay_surface_smooth_fwhm
+    )
+    return(out)
   }
 
   ggiraph::girafe(
@@ -2869,7 +3154,8 @@ plot_brain <- function(surfatlas,
                                  lim,
                                  title = NULL,
                                  position = c("right", "bottom"),
-                                 bg = "white") {
+                                 bg = "white",
+                                 breaks = NULL) {
   position <- match.arg(position)
   guide <- if (identical(position, "bottom")) {
     ggplot2::guide_colorbar(
@@ -2894,6 +3180,7 @@ plot_brain <- function(surfatlas,
     scico::scale_fill_scico(
       palette = palette, limits = lim, oob = scales::squish,
       name = title,
+      breaks = breaks,
       guide = guide
     ) +
     ggplot2::theme_void() +

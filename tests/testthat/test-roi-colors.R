@@ -73,3 +73,21 @@ test_that("roi_colors_embedding maps structured hues", {
   expect_equal(nrow(pal), nrow(rois))
   expect_snapshot_value(pal, style = "json2")
 })
+
+test_that("PCA score canonicalization removes component sign ambiguity", {
+  scores <- matrix(c(-2, -1, 1, 2, 3, 2, -2, -3), ncol = 2)
+  rotation <- matrix(
+    c(0, 0.8, -0.2, 0, -0.6, 0.4),
+    nrow = 3,
+    ncol = 2
+  )
+  signs <- c(-1, 1)
+
+  expected <- neuroatlas:::.canonicalize_pca_scores(scores, rotation)
+  observed <- neuroatlas:::.canonicalize_pca_scores(
+    sweep(scores, 2, signs, `*`),
+    sweep(rotation, 2, signs, `*`)
+  )
+
+  expect_identical(observed, expected)
+})

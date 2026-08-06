@@ -121,6 +121,7 @@ Collate:
     'print-plot-methods.R'
     'query_point.R'
     'reduce_atlas_vec.R'
+    'render_stat_surface.R'
     'roi_colors.R'
     'roi_metadata.R'
     'schaefer.R'

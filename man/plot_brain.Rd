@@ -15,10 +15,11 @@ plot_brain(
   palette = "cork",
   lim = NULL,
   interactive = TRUE,
+  static_backend = c("ggplot", "cpu"),
   data_id_mode = c("parcel", "polygon"),
   ncol = 2L,
   panel_layout = c("native", "presentation"),
-  style = c("default", "ggseg_like"),
+  style = c("default", "ggseg_like", "stat_publication"),
   border = TRUE,
   border_geom = c("path", "segment"),
   boundary_smooth = 0L,
@@ -30,6 +31,9 @@ plot_brain(
   silhouette = border,
   silhouette_color = border_color,
   silhouette_size = border_size,
+  outer_contour = FALSE,
+  outer_contour_color = "grey35",
+  outer_contour_size = 0.3,
   network_border = FALSE,
   network_border_color = border_color,
   network_border_size = border_size * 2,
@@ -50,12 +54,29 @@ plot_brain(
   overlay_border_size = 0.25,
   overlay_fun = c("avg", "nn", "mode"),
   overlay_sampling = c("midpoint", "normal_line", "thickness"),
+  overlay_interpolation = c("legacy", "nearest", "linear"),
+  overlay_aggregate = NULL,
+  overlay_n_samples = NULL,
+  overlay_depth = NULL,
+  overlay_surface_smooth_fwhm = 0,
   colorbar = FALSE,
+  colorbar_source = c("auto", "base", "overlay", "none"),
   colorbar_title = NULL,
+  overlay_title = colorbar_title,
   title = NULL,
   subtitle = NULL,
   caption = NULL,
   panel_labels = NULL,
+  cortex_mask = NULL,
+  cortex_mask_source = NULL,
+  anatomy_metric = NULL,
+  anatomy_metric_source = NULL,
+  medial_wall = c("shade", "mask", "outline"),
+  camera = c("canonical", "presentation"),
+  orientation_labels = TRUE,
+  render_width = 1200L,
+  render_height = 750L,
+  render_antialias = 2L,
   outline = FALSE,
   background = FALSE,
   background_color = "grey80",
@@ -81,7 +102,9 @@ Default: \code{c("lateral", "medial")}.}
 Default: \code{c("left", "right")}.}
 
 \item{surface}{Surface type. One of \code{"inflated"}, \code{"pial"},
-\code{"white"}. Must match the surface type of \code{surfatlas}.}
+\code{"white"}, or \code{"midthickness"}. When omitted, it is read from
+\code{surfatlas$surf_type}; an explicitly requested type must match the
+geometry carried by \code{surfatlas}.}
 
 \item{color_method}{Colour algorithm for discrete parcel colouring (when
 \code{vals} is \code{NULL}). Passed to \code{\link{atlas_roi_colors}()}.
@@ -102,6 +125,11 @@ mode). Defaults to range of \code{vals}.}
 \code{ggiraph::girafe} widget with hover tooltips. If \code{FALSE},
 returns a static \code{ggplot2} object.}
 
+\item{static_backend}{Static renderer: the existing \code{"ggplot"} polygon
+path or deterministic \code{"cpu"} barycentric rasterization. The CPU
+path is intended for continuous publication overlays and requires no
+OpenGL or browser.}
+
 \item{data_id_mode}{Interactive data-id granularity (when
 \code{interactive = TRUE}): \code{"parcel"} (default) uses parcel ids;
 \code{"polygon"} encodes panel + parcel + polygon/face id for
@@ -119,7 +147,10 @@ grid.}
 \code{"ggseg_like"} enables a cleaner publication style and, unless
 explicitly overridden, switches \code{panel_layout} to
 \code{"presentation"} with softer border defaults and light projection
-smoothing.}
+smoothing. \code{"stat_publication"} treats the surface as an anatomical
+substrate for a continuous overlay: parcel and culling-derived silhouette
+lines are disabled, weak shading is drawn below the overlay, and a clean
+outer contour is enabled.}
 
 \item{border}{Logical. If \code{TRUE} (default), draw thin lines at parcel
 boundaries (edges between different parcels). Gives a clean ggseg-like
@@ -164,6 +195,14 @@ to \code{border}.}
 
 \item{silhouette_size}{Line width for silhouette lines. Default:
 \code{border_size}.}
+
+\item{outer_contour}{Logical. If \code{TRUE}, draw the largest projected
+exterior loop in each panel. Unlike \code{silhouette}, this excludes
+internal visibility and sulcal edge fragments.}
+
+\item{outer_contour_color}{Colour for the exterior contour.}
+
+\item{outer_contour_size}{Line width for the exterior contour.}
 
 \item{network_border}{Logical. If \code{TRUE}, highlight boundaries between
 different networks (requires \code{surfatlas$network}). Default:
@@ -239,13 +278,36 @@ Default: \code{"avg"}.}
 \code{NeuroVol}. One of \code{"midpoint"}, \code{"normal_line"}, or
 \code{"thickness"}. Default: \code{"midpoint"}.}
 
-\item{colorbar}{Logical or character. When \code{vals} is non-NULL and
-\code{interactive = FALSE}, controls whether and where to add a standalone
-colorbar panel. Use \code{TRUE} or \code{"right"} for a vertical colorbar,
+\item{overlay_interpolation}{Voxel interpolation passed to
+\code{neurosurf::vol_to_surf()}: \code{"legacy"}, \code{"nearest"}, or
+\code{"linear"}. The publication preset defaults to linear interpolation.}
+
+\item{overlay_aggregate}{Optional explicit aggregation across depth samples:
+\code{"mean"}, \code{"mode"}, or \code{"closest"}.}
+
+\item{overlay_n_samples}{Optional number of sampling depths.}
+
+\item{overlay_depth}{Optional explicit thickness fractions or normal-line
+offsets. The publication preset uses five fractions from 0.1 through 0.9.}
+
+\item{overlay_surface_smooth_fwhm}{Tangential surface smoothing in mm.
+Defaults to zero; it is separate from voxel interpolation.}
+
+\item{colorbar}{Logical or character. When \code{interactive = FALSE},
+controls whether and where to add a standalone colorbar panel. Use
+\code{TRUE} or \code{"right"} for a vertical colorbar,
 \code{"bottom"} for a horizontal colorbar, or \code{FALSE} /
 \code{"none"} to omit it. Default: \code{FALSE}.}
 
+\item{colorbar_source}{Which mapped quantity supplies the static colorbar:
+\code{"auto"}, \code{"base"}, \code{"overlay"}, or \code{"none"}.
+\code{"auto"} chooses the overlay whenever one was supplied, even if all
+of its values are removed by thresholding; otherwise it chooses \code{vals}.}
+
 \item{colorbar_title}{Optional character label for the colorbar.}
+
+\item{overlay_title}{Optional character label used when the colorbar source
+is the overlay. Defaults to \code{colorbar_title}.}
 
 \item{title, subtitle, caption}{Optional plot-level annotations for static
 output. When a colorbar is present these are applied to the composed
@@ -255,6 +317,28 @@ figure; otherwise they are added directly to the returned ggplot.}
 character vector matching the number of panels, a named character vector
 keyed by default panel names such as \code{"Left Lateral"}, or a function
 that takes the default panel name and returns a new label.}
+
+\item{cortex_mask}{Optional logical vertex-domain mask or lh/rh list.}
+
+\item{cortex_mask_source}{Provenance label for an explicit cortex mask.}
+
+\item{anatomy_metric}{Optional anatomy metric or lh/rh list. A declared
+sulcal metric is preferred; otherwise the CPU backend computes curvature
+on matched white geometry and verifies vertex correspondence.}
+
+\item{anatomy_metric_source}{Provenance label for an explicit metric.}
+
+\item{medial_wall}{Explicit medial-wall policy: neutral shade, mask, or
+independent outline.}
+
+\item{camera}{Strict canonical orthographic or slightly oblique presentation
+camera.}
+
+\item{orientation_labels}{Draw small anterior/posterior marks in CPU panels.}
+
+\item{render_width, render_height}{Per-panel CPU raster dimensions.}
+
+\item{render_antialias}{CPU supersampling factor.}
 
 \item{outline}{Logical. If \code{TRUE}, draw every triangle edge (mesh
 wireframe). Default: \code{FALSE}. Typically \code{border} is preferred.}

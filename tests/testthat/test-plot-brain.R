@@ -304,6 +304,49 @@ test_that(".overlay_alpha_values supports soft threshold ramps", {
   expect_equal(ramped[5], 0)
 })
 
+test_that("colorbar source and threshold breaks follow overlay semantics", {
+  expect_equal(
+    neuroatlas:::.resolve_colorbar_source(
+      "auto", vals = c(0, 0), overlay_values = c(-3, 2)
+    ),
+    "overlay"
+  )
+  expect_equal(
+    neuroatlas:::.resolve_colorbar_source(
+      "auto", vals = c(1, 2), overlay_values = NULL
+    ),
+    "base"
+  )
+  expect_equal(
+    neuroatlas:::.resolve_colorbar_source(
+      "auto", vals = c(0, 0), overlay_values = NULL,
+      overlay_present = TRUE
+    ),
+    "overlay"
+  )
+  expect_equal(
+    neuroatlas:::.colorbar_break_values(c(-4, 4), threshold = 2),
+    c(-4, -2, 0, 2, 4)
+  )
+})
+
+test_that("outer contour keeps only the largest exterior loop per panel", {
+  base <- tibble::tibble(
+    x = c(0, 4, 4, 0, 1, 2, 2, 1),
+    y = c(0, 0, 4, 4, 1, 1, 2, 2),
+    poly_id = rep(1:2, each = 4),
+    panel = "Left Lateral"
+  )
+
+  contour <- neuroatlas:::.surface_outer_contour_data(base)
+  expect_s3_class(contour, "tbl_df")
+  expect_equal(length(unique(contour$contour_id)), 1L)
+  expect_equal(nrow(contour), 5L)
+  expect_equal(contour[1, c("x", "y")], contour[5, c("x", "y")])
+  expect_equal(range(contour$x), c(0, 4))
+  expect_equal(range(contour$y), c(0, 4))
+})
+
 .make_plot_brain_overlay_test_atlas <- function() {
   skip_if_not_installed("neurosurf")
 
@@ -398,6 +441,120 @@ test_that("plot_brain can soften thresholded overlay opacity", {
 
   expect_true(any(alpha > 0 & alpha < 0.8))
   expect_true(any(abs(alpha - 0.8) < 1e-8))
+})
+
+test_that("stat_publication keeps anatomy below the overlay and removes atlas lines", {
+  atl <- .make_plot_brain_overlay_test_atlas()
+  overlay <- list(lh = rep(4, 4), rh = rep(4, 4))
+
+  p <- plot_brain(
+    atl,
+    vals = 0,
+    lim = c(0, 0),
+    views = "lateral",
+    hemis = "left",
+    overlay = overlay,
+    overlay_threshold = 1,
+    overlay_lim = c(-4, 4),
+    style = "stat_publication",
+    interactive = FALSE,
+    colorbar = FALSE
+  )
+
+  layer_has <- function(layer, column) {
+    is.data.frame(layer$data) && column %in% names(layer$data)
+  }
+  shade_idx <- which(vapply(p$layers, layer_has, logical(1), column = "shade"))
+  overlay_idx <- which(vapply(p$layers, layer_has, logical(1),
+                              column = "overlay_value"))
+  edge_idx <- which(vapply(p$layers, layer_has, logical(1), column = "edge_type"))
+  contour_idx <- which(vapply(p$layers, layer_has, logical(1),
+                              column = "contour_id"))
+
+  expect_length(shade_idx, 1L)
+  expect_length(overlay_idx, 1L)
+  expect_lt(shade_idx, overlay_idx)
+  expect_length(edge_idx, 0L)
+  expect_length(contour_idx, 1L)
+})
+
+test_that("overlay-only colorbar uses overlay limits, palette, title, and thresholds", {
+  skip_if_not_installed("patchwork")
+  atl <- .make_plot_brain_overlay_test_atlas()
+  overlay <- list(lh = c(-4, -2, 2, 4), rh = c(-4, -2, 2, 4))
+
+  p <- plot_brain(
+    atl,
+    vals = 0,
+    lim = c(0, 0),
+    views = "lateral",
+    hemis = "left",
+    overlay = overlay,
+    overlay_threshold = 2,
+    overlay_palette = "vik",
+    overlay_lim = c(-4, 4),
+    overlay_title = "Statistic",
+    style = "stat_publication",
+    interactive = FALSE,
+    colorbar = TRUE,
+    colorbar_source = "auto"
+  )
+
+  meta <- attr(p, "plot_brain_colorbar")
+  projection <- attr(p, "plot_brain_projection")
+  expect_s3_class(p, "patchwork")
+  expect_identical(meta$source, "overlay")
+  expect_identical(meta$palette, "vik")
+  expect_equal(meta$lim, c(-4, 4))
+  expect_identical(meta$title, "Statistic")
+  expect_equal(meta$breaks, c(-4, -2, 0, 2, 4))
+  expect_identical(projection$interpolation, "linear")
+  expect_identical(projection$sampling, "thickness")
+  expect_equal(projection$depth, seq(0.1, 0.9, length.out = 5L))
+})
+
+test_that("plot_brain rejects an explicit surface mismatch", {
+  atl <- .make_plot_brain_overlay_test_atlas()
+  expect_error(
+    plot_brain(atl, surface = "pial", interactive = FALSE),
+    "does not match surfatlas\\$surf_type"
+  )
+})
+
+test_that("CPU backend records mask, anatomy, camera, and legend provenance", {
+  skip_if_not_installed("patchwork")
+  atl <- .make_plot_brain_overlay_test_atlas()
+  mask <- list(lh = c(TRUE, TRUE, TRUE, FALSE),
+               rh = c(TRUE, TRUE, TRUE, FALSE))
+  anatomy <- list(lh = c(-1, 0, 1, 0), rh = c(-1, 0, 1, 0))
+  p <- plot_brain(
+    atl, vals = 0, lim = c(0, 0), views = "lateral", hemis = "left",
+    overlay = list(lh = rep(4, 4), rh = rep(4, 4)),
+    overlay_threshold = 2, overlay_lim = c(-4, 4),
+    style = "stat_publication", static_backend = "cpu",
+    cortex_mask = mask, cortex_mask_source = "toy_cortex_label",
+    anatomy_metric = anatomy, anatomy_metric_source = "toy_sulc",
+    medial_wall = "outline", camera = "canonical",
+    render_width = 80, render_height = 60, render_antialias = 1,
+    interactive = FALSE, colorbar = TRUE
+  )
+  prov <- attr(p, "plot_brain_anatomy")
+  expect_s3_class(p, "patchwork")
+  expect_identical(attr(p, "plot_brain_backend"), "cpu_barycentric")
+  expect_identical(prov$mask$lh$source, "toy_cortex_label")
+  expect_equal(prov$mask$lh$n_medial_wall, 1)
+  expect_identical(prov$anatomy$lh$source, "toy_sulc")
+  expect_true(prov$anatomy$lh$topology_verified)
+  expect_identical(prov$camera$`Left Lateral`$projection,
+                   "canonical_orthographic")
+  expect_identical(attr(p, "plot_brain_colorbar")$source, "overlay")
+})
+
+test_that("cortex masks never fall back to atlas label zero semantics", {
+  atl <- .make_plot_brain_overlay_test_atlas()
+  domain <- neuroatlas:::.resolve_surface_domain(atl, "lh")
+  expect_true(all(domain$mask))
+  expect_identical(domain$provenance$source, "geometry_all_vertices")
 })
 
 test_that(".encode_plot_brain_data_id creates stable polygon keys", {

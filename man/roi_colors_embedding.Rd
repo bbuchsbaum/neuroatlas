@@ -26,7 +26,9 @@ will be embedded (passed to `stats::model.matrix()`).}
 \item{hemi_col}{Optional hemisphere column used for the final light/dark
 adjustment.}
 
-\item{method}{Either `"umap"` (requires the `uwot` package) or `"pca"`.}
+\item{method}{Either `"umap"` (requires the `uwot` package) or `"pca"`.
+PCA component signs are canonicalized from the first non-negligible
+loading so the resulting hues are stable across LAPACK implementations.}
 
 \item{C_range}{Chroma range mapped from radial distance in the embedding.}
 
