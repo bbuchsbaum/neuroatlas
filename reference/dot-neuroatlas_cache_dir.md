@@ -8,7 +8,7 @@ user-specific, OS-appropriate cache location.
 ## Usage
 
 ``` r
-.neuroatlas_cache_dir(subdir = NULL)
+.neuroatlas_cache_dir(subdir = NULL, create = TRUE)
 ```
 
 ## Arguments
@@ -18,6 +18,12 @@ user-specific, OS-appropriate cache location.
   Optional character string. If provided, a subdirectory named
   \`subdir\` will be created/used within the main neuroatlas cache
   directory.
+
+- create:
+
+  Logical. If \`TRUE\` (default), create the directory if it does not
+  exist. If \`FALSE\`, return the path without creating it (for
+  read-only lookups that must not write to the user's home cache).
 
 ## Value
 

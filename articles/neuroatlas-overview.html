@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting Started with neuroatlas • neuroatlas</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <script src="../extra.js"></script><meta property="og:title" content="Getting Started with neuroatlas">
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,11 +34,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
-    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
-    <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
-    <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
-    <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
+<li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -62,436 +60,350 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Getting Started with neuroatlas</h1>
-                        <h4 data-toc-skip class="author">neuroatlas Dev
-Team</h4>
             
-            <h4 data-toc-skip class="date">2026-02-26</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/vignettes/neuroatlas-overview.Rmd" class="external-link"><code>vignettes/neuroatlas-overview.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/vignettes/neuroatlas-overview.Rmd" class="external-link"><code>vignettes/neuroatlas-overview.Rmd</code></a></small>
       <div class="d-none name"><code>neuroatlas-overview.Rmd</code></div>
     </div>
 
     
     
+<script>document.addEventListener("DOMContentLoaded",function(){document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");document.body.classList.add("palette-red","preset-interaction");});</script><p>You have a brain image and want to ask a regional question: <em>what
+value does this image take in each parcel, region, or hemisphere?</em>
+The difficult part is not computing a mean. It is keeping the atlas
+labels, spatial grid, metadata, and plotting representation aligned from
+beginning to end.</p>
+<p>This article follows one complete path. You will load the bundled
+FreeSurfer ASEG atlas, inspect its regions, create a compatible image,
+reduce that image to one value per region, and draw the atlas. The core
+path is offline and every result is executed when this vignette is
+built.</p>
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="what-are-the-objects">What are the objects?<a class="anchor" aria-label="anchor" href="#what-are-the-objects"></a>
 </h2>
-<p>The <code>neuroatlas</code> package provides a unified interface for
-working with neuroimaging atlases and parcellations in R. Whether you’re
-conducting ROI-based analyses, visualizing brain data, or integrating
-different parcellation schemes, <code>neuroatlas</code> streamlines
-these tasks with consistent, user-friendly functions.</p>
-<p>Key features include:</p>
-<ul>
-<li>
-<strong>Multiple Atlas Support</strong>: Access to Schaefer,
-Glasser, FreeSurfer ASEG, and Olsen MTL atlases</li>
-<li>
-<strong>Flexible Resampling</strong>: Transform atlases to different
-spaces and resolutions</li>
-<li>
-<strong>ROI Analysis</strong>: Extract and analyze specific regions
-of interest</li>
-<li>
-<strong>Visualization</strong>: Integration with ggseg for beautiful
-brain visualizations</li>
-<li>
-<strong>TemplateFlow Integration</strong>: Access to standardized
-templates and spaces</li>
-</ul>
+<p>Three object transitions organise the workflow:</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>You have</th>
+<th>What it contains</th>
+<th>A common next step</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>an <code>atlas</code>
+</td>
+<td>a labelled volume plus one row of metadata per region</td>
+<td>
+<code><a href="../reference/roi_metadata.html">roi_metadata()</a></code>, <code><a href="../reference/get_roi.html">get_roi()</a></code>, or
+<code><a href="../reference/reduce_atlas.html">reduce_atlas()</a></code>
+</td>
+</tr>
+<tr class="even">
+<td>a <code>NeuroVol</code>
+</td>
+<td>one numeric value at every voxel on a declared grid</td>
+<td>summarise it with a compatible volume atlas</td>
+</tr>
+<tr class="odd">
+<td>a regional tibble</td>
+<td>one value per parcel or anatomical region</td>
+<td>analyse it or pair it with a matching plot</td>
+</tr>
+</tbody>
+</table>
+<p>A <code>surfatlas</code> is the surface counterpart of an
+<code>atlas</code>. It stores a labelled mesh for each hemisphere rather
+than a labelled volume. Volume and surface atlases share region IDs and
+metadata, but they are not interchangeable containers.</p>
 </div>
 <div class="section level2">
-<h2 id="loading-atlases">Loading Atlases<a class="anchor" aria-label="anchor" href="#loading-atlases"></a>
+<h2 id="how-do-you-load-and-inspect-an-atlas">How do you load and inspect an atlas?<a class="anchor" aria-label="anchor" href="#how-do-you-load-and-inspect-an-atlas"></a>
 </h2>
-<div class="section level3">
-<h3 id="schaefer-cortical-atlas">Schaefer Cortical Atlas<a class="anchor" aria-label="anchor" href="#schaefer-cortical-atlas"></a>
-</h3>
-<p>The Schaefer atlas provides cortical parcellations organized by
-functional networks. It’s available in multiple resolutions (100-1000
-parcels) and network configurations (7 or 17 networks).</p>
+<p><code><a href="../reference/get_atlas.html">get_atlas()</a></code> is the general discovery-and-loading entry
+point. Atlas-specific loaders remain useful when you want their
+specialised arguments.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Load Schaefer atlas with 200 parcels and 7 networks</span></span>
-<span><span class="va">atlas_200_7</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="st">"200"</span>, networks <span class="op">=</span> <span class="st">"7"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">atlas_200_7</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Use convenience functions for common configurations</span></span>
-<span><span class="va">atlas_400_17</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">sy_400_17</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># 400 parcels, 17 networks</span></span></code></pre></div>
-<p>The atlas object contains: - <code>atlas</code>: The parcellation
-volume (ClusteredNeuroVol) - <code>labels</code>: Region names -
-<code>ids</code>: Numeric region identifiers - <code>network</code>:
-Network assignment for each region - <code>hemi</code>: Hemisphere
-designation (“left” or “right”) - <code>cmap</code>: Color map for
-visualization</p>
-</div>
-<div class="section level3">
-<h3 id="glasser-multi-modal-parcellation">Glasser Multi-Modal Parcellation<a class="anchor" aria-label="anchor" href="#glasser-multi-modal-parcellation"></a>
-</h3>
-<p>The Glasser atlas provides 360 cortical areas defined using
-multi-modal MRI data:</p>
+<span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_atlas.html">get_atlas</a></span><span class="op">(</span><span class="st">"aseg"</span><span class="op">)</span></span>
+<span><span class="va">atlas</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="color: #00BBBB; font-weight: bold;">Atlas Summary</span> <span style="color: #00BBBB;">───────────────────────────────────────────</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">❯</span> <span style="font-weight: bold;">Name:   </span><span style="color: #BBBBBB;">ASEG</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">❯</span> <span style="font-weight: bold;">Model:  </span><span style="color: #BBBBBB;">FreeSurferASEG [volume]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">❯</span> <span style="font-weight: bold;">Space:  </span><span style="color: #BBBBBB;">MNI152NLin6Asym</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">❯</span> <span style="font-weight: bold;">Source: </span><span style="color: #BBBBBB;">bundled_extdata</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">❯</span> <span style="font-weight: bold;">Provenance: </span><span style="color: #BBBBBB;">1 artifacts, 1 history steps</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">❯</span> <span style="font-weight: bold;">Dimensions: </span><span style="color: #BBBBBB;">193 x 229 x 193</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">❯</span> <span style="font-weight: bold;">Regions: </span><span style="color: #00BB00;">17</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Structure Distribution:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">|-</span> Left hemisphere:     <span style="color: #BBBBBB;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">|-</span> Right hemisphere:    <span style="color: #BBBBBB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">\-</span> Bilateral/Midline:   <span style="color: #BBBBBB;">2</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span></span></code></pre></div>
+<p>The object contains 17 subcortical and midline regions on an
+<code>MNI152NLin6Asym</code> grid. Prefer public accessors over reaching
+into the object when an accessor exists:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Load the Glasser atlas</span></span>
-<span><span class="va">glasser</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_glasser_atlas.html">get_glasser_atlas</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">glasser</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Check the number of regions</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">glasser</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span>  <span class="co"># 360 regions</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">glasser</span><span class="op">$</span><span class="va">hemi</span><span class="op">)</span>     <span class="co"># 180 per hemisphere</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="freesurfer-aseg-subcortical-atlas">FreeSurfer ASEG Subcortical Atlas<a class="anchor" aria-label="anchor" href="#freesurfer-aseg-subcortical-atlas"></a>
-</h3>
-<p>For subcortical structures, use the ASEG (Automatic Segmentation)
-atlas:</p>
+<code class="sourceCode R"><span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/roi_metadata.html">roi_metadata</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">)</span></span>
+<span><span class="va">meta</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"label"</span>, <span class="st">"hemi"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 3</span></span></span>
+<span><span class="co">#&gt;       id label       hemi </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    10 Thalamus    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>    11 Caudate     left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>    12 Putamen     left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>    13 Pallidum    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>    16 Brainstem   <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    17 Hippocampus left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>    18 Amygdala    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    26 Accumbens   left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    28 VentralDC   <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    49 Thalamus    right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>    50 Caudate     right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>    51 Putamen     right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>    52 Pallidum    right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>    53 Hippocampus right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span>    54 Amygdala    right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span>    58 Accumbens   right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span>    60 VentralDC   right</span></span></code></pre></div>
+<p>Use <code><a href="../reference/list_atlases.html">list_atlases()</a></code> to discover the other registered
+families without loading them:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Load ASEG subcortical atlas</span></span>
-<span><span class="va">aseg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_aseg_atlas.html">get_aseg_atlas</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">aseg</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># View available subcortical structures</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">aseg</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
-<span><span class="co"># [1] "Thalamus" "Caudate" "Putamen" "Pallidum" "Hippocampus" "Amygdala"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/list_atlases.html">list_atlases</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"label"</span>, <span class="st">"representation"</span>, <span class="st">"default_space"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 16 × 4</span></span></span>
+<span><span class="co">#&gt;    id                         label                 representation default_space</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> aseg                       FreeSurfer ASEG subc… volume         MNI152NLin6A…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> brainnetome                Brainnetome 246-regi… volume         MNI152       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> glasser                    Glasser HCP-MMP1.0 (… volume         MNI152NLin20…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> glasser_surf               Glasser HCP-MMP1.0 (… surface        fsaverage    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> harvard_oxford             Harvard-Oxford corti… volume         MNI152NLin6A…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> harvard_oxford_cortical    Harvard-Oxford corti… volume         MNI152NLin6A…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> harvard_oxford_subcortical Harvard-Oxford subco… volume         MNI152NLin6A…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> hippocampus                Hippocampus (derived… derived        MNI152_custom</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> julich_brain               Julich-Brain cytoarc… volume         MNI152       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> olsen_mtl                  Olsen MTL atlas       volume         MNI152_custom</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> schaefer                   Schaefer2018 cortica… volume         MNI152NLin6A…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> schaefer_surf              Schaefer2018 cortica… surface        fsaverage6   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> subcortical                Subcortical atlases … volume         MNI152NLin6A…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> visfatlas                  visfAtlas probabilis… volume         MNI152       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> visual                     Early visual cortex … derived        MNI152       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> wang                       Wang 2015 probabilis… surface        fsaverage</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="olsen-medial-temporal-lobe-atlas">Olsen Medial Temporal Lobe Atlas<a class="anchor" aria-label="anchor" href="#olsen-medial-temporal-lobe-atlas"></a>
-</h3>
-<p>For detailed MTL parcellations:</p>
+<div class="section level2">
+<h2 id="how-do-you-select-regions">How do you select regions?<a class="anchor" aria-label="anchor" href="#how-do-you-select-regions"></a>
+</h2>
+<p>Use <code><a href="../reference/filter_atlas.html">filter_atlas()</a></code> when the selection is naturally
+expressed through metadata. Multiple expressions are intersected.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Load Olsen MTL atlas</span></span>
-<span><span class="va">mtl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_olsen_mtl.html">get_olsen_mtl</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mtl</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">left_atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_atlas.html">filter_atlas</a></span><span class="op">(</span><span class="va">atlas</span>, <span class="va">hemi</span> <span class="op">==</span> <span class="st">"left"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get hippocampus-specific parcellation with anterior-posterior divisions</span></span>
-<span><span class="va">hipp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_hipp_atlas.html">get_hipp_atlas</a></span><span class="op">(</span>apsections <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>  <span class="co"># Divide into 3 A-P sections</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="resampling-atlases-to-different-spaces">Resampling Atlases to Different Spaces<a class="anchor" aria-label="anchor" href="#resampling-atlases-to-different-spaces"></a>
-</h2>
-<p>Often you need atlases in a specific space or resolution. The
-<code>resample</code> function handles this:</p>
+<span><span class="fu"><a href="../reference/roi_metadata.html">roi_metadata</a></span><span class="op">(</span><span class="va">left_atlas</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"label"</span>, <span class="st">"hemi"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 3</span></span></span>
+<span><span class="co">#&gt;      id label       hemi </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    10 Thalamus    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    11 Caudate     left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    12 Putamen     left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    13 Pallidum    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    17 Hippocampus left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    18 Amygdala    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>    26 Accumbens   left</span></span></code></pre></div>
+<p>The result is still an atlas, now containing only the seven selected
+regions. Excluded voxels are unlabelled; region IDs are preserved.</p>
+<p>Atlas-level subsetting currently applies to volume atlases. For a
+<code>surfatlas</code>, both <code><a href="../reference/filter_atlas.html">filter_atlas()</a></code> and
+<code><a href="../reference/sub_atlas.html">sub_atlas()</a></code> fail with a typed unsupported-operation error.
+Use <code><a href="../reference/get_roi.html">get_roi()</a></code> to extract labelled surface ROIs instead.</p>
+<p><code><a href="../reference/get_roi.html">get_roi()</a></code> answers a different question: it extracts the
+voxel set belonging to a named region. Labels repeat across hemispheres,
+so specify <code>hemi</code> when you need one side.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define a target space (e.g., 2mm isotropic)</span></span>
-<span><span class="va">target_space</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroSpace.html" class="external-link">NeuroSpace</a></span><span class="op">(</span></span>
-<span>  dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">91</span>, <span class="fl">109</span>, <span class="fl">91</span><span class="op">)</span>,</span>
-<span>  spacing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>,</span>
-<span>  origin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">90</span>, <span class="op">-</span><span class="fl">126</span>, <span class="op">-</span><span class="fl">72</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Resample atlas to target space</span></span>
-<span><span class="va">atlas_2mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/resample.html">resample</a></span><span class="op">(</span><span class="va">atlas_200_7</span><span class="op">$</span><span class="va">atlas</span>, <span class="va">target_space</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Or specify the space when loading</span></span>
-<span><span class="va">atlas_in_space</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span></span>
-<span>  parcels <span class="op">=</span> <span class="st">"200"</span>, </span>
-<span>  networks <span class="op">=</span> <span class="st">"7"</span>,</span>
-<span>  outspace <span class="op">=</span> <span class="va">target_space</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>You can also use TemplateFlow space identifiers:</p>
+<code class="sourceCode R"><span><span class="va">hippocampus</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">atlas</span>, label <span class="op">=</span> <span class="st">"Hippocampus"</span>, hemi <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span>
+<span><span class="va">hippocampus</span></span>
+<span><span class="co">#&gt; $Hippocampus</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;ROIVol&gt;</span> [5990 voxels] </span></span>
+<span><span class="co">#&gt;   Coords        : 5990 x 3</span></span>
+<span><span class="co">#&gt;   Range         : [17.000, 17.000]</span></span></code></pre></div>
+<p>The return value is a named list because one query can legitimately
+return several ROIs. Here it contains one
+<code><a href="https://bbuchsbaum.github.io/neuroim2/reference/ROIVol.html" class="external-link">neuroim2::ROIVol</a></code>.</p>
+</div>
+<div class="section level2">
+<h2 id="how-do-you-summarise-an-image-by-parcel">How do you summarise an image by parcel?<a class="anchor" aria-label="anchor" href="#how-do-you-summarise-an-image-by-parcel"></a>
+</h2>
+<p>The atlas and image must describe the same voxel grid. To make that
+contract visible, this example constructs a deterministic left-to-right
+gradient in the atlas space. Replace <code>image</code> with a
+<code>NeuroVol</code> read from your own analysis once you have checked
+its space and dimensions.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Resample to MNI152NLin2009cAsym space at 2mm</span></span>
-<span><span class="va">atlas_mni</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span></span>
-<span>  parcels <span class="op">=</span> <span class="st">"200"</span>,</span>
-<span>  networks <span class="op">=</span> <span class="st">"7"</span>, </span>
-<span>  outspace <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,  <span class="co"># TemplateFlow space ID</span></span>
-<span>  resolution <span class="op">=</span> <span class="st">"2"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="working-with-regions-of-interest">Working with Regions of Interest<a class="anchor" aria-label="anchor" href="#working-with-regions-of-interest"></a>
-</h2>
-<div class="section level3">
-<h3 id="extracting-specific-rois">Extracting Specific ROIs<a class="anchor" aria-label="anchor" href="#extracting-specific-rois"></a>
-</h3>
-<p>Extract individual regions by label or ID:</p>
+<code class="sourceCode R"><span><span class="va">atlas_space</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/space-methods.html" class="external-link">space</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">$</span><span class="va">atlas</span><span class="op">)</span></span>
+<span><span class="va">atlas_dim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">$</span><span class="va">atlas</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">x_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">atlas_dim</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>, <span class="va">atlas_dim</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">atlas_dim</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  dim <span class="op">=</span> <span class="va">atlas_dim</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">x_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">x_gradient</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">x_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="va">x_gradient</span>, dim <span class="op">=</span> <span class="va">atlas_dim</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">image</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroVol.html" class="external-link">NeuroVol</a></span><span class="op">(</span><span class="va">x_gradient</span>, <span class="va">atlas_space</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/reduce_atlas.html">reduce_atlas()</a></code> applies a statistic within every labelled
+parcel. A 3D image returns a long tibble by default.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Extract hippocampus from ASEG atlas</span></span>
-<span><span class="va">hippocampus</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">aseg</span>, label <span class="op">=</span> <span class="st">"Hippocampus"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Extract by numeric ID</span></span>
-<span><span class="va">thalamus</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">aseg</span>, id <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Extract multiple regions</span></span>
-<span><span class="va">subcortical</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">aseg</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hippocampus"</span>, <span class="st">"Amygdala"</span>, <span class="st">"Thalamus"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">parcel_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas</span>, <span class="va">image</span>, <span class="va">mean</span><span class="op">)</span></span>
+<span><span class="va">parcel_summary</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 2</span></span></span>
+<span><span class="co">#&gt;    region         value</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Thalamus    -<span style="color: #BB0000;">0.216</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Caudate     -<span style="color: #BB0000;">0.236</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Putamen     -<span style="color: #BB0000;">0.478</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Pallidum    -<span style="color: #BB0000;">0.350</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Brainstem   -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">68</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Hippocampus -<span style="color: #BB0000;">0.468</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Amygdala    -<span style="color: #BB0000;">0.420</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Accumbens   -<span style="color: #BB0000;">0.137</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> VentralDC   -<span style="color: #BB0000;">0.175</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Thalamus     0.215  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> Caudate      0.230  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> Putamen      0.472  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> Pallidum     0.347  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> Hippocampus  0.471  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> Amygdala     0.410  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> Accumbens    0.128  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> VentralDC    0.181</span></span></code></pre></div>
+<p>The <code>region</code> column uses the atlas’s full region labels.
+The values are finite and vary across parcels because the input image
+varies in space.</p>
 </div>
-<div class="section level3">
-<h3 id="reducing-data-by-atlas-regions">Reducing Data by Atlas Regions<a class="anchor" aria-label="anchor" href="#reducing-data-by-atlas-regions"></a>
-</h3>
-<p>Use <code>reduce_atlas</code> to summarize neuroimaging data within
-atlas regions:</p>
+<div class="section level2">
+<h2 id="what-does-map_atlas-return">What does <code>map_atlas()</code> return?<a class="anchor" aria-label="anchor" href="#what-does-map_atlas-return"></a>
+</h2>
+<p><code><a href="../reference/map_atlas.html">map_atlas()</a></code> pairs one value per region with the atlas’s
+labels and hemispheres. It returns a tibble; it does
+<strong>not</strong> mutate the atlas or create a new surface
+object.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create example brain data</span></span>
-<span><span class="va">brain_data</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroVol.html" class="external-link">NeuroVol</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">atlas_200_7</span><span class="op">$</span><span class="va">atlas</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>  space <span class="op">=</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/space-methods.html" class="external-link">space</a></span><span class="op">(</span><span class="va">atlas_200_7</span><span class="op">$</span><span class="va">atlas</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Calculate mean values within each region</span></span>
-<span><span class="va">region_means</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas_200_7</span>, <span class="va">brain_data</span>, <span class="va">mean</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">region_means</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Calculate other statistics</span></span>
-<span><span class="va">region_sds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas_200_7</span>, <span class="va">brain_data</span>, <span class="va">sd</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">region_max</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas_200_7</span>, <span class="va">brain_data</span>, <span class="va">max</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Custom function</span></span>
-<span><span class="va">region_robust_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span></span>
-<span>  <span class="va">atlas_200_7</span>, </span>
-<span>  <span class="va">brain_data</span>, </span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, trim <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="mapping-values-to-atlas-regions">Mapping Values to Atlas Regions<a class="anchor" aria-label="anchor" href="#mapping-values-to-atlas-regions"></a>
-</h3>
-<p>Map statistical values back onto atlas regions for visualization:</p>
+<code class="sourceCode R"><span><span class="va">mapped_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_atlas.html">map_atlas</a></span><span class="op">(</span><span class="va">atlas</span>, <span class="va">parcel_summary</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span>
+<span><span class="va">mapped_values</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 4</span></span></span>
+<span><span class="co">#&gt;    statistic label       region      hemi </span></span>
+<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  -<span style="color: #BB0000;">0.216</span>   Thalamus    Thalamus    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  -<span style="color: #BB0000;">0.236</span>   Caudate     Caudate     left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  -<span style="color: #BB0000;">0.478</span>   Putamen     Putamen     left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  -<span style="color: #BB0000;">0.350</span>   Pallidum    Pallidum    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">68</span> Brainstem   Brainstem   <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  -<span style="color: #BB0000;">0.468</span>   Hippocampus Hippocampus left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  -<span style="color: #BB0000;">0.420</span>   Amygdala    Amygdala    left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  -<span style="color: #BB0000;">0.137</span>   Accumbens   Accumbens   left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  -<span style="color: #BB0000;">0.175</span>   VentralDC   VentralDC   <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   0.215   Thalamus    Thalamus    right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>   0.230   Caudate     Caudate     right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>   0.472   Putamen     Putamen     right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>   0.347   Pallidum    Pallidum    right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>   0.471   Hippocampus Hippocampus right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span>   0.410   Amygdala    Amygdala    right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span>   0.128   Accumbens   Accumbens   right</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span>   0.181   VentralDC   VentralDC   right</span></span></code></pre></div>
+<p>This table is useful for reporting or aggregation because it keeps
+each value beside its label and hemisphere. Here we make the midline
+group explicit and then compute a hemisphere-level summary:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Simulate some statistical values for each region</span></span>
-<span><span class="va">n_regions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atlas_200_7</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
-<span><span class="va">t_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_regions</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Map values to atlas (threshold at ±1.96)</span></span>
-<span><span class="va">atlas_mapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_atlas.html">map_atlas</a></span><span class="op">(</span></span>
-<span>  <span class="va">atlas_200_7</span>, </span>
-<span>  vals <span class="op">=</span> <span class="va">t_values</span>, </span>
-<span>  thresh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.96</span>, <span class="cn">Inf</span><span class="op">)</span>  <span class="co"># Only show |t| &gt; 1.96</span></span>
+<code class="sourceCode R"><span><span class="va">mapped_values</span><span class="op">$</span><span class="va">hemi</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mapped_values</span><span class="op">$</span><span class="va">hemi</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"midline"</span></span>
+<span><span class="va">hemisphere_summary</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span></span>
+<span>  <span class="va">statistic</span> <span class="op">~</span> <span class="va">hemi</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">mapped_values</span>,</span>
+<span>  FUN <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># For Glasser atlas</span></span>
-<span><span class="va">glasser_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">360</span><span class="op">)</span></span>
-<span><span class="va">glasser_mapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_atlas.html">map_atlas</a></span><span class="op">(</span><span class="va">glasser</span>, <span class="va">glasser_vals</span>, thresh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</div>
+<span><span class="va">hemisphere_summary</span></span>
+<span><span class="co">#&gt;      hemi   statistic</span></span>
+<span><span class="co">#&gt; 1    left -0.32933258</span></span>
+<span><span class="co">#&gt; 2 midline -0.08891959</span></span>
+<span><span class="co">#&gt; 3   right  0.30673587</span></span></code></pre></div>
+<p>The left/right sign difference is an executable check on the
+orientation of our synthetic gradient, not a claim about brain
+organisation.</p>
 </div>
 <div class="section level2">
-<h2 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
+<h2 id="how-do-you-inspect-the-atlas-spatially">How do you inspect the atlas spatially?<a class="anchor" aria-label="anchor" href="#how-do-you-inspect-the-atlas-spatially"></a>
 </h2>
-<div class="section level3">
-<h3 id="using-ggseg-for-2d-brain-plots">Using ggseg for 2D Brain Plots<a class="anchor" aria-label="anchor" href="#using-ggseg-for-2d-brain-plots"></a>
-</h3>
-<p>The package integrates with ggseg for publication-quality
-visualizations:</p>
+<p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> renders a volume atlas with one discrete colour
+per region. Use a montage to see coverage across slices or
+<code>view = "ortho"</code> for three intersecting planes.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Visualize Schaefer atlas with random values</span></span>
-<span><span class="va">vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/ggseg_schaefer.html">ggseg_schaefer</a></span><span class="op">(</span></span>
-<span>  <span class="va">atlas_200_7</span>, </span>
-<span>  vals <span class="op">=</span> <span class="va">vals</span>,</span>
-<span>  thresh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>,     <span class="co"># Threshold values</span></span>
-<span>  palette <span class="op">=</span> <span class="st">"RdBu"</span>,      <span class="co"># Color palette</span></span>
-<span>  interactive <span class="op">=</span> <span class="cn">TRUE</span>     <span class="co"># Interactive plot with tooltips</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Visualize Glasser atlas</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">glasser</span>, vals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">360</span><span class="op">)</span>, thresh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, nslices <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
+<p><img src="neuroatlas-overview_files/figure-html/plot-atlas-1.png" class="r-plt" alt="Axial montage of the bundled FreeSurfer ASEG atlas, showing discrete subcortical and midline regions in distinct colours across six slices." width="768"></p>
+<p>For a cortical <code>surfatlas</code>, pass one value per region
+directly to <code><a href="../reference/plot_brain.html">plot_brain()</a></code>. The surface articles develop that
+separate object flow. Verify region IDs rather than assuming unrelated
+volume and surface products align by shape or region count.</p>
 </div>
-<div class="section level3">
-<h3 id="interactive-3d-visualization-glasser">Interactive 3D Visualization (Glasser)<a class="anchor" aria-label="anchor" href="#interactive-3d-visualization-glasser"></a>
-</h3>
-<p>For the Glasser atlas, use the echarts-based 3D visualization:</p>
+<div class="section level2">
+<h2 id="when-is-resampling-safe">When is resampling safe?<a class="anchor" aria-label="anchor" href="#when-is-resampling-safe"></a>
+</h2>
+<p>Resampling changes a voxel grid. It does not, by itself, establish
+anatomical correspondence between different templates.</p>
+<ul>
+<li>Within one template space, nearest-neighbour resampling is
+appropriate for discrete atlas labels when you need a different
+resolution or grid.</li>
+<li>Between template spaces, use a validated spatial transform. An
+affine grid reslice is not a substitute for a nonlinear
+template-to-template warp.</li>
+</ul>
+<p>The transform planner makes the distinction explicit:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create random data for visualization</span></span>
-<span><span class="va">glasser_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  label <span class="op">=</span> <span class="va">glasser</span><span class="op">$</span><span class="va">labels</span>,</span>
-<span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">360</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/atlas_transform_plan.html">atlas_transform_plan</a></span><span class="op">(</span></span>
+<span>  <span class="st">"MNI152NLin6Asym"</span>,</span>
+<span>  <span class="st">"MNI152NLin2009cAsym"</span>,</span>
+<span>  data_type <span class="op">=</span> <span class="st">"voxel"</span></span>
 <span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create interactive 3D plot</span></span>
-<span><span class="fu"><a href="../reference/plot_glasser.html">plot_glasser</a></span><span class="op">(</span>vals <span class="op">=</span> <span class="va">glasser_data</span>, value_col <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Uniform coloring (no data)</span></span>
-<span><span class="fu"><a href="../reference/plot_glasser.html">plot_glasser</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># All regions colored uniformly</span></span></code></pre></div>
-</div>
+<span><span class="co">#&gt; &lt;atlas_transform_plan&gt;</span></span>
+<span><span class="co">#&gt;   from_space: MNI152NLin6Asym </span></span>
+<span><span class="co">#&gt;   to_space: MNI152NLin2009cAsym </span></span>
+<span><span class="co">#&gt;   n_steps: 1 </span></span>
+<span><span class="co">#&gt;   status: planned </span></span>
+<span><span class="co">#&gt;   confidence: high </span></span>
+<span><span class="co">#&gt;   warnings: Plan includes unimplemented/planned transform step(s).</span></span></code></pre></div>
+<p>At the time this article was built, that route is recorded as
+<code>planned</code>, not available. Do not interpret
+<code>outspace = "MNI152NLin2009cAsym"</code> as a certified nonlinear
+transformation until the plan reports an available backend.</p>
 </div>
 <div class="section level2">
-<h2 id="combining-and-dilating-atlases">Combining and Dilating Atlases<a class="anchor" aria-label="anchor" href="#combining-and-dilating-atlases"></a>
+<h2 id="where-should-you-go-next">Where should you go next?<a class="anchor" aria-label="anchor" href="#where-should-you-go-next"></a>
 </h2>
-<div class="section level3">
-<h3 id="merging-multiple-atlases">Merging Multiple Atlases<a class="anchor" aria-label="anchor" href="#merging-multiple-atlases"></a>
-</h3>
-<p>Combine atlases for comprehensive coverage:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Combine cortical and subcortical atlases</span></span>
-<span><span class="va">cortical</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="st">"100"</span>, networks <span class="op">=</span> <span class="st">"7"</span><span class="op">)</span></span>
-<span><span class="va">subcortical</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_aseg_atlas.html">get_aseg_atlas</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Ensure same space</span></span>
-<span><span class="va">subcortical_resampled</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_aseg_atlas.html">get_aseg_atlas</a></span><span class="op">(</span>outspace <span class="op">=</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/space-methods.html" class="external-link">space</a></span><span class="op">(</span><span class="va">cortical</span><span class="op">$</span><span class="va">atlas</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Merge atlases</span></span>
-<span><span class="va">combined</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_atlases.html">merge_atlases</a></span><span class="op">(</span><span class="va">cortical</span>, <span class="va">subcortical_resampled</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">combined</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="dilating-atlas-parcels">Dilating Atlas Parcels<a class="anchor" aria-label="anchor" href="#dilating-atlas-parcels"></a>
-</h3>
-<p>Fill gaps between parcels using dilation:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Dilate parcels to fill gaps</span></span>
-<span><span class="va">dilated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dilate_atlas.html">dilate_atlas</a></span><span class="op">(</span></span>
-<span>  atlas <span class="op">=</span> <span class="va">cortical</span>,</span>
-<span>  mask <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,  <span class="co"># Use standard brain mask</span></span>
-<span>  radius <span class="op">=</span> <span class="fl">2</span>,                      <span class="co"># Dilation radius in voxels</span></span>
-<span>  maxn <span class="op">=</span> <span class="fl">20</span>                        <span class="co"># Max neighbors to consider</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Use custom mask</span></span>
-<span><span class="va">brain_mask</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
-<span>  space <span class="op">=</span> <span class="st">"MNI152NLin2009cAsym"</span>,</span>
-<span>  variant <span class="op">=</span> <span class="st">"mask"</span>,</span>
-<span>  resolution <span class="op">=</span> <span class="st">"1"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">dilated_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dilate_atlas.html">dilate_atlas</a></span><span class="op">(</span><span class="va">cortical</span>, mask <span class="op">=</span> <span class="va">brain_mask</span>, radius <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<p>Note: When fetching masks from TemplateFlow,
-<code>variant = "mask"</code> resolves the correct combination of
-<code>desc</code> and <code>suffix</code> (typically
-<code>desc = "brain"</code>, <code>suffix = "mask"</code>), so you do
-not need to set <code>desc</code> explicitly.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="surface-based-atlases">Surface-Based Atlases<a class="anchor" aria-label="anchor" href="#surface-based-atlases"></a>
-</h2>
-<p>Work with surface-based versions of atlases using neurosurf
-<code>NeuroSurface</code> objects:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get Schaefer atlas on fsaverage6 surface (mesh + labels)</span></span>
-<span><span class="va">surf_atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span></span>
-<span>  parcels  <span class="op">=</span> <span class="fl">400</span>,</span>
-<span>  networks <span class="op">=</span> <span class="fl">17</span>,</span>
-<span>  space    <span class="op">=</span> <span class="st">"fsaverage6"</span>,</span>
-<span>  surf     <span class="op">=</span> <span class="st">"inflated"</span>  <span class="co"># "inflated", "white", or "pial"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Access hemisphere meshes with vertex-wise labels</span></span>
-<span><span class="va">lh_surface</span> <span class="op">&lt;-</span> <span class="va">surf_atlas</span><span class="op">$</span><span class="va">lh_atlas</span></span>
-<span><span class="va">rh_surface</span> <span class="op">&lt;-</span> <span class="va">surf_atlas</span><span class="op">$</span><span class="va">rh_atlas</span></span>
-<span></span>
-<span><span class="co"># Surface atlases integrate with the neurosurf package</span></span>
-<span><span class="co"># for downstream surface-based analyses and visualization</span></span></code></pre></div>
-<p>You can obtain a similar mesh-plus-label structure for the Glasser
-MMP1.0 parcellation projected to fsaverage:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">glasser_surf_atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glasser_surf.html">glasser_surf</a></span><span class="op">(</span></span>
-<span>  space <span class="op">=</span> <span class="st">"fsaverage"</span>,</span>
-<span>  surf  <span class="op">=</span> <span class="st">"pial"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">lh_glasser</span> <span class="op">&lt;-</span> <span class="va">glasser_surf_atlas</span><span class="op">$</span><span class="va">lh_atlas</span></span>
-<span><span class="va">rh_glasser</span> <span class="op">&lt;-</span> <span class="va">glasser_surf_atlas</span><span class="op">$</span><span class="va">rh_atlas</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="common-workflows">Common Workflows<a class="anchor" aria-label="anchor" href="#common-workflows"></a>
-</h2>
-<div class="section level3">
-<h3 id="roi-based-analysis-pipeline">ROI-Based Analysis Pipeline<a class="anchor" aria-label="anchor" href="#roi-based-analysis-pipeline"></a>
-</h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Load atlas</span></span>
-<span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="st">"200"</span>, networks <span class="op">=</span> <span class="st">"7"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 2. Load your brain data</span></span>
-<span><span class="co"># brain_data &lt;- neuroim2::read_vol("my_statistical_map.nii.gz")</span></span>
-<span></span>
-<span><span class="co"># 3. Extract values by region</span></span>
-<span><span class="va">roi_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas</span>, <span class="va">brain_data</span>, <span class="va">mean</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 4. Statistical analysis</span></span>
-<span><span class="co"># Identify significant regions</span></span>
-<span><span class="va">sig_regions</span> <span class="op">&lt;-</span> <span class="va">roi_values</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">roi_values</span><span class="op">$</span><span class="va">value</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># 5. Visualize results</span></span>
-<span><span class="va">viz_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">viz_vals</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">roi_values</span><span class="op">$</span><span class="va">value</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">roi_values</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">roi_values</span><span class="op">$</span><span class="va">value</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">]</span></span>
-<span><span class="fu"><a href="../reference/ggseg_schaefer.html">ggseg_schaefer</a></span><span class="op">(</span><span class="va">atlas</span>, vals <span class="op">=</span> <span class="va">viz_vals</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="multi-atlas-comparison">Multi-Atlas Comparison<a class="anchor" aria-label="anchor" href="#multi-atlas-comparison"></a>
-</h3>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Compare parcellations at different resolutions</span></span>
-<span><span class="va">atlas_100</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">sy_100_7</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">atlas_200</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">sy_200_7</a></span><span class="op">(</span><span class="op">)</span> </span>
-<span><span class="va">atlas_400</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">sy_400_7</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Extract same data with different parcellations</span></span>
-<span><span class="va">values_100</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas_100</span>, <span class="va">brain_data</span>, <span class="va">mean</span><span class="op">)</span></span>
-<span><span class="va">values_200</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas_200</span>, <span class="va">brain_data</span>, <span class="va">mean</span><span class="op">)</span></span>
-<span><span class="va">values_400</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas_400</span>, <span class="va">brain_data</span>, <span class="va">mean</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Compare results across resolutions</span></span>
-<span><span class="co"># Higher resolution captures more spatial detail</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="network-based-analysis">Network-Based Analysis<a class="anchor" aria-label="anchor" href="#network-based-analysis"></a>
-</h3>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Analyze by functional network</span></span>
-<span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="st">"200"</span>, networks <span class="op">=</span> <span class="st">"17"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Extract values</span></span>
-<span><span class="va">roi_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduce_atlas.html">reduce_atlas</a></span><span class="op">(</span><span class="va">atlas</span>, <span class="va">brain_data</span>, <span class="va">mean</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Add network information</span></span>
-<span><span class="va">roi_values</span><span class="op">$</span><span class="va">network</span> <span class="op">&lt;-</span> <span class="va">atlas</span><span class="op">$</span><span class="va">network</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">roi_values</span><span class="op">$</span><span class="va">region_id</span>, <span class="va">atlas</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Summarize by network</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="va">network_summary</span> <span class="op">&lt;-</span> <span class="va">roi_values</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">network</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>    mean_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>,</span>
-<span>    sd_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>,</span>
-<span>    n_regions <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">network_summary</span><span class="op">)</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="tips-and-best-practices">Tips and Best Practices<a class="anchor" aria-label="anchor" href="#tips-and-best-practices"></a>
-</h2>
+<p>You now have the package’s central path:</p>
+<p><code>atlas</code> + compatible <code>NeuroVol</code> -&gt; regional
+tibble -&gt; analysis or volume plot.</p>
+<p>Continue with:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Space Consistency</strong>: Always ensure your atlas and
-data are in the same space before analysis</li>
+<code><a href="../articles/atlas-visualization.html">vignette("atlas-visualization")</a></code> for volume figures and
+ROI colours.</li>
 <li>
-<strong>Resolution Choice</strong>: Higher parcellation counts
-provide more spatial detail but may reduce statistical power</li>
+<code><a href="../articles/surface-parcellations.html">vignette("surface-parcellations")</a></code> for the surface
+object model and parcel-level values.</li>
 <li>
-<strong>Visualization</strong>: Use <code>interactive = TRUE</code>
-for exploratory analysis, <code>FALSE</code> for publication
-figures</li>
+<code><a href="../articles/surface-panels.html">vignette("surface-panels")</a></code> for publication-style
+comparison figures.</li>
 <li>
-<strong>Caching</strong>: Atlas files are cached locally after first
-download to speed up subsequent use</li>
-<li>
-<strong>Memory</strong>: Large atlases at high resolution can be
-memory-intensive; consider downsampling if needed</li>
+<code><a href="../articles/working-with-templateflow.html">vignette("working-with-templateflow")</a></code> when you need
+external template assets and understand their space contract.</li>
 </ol>
-</div>
-<div class="section level2">
-<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
-</h2>
-<p>The <code>neuroatlas</code> package provides a comprehensive toolkit
-for neuroimaging atlas work:</p>
-<ul>
-<li>
-<strong>Unified Interface</strong>: Consistent functions across
-different atlases</li>
-<li>
-<strong>Flexible Options</strong>: Multiple parcellation schemes and
-resolutions</li>
-<li>
-<strong>Integration</strong>: Works seamlessly with neuroim2, ggseg,
-and TemplateFlow</li>
-<li>
-<strong>Visualization</strong>: Both 2D and 3D options for different
-atlases</li>
-<li>
-<strong>Analysis Ready</strong>: Built-in functions for ROI
-extraction and data reduction</li>
-</ul>
-<p>For more advanced usage, see the TemplateFlow integration vignette
-and the package documentation.</p>
+<p>The dilation and Wang visual-cortex articles are specialist
+workflows. They are not prerequisites for ordinary ROI analysis.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -504,7 +416,7 @@ and the package documentation.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -48,7 +48,7 @@ cols <- atlas_roi_colors(atlas)
 head(cols)
 #> # A tibble: 6 × 2
 #>      id color  
-#>   <dbl> <chr>  
+#>   <int> <chr>  
 #> 1    10 #FC90AD
 #> 2    11 #EAA06D
 #> 3    12 #F19B7F

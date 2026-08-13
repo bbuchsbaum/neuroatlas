@@ -69,5 +69,6 @@ if (requireNamespace("templateflow", quietly = TRUE)) {
 #> ℹ The signature get_template(name, desc, resolution, ...) is deprecated. Please
 #>   use the new signature: get_template(space, variant, modality, resolution,
 #>   ...).
+#> [templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_T1w.nii.gz
 # }
 ```

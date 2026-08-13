@@ -60,5 +60,6 @@ if (requireNamespace("templateflow", quietly = TRUE)) {
 #> Warning: The `name` argument of `get_template_schaefer()` is deprecated as of neuroatlas
 #> 0.10.0.
 #> ℹ Please use `get_template()` instead.
+#> [templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_atlas-Schaefer2018_desc-400Parcels17Networks_dseg.nii.gz
 # }
 ```

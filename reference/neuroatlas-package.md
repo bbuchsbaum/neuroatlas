@@ -1,15 +1,17 @@
 # neuroatlas: Neuroimaging Atlases and Parcellations
 
 Provides a unified interface to access and work with various
-neuroimaging atlases and parcellations including Schaefer, Glasser,
-FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for
-standardized template access and supports interactive brain surface
-visualisation via triangle-mesh rendering with 'ggplot2' and 'ggiraph'.
+neuroimaging atlases and parcellations including Schaefer, Brainnetome,
+Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with
+TemplateFlow for standardized template access and supports interactive
+brain surface visualisation via triangle-mesh rendering with 'ggplot2'
+and 'ggiraph'.
 
 The neuroatlas package provides a unified interface to access and work
 with various neuroimaging atlases and parcellations. It includes support
 for cortical atlases (Schaefer, Glasser), subcortical segmentations
-(FreeSurfer ASEG), and specialized atlases (Olsen MTL). The package
+(FreeSurfer ASEG), FSL/TemplateFlow structural atlases (Harvard-Oxford,
+Julich-Brain), and specialized atlases (Olsen MTL). The package
 integrates with TemplateFlow for standardized template access and
 supports interactive brain surface visualisation via triangle-mesh
 rendering.
@@ -27,6 +29,14 @@ rendering.
 - [`get_aseg_atlas`](get_aseg_atlas.md):
 
   Access FreeSurfer subcortical segmentation
+
+- [`get_harvard_oxford_atlas`](get_harvard_oxford_atlas.md):
+
+  Access Harvard-Oxford structural atlases
+
+- [`get_fsl_atlas`](get_fsl_atlas.md):
+
+  Access FSL XML-described atlases
 
 - [`get_olsen_mtl`](get_olsen_mtl.md):
 
@@ -74,19 +84,20 @@ rendering.
 
 ## TemplateFlow Integration
 
-Access standardized neuroimaging templates:
+Access standardized neuroimaging templates through the pure-R
+\`templateflow\` backend:
 
-- [`create_templateflow`](create_templateflow.md):
+- [`get_template`](get_template.md):
 
-  Initialize TemplateFlow connection
+  Fetch a template asset
 
 - [`tflow_spaces`](tflow_spaces.md):
 
   List available template spaces
 
-- [`install_templateflow`](install_templateflow.md):
+- [`tflow_files`](tflow_files.md):
 
-  Install Python TemplateFlow module
+  Query template assets
 
 ## See also
 

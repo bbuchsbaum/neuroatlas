@@ -10,6 +10,9 @@ given they are intersected.
 ``` r
 sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, ...)
 
+# S3 method for class 'surfatlas'
+sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...)
+
 # S3 method for class 'atlas'
 sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...)
 ```

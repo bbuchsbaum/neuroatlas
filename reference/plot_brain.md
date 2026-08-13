@@ -18,10 +18,11 @@ plot_brain(
   palette = "cork",
   lim = NULL,
   interactive = TRUE,
+  static_backend = c("ggplot", "cpu"),
   data_id_mode = c("parcel", "polygon"),
   ncol = 2L,
   panel_layout = c("native", "presentation"),
-  style = c("default", "ggseg_like"),
+  style = c("default", "ggseg_like", "stat_publication"),
   border = TRUE,
   border_geom = c("path", "segment"),
   boundary_smooth = 0L,
@@ -33,6 +34,9 @@ plot_brain(
   silhouette = border,
   silhouette_color = border_color,
   silhouette_size = border_size,
+  outer_contour = FALSE,
+  outer_contour_color = "grey35",
+  outer_contour_size = 0.3,
   network_border = FALSE,
   network_border_color = border_color,
   network_border_size = border_size * 2,
@@ -44,16 +48,42 @@ plot_brain(
   overlay = NULL,
   overlay_threshold = NULL,
   overlay_alpha = 0.45,
+  overlay_alpha_mode = c("constant", "threshold"),
+  overlay_alpha_ramp = NULL,
   overlay_palette = "vik",
   overlay_lim = NULL,
-  overlay_border = TRUE,
+  overlay_border = FALSE,
   overlay_border_color = "black",
   overlay_border_size = 0.25,
   overlay_fun = c("avg", "nn", "mode"),
   overlay_sampling = c("midpoint", "normal_line", "thickness"),
+  overlay_interpolation = c("legacy", "nearest", "linear"),
+  overlay_aggregate = NULL,
+  overlay_n_samples = NULL,
+  overlay_depth = NULL,
+  overlay_surface_smooth_fwhm = 0,
   colorbar = FALSE,
+  colorbar_source = c("auto", "base", "overlay", "none"),
   colorbar_title = NULL,
+  overlay_title = colorbar_title,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  panel_labels = NULL,
+  cortex_mask = NULL,
+  cortex_mask_source = NULL,
+  anatomy_metric = NULL,
+  anatomy_metric_source = NULL,
+  medial_wall = c("shade", "mask", "outline"),
+  camera = c("canonical", "presentation"),
+  orientation_labels = TRUE,
+  render_width = 1200L,
+  render_height = 750L,
+  render_antialias = 2L,
   outline = FALSE,
+  background = FALSE,
+  background_color = "grey80",
+  depth_cull = TRUE,
   bg = "white",
   ...
 )
@@ -86,8 +116,10 @@ plot_brain(
 
 - surface:
 
-  Surface type. One of `"inflated"`, `"pial"`, `"white"`. Must match the
-  surface type of `surfatlas`.
+  Surface type. One of `"inflated"`, `"pial"`, `"white"`, or
+  `"midthickness"`. When omitted, it is read from `surfatlas$surf_type`;
+  an explicitly requested type must match the geometry carried by
+  `surfatlas`.
 
 - color_method:
 
@@ -118,6 +150,12 @@ plot_brain(
   widget with hover tooltips. If `FALSE`, returns a static `ggplot2`
   object.
 
+- static_backend:
+
+  Static renderer: the existing `"ggplot"` polygon path or deterministic
+  `"cpu"` barycentric rasterization. The CPU path is intended for
+  continuous publication overlays and requires no OpenGL or browser.
+
 - data_id_mode:
 
   Interactive data-id granularity (when `interactive = TRUE`):
@@ -140,7 +178,10 @@ plot_brain(
   Visual preset. `"default"` keeps existing behaviour. `"ggseg_like"`
   enables a cleaner publication style and, unless explicitly overridden,
   switches `panel_layout` to `"presentation"` with softer border
-  defaults and light projection smoothing.
+  defaults and light projection smoothing. `"stat_publication"` treats
+  the surface as an anatomical substrate for a continuous overlay:
+  parcel and culling-derived silhouette lines are disabled, weak shading
+  is drawn below the overlay, and a clean outer contour is enabled.
 
 - border:
 
@@ -206,6 +247,20 @@ plot_brain(
 
   Line width for silhouette lines. Default: `border_size`.
 
+- outer_contour:
+
+  Logical. If `TRUE`, draw the largest projected exterior loop in each
+  panel. Unlike `silhouette`, this excludes internal visibility and
+  sulcal edge fragments.
+
+- outer_contour_color:
+
+  Colour for the exterior contour.
+
+- outer_contour_size:
+
+  Line width for the exterior contour.
+
 - network_border:
 
   Logical. If `TRUE`, highlight boundaries between different networks
@@ -245,11 +300,15 @@ plot_brain(
 
 - overlay:
 
-  Vertex-wise overlay or a `NeuroVol`. If a `NeuroVol`, it is
-  automatically projected onto the surface using
-  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html).
-  Otherwise, a list with `lh` and `rh` components (numeric vectors
-  matching the vertex count of each hemisphere mesh).
+  Vertex-wise overlay or a `NeuroVol`. If a `NeuroVol`, it is projected
+  onto the surface using
+  [`neurosurf::vol_to_surf()`](https://bbuchsbaum.github.io/neurosurf/reference/vol_to_surf.html).
+  A raw `NeuroVol` does not carry a template-space identifier that this
+  function can enforce, so callers must ensure it is already expressed
+  in the coordinates of the resolved white and pial surfaces. No
+  cross-coordinate transform is applied here. Otherwise, a list with
+  `lh` and `rh` components (numeric vectors matching the vertex count of
+  each hemisphere mesh).
 
 - overlay_threshold:
 
@@ -258,6 +317,21 @@ plot_brain(
 - overlay_alpha:
 
   Numeric in `[0, 1]`. Opacity of overlay polygons. Default: `0.45`.
+
+- overlay_alpha_mode:
+
+  Character. `"constant"` uses `overlay_alpha` for all rendered overlay
+  faces. `"threshold"` fades overlay faces from transparent at
+  `overlay_threshold` to `overlay_alpha`, avoiding hard threshold edges
+  for dense surface maps. Default: `"constant"`.
+
+- overlay_alpha_ramp:
+
+  Optional positive numeric scalar controlling the absolute-value
+  distance above `overlay_threshold` over which
+  `overlay_alpha_mode = "threshold"` reaches full opacity. If `NULL`, a
+  small data-driven ramp is chosen from the rendered overlay values. Use
+  `0` to disable ramping while keeping the threshold mode.
 
 - overlay_palette:
 
@@ -269,7 +343,7 @@ plot_brain(
 
 - overlay_border:
 
-  Logical. If `TRUE`, draw cluster overlay boundaries. Default: `TRUE`.
+  Logical. If `TRUE`, draw cluster overlay boundaries. Default: `FALSE`.
 
 - overlay_border_color:
 
@@ -282,31 +356,144 @@ plot_brain(
 - overlay_fun:
 
   Character: interpolation function passed to
-  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html)
+  [`neurosurf::vol_to_surf()`](https://bbuchsbaum.github.io/neurosurf/reference/vol_to_surf.html)
   when `overlay` is a `NeuroVol`. One of `"avg"`, `"nn"`, or `"mode"`.
   Default: `"avg"`.
 
 - overlay_sampling:
 
   Character: sampling strategy passed to
-  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html)
+  [`neurosurf::vol_to_surf()`](https://bbuchsbaum.github.io/neurosurf/reference/vol_to_surf.html)
   when `overlay` is a `NeuroVol`. One of `"midpoint"`, `"normal_line"`,
   or `"thickness"`. Default: `"midpoint"`.
 
+- overlay_interpolation:
+
+  Voxel interpolation passed to
+  [`neurosurf::vol_to_surf()`](https://bbuchsbaum.github.io/neurosurf/reference/vol_to_surf.html):
+  `"legacy"`, `"nearest"`, or `"linear"`. The publication preset
+  defaults to linear interpolation.
+
+- overlay_aggregate:
+
+  Optional explicit aggregation across depth samples: `"mean"`,
+  `"mode"`, or `"closest"`.
+
+- overlay_n_samples:
+
+  Optional number of sampling depths.
+
+- overlay_depth:
+
+  Optional explicit thickness fractions or normal-line offsets. The
+  publication preset uses five fractions from 0.1 through 0.9.
+
+- overlay_surface_smooth_fwhm:
+
+  Tangential surface smoothing in mm. Defaults to zero; it is separate
+  from voxel interpolation.
+
 - colorbar:
 
-  Logical. When `vals` is non-NULL and `interactive = FALSE`, add a
-  standalone colorbar panel composed alongside the main plot via
-  patchwork. Default: `FALSE`.
+  Logical or character. When `interactive = FALSE`, controls whether and
+  where to add a standalone colorbar panel. Use `TRUE` or `"right"` for
+  a vertical colorbar, `"bottom"` for a horizontal colorbar, or `FALSE`
+  / `"none"` to omit it. Default: `FALSE`.
+
+- colorbar_source:
+
+  Which mapped quantity supplies the static colorbar: `"auto"`,
+  `"base"`, `"overlay"`, or `"none"`. `"auto"` chooses the overlay
+  whenever one was supplied, even if all of its values are removed by
+  thresholding; otherwise it chooses `vals`.
 
 - colorbar_title:
 
   Optional character label for the colorbar.
 
+- overlay_title:
+
+  Optional character label used when the colorbar source is the overlay.
+  Defaults to `colorbar_title`.
+
+- title, subtitle, caption:
+
+  Optional plot-level annotations for static output. When a colorbar is
+  present these are applied to the composed figure; otherwise they are
+  added directly to the returned ggplot.
+
+- panel_labels:
+
+  Optional panel label override. Use either an unnamed character vector
+  matching the number of panels, a named character vector keyed by
+  default panel names such as `"Left Lateral"`, or a function that takes
+  the default panel name and returns a new label.
+
+- cortex_mask:
+
+  Optional logical vertex-domain mask or lh/rh list.
+
+- cortex_mask_source:
+
+  Provenance label for an explicit cortex mask.
+
+- anatomy_metric:
+
+  Optional anatomy metric or lh/rh list. A declared sulcal metric is
+  preferred; otherwise the CPU backend computes curvature on matched
+  white geometry and verifies vertex correspondence.
+
+- anatomy_metric_source:
+
+  Provenance label for an explicit metric.
+
+- medial_wall:
+
+  Explicit medial-wall policy: neutral shade, mask, or independent
+  outline.
+
+- camera:
+
+  Strict canonical orthographic or slightly oblique presentation camera.
+
+- orientation_labels:
+
+  Draw small anterior/posterior marks in CPU panels.
+
+- render_width, render_height:
+
+  Per-panel CPU raster dimensions.
+
+- render_antialias:
+
+  CPU supersampling factor.
+
 - outline:
 
   Logical. If `TRUE`, draw every triangle edge (mesh wireframe).
   Default: `FALSE`. Typically `border` is preferred.
+
+- background:
+
+  Logical. If `TRUE`, draw the full cortical surface beneath the
+  parcellation, so sparse atlases (e.g. the Wang visual areas, which
+  label only part of cortex) are shown in anatomical context rather than
+  floating on the page. The backdrop is given sulcal/gyral depth via
+  normal-based shading (controlled by `shading_strength`/
+  `shading_gamma`), so it reads as a folded surface rather than a flat
+  silhouette. Default: `FALSE`.
+
+- background_color:
+
+  Fill colour for the cortex backdrop when `background = TRUE`. Default:
+  `"grey80"`.
+
+- depth_cull:
+
+  Logical. If `TRUE` (default), remove faces hidden behind nearer
+  cortical surface faces in each projected view. This makes static
+  medial/lateral panels read as opaque cortex instead of showing
+  far-side folds through the mesh.
 
 - bg:
 
@@ -318,7 +505,9 @@ plot_brain(
 
 ## Value
 
-A `ggplot2` object (when `interactive = FALSE`) or a
+A `ggplot2` object (when `interactive = FALSE` and no standalone
+colorbar is requested), a `patchwork` object (when a standalone static
+colorbar is composed), or a
 [`ggiraph::girafe`](https://davidgohel.github.io/ggiraph/reference/girafe.html)
 widget (when `interactive = TRUE`).
 

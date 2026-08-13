@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Atlas Visualization with Optimal Colours • neuroatlas</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <script src="../extra.js"></script><meta property="og:title" content="Atlas Visualization with Optimal Colours">
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,11 +34,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
-    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
-    <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
-    <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
-    <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
+<li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -64,16 +62,13 @@
       <h1>Atlas Visualization with Optimal Colours</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/vignettes/atlas-visualization.Rmd" class="external-link"><code>vignettes/atlas-visualization.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/vignettes/atlas-visualization.Rmd" class="external-link"><code>vignettes/atlas-visualization.Rmd</code></a></small>
       <div class="d-none name"><code>atlas-visualization.Rmd</code></div>
     </div>
 
     
     
-<div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
-</h2>
-<p>Every atlas in neuroatlas can be visualised with a single call to
+<script>document.addEventListener("DOMContentLoaded",function(){document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");document.body.classList.add("palette-red","preset-interaction");});</script><p>Every atlas in neuroatlas can be visualised with a single call to
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Behind the scenes, <code><a href="../reference/plot-methods.html">plot.atlas()</a></code>
 renders coloured parcels as volumetric slices using
 <strong>neuroim2</strong>’s <code>plot_montage()</code> and
@@ -81,14 +76,13 @@ renders coloured parcels as volumetric slices using
 <strong>roi_colors</strong> system.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span></code></pre></div>
-</div>
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_aseg_atlas.html">get_aseg_atlas</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/quick-montage-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/quick-montage-1.png" class="r-plt" alt="Axial montage of the bundled FreeSurfer ASEG atlas, with subcortical and midline regions shown in distinct colours across twelve slices." width="768"></p>
 <p>The default view is a multi-slice <strong>montage</strong> (axial
 slices) with colours chosen by the <code>rule_hcl</code> algorithm — a
 fast, deterministic palette that uses network hues and hemisphere
@@ -96,7 +90,25 @@ luminance differences.</p>
 <p>For a three-plane <strong>orthogonal</strong> view:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, view <span class="op">=</span> <span class="st">"ortho"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/quick-ortho-1.png" class="r-plt" alt="" width="768"><img src="atlas-visualization_files/figure-html/quick-ortho-2.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/quick-ortho-1.png" class="r-plt" alt="Orthogonal sagittal, coronal, and axial planes through the bundled ASEG atlas, with each anatomical region in a distinct colour." width="768"><img src="atlas-visualization_files/figure-html/quick-ortho-2.png" class="r-plt" alt="Orthogonal sagittal, coronal, and axial planes through the bundled ASEG atlas, with each anatomical region in a distinct colour." width="768"></p>
+<div class="section level3">
+<h3 id="region-legends">Region legends<a class="anchor" aria-label="anchor" href="#region-legends"></a>
+</h3>
+<p>By default no legend is drawn — for a 400-region cortical
+parcellation it would be useless. But for small atlases (subcortical,
+MTL, a handful of ROIs) a colour legend is genuinely helpful. Pass
+<code>legend = TRUE</code> to add one below a montage; labels appearing
+in both hemispheres are disambiguated with
+<code>(L)</code>/<code>(R)</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, legend <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>   <span class="co"># ASEG has 17 regions</span></span></code></pre></div>
+<p><img src="atlas-visualization_files/figure-html/quick-legend-1.png" class="r-plt" alt="Axial ASEG montage with a compact region legend below the slices; left and right occurrences of repeated labels are distinguished." width="768"></p>
+<p>The legend is capped by <code>legend_max</code> (default 30). A
+request above that limit emits a warning and omits the legend; raise
+<code>legend_max</code> to override. Legends are drawn for montage
+views, not orthogonal views whose planes contain different subsets of
+regions.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="colour-algorithms">Colour Algorithms<a class="anchor" aria-label="anchor" href="#colour-algorithms"></a>
@@ -109,9 +121,9 @@ switch between them.</p>
 </h3>
 <p>Deterministic and fast. Assigns hues per network with
 anterior-posterior gradients and hemisphere luminance offsets.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, method <span class="op">=</span> <span class="st">"rule_hcl"</span>, nslices <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/rule-hcl-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/rule-hcl-1.png" class="r-plt" alt="Eight-slice ASEG montage using deterministic rule-based HCL colours to separate neighbouring anatomical regions." width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="maximin_view">maximin_view<a class="anchor" aria-label="anchor" href="#maximin_view"></a>
@@ -119,9 +131,9 @@ anterior-posterior gradients and hemisphere luminance offsets.</p>
 <p>Optimises perceptual separation between spatially neighbouring ROIs
 across slice views. Best for publication figures where adjacent parcels
 must be easily distinguished.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, method <span class="op">=</span> <span class="st">"maximin_view"</span>, nslices <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/maximin-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/maximin-1.png" class="r-plt" alt="Eight-slice ASEG montage using maximin colours selected to increase separation between spatially adjacent regions." width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="network_harmony">network_harmony<a class="anchor" aria-label="anchor" href="#network_harmony"></a>
@@ -129,7 +141,7 @@ must be easily distinguished.</p>
 <p>Network-aware: ROIs in the same network share analogous hue families
 while still maximising local separation. Requires the atlas to have a
 <code>$network</code> field (e.g. Schaefer atlases).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Requires a Schaefer atlas with network metadata (network download)</span></span>
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="st">"200"</span>, networks <span class="op">=</span> <span class="st">"7"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">schaefer</span>, method <span class="op">=</span> <span class="st">"network_harmony"</span>, nslices <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
@@ -139,9 +151,9 @@ while still maximising local separation. Requires the atlas to have a
 </h3>
 <p>Projects ROI features to 2D (PCA or UMAP) and maps polar angle to
 hue, yielding globally structured gradients.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, method <span class="op">=</span> <span class="st">"embedding"</span>, nslices <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/embedding-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/embedding-1.png" class="r-plt" alt="Eight-slice ASEG montage using colours derived from a two-dimensional embedding of region features." width="768"></p>
 </div>
 </div>
 <div class="section level2">
@@ -152,20 +164,20 @@ are region IDs) or as a tibble from <code><a href="../reference/atlas_roi_colors
 <div class="section level3">
 <h3 id="named-vector">Named vector<a class="anchor" aria-label="anchor" href="#named-vector"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">rainbow</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span>, <span class="va">atlas</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, colors <span class="op">=</span> <span class="va">my_cols</span>, nslices <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/custom-named-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/custom-named-1.png" class="r-plt" alt="Six-slice ASEG montage using a caller-supplied rainbow colour for each named region ID." width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="pre-computed-tibble">Pre-computed tibble<a class="anchor" aria-label="anchor" href="#pre-computed-tibble"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">color_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/atlas_roi_colors.html">atlas_roi_colors</a></span><span class="op">(</span><span class="va">atlas</span>, method <span class="op">=</span> <span class="st">"maximin_view"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">color_tbl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
 <span><span class="co">#&gt;      id color  </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    10 #14E2C6</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    11 #EEB8C7</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    12 #A8C3E3</span></span>
@@ -173,7 +185,7 @@ are region IDs) or as a tibble from <code><a href="../reference/atlas_roi_colors
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    16 #81C2FF</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    17 #87CCBE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, colors <span class="op">=</span> <span class="va">color_tbl</span>, nslices <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/custom-tibble-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/custom-tibble-1.png" class="r-plt" alt="Six-slice ASEG montage reusing a precomputed table of maximin region colours." width="768"></p>
 </div>
 </div>
 <div class="section level2">
@@ -183,12 +195,12 @@ are region IDs) or as a tibble from <code><a href="../reference/atlas_roi_colors
 atlas objects and the <code>roi_colors_*()</code> family. It extracts
 ROI centroids, builds a metadata tibble, and dispatches to the requested
 algorithm.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/atlas_roi_colors.html">atlas_roi_colors</a></span><span class="op">(</span><span class="va">atlas</span>, method <span class="op">=</span> <span class="st">"rule_hcl"</span><span class="op">)</span></span>
 <span><span class="va">cols</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 2</span></span></span>
 <span><span class="co">#&gt;       id color  </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    10 #FC90AD</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>    11 #EAA06D</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>    12 #F19B7F</span></span>
@@ -214,23 +226,61 @@ analyses.</p>
 </h2>
 <p>Use <code>nslices</code> to control how many slices appear in the
 montage:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">atlas</span>, nslices <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="atlas-visualization_files/figure-html/nslices-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="atlas-visualization_files/figure-html/nslices-1.png" class="r-plt" alt="Compact four-slice ASEG montage demonstrating control of the number of displayed axial sections." width="768"></p>
 </div>
 <div class="section level2">
-<h2 id="existing-visualisation-tools">Existing Visualisation Tools<a class="anchor" aria-label="anchor" href="#existing-visualisation-tools"></a>
+<h2 id="surface-figures-with-layout-control">Surface Figures with Layout Control<a class="anchor" aria-label="anchor" href="#surface-figures-with-layout-control"></a>
 </h2>
-<p>For flatmap-style cortical visualisations (not volumetric),
-neuroatlas also provides:</p>
-<ul>
-<li>
-<code><a href="../reference/ggseg_schaefer.html">ggseg_schaefer()</a></code> — ggseg-based Schaefer flatmaps</li>
-<li>
-<code><a href="../reference/plot_glasser.html">plot_glasser()</a></code> — Glasser atlas flatmaps</li>
-</ul>
-<p>These are complementary to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> and remain available
-as standalone functions.</p>
+<p>For cortical surface atlases, <code><a href="../reference/plot_brain.html">plot_brain()</a></code> gives you
+direct control over the static figure layout. You can move the colorbar,
+add figure titles, and replace the default facet labels without
+assembling the figure by hand afterward.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">surf_atl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span></span>
+<span>  parcels <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  networks <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  space <span class="op">=</span> <span class="st">"fsaverage6"</span>,</span>
+<span>  surf <span class="op">=</span> <span class="st">"inflated"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">surf_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">surf_atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">surf_atl</span>,</span>
+<span>  vals <span class="op">=</span> <span class="va">surf_vals</span>,</span>
+<span>  views <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lateral"</span>, <span class="st">"medial"</span><span class="op">)</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  style <span class="op">=</span> <span class="st">"ggseg_like"</span>,</span>
+<span>  colorbar <span class="op">=</span> <span class="st">"bottom"</span>,</span>
+<span>  colorbar_title <span class="op">=</span> <span class="st">"Standardized effect"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Parcel-level summary on fsaverage6"</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">"Bottom colorbar plus concise panel labels"</span>,</span>
+<span>  panel_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Left Lateral"</span> <span class="op">=</span> <span class="st">"LH lateral"</span>,</span>
+<span>    <span class="st">"Right Lateral"</span> <span class="op">=</span> <span class="st">"RH lateral"</span>,</span>
+<span>    <span class="st">"Left Medial"</span> <span class="op">=</span> <span class="st">"LH medial"</span>,</span>
+<span>    <span class="st">"Right Medial"</span> <span class="op">=</span> <span class="st">"RH medial"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="figures/surface-panel-parcels.png" class="r-plt" alt="Schaefer parcels on left and right inflated hemispheres in lateral and medial views, coloured by one value per parcel with a horizontal effect-size colorbar." width="100%"></p>
+<p>Because this example mixes lateral and medial views, each short label
+retains both hemisphere and view. For a dedicated guide to multi-panel
+layout, shared legends, and the default hemisphere-orientation
+convention, see
+<code><a href="../articles/surface-panels.html">vignette("surface-panels", package = "neuroatlas")</a></code>.</p>
+</div>
+<div class="section level2">
+<h2 id="which-entry-point-should-you-use">Which entry point should you use?<a class="anchor" aria-label="anchor" href="#which-entry-point-should-you-use"></a>
+</h2>
+<p>Use <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for volume atlases and
+<code><a href="../reference/plot_brain.html">plot_brain()</a></code> for surface atlases. The older ggseg helpers
+are migration paths: <code><a href="../reference/ggseg_schaefer.html">ggseg_schaefer()</a></code> is deprecated and
+<code><a href="../reference/plot_glasser.html">plot_glasser()</a></code> has been removed with a stop-level
+deprecation. New code should load a surface atlas with
+<code><a href="../reference/schaefer_surf.html">schaefer_surf()</a></code> or <code><a href="../reference/glasser_surf.html">glasser_surf()</a></code> and pass it
+to <code><a href="../reference/plot_brain.html">plot_brain()</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -243,7 +293,7 @@ as standalone functions.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

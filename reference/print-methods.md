@@ -8,6 +8,9 @@ Print methods for various atlas objects in the neuroatlas package
 # S3 method for class 'atlas'
 print(x, ...)
 
+# S3 method for class 'atlas_provenance'
+print(x, ...)
+
 # S3 method for class 'glasser'
 print(x, ...)
 
@@ -27,6 +30,8 @@ print(x, ...)
 
 ## Value
 
+Invisibly returns `x`.
+
 The object is returned invisibly
 
 ## Examples
@@ -37,6 +42,10 @@ print(atlas)
 #> ── Atlas Summary ─────────────────────────────────────────── 
 #> 
 #> ❯ Name:   ASEG
+#> ❯ Model:  FreeSurferASEG [volume]
+#> ❯ Space:  MNI152NLin6Asym
+#> ❯ Source: bundled_extdata
+#> ❯ Provenance: 1 artifacts, 1 history steps
 #> ❯ Dimensions: 193 x 229 x 193
 #> ❯ Regions: 17
 #> 

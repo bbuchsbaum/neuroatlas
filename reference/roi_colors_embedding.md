@@ -40,7 +40,10 @@ roi_colors_embedding(
 
 - method:
 
-  Either \`"umap"\` (requires the \`uwot\` package) or \`"pca"\`.
+  Either \`"umap"\` (requires the \`uwot\` package) or \`"pca"\`. PCA
+  component signs are canonicalized from the first non-negligible
+  loading so the resulting hues are stable across LAPACK
+  implementations.
 
 - C_range:
 

@@ -18,5 +18,5 @@ directory.
 
 ``` r
 cat("TemplateFlow cache is at:", show_templateflow_cache_path(), "\n")
-#> TemplateFlow cache is at: /Users/bbuchsbaum/Library/Caches/org.R-project.R/R/neuroatlas/templateflow 
+#> TemplateFlow cache is at: /home/runner/.cache/R/neuroatlas/templateflow 
 ```

@@ -21,10 +21,11 @@ check_templateflow()
 #> === TemplateFlow Installation Status ===
 #> 
 #> templateflow R package: INSTALLED
-#>   Version: 0.0.1 
+#>   Version: 0.1.0 
 #>   Cache info: unavailable ( 'tf_home' is not an exported object from 'namespace:templateflow' )
+#> [templateflow] Updating TEMPLATEFLOW_HOME at /home/runner/.cache/templateflow
 #> 
-#>   Templates available: 28 
+#>   Templates available: 30 
 #> 
 #> === Status: Ready ===
 #> TemplateFlow is properly installed and ready to use.

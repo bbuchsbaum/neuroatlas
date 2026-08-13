@@ -30,17 +30,19 @@ filter_atlas(x, ..., .dots = NULL)
 
 ## Value
 
-A new atlas object of the same class containing only the matching ROIs.
-The returned atlas has updated `ids`, `labels`, `hemi`, `orig_labels`,
-`cmap`, `network` (if present), and `roi_metadata` fields. The
-underlying volume/surface data is also subset.
+A new volume atlas object of the same class containing only the matching
+ROIs. The returned atlas has updated `ids`, `labels`, `hemi`,
+`orig_labels`, `cmap`, `network` (if present), and `roi_metadata`
+fields. The underlying volume data is also subset.
 
 ## Details
 
 The filter operation creates a new atlas containing only the specified
 ROIs. For volume atlases, voxels belonging to excluded ROIs are set to
 zero. ROI IDs are preserved (not renumbered) to maintain consistency
-with the original atlas labeling.
+with the original atlas labeling. Surface-atlas subsetting is not
+implemented; use [`get_roi()`](get_roi.md) to extract labelled surface
+regions.
 
 ## See also
 

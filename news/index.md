@@ -2,6 +2,79 @@
 
 ## neuroatlas 0.1.0.9000
 
+- [`dilate_atlas()`](../reference/dilate_atlas.md) now genuinely honours
+  its `radius` argument. The previous implementation passed a fixed `k`
+  to `Rnanoflann::nn(search = "radius")`, which returns the `k` nearest
+  neighbours regardless of distance, so `radius` had no effect and
+  dilation filled the entire mask (absorbing, for a cortical atlas,
+  distant cerebellar and deep subcortical grey matter). Dilation now
+  uses a standard k-NN search with an explicit Euclidean radius cutoff:
+  in-mask voxels with no parcel within `radius` voxels are left
+  unassigned. This is a behaviour change — callers that relied on the
+  old whole-mask fill will now get radius-limited results. See the new
+  “Dilating an Atlas to Cover Grey Matter” vignette.
+- Added
+  [`get_harvard_oxford_atlas()`](../reference/get_harvard_oxford_atlas.md)
+  and registry entries for Harvard-Oxford cortical, subcortical, and
+  combined structural parcellations. The default source is TemplateFlow,
+  with threshold and resolution options for maximum-probability `dseg`
+  images.
+- Added [`get_fsl_atlas()`](../reference/get_fsl_atlas.md) for FSL
+  XML-described atlases, including the documented offset between
+  probabilistic XML label indices and max-probability summary image
+  label values. Added a thin FSL-backed wrapper for Julich-Brain /
+  Brodmann-style cytoarchitectonic labels
+  ([`get_julich_brain_atlas()`](../reference/get_julich_brain_atlas.md)),
+  which now downloads the Nilearn/NITRC `Juelich.tgz` archive into a
+  local FSL-style cache when `FSLDIR` is unset.
+- `plot_brain(overlay = <NeuroVol>)` now propagates missing data through
+  the volume-to-surface projection: vertices that fall outside the input
+  volume’s coverage (or whose neighbourhood contains no finite source
+  voxel) are emitted as `NA` rather than `0`. Faces with no finite
+  vertices are dropped from the polygon set, so uncovered cortex renders
+  as transparent background instead of an opaque dark-palette wash.
+  Faces with partial coverage continue to render using the average of
+  their finite vertices. The internal `vol_to_surf()` `fill` argument
+  changed from `0` to `NA_real_`.
+- `plot_brain(overlay = <NeuroVol>)` now repairs legacy
+  `SurfaceGeometry` objects on the fly. The bundled `data(fsaverage)`
+  artefact and the `@geometry` slots inside packaged surface atlases
+  were serialized before
+  [`neurosurf::SurfaceGeometry`](https://bbuchsbaum.github.io/neurosurf/reference/SurfaceGeometry.html)
+  gained the `label` and `surf_to_world` slots; accessing those slots on
+  a legacy object errored out and caused `vol_to_surf()` to silently
+  return all-NA overlays. `.resolve_overlay_surface_pair()` now rebuilds
+  any geometry that fails `validObject()` via the current constructor
+  before passing it to `vol_to_surf()`.
+- Added a canonical [`new_atlas()`](../reference/atlas_constructor.md) /
+  [`new_surfatlas()`](../reference/atlas_constructor.md) constructor
+  that assembles every loader’s return value (Schaefer, Glasser, ASEG,
+  Olsen MTL / hippocampus, TemplateFlow subcortical). The constructor
+  validates required fields with a typed
+  `neuroatlas_error_invalid_atlas` condition, normalises RGB colour maps
+  to a data frame, builds `roi_metadata` uniformly, and attaches
+  `atlas_ref` / provenance in one place — removing ~100 lines of
+  per-loader boilerplate.
+- Added a lightweight atlas registry
+  ([`register_atlas()`](../reference/register_atlas.md)) exposed via two
+  new public helpers: [`list_atlases()`](../reference/list_atlases.md)
+  enumerates the built-in atlases, and `get_atlas(name, ...)` dispatches
+  to the registered loader by id or alias
+  (e.g. `get_atlas("schaefer2018", parcels="100", networks="7")`).
+- Added centralised download helpers
+  ([`.neuroatlas_download()`](../reference/dot-neuroatlas_download.md),
+  [`.neuroatlas_try_download()`](../reference/dot-neuroatlas_try_download.md))
+  used by the Schaefer and Glasser loaders. Failures now raise classed
+  `neuroatlas_error_download` conditions with the upstream URL instead
+  of returning a silent `NULL`; Git LFS pointer stubs are detected and
+  reported explicitly.
+- Atlas loaders now emit
+  [`cli::cli_abort()`](https://cli.r-lib.org/reference/cli_abort.html) /
+  [`cli::cli_warn()`](https://cli.r-lib.org/reference/cli_abort.html)
+  with structured classes (`neuroatlas_error_*`, `neuroatlas_warn_*`) in
+  place of bare [`stop()`](https://rdrr.io/r/base/stop.html) /
+  [`warning()`](https://rdrr.io/r/base/warning.html), so callers can
+  catch loader errors by class.
 - Added atlas provenance descriptors via new `atlas_ref` infrastructure:
   [`new_atlas_ref()`](../reference/new_atlas_ref.md),
   [`atlas_ref()`](../reference/atlas_ref.md),

@@ -6,7 +6,7 @@ Retrieves and loads a volumetric representation of the Glasser/HCP-MMP
 ## Usage
 
 ``` r
-get_glasser_atlas(outspace = NULL, source = c("mni2009c", "xcpengine"))
+get_glasser_atlas(outspace = NULL, source = c("xcpengine", "mni2009c"))
 ```
 
 ## Source
@@ -22,7 +22,7 @@ Source-specific links are recorded in `atlas_ref(atlas)$provenance`.
 
 - source:
 
-  Volume source to use. One of `"mni2009c"` (default) or `"xcpengine"`.
+  Volume source to use. One of `"xcpengine"` (default) or `"mni2009c"`.
 
 ## Value
 
@@ -59,15 +59,18 @@ based on cortical architecture, function, connectivity, and topography.
 
 Supported sources:
 
-- `"mni2009c"` (default): MNI152NLin2009cAsym-provenance volume file
-  (`MMP_in_MNI_corr.nii.gz`).
+- `"xcpengine"` (default): xcpEngine Glasser360 volume
+  (`glasser360MNI.nii.gz`) with stable runtime availability but less
+  explicit template provenance.
 
-- `"xcpengine"`: legacy xcpEngine Glasser360 volume
-  (`glasser360MNI.nii.gz`) with less explicit template provenance.
+- `"mni2009c"`: MNI152NLin2009cAsym-provenance volume file
+  (`MMP_in_MNI_corr.nii.gz`). This source is attempted only when
+  requested.
 
 If `source = "mni2009c"` is unavailable at runtime, the loader
 automatically falls back to `"xcpengine"` and marks confidence as
-`"uncertain"`.
+`"uncertain"`. In practice, some GitHub mirrors for this source may
+serve a small git-annex pointer stub rather than the real NIfTI payload.
 
 Region labels are read from the xcpEngine node-name table to provide
 stable parcel naming across sources.

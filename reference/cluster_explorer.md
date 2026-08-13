@@ -116,12 +116,12 @@ cluster_explorer(
 - overlay_fun:
 
   Reduction used by
-  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html).
+  [`neurosurf::vol_to_surf()`](https://bbuchsbaum.github.io/neurosurf/reference/vol_to_surf.html).
 
 - overlay_sampling:
 
   Sampling strategy for
-  [`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html).
+  [`neurosurf::vol_to_surf()`](https://bbuchsbaum.github.io/neurosurf/reference/vol_to_surf.html).
 
 - prefetch:
 

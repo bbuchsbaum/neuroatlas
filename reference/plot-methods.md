@@ -20,6 +20,8 @@ plot(
   method = "rule_hcl",
   colors = NULL,
   nslices = 12L,
+  legend = FALSE,
+  legend_max = 30L,
   ...
 )
 
@@ -69,6 +71,21 @@ plot(x, y, vals = NULL, views = c("lateral", "medial"), ...)
 - nslices:
 
   Number of slices for montage view (default 12).
+
+- legend:
+
+  Logical. If `TRUE`, draw a region colour legend (label -\> colour)
+  below the `"montage"` view. Default `FALSE`. A legend is only useful
+  for small atlases, so it is suppressed (with a warning) when the atlas
+  has more than `legend_max` regions; it is also omitted for
+  `view = "ortho"` (each plane shows a different subset of regions).
+  Labels occurring in both hemispheres are disambiguated with
+  `(L)`/`(R)`.
+
+- legend_max:
+
+  Integer. Maximum number of regions for which a legend is drawn when
+  `legend = TRUE`. Default `30`.
 
 - ...:
 

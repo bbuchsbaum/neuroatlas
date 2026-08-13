@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Surface Parcellations with neurosurf • neuroatlas</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <script src="../extra.js"></script><meta property="og:title" content="Surface Parcellations with neurosurf">
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,11 +34,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
-    <li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
-    <li><a class="dropdown-item" href="../articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
-    <li><a class="dropdown-item" href="../articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
-    <li><a class="dropdown-item" href="../articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
+<li><a class="dropdown-item" href="../articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -62,365 +60,234 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Surface Parcellations with neurosurf</h1>
-                        <h4 data-toc-skip class="author">neuroatlas Dev
-Team</h4>
             
-            <h4 data-toc-skip class="date">2026-02-26</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/HEAD/vignettes/surface-parcellations.Rmd" class="external-link"><code>vignettes/surface-parcellations.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/vignettes/surface-parcellations.Rmd" class="external-link"><code>vignettes/surface-parcellations.Rmd</code></a></small>
       <div class="d-none name"><code>surface-parcellations.Rmd</code></div>
     </div>
 
     
     
+<script>document.addEventListener("DOMContentLoaded",function(){document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");document.body.classList.add("palette-red","preset-interaction");});</script><p>A surface parcellation answers a simple-looking question: <em>which
+cortical parcel owns each mesh vertex?</em> The answer involves three
+aligned pieces: surface geometry, one integer label per vertex, and
+region metadata. This article shows how <code>neuroatlas</code> keeps
+those pieces together and how to attach one statistic per parcel without
+changing the atlas.</p>
+<p>The first surface-atlas call may download annotation files. For that
+reason, network-backed chunks are displayed but not run during package
+builds. Their outputs are real committed figures, generated from the
+code shown here.</p>
 <div class="section level2">
-<h2 id="what-this-vignette-covers">What this vignette covers<a class="anchor" aria-label="anchor" href="#what-this-vignette-covers"></a>
+<h2 id="what-is-a-surface-atlas">What is a surface atlas?<a class="anchor" aria-label="anchor" href="#what-is-a-surface-atlas"></a>
 </h2>
-<p>This guide focuses on loading <strong>surface parcellations</strong>
-as actual meshes (<code>neurosurf::LabeledNeuroSurface</code>)—not ggseg
-flats. We cover:</p>
-<ul>
-<li>Discovering available surface templates in TemplateFlow</li>
-<li>Schaefer on fsaverage6 (packaged geometry)</li>
-<li>Schaefer on fsaverage5/fsaverage (via TemplateFlow, when
-available)</li>
-<li>Glasser MMP1.0 (via TemplateFlow, when available)</li>
-<li>Loading raw surface geometry from TemplateFlow</li>
-<li>Downloading surfaces to a local folder</li>
-<li>What files are fetched, what the <code>data</code> slot contains,
-and how labels map.</li>
-<li>Minimal patterns to attach your own per-vertex values.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="discovering-available-surface-templates">Discovering available surface templates<a class="anchor" aria-label="anchor" href="#discovering-available-surface-templates"></a>
-</h2>
-<p>Before loading surfaces, you can query what’s available in
-TemplateFlow:</p>
+<p><code><a href="../reference/schaefer_surf.html">schaefer_surf()</a></code> returns a <code>surfatlas</code>. Its
+two labelled surfaces share one region catalogue:</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Object</th>
+<th>Contents</th>
+<th>Cardinality</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>atl$lh_atlas</code></td>
+<td>left geometry plus an integer label at every vertex</td>
+<td>vertices</td>
+</tr>
+<tr class="even">
+<td><code>atl$rh_atlas</code></td>
+<td>right geometry plus an integer label at every vertex</td>
+<td>vertices</td>
+</tr>
+<tr class="odd">
+<td>
+<code>atl$ids</code>, <code>atl$labels</code>,
+<code>atl$hemi</code>
+</td>
+<td>region identity and metadata</td>
+<td>parcels</td>
+</tr>
+</tbody>
+</table>
+<p>Load a 200-parcel Schaefer atlas on the bundled
+<code>fsaverage6</code> geometry like this:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Find surface-related template spaces</span></span>
-<span><span class="fu"><a href="../reference/tflow_spaces.html">tflow_spaces</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"fs"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "fsLR"      "fsaverage"</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># List available fsLR surfaces</span></span>
-<span><span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsLR"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hemi <span class="op">=</span> <span class="st">"L"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">atl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span></span>
+<span>  parcels <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  networks <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  space <span class="op">=</span> <span class="st">"fsaverage6"</span>,</span>
+<span>  surf <span class="op">=</span> <span class="st">"inflated"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Filter by specific density and surface type</span></span>
-<span><span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsLR"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  hemi <span class="op">=</span> <span class="st">"L"</span>,</span>
-<span>  density <span class="op">=</span> <span class="st">"32k"</span>,</span>
-<span>  suffix <span class="op">=</span> <span class="st">"midthickness"</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># List fsaverage surfaces at a specific resolution (e.g., fsaverage6)</span></span>
-<span><span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsaverage"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  hemi <span class="op">=</span> <span class="st">"L"</span>,</span>
-<span>  resolution <span class="op">=</span> <span class="st">"06"</span>  <span class="co"># fsaverage6</span></span>
-<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Common query parameters for surfaces: - <code>hemi</code>: “L” or “R”
-- <code>density</code>: “32k”, “164k” (for fsLR) -
-<code>resolution</code>: “06” (fsaverage6), “05” (fsaverage5) -
-<code>suffix</code>: “pial”, “white”, “inflated”, “midthickness”,
-“sphere”</p>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">atl</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">)</span></span></code></pre></div>
+<p>The mesh geometry is bundled, while the Schaefer annotation is
+downloaded and cached on first use. Annotations supply the vertex
+labels; geometry alone is not a parcellation.</p>
 </div>
 <div class="section level2">
-<h2 id="schaefer-surface-atlases">Schaefer surface atlases<a class="anchor" aria-label="anchor" href="#schaefer-surface-atlases"></a>
+<h2 id="how-do-you-verify-geometry-and-labels">How do you verify geometry and labels?<a class="anchor" aria-label="anchor" href="#how-do-you-verify-geometry-and-labels"></a>
 </h2>
+<p>A grey silhouette proves only that a mesh can be projected. A useful
+diagnostic checks topology, label length, and region coverage
+together:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 200 parcels, 7 networks, fsaverage6 inflated (packaged geometry, no TF needed)</span></span>
-<span><span class="va">atl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span></span>
-<span>  parcels  <span class="op">=</span> <span class="fl">200</span>,</span>
-<span>  networks <span class="op">=</span> <span class="fl">7</span>,</span>
-<span>  space    <span class="op">=</span> <span class="st">"fsaverage6"</span>,</span>
-<span>  surf     <span class="op">=</span> <span class="st">"inflated"</span></span>
+<code class="sourceCode R"><span><span class="va">lh_geometry</span> <span class="op">&lt;-</span> <span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neurosurf/reference/geometry-methods.html" class="external-link">geometry</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">)</span></span>
+<span><span class="va">lh_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">@</span><span class="va">data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">diagnostic</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  vertices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neurosurf/reference/vertices-methods.html" class="external-link">vertices</a></span><span class="op">(</span><span class="va">lh_geometry</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  faces <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">lh_geometry</span><span class="op">@</span><span class="va">mesh</span><span class="op">$</span><span class="va">it</span><span class="op">)</span>,</span>
+<span>  vertex_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">lh_labels</span><span class="op">)</span>,</span>
+<span>  labelled_regions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">lh_labels</span><span class="op">[</span><span class="va">lh_labels</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">diagnostic</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span></span>
+<span>  <span class="va">diagnostic</span><span class="op">[[</span><span class="st">"vertices"</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="va">diagnostic</span><span class="op">[[</span><span class="st">"vertex_labels"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  <span class="va">diagnostic</span><span class="op">[[</span><span class="st">"faces"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0</span>,</span>
+<span>  <span class="va">diagnostic</span><span class="op">[[</span><span class="st">"labelled_regions"</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">hemi</span> <span class="op">==</span> <span class="st">"left"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">lh_labels</span><span class="op">[</span><span class="va">lh_labels</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Returned structure:</p>
-<ul>
-<li>
-<code>atl$lh_atlas</code>, <code>atl$rh_atlas</code>:
-<code>LabeledNeuroSurface</code> objects.</li>
-<li>
-<code>slot(..., "data")</code>: integer parcel IDs per vertex.</li>
-<li>
-<code>atl$labels</code> / <code>atl$orig_labels</code>: name
-lookups; <code>atl$network</code>: network per ID.</li>
-</ul>
-<div class="section level3">
-<h3 id="using-templateflow-spaces-when-available">Using TemplateFlow spaces (when available)<a class="anchor" aria-label="anchor" href="#using-templateflow-spaces-when-available"></a>
-</h3>
-<p>Note: TemplateFlow surface support requires the
-<code>fsaverage</code> template to be available in your TemplateFlow
-installation. As of this writing, surface templates may have limited
-availability. Use <code>fsaverage6</code> (above) for reliable access to
-Schaefer atlases.</p>
+<p>The resulting parcellation should look like this, with visible parcel
+boundaries and more than one label colour:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># fsaverage5 white surface; uses TemplateFlow geometry (if available)</span></span>
-<span><span class="va">atl_tf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span></span>
-<span>  parcels  <span class="op">=</span> <span class="fl">400</span>,</span>
-<span>  networks <span class="op">=</span> <span class="fl">17</span>,</span>
-<span>  space    <span class="op">=</span> <span class="st">"fsaverage5"</span>,</span>
-<span>  surf     <span class="op">=</span> <span class="st">"white"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>If TemplateFlow surfaces are available, this uses the same
-labels/data layout as above.</p>
-</div>
-<div class="section level3">
-<h3 id="attaching-your-own-values">Attaching your own values<a class="anchor" aria-label="anchor" href="#attaching-your-own-values"></a>
-</h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span>        <span class="co"># one value per parcel</span></span>
-<span><span class="va">mapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_atlas.html">map_atlas</a></span><span class="op">(</span><span class="va">atl</span>, <span class="va">vals</span><span class="op">)</span>        <span class="co"># returns LabeledNeuroSurface per hemi with data filled</span></span></code></pre></div>
-<p><code><a href="../reference/map_atlas.html">map_atlas()</a></code> writes your parcel values into the
-<code>data</code> slot of each hemisphere surface.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="glasser-mmp1-0-surface-atlas-when-available">Glasser MMP1.0 surface atlas (when available)<a class="anchor" aria-label="anchor" href="#glasser-mmp1-0-surface-atlas-when-available"></a>
-</h2>
-<p>Note: Like Schaefer TemplateFlow surfaces, Glasser surface support
-requires the <code>fsaverage</code> template in TemplateFlow. Check
-availability before using.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Requires fsaverage template in TemplateFlow</span></span>
-<span><span class="va">glas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glasser_surf.html">glasser_surf</a></span><span class="op">(</span>space <span class="op">=</span> <span class="st">"fsaverage"</span>, surf <span class="op">=</span> <span class="st">"pial"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">slot</span><span class="op">(</span><span class="va">glas</span><span class="op">$</span><span class="va">lh_atlas</span>, <span class="st">"data"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>  <span class="co"># parcel IDs</span></span>
-<span><span class="va">glas</span><span class="op">$</span><span class="va">labels</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>                  <span class="co"># names for those IDs</span></span></code></pre></div>
-<p>If available, geometry comes from TemplateFlow (fsaverage
-pial/white/inflated/midthickness); labels come from the HCP-MMP1.0
-fsaverage annotations published on Figshare as the “HCP-MMP1_0 projected
-on fsaverage” dataset (ID 3498446; DOI: 10.6084/m9.figshare.3498446).
-The <code>data</code> vector length equals the vertex count of the mesh;
-each entry is the parcel ID at that vertex.</p>
-</div>
-<div class="section level2">
-<h2 id="whats-in-the-data-slot">What’s in the <code>data</code> slot?<a class="anchor" aria-label="anchor" href="#whats-in-the-data-slot"></a>
-</h2>
-<ul>
-<li>Schaefer / Glasser surface atlases: integer parcel IDs per
-vertex.</li>
-<li>If you construct a <code>NeuroSurface</code> yourself (e.g., from
-<code><a href="../reference/load_surface_template.html">load_surface_template()</a></code>), you supply the per-vertex numeric
-values.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="saving-reusing">Saving / reusing<a class="anchor" aria-label="anchor" href="#saving-reusing"></a>
-</h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">atl</span>, <span class="st">"schaefer200_7_fs6_inflated.rds"</span><span class="op">)</span></span>
-<span><span class="co"># reload later</span></span>
-<span><span class="va">atl2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"schaefer200_7_fs6_inflated.rds"</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="sanity-check-parcel-surface-renders">Sanity check: parcel surface renders<a class="anchor" aria-label="anchor" href="#sanity-check-parcel-surface-renders"></a>
-</h3>
-<p>We snapshot a labeled Schaefer surface to verify geometry+labels
-load. Runs only when TemplateFlow is available (for non-packaged
-spaces).</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"figures"</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">png_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"schaefer200_fs6_L_inflated.png"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">atl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span></span>
-<span>  parcels  <span class="op">=</span> <span class="fl">200</span>,</span>
-<span>  networks <span class="op">=</span> <span class="fl">7</span>,</span>
-<span>  space    <span class="op">=</span> <span class="st">"fsaverage6"</span>,  <span class="co"># packaged geometry (no TF), keeps it fast</span></span>
-<span>  surf     <span class="op">=</span> <span class="st">"inflated"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">geom_l</span> <span class="op">&lt;-</span> <span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/geometry-methods.html" class="external-link">geometry</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">)</span></span>
-<span><span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/snapshot_surface.html" class="external-link">snapshot_surface</a></span><span class="op">(</span><span class="va">geom_l</span>, file <span class="op">=</span> <span class="va">png_path</span><span class="op">)</span></span>
-<span><span class="va">png_path</span></span></code></pre></div>
-<p>If the image renders, the parcellated surface is displayable.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="loading-raw-surface-geometry-from-templateflow">Loading raw surface geometry from TemplateFlow<a class="anchor" aria-label="anchor" href="#loading-raw-surface-geometry-from-templateflow"></a>
-</h2>
-<p>To load just the surface geometry (without parcellation labels), use
-<code><a href="../reference/get_template.html">get_surface_template()</a></code> or
-<code><a href="../reference/load_surface_template.html">load_surface_template()</a></code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get path to a surface file</span></span>
-<span><span class="va">fslr_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_surface_template</a></span><span class="op">(</span></span>
-<span>  template_id <span class="op">=</span> <span class="st">"fsLR"</span>,</span>
-<span>  surface_type <span class="op">=</span> <span class="st">"midthickness"</span>,</span>
-<span>  hemi <span class="op">=</span> <span class="st">"L"</span>,</span>
-<span>  density <span class="op">=</span> <span class="st">"32k"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fslr_path</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load as a neurosurf SurfaceGeometry object</span></span>
-<span><span class="va">fslr_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_surface_template.html">load_surface_template</a></span><span class="op">(</span></span>
-<span>  template_id <span class="op">=</span> <span class="st">"fsLR"</span>,</span>
-<span>  surface_type <span class="op">=</span> <span class="st">"inflated"</span>,</span>
-<span>  hemi <span class="op">=</span> <span class="st">"L"</span>,</span>
-<span>  density <span class="op">=</span> <span class="st">"32k"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load both hemispheres at once</span></span>
-<span><span class="va">both_hemi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_surface_template.html">load_surface_template</a></span><span class="op">(</span></span>
-<span>  template_id <span class="op">=</span> <span class="st">"fsLR"</span>,</span>
-<span>  surface_type <span class="op">=</span> <span class="st">"pial"</span>,</span>
-<span>  hemi <span class="op">=</span> <span class="st">"both"</span>,</span>
-<span>  density <span class="op">=</span> <span class="st">"32k"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co"># Returns list with $L and $R</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="downloading-surfaces-to-a-local-folder">Downloading surfaces to a local folder<a class="anchor" aria-label="anchor" href="#downloading-surfaces-to-a-local-folder"></a>
-</h2>
-<p>To copy TemplateFlow surfaces to a local directory:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get paths to surfaces (automatically downloaded to cache)</span></span>
-<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="st">"fsLR"</span>, query_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hemi <span class="op">=</span> <span class="st">"L"</span>, density <span class="op">=</span> <span class="st">"32k"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Copy to local folder</span></span>
-<span><span class="va">dest_folder</span> <span class="op">&lt;-</span> <span class="st">"~/my_surfaces/fsLR"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">dest_folder</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="va">files</span>, <span class="va">dest_folder</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Or use a helper function for bulk downloads</span></span>
-<span><span class="va">download_surfaces</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">space</span>, <span class="va">query_args</span>, <span class="va">dest_folder</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">dest_folder</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tflow_files.html">tflow_files</a></span><span class="op">(</span><span class="va">space</span>, query_args <span class="op">=</span> <span class="va">query_args</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">dest_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">dest_folder</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="va">files</span>, <span class="va">dest_paths</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Copied "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span>, <span class="st">" files to "</span>, <span class="va">dest_folder</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="va">dest_paths</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># Download all fsLR 32k surfaces</span></span>
-<span><span class="fu">download_surfaces</span><span class="op">(</span><span class="st">"fsLR"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>density <span class="op">=</span> <span class="st">"32k"</span><span class="op">)</span>, <span class="st">"~/my_surfaces/fsLR_32k"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="common-workflows">Common workflows<a class="anchor" aria-label="anchor" href="#common-workflows"></a>
-</h2>
-<ul>
-<li>
-<strong>Vertex-wise stats:</strong> build your own
-<code>NeuroSurface</code> from <code><a href="../reference/load_surface_template.html">load_surface_template()</a></code> and
-write stats into <code>data</code>.</li>
-<li>
-<strong>Parcel summaries:</strong> use volumetric data with
-<code><a href="../reference/reduce_atlas.html">reduce_atlas()</a></code> or surface atlases with
-<code><a href="../reference/map_atlas.html">map_atlas()</a></code> to project parcel statistics back onto the mesh
-for visualization.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="dense-vertex-wise-overlays">Dense vertex-wise overlays<a class="anchor" aria-label="anchor" href="#dense-vertex-wise-overlays"></a>
-</h2>
-<p><code><a href="../reference/plot_brain.html">plot_brain()</a></code> supports dense (per-vertex) overlays in
-addition to parcel-level colouring. You can pass a list with
-<code>lh</code> and <code>rh</code> numeric vectors — one value per
-vertex — and the result is a continuous colour map draped over the
-cortical surface.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">atl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">7</span>, space <span class="op">=</span> <span class="st">"fsaverage6"</span>, surf <span class="op">=</span> <span class="st">"inflated"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">make_spatial_overlay</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">atlas_hemi</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">verts</span> <span class="op">&lt;-</span> <span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/vertices-methods.html" class="external-link">vertices</a></span><span class="op">(</span><span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/neurosurf/man/geometry-methods.html" class="external-link">geometry</a></span><span class="op">(</span><span class="va">atlas_hemi</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">verts</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="va">z</span> <span class="op">&lt;-</span> <span class="va">verts</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span></span>
-<span>  <span class="va">vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">y</span> <span class="op">/</span> <span class="fl">25</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">z</span> <span class="op">/</span> <span class="fl">30</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">vals</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">ov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  lh <span class="op">=</span> <span class="fu">make_spatial_overlay</span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">)</span>,</span>
-<span>  rh <span class="op">=</span> <span class="fu">make_spatial_overlay</span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">rh_atlas</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
-<span>  <span class="va">atl</span>,</span>
-<span>  overlay         <span class="op">=</span> <span class="va">ov</span>,</span>
-<span>  overlay_alpha   <span class="op">=</span> <span class="fl">0.7</span>,</span>
-<span>  overlay_palette <span class="op">=</span> <span class="st">"vik"</span>,</span>
-<span>  interactive     <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="surface-parcellations_files/figure-html/overlay-dense-1.png" class="r-plt" alt="" width="768"></p>
-<div class="section level3">
-<h3 id="automatic-neurovol-projection">Automatic NeuroVol projection<a class="anchor" aria-label="anchor" href="#automatic-neurovol-projection"></a>
-</h3>
-<p>When <code>overlay</code> is a <code>NeuroVol</code> (e.g. a
-whole-brain statistical map), <code><a href="../reference/plot_brain.html">plot_brain()</a></code> automatically
-projects it onto the surface via <code><a href="https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html" class="external-link">neurosurf::vol_to_surf()</a></code> —
-no manual preprocessing required. Here we build a synthetic volume with
-two positive “activation” blobs over frontal cortex and one negative
-blob over occipital cortex.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spacing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="va">origin</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">80</span>, <span class="op">-</span><span class="fl">120</span>, <span class="op">-</span><span class="fl">60</span><span class="op">)</span></span>
-<span><span class="va">dims</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40L</span>, <span class="fl">50L</span>, <span class="fl">40L</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">sp</span>  <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroSpace.html" class="external-link">NeuroSpace</a></span><span class="op">(</span><span class="va">dims</span>, spacing <span class="op">=</span> <span class="va">spacing</span>, origin <span class="op">=</span> <span class="va">origin</span><span class="op">)</span></span>
-<span><span class="va">arr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="fl">0</span>, dim <span class="op">=</span> <span class="va">dims</span><span class="op">)</span></span>
-<span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">dims</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">dims</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw">for</span> <span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">dims</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="va">coord</span> <span class="op">&lt;-</span> <span class="va">origin</span> <span class="op">+</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">k</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="va">spacing</span></span>
-<span>      <span class="va">d1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">coord</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">20</span>, <span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span>      <span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">coord</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="fl">20</span>, <span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span>      <span class="va">d3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">coord</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>  <span class="fl">0</span>,<span class="op">-</span><span class="fl">60</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span>      <span class="va">arr</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">d1</span> <span class="op">/</span> <span class="fl">800</span><span class="op">)</span> <span class="op">+</span></span>
-<span>                       <span class="fl">3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">d2</span> <span class="op">/</span> <span class="fl">800</span><span class="op">)</span> <span class="op">-</span></span>
-<span>                       <span class="fl">2.5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">d3</span> <span class="op">/</span> <span class="fl">600</span><span class="op">)</span></span>
-<span>    <span class="op">}</span></span>
-<span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">stat_vol</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroVol.html" class="external-link">NeuroVol</a></span><span class="op">(</span><span class="va">arr</span>, <span class="va">sp</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
-<span>  <span class="va">atl</span>,</span>
-<span>  overlay           <span class="op">=</span> <span class="va">stat_vol</span>,</span>
-<span>  overlay_threshold <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  overlay_palette   <span class="op">=</span> <span class="st">"vik"</span>,</span>
-<span>  overlay_alpha     <span class="op">=</span> <span class="fl">0.7</span>,</span>
-<span>  interactive       <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="surface-parcellations_files/figure-html/overlay-vol-1.png" class="r-plt" alt="" width="768"></p>
-<p>In practice you would load a real statistical map instead:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">stat_vol</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/read_vol.html" class="external-link">read_vol</a></span><span class="op">(</span><span class="st">"my_tstat.nii.gz"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span><span class="va">atl</span>, overlay <span class="op">=</span> <span class="va">stat_vol</span>, overlay_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>           overlay_palette <span class="op">=</span> <span class="st">"vik"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Two optional parameters control the volume-to-surface projection:</p>
-<ul>
-<li>
-<strong><code>overlay_fun</code></strong>: interpolation function —
-<code>"avg"</code> (default), <code>"nn"</code> (nearest-neighbour), or
-<code>"mode"</code> (most frequent label).</li>
-<li>
-<strong><code>overlay_sampling</code></strong>: sampling strategy —
-<code>"midpoint"</code> (default, halfway between white and pial),
-<code>"normal_line"</code> (multiple samples along the surface normal),
-or <code>"thickness"</code> (cortical-thickness–aware sampling).</li>
-</ul>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
 <span>  <span class="va">atl</span>,</span>
-<span>  overlay          <span class="op">=</span> <span class="va">stat_vol</span>,</span>
-<span>  overlay_fun      <span class="op">=</span> <span class="st">"nn"</span>,</span>
-<span>  overlay_sampling <span class="op">=</span> <span class="st">"normal_line"</span>,</span>
-<span>  overlay_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  interactive       <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  vals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  views <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lateral"</span>, <span class="st">"medial"</span><span class="op">)</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  style <span class="op">=</span> <span class="st">"ggseg_like"</span>,</span>
+<span>  colorbar <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  colorbar_title <span class="op">=</span> <span class="st">"Example value"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Schaefer-200 (7 networks) on fsaverage6"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-</div>
+<p><img src="figures/overview-schaefer-surface.png" class="r-plt" alt="Schaefer 200-parcel atlas on left and right inflated fsaverage6 surfaces in lateral and medial views. Parcels have distinct blue-to-orange values, visible white boundaries, and a vertical example-value colorbar." width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="notes-on-dependencies">Notes on dependencies<a class="anchor" aria-label="anchor" href="#notes-on-dependencies"></a>
+<h2 id="how-do-you-attach-one-value-per-parcel">How do you attach one value per parcel?<a class="anchor" aria-label="anchor" href="#how-do-you-attach-one-value-per-parcel"></a>
 </h2>
-<ul>
-<li>fsaverage6 geometry is bundled; other spaces require
-TemplateFlow.</li>
-<li>Chunk <code>eval = FALSE</code> by default; set to <code>TRUE</code>
-locally with network and TemplateFlow.</li>
-</ul>
+<p>Keep the atlas and the data conceptually separate. A numeric vector
+supplied to <code><a href="../reference/plot_brain.html">plot_brain()</a></code> must have exactly one value for
+every element of <code>atl$ids</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">parcel_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">parcel_values</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">atl</span>,</span>
+<span>  vals <span class="op">=</span> <span class="va">parcel_values</span>,</span>
+<span>  views <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lateral"</span>, <span class="st">"medial"</span><span class="op">)</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  style <span class="op">=</span> <span class="st">"ggseg_like"</span>,</span>
+<span>  colorbar <span class="op">=</span> <span class="st">"bottom"</span>,</span>
+<span>  colorbar_title <span class="op">=</span> <span class="st">"Standardized effect"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/map_atlas.html">map_atlas()</a></code> is the tabular companion to this plot. It
+does <strong>not</strong> mutate the surface or return a labelled
+mesh:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_atlas.html">map_atlas</a></span><span class="op">(</span><span class="va">atl</span>, <span class="va">parcel_values</span><span class="op">)</span></span>
+<span><span class="va">mapped</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mapped</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">mapped</span><span class="op">$</span><span class="va">statistic</span>, <span class="va">parcel_values</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">mapped</span><span class="op">$</span><span class="va">region</span>, <span class="va">atl</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">mapped</span><span class="op">$</span><span class="va">hemi</span>, <span class="va">atl</span><span class="op">$</span><span class="va">hemi</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Use the tibble for modelling and reporting; pass the original atlas
+plus the same value vector to <code><a href="../reference/plot_brain.html">plot_brain()</a></code> for a surface
+figure.</p>
+</div>
+<div class="section level2">
+<h2 id="how-do-you-extract-one-surface-roi">How do you extract one surface ROI?<a class="anchor" aria-label="anchor" href="#how-do-you-extract-one-surface-roi"></a>
+</h2>
+<p><code><a href="../reference/get_roi.html">get_roi()</a></code> selects vertices for one or more named regions
+and returns <code><a href="https://bbuchsbaum.github.io/neurosurf/reference/ROISurface.html" class="external-link">neurosurf::ROISurface</a></code> objects. Labels may occur
+in both hemispheres, so make the side explicit when the question is
+unilateral:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">region_name</span> <span class="op">&lt;-</span> <span class="va">atl</span><span class="op">$</span><span class="va">labels</span><span class="op">[</span><span class="va">atl</span><span class="op">$</span><span class="va">hemi</span> <span class="op">==</span> <span class="st">"left"</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="va">roi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">atl</span>, label <span class="op">=</span> <span class="va">region_name</span>, hemi <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">roi</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1L</span>,</span>
+<span>  <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/is.html" class="external-link">is</a></span><span class="op">(</span><span class="va">roi</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"ROISurface"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">roi</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Atlas-level subsetting is currently volume-only.
+<code>filter_atlas(atl, ...)</code> and <code>sub_atlas(atl, ...)</code>
+fail clearly for a surface atlas; use <code><a href="../reference/get_roi.html">get_roi()</a></code> for surface
+regions rather than expecting a smaller <code>surfatlas</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="how-do-you-use-per-vertex-data">How do you use per-vertex data?<a class="anchor" aria-label="anchor" href="#how-do-you-use-per-vertex-data"></a>
+</h2>
+<p>Parcel values and vertex values are different data shapes. For an
+already surface-aligned continuous field, supply one vector per
+hemisphere through <code>overlay</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vertex_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  lh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neurosurf/reference/vertices-methods.html" class="external-link">vertices</a></span><span class="op">(</span></span>
+<span>    <span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neurosurf/reference/geometry-methods.html" class="external-link">geometry</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">lh_atlas</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  rh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neurosurf/reference/vertices-methods.html" class="external-link">vertices</a></span><span class="op">(</span></span>
+<span>    <span class="fu">neurosurf</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neurosurf/reference/geometry-methods.html" class="external-link">geometry</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">rh_atlas</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">atl</span>,</span>
+<span>  overlay <span class="op">=</span> <span class="va">vertex_values</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  style <span class="op">=</span> <span class="st">"stat_publication"</span>,</span>
+<span>  colorbar <span class="op">=</span> <span class="st">"bottom"</span>,</span>
+<span>  overlay_title <span class="op">=</span> <span class="st">"Vertex statistic"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>A <code>NeuroVol</code> is not automatically aligned merely because
+it can be sampled. The current <code><a href="../reference/plot_brain.html">plot_brain()</a></code> volume
+projection cannot infer template identity from a raw
+<code>NeuroVol</code>, check compatibility, or consume a transformed
+white/pial pair. Passing a volume is therefore unchecked caller
+responsibility and is appropriate only when the volume already uses the
+resolved surface coordinates. <code>fsaverage</code>,
+<code>fsaverage5</code>, and <code>fsaverage6</code> use MNI305
+coordinates, whereas most modern MNI volumes use MNI152 coordinates; do
+not project the latter directly.
+<code><a href="../reference/transform_vertices_to_volume.html">transform_vertices_to_volume()</a></code> is useful for
+coordinate-level calculations, but it does not by itself create a
+<code><a href="../reference/plot_brain.html">plot_brain()</a></code> projection geometry. A grid reslice does not
+establish correspondence.</p>
+</div>
+<div class="section level2">
+<h2 id="what-about-other-atlases-and-templates">What about other atlases and templates?<a class="anchor" aria-label="anchor" href="#what-about-other-atlases-and-templates"></a>
+</h2>
+<p><code><a href="../reference/glasser_surf.html">glasser_surf()</a></code> has the same <code>surfatlas</code>
+contract, but uses 164k <code>fsaverage</code> geometry and downloads
+both geometry and annotations on first use. Raw geometry from
+<code><a href="../reference/load_surface_template.html">load_surface_template()</a></code> has no atlas labels; the next
+article explains that distinction in detail.</p>
+<p>Continue with:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code><a href="../articles/surface-panels.html">vignette("surface-panels")</a></code> for shared legends and
+multi-map figures.</li>
+<li>
+<code><a href="../articles/surface-templates.html">vignette("surface-templates")</a></code> for paths, geometry, and
+per-vertex data.</li>
+<li>
+<code><a href="../articles/working-with-templateflow.html">vignette("working-with-templateflow")</a></code> for live asset
+discovery.</li>
+</ol>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -433,7 +300,7 @@ locally with network and TemplateFlow.</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

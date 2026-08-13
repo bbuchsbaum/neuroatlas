@@ -18,6 +18,10 @@ plot_brain_grid(
   lim = NULL,
   titles = NULL,
   colorbar = TRUE,
+  colorbar_title = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
   ...
 )
 ```
@@ -70,8 +74,17 @@ plot_brain_grid(
 
 - colorbar:
 
-  Logical. If `TRUE` (default), a standalone colorbar panel is appended
-  to the grid.
+  Logical or character. Use `TRUE` or `"right"` (default) for a vertical
+  shared colorbar, `"bottom"` for a horizontal shared colorbar, or
+  `FALSE` / `"none"` to omit it.
+
+- colorbar_title:
+
+  Optional shared colorbar title.
+
+- title, subtitle, caption:
+
+  Optional overall plot annotations applied to the composed figure.
 
 - ...:
 

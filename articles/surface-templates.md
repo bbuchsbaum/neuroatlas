@@ -1,199 +1,199 @@
 # Surface Templates: Geometry vs. Data
 
-## Why this vignette
+A surface file can contain a cortical mesh without containing any
+measurements or atlas labels. Many confusing workflows begin by treating
+those things as equivalent. This article keeps the object transitions
+explicit: path, geometry, per-vertex surface, then labelled atlas.
 
-Surface work in `neuroatlas` uses two key pieces:
+TemplateFlow-backed examples are not executed during package builds
+because a first call may download files. No output is simulated.
 
-- **Geometry** (mesh and topology): stored as a
-  [`neurosurf::SurfaceGeometry`](https://rdrr.io/pkg/neurosurf/man/SurfaceGeometry.html).
-- **Per-vertex data** (numbers or labels): stored as the `data` slot of
-  a
-  [`neurosurf::NeuroSurface`](https://rdrr.io/pkg/neurosurf/man/NeuroSurface.html)
-  (one value per vertex).
+## What are the four layers?
 
-This vignette shows how to fetch surface *geometry* from TemplateFlow,
-what each helper returns, and how to attach data when you need a full
-`NeuroSurface`.
+| Layer        | R representation  | What it knows                               |
+|--------------|-------------------|---------------------------------------------|
+| file         | character path    | where a mesh asset is cached                |
+| geometry     | `SurfaceGeometry` | vertices, triangles, hemisphere             |
+| data surface | `NeuroSurface`    | geometry plus one value per selected vertex |
+| parcellation | `surfatlas`       | two labelled surfaces plus region metadata  |
 
-## Quick reference
+Choose the narrowest layer that matches your task. A path is enough for
+an external program; a geometry is enough for coordinate calculations; a
+`NeuroSurface` carries vertex measurements; a `surfatlas` carries parcel
+identity.
 
-- [`get_surface_template()`](../reference/get_template.md) → character
-  path to a `.surf.gii` file (one hemi). No mesh loaded yet.
-- [`load_surface_template()`](../reference/load_surface_template.md) →
-  `SurfaceGeometry` (mesh + graph + hemi), still **no per-vertex data**.
-  Can return L/R or both as a list.
-- Atlas helpers (e.g.,
-  [`schaefer_surf()`](../reference/schaefer_surf.md),
-  [`glasser_surf()`](../reference/glasser_surf.md)) →
-  `LabeledNeuroSurface` with integer labels in `data` and a mesh in
-  `geometry`.
-- Packaged fsaverage6 meshes live in `data/fsaverage.rda` and are used
-  automatically by `schaefer_surf(..., space = "fsaverage6")`.
+## How do you find a valid surface asset?
 
-## Fetching geometry only
-
-Note: [`load_surface_template()`](../reference/load_surface_template.md)
-requires TemplateFlow. The `fsaverage` template may have limited
-availability for surface files. Check
-[`tflow_spaces()`](../reference/tflow_spaces.md) for available
-templates.
+TemplateFlow surface entities use `hemi`, `density`, and `suffix`. Query
+the live inventory before loading because the archive is versioned
+independently of `neuroatlas`:
 
 ``` r
-# fsaverage6 pial surface, left hemi (requires TemplateFlow)
-geom_l <- load_surface_template(
-  template_id = "fsaverage",
-  surface_type = "pial",
-  hemi = "L",
-  density = "41k",
-  resolution = "06"
-)
-geom_l
-```
 
-`geom_l` is a `SurfaceGeometry` with:
+library(neuroatlas)
 
-- `mesh`:
-  [`rgl::mesh3d`](https://dmurdoch.github.io/rgl/dev/reference/mesh3d.html)
-  containing vertices (`vb`) and faces (`it`).
-- `graph`: `igraph` adjacency of the mesh.
-- `hemi`: `"left"` or `"right"`.
+tflow_spaces(pattern = "^fs")
 
-No per-vertex values are present yet.
-
-### Both hemispheres at once
-
-``` r
-# fsLR is more commonly available in TemplateFlow than fsaverage
-geoms <- load_surface_template(
-  "fsLR", "inflated", hemi = "both", density = "32k"
-)
-str(geoms, max.level = 1)
-```
-
-Returns a named list with `L` and `R` `SurfaceGeometry` objects if the
-template is available in TemplateFlow.
-
-## Attaching per-vertex data
-
-To get a full `NeuroSurface`, supply data explicitly:
-
-``` r
-geom_l <- load_surface_template("fsaverage", "pial", hemi = "L",
-                                density = "41k", resolution = "06")
-
-# Example: all zeros (same length as vertices)
-vals <- rep(0, length(neurosurf::nodes(geom_l)))
-
-surf_l <- neurosurf::NeuroSurface(
-  geometry = geom_l,
-  indices  = neurosurf::nodes(geom_l),
-  data     = vals
-)
-```
-
-`surf_l@data` now holds one value per vertex; you can replace `vals`
-with cortical thickness, activation, etc.
-
-## Getting labeled surfaces (parcellations)
-
-If you want labels already attached, use the atlas helpers; they combine
-geometry with per-vertex label IDs:
-
-``` r
-atl <- schaefer_surf(parcels = 200, networks = 7,
-                     space = "fsaverage6", surf = "inflated")
-
-class(atl$lh_atlas)
-#> "LabeledNeuroSurface" "NeuroSurface" ...
-
-head(slot(atl$lh_atlas, "data"))
-# integer labels per vertex
-```
-
-`slot(atl$lh_atlas, "data")` holds parcel IDs; metadata in `atl$labels`
-maps those IDs to names.
-
-## When TemplateFlow is required
-
-- Any call that specifies `template_id`/`space` not packaged (e.g.,
-  fsaverage, fsaverage5/6, fsLR) needs TemplateFlow plus network access
-  on first use.
-- fsaverage6 geometry is bundled; set `space = "fsaverage6"` in
-  [`schaefer_surf()`](../reference/schaefer_surf.md) to avoid
-  TemplateFlow.
-
-## Common patterns
-
-- Get a mesh path only (no R object): `get_surface_template(...)`.
-- Get a mesh object: `load_surface_template(...)`.
-- Get mesh + labels: [`schaefer_surf()`](../reference/schaefer_surf.md)
-  / [`glasser_surf()`](../reference/glasser_surf.md).
-- Add your own values: wrap the geometry with `NeuroSurface(...)`.
-
-## Sanity check: surface renders
-
-We generate a small snapshot to prove the geometry loads and is
-displayable. This chunk only runs when TemplateFlow is available; the
-PNG is written to `figures/` and then shown below.
-
-``` r
-dir.create("figures", showWarnings = FALSE)
-png_path <- file.path("figures", "fslr32k_inflated_L.png")
-geom_l <- load_surface_template(
+tflow_files(
   "fsLR",
-  "inflated",
+  query_args = list(
+    hemi = "L",
+    density = "32k",
+    suffix = "midthickness"
+  )
+)
+```
+
+At the time this article was built, the practical geometry choices were:
+
+| TemplateFlow ID | Densities used here | Geometry suffixes to expect |
+|----|----|----|
+| `fsLR` | `32k` | `midthickness`, `inflated`, sphere variants |
+| `fsaverage` | `10k`, `41k`, `164k` | `pial`, `white`, sphere variants |
+
+This is a guide, not a frozen catalogue. In particular, do not infer
+that `fsLR` 32k has a `pial` mesh or that TemplateFlow has an
+`fsaverage6` template ID. Discover the current files and require an
+unambiguous match.
+
+## How do you get a file path?
+
+[`get_surface_template()`](../reference/get_template.md) resolves one
+mesh and returns its cached path:
+
+``` r
+
+path <- get_surface_template(
+  template_id = "fsLR",
+  surface_type = "midthickness",
   hemi = "L",
   density = "32k"
 )
-neurosurf::snapshot_surface(geom_l, file = png_path)
-png_path
+
+stopifnot(length(path) == 1L, file.exists(path))
+path
 ```
 
-If the image renders, the template fetched correctly.
+Use `template_id = "fsaverage"`, `density = "41k"`, and
+`surface_type = "pial"` for the corresponding 41k fsaverage geometry.
+Density is the relevant entity; adding `resolution = "06"` to that query
+currently produces no match.
 
-## Template roster & snapshots
+## How do you load geometry?
 
-Below are the surface templates we currently target in code/tests.
-Densities are TemplateFlow defaults; surface types are those exposed by
-[`get_surface_template()`](../reference/get_template.md) (and used by
-our atlas helpers).
-
-| template_id | density/res | surface types | packaged? |
-|----|----|----|----|
-| fsaverage | 164k | white, pial, inflated, midthickness, sphere | TF |
-| fsaverage6 | 41k (`res-06`) | white, pial, inflated | **yes** (bundled) |
-| fsaverage5 | 10k (`res-05`) | white, pial, inflated | TF |
-| fsLR | 32k | white, pial, inflated, midthickness, sphere | TF |
-
-### Batch snapshot script (run locally)
-
-To create a thumbnail per template/hemisphere/type for quick QA:
+[`load_surface_template()`](../reference/load_surface_template.md) reads
+the asset into a
+[`neurosurf::SurfaceGeometry`](https://bbuchsbaum.github.io/neurosurf/reference/SurfaceGeometry.html):
 
 ``` r
-templates <- list(
-  list(id = "fsaverage",  den = "164k", res = NULL, types = c("pial", "inflated")),
-  list(id = "fsaverage6", den = "41k",  res = "06",  types = c("pial", "inflated")),
-  list(id = "fsaverage5", den = "10k",  res = "05",  types = c("pial")),
-  list(id = "fsLR",       den = "32k",  res = NULL,  types = c("pial", "inflated"))
+
+geometry <- load_surface_template(
+  template_id = "fsLR",
+  surface_type = "midthickness",
+  hemi = "L",
+  density = "32k"
 )
 
-for (tpl in templates) {
-  for (stype in tpl$types) {
-    geom_l <- load_surface_template(
-      template_id = tpl$id,
-      surface_type = stype,
-      hemi = "L",
-      density = tpl$den,
-      resolution = tpl$res
-    )
-    fname <- sprintf("%s_%s_L.png", tpl$id, stype)
-    neurosurf::snapshot_surface(geom_l, file = fname)
-  }
-}
+vertices <- neurosurf::vertices(geometry)
+faces <- geometry@mesh$it
+
+stopifnot(
+  inherits(geometry, "SurfaceGeometry"),
+  ncol(vertices) == 3L,
+  nrow(vertices) > 0L,
+  nrow(faces) == 3L,
+  ncol(faces) > 0L
+)
 ```
 
-Enable and run locally to generate PNGs you can embed or eyeball to
-verify each template is present and renderable.
+Load both hemispheres by setting `hemi = "both"`; the result is a named
+list with `L` and `R` geometries.
 
-That’s it—use geometry-only helpers when you want maximal control, and
-atlas helpers when you want labeled surfaces out of the box.
+## How do you attach vertex data?
+
+Construct a `NeuroSurface` only after proving the value vector and
+vertex indices agree:
+
+``` r
+
+vertex_ids <- seq_len(nrow(vertices))
+vertex_values <- as.numeric(scale(vertices[, 3]))
+
+surface <- neurosurf::NeuroSurface(
+  geometry = geometry,
+  indices = vertex_ids,
+  data = vertex_values
+)
+
+stopifnot(
+  length(surface@indices) == nrow(vertices),
+  length(surface@data) == nrow(vertices),
+  all(is.finite(surface@data))
+)
+```
+
+The geometry supplies topology; `surface@data` supplies one value for
+each selected vertex. Neither supplies parcel names.
+
+## How is a labelled atlas different?
+
+Atlas loaders combine geometry with integer labels and a region
+catalogue:
+
+``` r
+
+atl <- schaefer_surf(
+  parcels = 200,
+  networks = 7,
+  space = "fsaverage6",
+  surf = "inflated"
+)
+
+lh_labels <- as.integer(atl$lh_atlas@data)
+lh_geometry <- neurosurf::geometry(atl$lh_atlas)
+
+stopifnot(
+  length(lh_labels) == nrow(neurosurf::vertices(lh_geometry)),
+  length(unique(lh_labels[lh_labels > 0])) == sum(atl$hemi == "left")
+)
+```
+
+Here is the visible distinction: labelled parcels and their boundaries,
+not a featureless geometry silhouette.
+
+![Schaefer 200-parcel atlas on inflated fsaverage6 cortex, showing many
+labelled regions with visible boundaries across lateral and medial views
+of both hemispheres.](figures/overview-schaefer-surface.png)
+
+The `fsaverage6` mesh is bundled, but Schaefer annotations are
+downloaded and cached on first use. Other surface atlases may also
+require TemplateFlow geometry. That network boundary is part of the
+workflow, not something a vignette should hide.
+
+## How do coordinate spaces enter the picture?
+
+Mesh identity is not only vertex count. `fsaverage` variants use MNI305
+coordinates; `fsLR` is an MNI152-family surface space. Before combining
+a surface with a volume, inspect the surface template and the volume’s
+declared space. Use
+[`needs_coord_transform()`](../reference/needs_coord_transform.md) or
+[`needs_transform()`](../reference/needs_transform.md) to detect a
+coordinate-system mismatch, and use a validated transform before
+sampling.
+
+Two meshes with the same number of vertices are not thereby aligned, and
+a volume reslice is not a surface registration.
+
+## What should you use next?
+
+- Use
+  [`vignette("surface-parcellations")`](../articles/surface-parcellations.md)
+  when region identity matters.
+- Use [`vignette("surface-panels")`](../articles/surface-panels.md) to
+  display parcel or per-vertex values.
+- Use
+  [`vignette("working-with-templateflow")`](../articles/working-with-templateflow.md)
+  for cache and volume queries.
+
+The durable rule is simple: verify file identity, topology, value
+length, and coordinate space at each transition.

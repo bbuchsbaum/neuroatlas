@@ -7,7 +7,13 @@ identical arguments return cached data.
 ## Usage
 
 ``` r
-build_brain_polygon_data(surfatlas, views, surface, projection_smooth = 0L)
+build_brain_polygon_data(
+  surfatlas,
+  views,
+  surface,
+  projection_smooth = 0L,
+  depth_cull = TRUE
+)
 ```
 
 ## Arguments
@@ -28,6 +34,11 @@ build_brain_polygon_data(surfatlas, views, surface, projection_smooth = 0L)
 
   Integer: number of Laplacian smoothing iterations on projected
   coordinates (default `0L`).
+
+- depth_cull:
+
+  Logical. If `TRUE` (default), remove faces hidden behind nearer
+  cortical surface faces in the projected view.
 
 ## Value
 

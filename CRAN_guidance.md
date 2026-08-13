@@ -26,6 +26,7 @@ no period at the end if it’s a phrase). Subsequent paragraphs form the
 description.
 
 ``` r
+
 #' Compute Summary Statistics
 #'
 #' Calculates descriptive statistics for numeric data, handling missing
@@ -36,6 +37,7 @@ description.
 and purpose.
 
 ``` r
+
 #' @param x A numeric vector or matrix.
 #' @param na.rm Logical; if TRUE, NA values are removed before computation.
 #' @param method Character string specifying computation method: "fast" or "robust".
@@ -45,6 +47,7 @@ and purpose.
 complex objects, use `\item{}` for lists or describe data frame columns.
 
 ``` r
+
 #' @return A named list with elements:
 #'   \item{mean}{Arithmetic mean.}
 #'   \item{median}{Median value.}
@@ -56,6 +59,7 @@ complex objects, use `\item{}` for lists or describe data frame columns.
 Examples Best Practices” for details.
 
 ``` r
+
 #' @examples
 #' # Basic usage
 #' x <- c(1, 2, 3, NA, 5)
@@ -79,6 +83,7 @@ Examples Best Practices” for details.
 and signals `roxygen2` to generate documentation.
 
 ``` r
+
 #' @export
 ```
 
@@ -88,6 +93,7 @@ and signals `roxygen2` to generate documentation.
 technical specifics.
 
 ``` r
+
 #' @details
 #' Uses Welford's online algorithm for numerically stable computation.
 #' For matrices, statistics are computed column-wise.
@@ -97,6 +103,7 @@ technical specifics.
 `\code{\link{function_name}}` or `\code{\link[package]{function_name}}`.
 
 ``` r
+
 #' @seealso
 #' \code{\link{base_stats}} for basic statistics,
 #' \code{\link[stats]{summary}} for R's built-in summary.
@@ -106,6 +113,7 @@ technical specifics.
 Use `\doi{}` for DOIs.
 
 ``` r
+
 #' @references
 #' Welford, B. P. (1962). Note on a method for calculating corrected
 #' sums of squares and products. Technometrics, 4(3), 419-420.
@@ -133,6 +141,7 @@ Create a dedicated file, typically `R/yourpackage-package.R` (or
 generally *not* contain other function definitions.
 
 ``` r
+
 #' @keywords internal
 "_PACKAGE"
 
@@ -177,6 +186,7 @@ recommended way to anchor package-level documentation using `roxygen2`.
 `@return`, and `@examples`.
 
 ``` r
+
 #' Summarize Data Objects
 #'
 #' Generic function for creating summaries of various data types.
@@ -201,6 +211,7 @@ summarize_data <- function(x, ...) {
 link method documentation to the generic’s documentation file.
 
 ``` r
+
 #' @rdname summarize_data
 #' @method summarize_data numeric
 #' @param na.rm Logical; if TRUE, NAs are removed (specific to numeric method).
@@ -235,6 +246,7 @@ Place data (e.g., `survey_data.rda`) in the `data/` directory. Create a
 documentation file (e.g., `R/data.R`):
 
 ``` r
+
 #' Example Survey Data
 #'
 #' Survey responses from 500 participants collected in 2023 for
@@ -269,6 +281,7 @@ documentation file (e.g., `R/data.R`):
 exported and no `.Rd` file is generated. They are invisible to users.
 
 ``` r
+
 #' Internal helper for data validation
 #'
 #' Checks input data format and throws informative errors. Not intended
@@ -291,6 +304,7 @@ main help index but can be accessed via
 `help("advanced_internal", help_type = "html")` (if known).
 
 ``` r
+
 #' Advanced internal processing function
 #'
 #' This function performs a specialized internal task. It is exposed for
@@ -313,6 +327,7 @@ package-level documentation file.
 **Specific Imports:**
 
 ``` r
+
 #' @importFrom stats median sd lm
 #' @importFrom utils head tail
 ```
@@ -367,6 +382,7 @@ If examples need to write files, **always use
 [`tempdir()`](https://rdrr.io/r/base/tempfile.html)** and clean up.
 
 ``` r
+
 #' @examples
 #' \dontshow{
 #' # CRAN-safe temporary directory for example output
@@ -391,6 +407,7 @@ If examples need to write files, **always use
 ### Conditional Examples
 
 ``` r
+
 #' @examples
 #' # Basic example (always runs)
 #' basic_function_call(1:10)
@@ -465,6 +482,7 @@ tracker.
 ### Essential Local Checks
 
 ``` r
+
 # 1. Generate documentation and NAMESPACE
 devtools::document() # or roxygen2::roxygenise()
 
@@ -485,6 +503,7 @@ urlchecker::url_check()
 Use services to check on platforms you don’t have access to:
 
 ``` r
+
 # Windows (devel and release)
 devtools::check_win_devel()
 devtools::check_win_release() # If available
@@ -514,10 +533,10 @@ with the package.
 | Slow examples (`@examples`) | Use `\donttest{}` for examples \>~5 seconds; optimize code. |
 | `\dontrun{}` overuse | Only for examples that truly cannot be run safely/automatically by CRAN. Justify heavily. |
 | Errors/Warnings in examples | Examples must run cleanly. Debug or use conditional logic. |
-| Broken URLs | Check with [`urlchecker::url_check()`](https://rdrr.io/pkg/urlchecker/man/url_check.html) and fix. |
+| Broken URLs | Check with `urlchecker::url_check()` and fix. |
 | Writing to file system outside [`tempdir()`](https://rdrr.io/r/base/tempfile.html) | Always use [`tempdir()`](https://rdrr.io/r/base/tempfile.html) in examples/tests and clean up. |
 | Non-ASCII characters without `Encoding` | Add `Encoding: UTF-8` to `DESCRIPTION` and save files as UTF-8. |
-| Typos/Grammar | Use [`devtools::spell_check()`](https://devtools.r-lib.org/reference/spell_check.html); proofread carefully. |
+| Typos/Grammar | Use `devtools::spell_check()`; proofread carefully. |
 | Incorrect `Title:` / `Description:` case | Use Sentence case for `Title:` fields, standard paragraph for `Description:`. |
 | Missing or incorrect `License` | Use a CRAN-accepted open-source license; ensure `LICENSE` file is correct. |
 | Vignettes fail to build or are slow | Ensure vignettes are robust, efficient, and build correctly. |
@@ -525,18 +544,15 @@ with the package.
 ## XI. Pro Tips for Smooth Submissions
 
 1.  **Use `usethis` for Setup:**
-    - [`usethis::use_package_doc()`](https://usethis.r-lib.org/reference/use_package_doc.html):
-      Sets up package-level documentation file.
-    - [`usethis::use_data()`](https://usethis.r-lib.org/reference/use_data.html):
-      Prepares datasets for inclusion in `data/` and optionally creates
-      `R/data.R`.
+    - `usethis::use_package_doc()`: Sets up package-level documentation
+      file.
+    - `usethis::use_data()`: Prepares datasets for inclusion in `data/`
+      and optionally creates `R/data.R`.
     - `usethis::use_vignette("my-vignette-title")`: Creates a vignette
       template.
-    - [`usethis::use_mit_license()`](https://usethis.r-lib.org/reference/licenses.html),
-      [`usethis::use_gpl3_license()`](https://usethis.r-lib.org/reference/licenses.html),
-      etc.: Sets up license files.
-    - [`usethis::use_testthat()`](https://usethis.r-lib.org/reference/use_testthat.html):
-      Sets up testing infrastructure.
+    - `usethis::use_mit_license()`, `usethis::use_gpl3_license()`, etc.:
+      Sets up license files.
+    - `usethis::use_testthat()`: Sets up testing infrastructure.
 2.  **Consistent Documentation Style:**
     - Use active voice and clear, concise language.
     - Be very specific in `@param` descriptions (e.g., “A numeric
@@ -592,10 +608,9 @@ value well-written vignettes.
       rmarkdown # And any other packages used ONLY in vignettes
   ```
 
-- **Building and Checking:**
-  [`devtools::check()`](https://devtools.r-lib.org/reference/check.html)
-  will attempt to build your vignettes. Ensure they build without errors
-  and reasonably quickly.
+- **Building and Checking:** `devtools::check()` will attempt to build
+  your vignettes. Ensure they build without errors and reasonably
+  quickly.
 
 ## Resources
 

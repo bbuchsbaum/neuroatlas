@@ -10,6 +10,8 @@
 - [`as_parcel_data()`](as_parcel_data.md) : Convert an Object to
   \`parcel_data\`
 - [`atlas_alignment()`](atlas_alignment.md) : Atlas Alignment Lookup
+- [`atlas_artifacts()`](atlas_artifacts.md) : Get Atlas Artifact
+  Metadata
 - [`atlas_connectivity()`](atlas_connectivity.md) : Compute Connectivity
   Matrix from Atlas Parcellations
 - [`atlas_coord_space()`](atlas_coord_space.md) : Atlas Coordinate-Space
@@ -19,7 +21,14 @@
 - [`atlas_graph()`](atlas_graph.md) : Compute Parcel Adjacency Graph
   from an Atlas
 - [`atlas_hierarchy()`](atlas_hierarchy.md) : Atlas Hierarchy
+- [`atlas_history()`](atlas_history.md) : Get Atlas Processing History
 - [`atlas_overlap()`](atlas_overlap.md) : Cross-Atlas Overlap Analysis
+- [`atlas_provenance()`](atlas_provenance.md)
+  [`atlas_artifacts(`*`<atlas>`*`)`](atlas_provenance.md)
+  [`atlas_artifacts(`*`<default>`*`)`](atlas_provenance.md)
+  [`atlas_history(`*`<atlas>`*`)`](atlas_provenance.md)
+  [`atlas_history(`*`<default>`*`)`](atlas_provenance.md) : Atlas
+  Provenance Accessors
 - [`atlas_ref()`](atlas_ref.md) : Atlas Reference Accessor
 - [`atlas_roi_colors()`](atlas_roi_colors.md) : Assign optimal colours
   to atlas regions
@@ -31,6 +40,8 @@
   Between Spaces
 - [`batch_reduce()`](batch_reduce.md) : Batch Reduce Multiple Volumes by
   an Atlas
+- [`brainnetome_labels()`](brainnetome_labels.md) : Brainnetome Atlas
+  Label Table
 - [`build_brain_polygon_data()`](build_brain_polygon_data.md) : Build
   brain polygon render data for a surface atlas
 - [`build_cluster_explorer_data()`](build_cluster_explorer_data.md) :
@@ -58,12 +69,25 @@
   atlas
 - [`get_aseg_atlas()`](get_aseg_atlas.md) : Get the FreeSurfer
   Subcortical Atlas (ASEG)
+- [`get_atlas()`](get_atlas.md) : Load an Atlas by Registered ID
+- [`get_brainnetome_atlas()`](get_brainnetome_atlas.md) : Load
+  Brainnetome 246-Region Atlas
+- [`get_fsl_atlas()`](get_fsl_atlas.md) : FSL Atlas Loaders
 - [`get_ggseg_atlas()`](get_ggseg_atlas.md) : Get ggseg-Compatible
   Schaefer Atlas
 - [`get_glasser_atlas()`](get_glasser_atlas.md) : Load Glasser Atlas
+- [`get_harvard_oxford_atlas()`](get_harvard_oxford_atlas.md)
+  [`get_harvard_oxford_cortical_atlas()`](get_harvard_oxford_atlas.md)
+  [`get_harvard_oxford_subcortical_atlas()`](get_harvard_oxford_atlas.md)
+  [`get_harvard_oxford_cortical_subcortical_atlas()`](get_harvard_oxford_atlas.md)
+  : Load a Harvard-Oxford Atlas
 - [`get_hipp_atlas()`](get_hipp_atlas.md) : Extract Hippocampal
   Parcellation
+- [`get_julich_brain_atlas()`](get_julich_brain_atlas.md) : Load a
+  Julich-Brain FSL Atlas
 - [`get_olsen_mtl()`](get_olsen_mtl.md) : Load Olsen MTL Atlas
+- [`get_roi(`*`<surfatlas>`*`)`](get_roi-surfatlas.md) : Extract regions
+  of interest from a surface atlas
 - [`get_roi()`](get_roi.md) : Extract a region of interest (ROI) from an
   atlas
 - [`get_schaefer_atlas()`](get_schaefer_atlas.md)
@@ -99,6 +123,15 @@
 - [`get_template()`](get_template.md)
   [`get_surface_template()`](get_template.md) : Fetch a Template from
   TemplateFlow
+- [`get_visfatlas()`](get_visfatlas.md) : visfAtlas Probabilistic
+  Functional Visual Atlas (volume)
+- [`get_visual_atlas()`](get_visual_atlas.md) : Early Visual Cortex
+  Atlas (V1-V5, cytoarchitectonic)
+- [`get_wang_atlas()`](get_wang_atlas.md) : Wang (2015) Probabilistic
+  Visual Topography Atlas
+- [`get_wang_prob_atlas()`](get_wang_prob_atlas.md)
+  [`print(`*`<wang_prob_paths>`*`)`](get_wang_prob_atlas.md) :
+  Wang (2015) Full Per-Area Probability Volumes (Princeton ProbAtlas_v4)
 - [`ggseg_schaefer()`](ggseg_schaefer.md) : Create Interactive Schaefer
   Atlas Visualization
 - [`glasser_surf()`](glasser_surf.md) : Glasser Surface Atlas
@@ -111,6 +144,7 @@
   Templateflow (DEPRECATED)
 - [`launch_cluster_explorer()`](launch_cluster_explorer.md) : Launch
   Cluster Explorer in Interactive Session
+- [`list_atlases()`](list_atlases.md) : List Registered Atlases
 - [`load_surface_template()`](load_surface_template.md) : Load a surface
   template as a neurosurf geometry
 - [`map_atlas()`](map_atlas.md) : Map values to an atlas
@@ -138,6 +172,7 @@
   Grid
 - [`plot_glasser()`](plot_glasser.md) : Plot Glasser Atlas Values
 - [`print(`*`<atlas>`*`)`](print-methods.md)
+  [`print(`*`<atlas_provenance>`*`)`](print-methods.md)
   [`print(`*`<glasser>`*`)`](print-methods.md)
   [`print(`*`<schaefer>`*`)`](print-methods.md) : Print Methods for
   neuroatlas Objects
@@ -151,6 +186,8 @@
   TemplateFlow Object
 - [`project_surface_view()`](project_surface_view.md) : Project Surface
   Vertices to a Canonical 2D View
+- [`query_coord()`](query_coord.md) [`query_vox()`](query_coord.md) :
+  Query Atlas Labels by Coordinate
 - [`query_point()`](query_point.md) : Look Up Atlas Regions at MNI
   Coordinates
 - [`read_parcel_data()`](read_parcel_data.md) : Read a \`parcel_data\`

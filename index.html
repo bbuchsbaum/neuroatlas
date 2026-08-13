@@ -7,13 +7,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Neuroimaging Atlases and Parcellations • neuroatlas</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <script src="extra.js"></script><meta property="og:title" content="Neuroimaging Atlases and Parcellations">
-<meta name="description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
-<meta property="og:description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
+<meta name="description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Brainnetome, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
+<meta property="og:description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Brainnetome, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,11 +36,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a></li>
-    <li><a class="dropdown-item" href="articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
-    <li><a class="dropdown-item" href="articles/surface-parcellations.html">Surface Parcellations with neurosurf</a></li>
-    <li><a class="dropdown-item" href="articles/surface-templates.html">Surface Templates: Geometry vs. Data</a></li>
-    <li><a class="dropdown-item" href="articles/working-with-templateflow.html">Working with TemplateFlow in neuroatlas</a></li>
+<li><a class="dropdown-item" href="articles/neuroatlas-overview.html">Getting Started with neuroatlas</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="articles/index.html">More articles...</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -68,18 +66,28 @@
 </h2>
 <ul>
 <li>
-<strong>Multiple Atlas Support</strong>: Access Schaefer (100-1000 parcels), Glasser (360 regions), FreeSurfer ASEG, and Olsen MTL atlases</li>
+<strong>Many built-in atlases</strong>: Schaefer (100-1000 parcels), Brainnetome (246 regions), Glasser (360 regions), Harvard-Oxford, Julich-Brain, FreeSurfer ASEG, harmonized TemplateFlow/AtlasPack subcortical atlases, Olsen MTL, and probabilistic visual-cortex atlases (Wang 2015, visfAtlas, cytoarchitectonic V1-V5)</li>
 <li>
-<strong>Flexible Resampling</strong>: Transform atlases to different spaces and resolutions</li>
+<strong>Surface &amp; volume</strong>: Work with both volumetric and surface-based parcellations through one consistent interface</li>
 <li>
-<strong>ROI Analysis</strong>: Extract and analyze specific regions of interest with <code><a href="reference/get_roi.html">get_roi()</a></code>, <code><a href="reference/map_atlas.html">map_atlas()</a></code>, and <code><a href="reference/reduce_atlas.html">reduce_atlas()</a></code>
+<strong>Atlas discovery</strong>: Enumerate built-ins with <code><a href="reference/list_atlases.html">list_atlases()</a></code> and load any of them by name with <code><a href="reference/get_atlas.html">get_atlas()</a></code>
 </li>
 <li>
-<strong>Surface &amp; Volume</strong>: Work with both volumetric and surface-based parcellations</li>
+<strong>ROI analysis</strong>: Extract and summarise regions with <code><a href="reference/get_roi.html">get_roi()</a></code>, <code><a href="reference/map_atlas.html">map_atlas()</a></code>, <code><a href="reference/reduce_atlas.html">reduce_atlas()</a></code>, and <code><a href="reference/batch_reduce.html">batch_reduce()</a></code>
+</li>
 <li>
-<strong>TemplateFlow Integration</strong>: Access standardized templates via the Python TemplateFlow API</li>
+<strong>Atlas operations</strong>: Combine and reshape parcellations with <code><a href="reference/merge_atlases.html">merge_atlases()</a></code>, <code><a href="reference/filter_atlas.html">filter_atlas()</a></code>, <code><a href="reference/dilate_atlas.html">dilate_atlas()</a></code>, <code><a href="reference/atlas_overlap.html">atlas_overlap()</a></code>, and resampling across spaces/resolutions</li>
 <li>
-<strong>Visualization</strong>: Integration with the ggseg ecosystem for brain visualization</li>
+<strong>Spatial queries</strong>: Look up parcels by world, voxel, or MNI coordinate with <code><a href="reference/query_point.html">query_point()</a></code>, <code><a href="reference/query_coord.html">query_coord()</a></code>, and <code><a href="reference/query_coord.html">query_vox()</a></code>
+</li>
+<li>
+<strong>Network &amp; graph tools</strong>: <code><a href="reference/atlas_connectivity.html">atlas_connectivity()</a></code>, <code><a href="reference/atlas_graph.html">atlas_graph()</a></code> / <code><a href="reference/as_igraph.html">as_igraph()</a></code>, <code><a href="reference/atlas_hierarchy.html">atlas_hierarchy()</a></code>, and <code><a href="reference/spin_test.html">spin_test()</a></code> spatial null models</li>
+<li>
+<strong>TemplateFlow integration</strong>: Access standardized templates through the pure-R <code>templateflow</code> backend</li>
+<li>
+<strong>Visualization</strong>: Publication-quality surface figures with <code><a href="reference/plot_brain.html">plot_brain()</a></code> / <code><a href="reference/plot_brain_grid.html">plot_brain_grid()</a></code>, perceptually-optimised ROI palettes, the ggseg ecosystem, and an interactive <code><a href="reference/cluster_explorer.html">cluster_explorer()</a></code> Shiny app</li>
+<li>
+<strong>Provenance</strong>: Every atlas carries structured space, family, and source metadata (<code><a href="reference/atlas_ref.html">atlas_ref()</a></code>, <code><a href="reference/atlas_provenance.html">atlas_provenance()</a></code>)</li>
 </ul>
 </div>
 <div class="section level2">
@@ -88,14 +96,14 @@
 <p>You can install the development version from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu">pak</span><span class="op">(</span><span class="st">"bbuchsbaum/neuroatlas"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"bbuchsbaum/neuroatlas"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="templateflow-setup">TemplateFlow Setup<a class="anchor" aria-label="anchor" href="#templateflow-setup"></a>
 </h3>
-<p>For TemplateFlow functionality, you’ll need Python with the templateflow package:</p>
+<p>TemplateFlow access uses the imported pure-R <code>templateflow</code> package. No Python or reticulate setup is required:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># After installing neuroatlas:</span></span>
-<span><span class="fu">neuroatlas</span><span class="fu">::</span><span class="fu"><a href="reference/install_templateflow.html">install_templateflow</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">neuroatlas</span><span class="fu">::</span><span class="fu"><a href="reference/tflow_spaces.html">tflow_spaces</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"^MNI"</span><span class="op">)</span></span>
+<span><span class="fu">neuroatlas</span><span class="fu">::</span><span class="fu"><a href="reference/show_templateflow_cache_path.html">show_templateflow_cache_path</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -107,39 +115,57 @@
 <span><span class="co"># Get a Schaefer atlas (200 parcels, 7 networks)</span></span>
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">schaefer</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ══ Schaefer Atlas ══════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt; Name: Schaefer-200-7networks</span></span>
+<span><span class="co">#&gt; Dimensions: 182 x 218 x 182</span></span>
+<span><span class="co">#&gt; Regions: 200</span></span>
+<span><span class="co">#&gt; Networks: 7</span></span>
+<span><span class="co">#&gt; Hemispheres: left: 100, right: 100</span></span>
+<span><span class="co">#&gt; Unique networks: 7</span></span>
 <span></span>
-<span><span class="co"># Extract specific ROIs</span></span>
-<span><span class="va">roi</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">schaefer</span>, <span class="st">"DefaultA"</span><span class="op">)</span></span>
+<span><span class="co"># Extract a specific ROI by label (e.g. the first visual parcel)</span></span>
+<span><span class="va">roi</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">schaefer</span>, <span class="st">"Vis_1"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get Glasser atlas</span></span>
 <span><span class="va">glasser</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_glasser_atlas.html">get_glasser_atlas</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Access templates via TemplateFlow</span></span>
 <span><span class="va">mni_brain</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_template.html">get_template</a></span><span class="op">(</span><span class="st">"MNI152NLin2009cAsym"</span>, variant <span class="op">=</span> <span class="st">"brain"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="discovering-and-loading-atlases">Discovering and loading atlases<a class="anchor" aria-label="anchor" href="#discovering-and-loading-atlases"></a>
+</h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># See every built-in atlas</span></span>
+<span><span class="fu"><a href="reference/list_atlases.html">list_atlases</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Load any of them by id (with loader-specific arguments)</span></span>
+<span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_atlas.html">get_atlas</a></span><span class="op">(</span><span class="st">"schaefer2018"</span>, parcels <span class="op">=</span> <span class="st">"100"</span>, networks <span class="op">=</span> <span class="st">"7"</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="palette-demos">Palette demos<a class="anchor" aria-label="anchor" href="#palette-demos"></a>
 </h2>
-<p><code>neuroatlas</code> now includes perceptually-optimised palettes for atlas ROIs. For instance, you can generate a slice-aware palette for the Schaefer 200×7 atlas and feed it directly into <code>ggseg</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p><code>neuroatlas</code> includes perceptually-optimised palettes for atlas ROIs. For instance, you can generate a slice-aware palette for the Schaefer 200×7 atlas and feed it directly into <code><a href="reference/plot_brain.html">plot_brain()</a></code>:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ggseg/ggseg" class="external-link">ggseg</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
-<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/roi_metadata.html">roi_metadata</a></span><span class="op">(</span><span class="va">schaefer</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/roi_colors_maximin_view.html">roi_colors_maximin_view</a></span><span class="op">(</span></span>
-<span>  <span class="va">meta</span>,</span>
-<span>  hemi_col <span class="op">=</span> <span class="st">"hemi"</span>,</span>
-<span>  network_col <span class="op">=</span> <span class="st">"network"</span>,</span>
-<span>  pair_col <span class="op">=</span> <span class="st">"pair_id"</span>,</span>
+<span><span class="va">colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/atlas_roi_colors.html">atlas_roi_colors</a></span><span class="op">(</span></span>
+<span>  <span class="va">schaefer</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"maximin_view"</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/ggseg_schaefer.html">ggseg_schaefer</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_sf</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">pal</span><span class="op">$</span><span class="va">color</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">label</span>, <span class="va">pal</span><span class="op">$</span><span class="va">roi</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_fill_identity</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">schaefer_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/schaefer_surf.html">schaefer_surf</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">schaefer_surface</span>,</span>
+<span>  colors <span class="op">=</span> <span class="va">colors</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  style <span class="op">=</span> <span class="st">"ggseg_like"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-roi-palette.png" alt="Schaefer-200 (7-network) parcellation on the fsaverage6 surface with a perceptually-optimised maximin colour palette; lateral and medial views of both hemispheres." width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="available-atlases">Available Atlases<a class="anchor" aria-label="anchor" href="#available-atlases"></a>
@@ -159,12 +185,28 @@
 <tr>
 <td>Schaefer</td>
 <td><code><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas()</a></code></td>
-<td>Cortical parcellations (100-1000 regions, 7 or 17 networks)</td>
+<td>Cortical parcellations (100-1000 regions, 7 or 17 networks); surface via <code><a href="reference/get_schaefer_surfatlas.html">get_schaefer_surfatlas()</a></code>
+</td>
+</tr>
+<tr>
+<td>Brainnetome</td>
+<td><code><a href="reference/get_brainnetome_atlas.html">get_brainnetome_atlas()</a></code></td>
+<td>246-region connectional atlas with Yeo network and cytoarchitectonic metadata</td>
 </tr>
 <tr>
 <td>Glasser</td>
 <td><code><a href="reference/get_glasser_atlas.html">get_glasser_atlas()</a></code></td>
-<td>360-region multi-modal cortical parcellation</td>
+<td>360-region multi-modal cortical parcellation (surface via <code><a href="reference/glasser_surf.html">glasser_surf()</a></code>)</td>
+</tr>
+<tr>
+<td>Harvard-Oxford</td>
+<td><code><a href="reference/get_harvard_oxford_atlas.html">get_harvard_oxford_atlas()</a></code></td>
+<td>Cortical/subcortical structural atlases via TemplateFlow or FSL</td>
+</tr>
+<tr>
+<td>Julich-Brain</td>
+<td><code><a href="reference/get_julich_brain_atlas.html">get_julich_brain_atlas()</a></code></td>
+<td>FSL Julich-Brain cytoarchitectonic atlas</td>
 </tr>
 <tr>
 <td>ASEG</td>
@@ -172,9 +214,30 @@
 <td>FreeSurfer subcortical segmentation</td>
 </tr>
 <tr>
+<td>Subcortical</td>
+<td><code><a href="reference/get_subcortical_atlas.html">get_subcortical_atlas()</a></code></td>
+<td>Harmonized thalamus, cerebellum, and subcortex atlases (AtlasPack/TemplateFlow)</td>
+</tr>
+<tr>
 <td>Olsen MTL</td>
 <td><code><a href="reference/get_olsen_mtl.html">get_olsen_mtl()</a></code></td>
 <td>Medial temporal lobe atlas with hippocampal subfields</td>
+</tr>
+<tr>
+<td>Wang (2015)</td>
+<td><code><a href="reference/get_wang_atlas.html">get_wang_atlas()</a></code></td>
+<td>Probabilistic visual topography on <code>fsaverage</code> (25 areas/hemi); probability volumes via <code><a href="reference/get_wang_prob_atlas.html">get_wang_prob_atlas()</a></code>
+</td>
+</tr>
+<tr>
+<td>visfAtlas</td>
+<td><code><a href="reference/get_visfatlas.html">get_visfatlas()</a></code></td>
+<td>Probabilistic functional atlas of occipito-temporal visual cortex (33 regions)</td>
+</tr>
+<tr>
+<td>Visual V1-V5</td>
+<td><code><a href="reference/get_visual_atlas.html">get_visual_atlas()</a></code></td>
+<td>Cytoarchitectonic early visual areas extracted from Julich-Brain</td>
 </tr>
 </tbody>
 </table>
@@ -186,9 +249,16 @@
 <li>
 <a href="https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.html" class="external-link">Getting Started</a> - Introduction and basic usage</li>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html" class="external-link">Working with TemplateFlow</a> - Template access and management</li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/atlas-visualization.html" class="external-link">Atlas Visualization with Optimal Colours</a> - Perceptually-optimised ROI palettes</li>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.html" class="external-link">Surface Panel Figures</a> - Static panel composition with <code><a href="reference/plot_brain.html">plot_brain()</a></code> and <code><a href="reference/plot_brain_grid.html">plot_brain_grid()</a></code>
+</li>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.html" class="external-link">Surface Templates</a> - Geometry vs. data on surface meshes</li>
 <li>
 <a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html" class="external-link">Surface Parcellations</a> - Surface-based atlas operations</li>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html" class="external-link">Working with TemplateFlow</a> - Template access and management</li>
 <li>
 <a href="https://bbuchsbaum.github.io/neuroatlas/reference/index.html" class="external-link">Function Reference</a> - Complete API documentation</li>
 </ul>
@@ -214,7 +284,7 @@
 <div class="section level2">
 <h2 id="albers-theme">Albers theme<a class="anchor" aria-label="anchor" href="#albers-theme"></a>
 </h2>
-<p>This package uses the albersdown theme. Existing vignette theme hooks are replaced so <code>albers.css</code> and local <code>albers.js</code> render consistently on CRAN and GitHub Pages. The palette family is provided via <code>params$family</code> (default ‘red’). The pkgdown site uses <code>template: { package: albersdown }</code>. <!-- albersdown:theme-note:end --></p>
+<p>This package uses the albersdown theme. Existing vignette theme hooks are replaced so <code>albers.css</code> and local <code>albers.js</code> render consistently on CRAN and GitHub Pages. The defaults are configured via <code>params$family</code> and <code>params$preset</code> (family = ‘red’, preset = ‘interaction’). The pkgdown site uses <code>template: { package: albersdown }</code> together with generated <code>pkgdown/extra.css</code> and <code>pkgdown/extra.js</code> so the theme is linked and activated on site pages. <!-- albersdown:theme-note:end --></p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -267,7 +337,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

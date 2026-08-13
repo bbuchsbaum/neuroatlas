@@ -68,6 +68,24 @@ columns include:
   Atlas family identifier (e.g., "schaefer"), when atlas_ref is
   available
 
+- atlas_model:
+
+  Atlas model identifier (e.g., "Schaefer2018"), when atlas_ref is
+  available
+
+- atlas_representation:
+
+  Representation type ("volume", "surface", or "derived"), when
+  atlas_ref is available
+
+- atlas_source:
+
+  Loader/source key, when atlas_ref is available
+
+- atlas_confidence:
+
+  Atlas provenance confidence tier, when atlas_ref is available
+
 Additional atlas-specific columns may be present (e.g., `network` for
 Schaefer atlases).
 

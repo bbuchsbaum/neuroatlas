@@ -85,6 +85,7 @@ processing.
       ```verbatim
       # Optional verbatim R code block
 
+
     **5. Type Aliases Section (v3.4 Enhanced):**
     ```markdown
     ## Type Aliases:

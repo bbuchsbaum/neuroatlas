@@ -72,10 +72,9 @@ columns:
 
 World coordinates are converted to voxel grid positions via
 [`coord_to_grid`](https://bbuchsbaum.github.io/neuroim2/reference/coord_to_grid-methods.html)
-and rounded to the nearest integer. When \`radius \> 0\`, a
-nearest-neighbour search is performed in world coordinates using
-[`nn`](https://rdrr.io/pkg/Rnanoflann/man/nn.html) to find all labelled
-atlas voxels within \`radius\` mm.
+and rounded to the nearest integer. When \`radius \> 0\`, candidate
+voxel centres in a local grid neighbourhood are tested in world
+coordinates to find all labelled atlas voxels within \`radius\` mm.
 
 If the atlas carries a coordinate-space annotation
 (\`atlas\$atlas_ref\$coord_space\`) that differs from \`from_space\`,

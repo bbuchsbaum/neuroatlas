@@ -3,7 +3,7 @@
 Convenience wrapper around [`get_surface_template`](get_template.md)
 that downloads (via TemplateFlow) the requested surface geometry and
 returns it as a
-[`neurosurf::SurfaceGeometry`](https://rdrr.io/pkg/neurosurf/man/SurfaceGeometry.html)
+[`neurosurf::SurfaceGeometry`](https://bbuchsbaum.github.io/neurosurf/reference/SurfaceGeometry.html)
 object (or a left/right list).
 
 ## Usage
@@ -52,7 +52,7 @@ load_surface_template(
 ## Value
 
 A
-[`neurosurf::SurfaceGeometry`](https://rdrr.io/pkg/neurosurf/man/SurfaceGeometry.html)
+[`neurosurf::SurfaceGeometry`](https://bbuchsbaum.github.io/neurosurf/reference/SurfaceGeometry.html)
 object when `hemi` is "L" or "R"; a named list of two `SurfaceGeometry`
 objects when `hemi` is "both".
 

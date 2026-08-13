@@ -10,7 +10,7 @@ pair of neurosurf `LabeledNeuroSurface` objects plus atlas metadata.
 ``` r
 glasser_surf(
   space = "fsaverage",
-  surf = c("pial", "white", "inflated", "midthickness"),
+  surf = c("pial", "white", "midthickness"),
   use_cache = TRUE
 )
 ```
@@ -24,13 +24,13 @@ glasser_surf(
 
 - surf:
 
-  Surface type. One of `"pial"`, `"white"`, `"inflated"`, or
-  `"midthickness"`.
+  Surface type. One of `"pial"`, `"white"`, or `"midthickness"`.
 
 - use_cache:
 
   Logical. Whether to cache downloaded annotation files in the
-  neuroatlas cache directory. Default: `TRUE`.
+  neuroatlas cache directory. TemplateFlow manages the geometry cache
+  independently. Default: `TRUE`.
 
 ## Value
 
@@ -50,12 +50,17 @@ A list with classes `c("glasser_surf","surfatlas","atlas")` containing:
 This function uses:
 
 - fsaverage surface geometry from TemplateFlow via
-  [`get_surface_template`](get_template.md)
+  [`load_surface_template`](load_surface_template.md)
 
 - fsaverage `.annot` files from the Mills Figshare distribution
   (`lh.HCP-MMP1.annot`, `rh.HCP-MMP1.annot`)
 
-Currently only the `"fsaverage"` surface space is supported.
+Annotation downloads are checked against the file sizes and MD5
+checksums published by Figshare before they enter or leave the
+neuroatlas cache. Currently only the `"fsaverage"` surface space is
+supported. TemplateFlow provides `"pial"`, `"white"`, and
+`"midthickness"` geometry at the required 164k density; it does not
+provide an `"inflated"` fsaverage surface.
 
 ## Examples
 

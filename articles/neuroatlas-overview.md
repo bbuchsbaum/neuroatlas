@@ -1,403 +1,353 @@
 # Getting Started with neuroatlas
 
-## Introduction
+You have a brain image and want to ask a regional question: *what value
+does this image take in each parcel, region, or hemisphere?* The
+difficult part is not computing a mean. It is keeping the atlas labels,
+spatial grid, metadata, and plotting representation aligned from
+beginning to end.
 
-The `neuroatlas` package provides a unified interface for working with
-neuroimaging atlases and parcellations in R. Whether you’re conducting
-ROI-based analyses, visualizing brain data, or integrating different
-parcellation schemes, `neuroatlas` streamlines these tasks with
-consistent, user-friendly functions.
+This article follows one complete path. You will load the bundled
+FreeSurfer ASEG atlas, inspect its regions, create a compatible image,
+reduce that image to one value per region, and draw the atlas. The core
+path is offline and every result is executed when this vignette is
+built.
 
-Key features include:
+## What are the objects?
 
-- **Multiple Atlas Support**: Access to Schaefer, Glasser, FreeSurfer
-  ASEG, and Olsen MTL atlases
-- **Flexible Resampling**: Transform atlases to different spaces and
-  resolutions
-- **ROI Analysis**: Extract and analyze specific regions of interest
-- **Visualization**: Integration with ggseg for beautiful brain
-  visualizations
-- **TemplateFlow Integration**: Access to standardized templates and
-  spaces
+Three object transitions organise the workflow:
 
-## Loading Atlases
+| You have | What it contains | A common next step |
+|----|----|----|
+| an `atlas` | a labelled volume plus one row of metadata per region | [`roi_metadata()`](../reference/roi_metadata.md), [`get_roi()`](../reference/get_roi.md), or [`reduce_atlas()`](../reference/reduce_atlas.md) |
+| a `NeuroVol` | one numeric value at every voxel on a declared grid | summarise it with a compatible volume atlas |
+| a regional tibble | one value per parcel or anatomical region | analyse it or pair it with a matching plot |
 
-### Schaefer Cortical Atlas
+A `surfatlas` is the surface counterpart of an `atlas`. It stores a
+labelled mesh for each hemisphere rather than a labelled volume. Volume
+and surface atlases share region IDs and metadata, but they are not
+interchangeable containers.
 
-The Schaefer atlas provides cortical parcellations organized by
-functional networks. It’s available in multiple resolutions (100-1000
-parcels) and network configurations (7 or 17 networks).
+## How do you load and inspect an atlas?
+
+[`get_atlas()`](../reference/get_atlas.md) is the general
+discovery-and-loading entry point. Atlas-specific loaders remain useful
+when you want their specialised arguments.
 
 ``` r
-# Load Schaefer atlas with 200 parcels and 7 networks
-atlas_200_7 <- get_schaefer_atlas(parcels = "200", networks = "7")
-print(atlas_200_7)
 
-# Use convenience functions for common configurations
-atlas_400_17 <- sy_400_17()  # 400 parcels, 17 networks
+library(neuroatlas)
+
+atlas <- get_atlas("aseg")
+atlas
+#> ── Atlas Summary ─────────────────────────────────────────── 
+#> 
+#> ❯ Name:   ASEG
+#> ❯ Model:  FreeSurferASEG [volume]
+#> ❯ Space:  MNI152NLin6Asym
+#> ❯ Source: bundled_extdata
+#> ❯ Provenance: 1 artifacts, 1 history steps
+#> ❯ Dimensions: 193 x 229 x 193
+#> ❯ Regions: 17
+#> 
+#> Structure Distribution:
+#> |- Left hemisphere:     7
+#> |- Right hemisphere:    8
+#> \- Bilateral/Midline:   2
+#> 
+#> ────────────────────────────────────────────────────────────
 ```
 
-The atlas object contains: - `atlas`: The parcellation volume
-(ClusteredNeuroVol) - `labels`: Region names - `ids`: Numeric region
-identifiers - `network`: Network assignment for each region - `hemi`:
-Hemisphere designation (“left” or “right”) - `cmap`: Color map for
-visualization
-
-### Glasser Multi-Modal Parcellation
-
-The Glasser atlas provides 360 cortical areas defined using multi-modal
-MRI data:
+The object contains 17 subcortical and midline regions on an
+`MNI152NLin6Asym` grid. Prefer public accessors over reaching into the
+object when an accessor exists:
 
 ``` r
-# Load the Glasser atlas
-glasser <- get_glasser_atlas()
-print(glasser)
 
-# Check the number of regions
-length(glasser$labels)  # 360 regions
-table(glasser$hemi)     # 180 per hemisphere
+meta <- roi_metadata(atlas)
+meta[c("id", "label", "hemi")]
+#> # A tibble: 17 × 3
+#>       id label       hemi 
+#>    <int> <chr>       <chr>
+#>  1    10 Thalamus    left 
+#>  2    11 Caudate     left 
+#>  3    12 Putamen     left 
+#>  4    13 Pallidum    left 
+#>  5    16 Brainstem   NA   
+#>  6    17 Hippocampus left 
+#>  7    18 Amygdala    left 
+#>  8    26 Accumbens   left 
+#>  9    28 VentralDC   NA   
+#> 10    49 Thalamus    right
+#> 11    50 Caudate     right
+#> 12    51 Putamen     right
+#> 13    52 Pallidum    right
+#> 14    53 Hippocampus right
+#> 15    54 Amygdala    right
+#> 16    58 Accumbens   right
+#> 17    60 VentralDC   right
 ```
 
-### FreeSurfer ASEG Subcortical Atlas
-
-For subcortical structures, use the ASEG (Automatic Segmentation) atlas:
+Use [`list_atlases()`](../reference/list_atlases.md) to discover the
+other registered families without loading them:
 
 ``` r
-# Load ASEG subcortical atlas
-aseg <- get_aseg_atlas()
-print(aseg)
 
-# View available subcortical structures
-head(aseg$labels)
-# [1] "Thalamus" "Caudate" "Putamen" "Pallidum" "Hippocampus" "Amygdala"
+list_atlases()[c("id", "label", "representation", "default_space")]
+#> # A tibble: 16 × 4
+#>    id                         label                 representation default_space
+#>    <chr>                      <chr>                 <chr>          <chr>        
+#>  1 aseg                       FreeSurfer ASEG subc… volume         MNI152NLin6A…
+#>  2 brainnetome                Brainnetome 246-regi… volume         MNI152       
+#>  3 glasser                    Glasser HCP-MMP1.0 (… volume         MNI152NLin20…
+#>  4 glasser_surf               Glasser HCP-MMP1.0 (… surface        fsaverage    
+#>  5 harvard_oxford             Harvard-Oxford corti… volume         MNI152NLin6A…
+#>  6 harvard_oxford_cortical    Harvard-Oxford corti… volume         MNI152NLin6A…
+#>  7 harvard_oxford_subcortical Harvard-Oxford subco… volume         MNI152NLin6A…
+#>  8 hippocampus                Hippocampus (derived… derived        MNI152_custom
+#>  9 julich_brain               Julich-Brain cytoarc… volume         MNI152       
+#> 10 olsen_mtl                  Olsen MTL atlas       volume         MNI152_custom
+#> 11 schaefer                   Schaefer2018 cortica… volume         MNI152NLin6A…
+#> 12 schaefer_surf              Schaefer2018 cortica… surface        fsaverage6   
+#> 13 subcortical                Subcortical atlases … volume         MNI152NLin6A…
+#> 14 visfatlas                  visfAtlas probabilis… volume         MNI152       
+#> 15 visual                     Early visual cortex … derived        MNI152       
+#> 16 wang                       Wang 2015 probabilis… surface        fsaverage
 ```
 
-### Olsen Medial Temporal Lobe Atlas
+## How do you select regions?
 
-For detailed MTL parcellations:
+Use [`filter_atlas()`](../reference/filter_atlas.md) when the selection
+is naturally expressed through metadata. Multiple expressions are
+intersected.
 
 ``` r
-# Load Olsen MTL atlas
-mtl <- get_olsen_mtl()
-print(mtl)
 
-# Get hippocampus-specific parcellation with anterior-posterior divisions
-hipp <- get_hipp_atlas(apsections = 3)  # Divide into 3 A-P sections
+left_atlas <- filter_atlas(atlas, hemi == "left")
+
+roi_metadata(left_atlas)[c("id", "label", "hemi")]
+#> # A tibble: 7 × 3
+#>      id label       hemi 
+#>   <int> <chr>       <chr>
+#> 1    10 Thalamus    left 
+#> 2    11 Caudate     left 
+#> 3    12 Putamen     left 
+#> 4    13 Pallidum    left 
+#> 5    17 Hippocampus left 
+#> 6    18 Amygdala    left 
+#> 7    26 Accumbens   left
 ```
 
-## Resampling Atlases to Different Spaces
+The result is still an atlas, now containing only the seven selected
+regions. Excluded voxels are unlabelled; region IDs are preserved.
 
-Often you need atlases in a specific space or resolution. The `resample`
-function handles this:
+Atlas-level subsetting currently applies to volume atlases. For a
+`surfatlas`, both [`filter_atlas()`](../reference/filter_atlas.md) and
+[`sub_atlas()`](../reference/sub_atlas.md) fail with a typed
+unsupported-operation error. Use [`get_roi()`](../reference/get_roi.md)
+to extract labelled surface ROIs instead.
+
+[`get_roi()`](../reference/get_roi.md) answers a different question: it
+extracts the voxel set belonging to a named region. Labels repeat across
+hemispheres, so specify `hemi` when you need one side.
 
 ``` r
-# Define a target space (e.g., 2mm isotropic)
-target_space <- neuroim2::NeuroSpace(
-  dim = c(91, 109, 91),
-  spacing = c(2, 2, 2),
-  origin = c(-90, -126, -72)
+
+hippocampus <- get_roi(atlas, label = "Hippocampus", hemi = "left")
+hippocampus
+#> $Hippocampus
+#> <ROIVol> [5990 voxels] 
+#>   Coords        : 5990 x 3
+#>   Range         : [17.000, 17.000]
+```
+
+The return value is a named list because one query can legitimately
+return several ROIs. Here it contains one
+[`neuroim2::ROIVol`](https://bbuchsbaum.github.io/neuroim2/reference/ROIVol.html).
+
+## How do you summarise an image by parcel?
+
+The atlas and image must describe the same voxel grid. To make that
+contract visible, this example constructs a deterministic left-to-right
+gradient in the atlas space. Replace `image` with a `NeuroVol` read from
+your own analysis once you have checked its space and dimensions.
+
+``` r
+
+atlas_space <- neuroim2::space(atlas$atlas)
+atlas_dim <- dim(atlas$atlas)
+
+x_gradient <- array(
+  rep(seq_len(atlas_dim[1]), atlas_dim[2] * atlas_dim[3]),
+  dim = atlas_dim
 )
+x_gradient <- as.numeric(scale(x_gradient))
+x_gradient <- array(x_gradient, dim = atlas_dim)
 
-# Resample atlas to target space
-atlas_2mm <- resample(atlas_200_7$atlas, target_space)
+image <- neuroim2::NeuroVol(x_gradient, atlas_space)
+```
 
-# Or specify the space when loading
-atlas_in_space <- get_schaefer_atlas(
-  parcels = "200", 
-  networks = "7",
-  outspace = target_space
+[`reduce_atlas()`](../reference/reduce_atlas.md) applies a statistic
+within every labelled parcel. A 3D image returns a long tibble by
+default.
+
+``` r
+
+parcel_summary <- reduce_atlas(atlas, image, mean)
+parcel_summary
+#> # A tibble: 17 × 2
+#>    region         value
+#>    <chr>          <dbl>
+#>  1 Thalamus    -0.216  
+#>  2 Caudate     -0.236  
+#>  3 Putamen     -0.478  
+#>  4 Pallidum    -0.350  
+#>  5 Brainstem   -0.00268
+#>  6 Hippocampus -0.468  
+#>  7 Amygdala    -0.420  
+#>  8 Accumbens   -0.137  
+#>  9 VentralDC   -0.175  
+#> 10 Thalamus     0.215  
+#> 11 Caudate      0.230  
+#> 12 Putamen      0.472  
+#> 13 Pallidum     0.347  
+#> 14 Hippocampus  0.471  
+#> 15 Amygdala     0.410  
+#> 16 Accumbens    0.128  
+#> 17 VentralDC    0.181
+```
+
+The `region` column uses the atlas’s full region labels. The values are
+finite and vary across parcels because the input image varies in space.
+
+## What does `map_atlas()` return?
+
+[`map_atlas()`](../reference/map_atlas.md) pairs one value per region
+with the atlas’s labels and hemispheres. It returns a tibble; it does
+**not** mutate the atlas or create a new surface object.
+
+``` r
+
+mapped_values <- map_atlas(atlas, parcel_summary$value)
+mapped_values
+#> # A tibble: 17 × 4
+#>    statistic label       region      hemi 
+#>        <dbl> <chr>       <chr>       <chr>
+#>  1  -0.216   Thalamus    Thalamus    left 
+#>  2  -0.236   Caudate     Caudate     left 
+#>  3  -0.478   Putamen     Putamen     left 
+#>  4  -0.350   Pallidum    Pallidum    left 
+#>  5  -0.00268 Brainstem   Brainstem   NA   
+#>  6  -0.468   Hippocampus Hippocampus left 
+#>  7  -0.420   Amygdala    Amygdala    left 
+#>  8  -0.137   Accumbens   Accumbens   left 
+#>  9  -0.175   VentralDC   VentralDC   NA   
+#> 10   0.215   Thalamus    Thalamus    right
+#> 11   0.230   Caudate     Caudate     right
+#> 12   0.472   Putamen     Putamen     right
+#> 13   0.347   Pallidum    Pallidum    right
+#> 14   0.471   Hippocampus Hippocampus right
+#> 15   0.410   Amygdala    Amygdala    right
+#> 16   0.128   Accumbens   Accumbens   right
+#> 17   0.181   VentralDC   VentralDC   right
+```
+
+This table is useful for reporting or aggregation because it keeps each
+value beside its label and hemisphere. Here we make the midline group
+explicit and then compute a hemisphere-level summary:
+
+``` r
+
+mapped_values$hemi[is.na(mapped_values$hemi)] <- "midline"
+hemisphere_summary <- stats::aggregate(
+  statistic ~ hemi,
+  data = mapped_values,
+  FUN = mean
 )
+hemisphere_summary
+#>      hemi   statistic
+#> 1    left -0.32933258
+#> 2 midline -0.08891959
+#> 3   right  0.30673587
 ```
 
-You can also use TemplateFlow space identifiers:
+The left/right sign difference is an executable check on the orientation
+of our synthetic gradient, not a claim about brain organisation.
+
+## How do you inspect the atlas spatially?
+
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) renders a
+volume atlas with one discrete colour per region. Use a montage to see
+coverage across slices or `view = "ortho"` for three intersecting
+planes.
 
 ``` r
-# Resample to MNI152NLin2009cAsym space at 2mm
-atlas_mni <- get_schaefer_atlas(
-  parcels = "200",
-  networks = "7", 
-  outspace = "MNI152NLin2009cAsym",  # TemplateFlow space ID
-  resolution = "2"
+
+plot(atlas, nslices = 6)
+```
+
+![Axial montage of the bundled FreeSurfer ASEG atlas, showing discrete
+subcortical and midline regions in distinct colours across six
+slices.](neuroatlas-overview_files/figure-html/plot-atlas-1.png)
+
+For a cortical `surfatlas`, pass one value per region directly to
+[`plot_brain()`](../reference/plot_brain.md). The surface articles
+develop that separate object flow. Verify region IDs rather than
+assuming unrelated volume and surface products align by shape or region
+count.
+
+## When is resampling safe?
+
+Resampling changes a voxel grid. It does not, by itself, establish
+anatomical correspondence between different templates.
+
+- Within one template space, nearest-neighbour resampling is appropriate
+  for discrete atlas labels when you need a different resolution or
+  grid.
+- Between template spaces, use a validated spatial transform. An affine
+  grid reslice is not a substitute for a nonlinear template-to-template
+  warp.
+
+The transform planner makes the distinction explicit:
+
+``` r
+
+atlas_transform_plan(
+  "MNI152NLin6Asym",
+  "MNI152NLin2009cAsym",
+  data_type = "voxel"
 )
+#> <atlas_transform_plan>
+#>   from_space: MNI152NLin6Asym 
+#>   to_space: MNI152NLin2009cAsym 
+#>   n_steps: 1 
+#>   status: planned 
+#>   confidence: high 
+#>   warnings: Plan includes unimplemented/planned transform step(s).
 ```
 
-## Working with Regions of Interest
-
-### Extracting Specific ROIs
-
-Extract individual regions by label or ID:
-
-``` r
-# Extract hippocampus from ASEG atlas
-hippocampus <- get_roi(aseg, label = "Hippocampus")
-
-# Extract by numeric ID
-thalamus <- get_roi(aseg, id = 1)
-
-# Extract multiple regions
-subcortical <- get_roi(aseg, label = c("Hippocampus", "Amygdala", "Thalamus"))
-```
-
-### Reducing Data by Atlas Regions
-
-Use `reduce_atlas` to summarize neuroimaging data within atlas regions:
-
-``` r
-# Create example brain data
-brain_data <- neuroim2::NeuroVol(
-  rnorm(prod(dim(atlas_200_7$atlas))), 
-  space = neuroim2::space(atlas_200_7$atlas)
-)
-
-# Calculate mean values within each region
-region_means <- reduce_atlas(atlas_200_7, brain_data, mean)
-print(head(region_means))
-
-# Calculate other statistics
-region_sds <- reduce_atlas(atlas_200_7, brain_data, sd, na.rm = TRUE)
-region_max <- reduce_atlas(atlas_200_7, brain_data, max)
-
-# Custom function
-region_robust_mean <- reduce_atlas(
-  atlas_200_7, 
-  brain_data, 
-  function(x) mean(x, trim = 0.1)
-)
-```
-
-### Mapping Values to Atlas Regions
-
-Map statistical values back onto atlas regions for visualization:
-
-``` r
-# Simulate some statistical values for each region
-n_regions <- length(atlas_200_7$labels)
-t_values <- rnorm(n_regions, mean = 0, sd = 2)
-
-# Map values to atlas (threshold at ±1.96)
-atlas_mapped <- map_atlas(
-  atlas_200_7, 
-  vals = t_values, 
-  thresh = c(1.96, Inf)  # Only show |t| > 1.96
-)
-
-# For Glasser atlas
-glasser_vals <- rnorm(360)
-glasser_mapped <- map_atlas(glasser, glasser_vals, thresh = c(2, 5))
-```
-
-## Visualization
-
-### Using ggseg for 2D Brain Plots
-
-The package integrates with ggseg for publication-quality
-visualizations:
-
-``` r
-# Visualize Schaefer atlas with random values
-vals <- rnorm(200)
-ggseg_schaefer(
-  atlas_200_7, 
-  vals = vals,
-  thresh = c(-2, 2),     # Threshold values
-  palette = "RdBu",      # Color palette
-  interactive = TRUE     # Interactive plot with tooltips
-)
-
-# Visualize Glasser atlas
-plot(glasser, vals = rnorm(360), thresh = c(-1, 1))
-```
-
-### Interactive 3D Visualization (Glasser)
-
-For the Glasser atlas, use the echarts-based 3D visualization:
-
-``` r
-# Create random data for visualization
-glasser_data <- data.frame(
-  label = glasser$labels,
-  value = rnorm(360, sd = 2)
-)
-
-# Create interactive 3D plot
-plot_glasser(vals = glasser_data, value_col = "value")
-
-# Uniform coloring (no data)
-plot_glasser()  # All regions colored uniformly
-```
-
-## Combining and Dilating Atlases
-
-### Merging Multiple Atlases
-
-Combine atlases for comprehensive coverage:
-
-``` r
-# Combine cortical and subcortical atlases
-cortical <- get_schaefer_atlas(parcels = "100", networks = "7")
-subcortical <- get_aseg_atlas()
-
-# Ensure same space
-subcortical_resampled <- get_aseg_atlas(outspace = neuroim2::space(cortical$atlas))
-
-# Merge atlases
-combined <- merge_atlases(cortical, subcortical_resampled)
-print(combined)
-```
-
-### Dilating Atlas Parcels
-
-Fill gaps between parcels using dilation:
-
-``` r
-# Dilate parcels to fill gaps
-dilated <- dilate_atlas(
-  atlas = cortical,
-  mask = "MNI152NLin2009cAsym",  # Use standard brain mask
-  radius = 2,                      # Dilation radius in voxels
-  maxn = 20                        # Max neighbors to consider
-)
-
-# Use custom mask
-brain_mask <- get_template(
-  space = "MNI152NLin2009cAsym",
-  variant = "mask",
-  resolution = "1"
-)
-dilated_custom <- dilate_atlas(cortical, mask = brain_mask, radius = 3)
-```
-
-Note: When fetching masks from TemplateFlow, `variant = "mask"` resolves
-the correct combination of `desc` and `suffix` (typically
-`desc = "brain"`, `suffix = "mask"`), so you do not need to set `desc`
-explicitly.
-
-## Surface-Based Atlases
-
-Work with surface-based versions of atlases using neurosurf
-`NeuroSurface` objects:
-
-``` r
-# Get Schaefer atlas on fsaverage6 surface (mesh + labels)
-surf_atlas <- schaefer_surf(
-  parcels  = 400,
-  networks = 17,
-  space    = "fsaverage6",
-  surf     = "inflated"  # "inflated", "white", or "pial"
-)
-
-# Access hemisphere meshes with vertex-wise labels
-lh_surface <- surf_atlas$lh_atlas
-rh_surface <- surf_atlas$rh_atlas
-
-# Surface atlases integrate with the neurosurf package
-# for downstream surface-based analyses and visualization
-```
-
-You can obtain a similar mesh-plus-label structure for the Glasser
-MMP1.0 parcellation projected to fsaverage:
-
-``` r
-glasser_surf_atlas <- glasser_surf(
-  space = "fsaverage",
-  surf  = "pial"
-)
-
-lh_glasser <- glasser_surf_atlas$lh_atlas
-rh_glasser <- glasser_surf_atlas$rh_atlas
-```
-
-## Common Workflows
-
-### ROI-Based Analysis Pipeline
-
-``` r
-# 1. Load atlas
-atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
-
-# 2. Load your brain data
-# brain_data <- neuroim2::read_vol("my_statistical_map.nii.gz")
-
-# 3. Extract values by region
-roi_values <- reduce_atlas(atlas, brain_data, mean)
-
-# 4. Statistical analysis
-# Identify significant regions
-sig_regions <- roi_values$value[abs(roi_values$value) > 2]
-
-# 5. Visualize results
-viz_vals <- rep(0, length(atlas$labels))
-viz_vals[abs(roi_values$value) > 2] <- roi_values$value[abs(roi_values$value) > 2]
-ggseg_schaefer(atlas, vals = viz_vals, interactive = TRUE)
-```
-
-### Multi-Atlas Comparison
-
-``` r
-# Compare parcellations at different resolutions
-atlas_100 <- sy_100_7()
-atlas_200 <- sy_200_7() 
-atlas_400 <- sy_400_7()
-
-# Extract same data with different parcellations
-values_100 <- reduce_atlas(atlas_100, brain_data, mean)
-values_200 <- reduce_atlas(atlas_200, brain_data, mean)
-values_400 <- reduce_atlas(atlas_400, brain_data, mean)
-
-# Compare results across resolutions
-# Higher resolution captures more spatial detail
-```
-
-### Network-Based Analysis
-
-``` r
-# Analyze by functional network
-atlas <- get_schaefer_atlas(parcels = "200", networks = "17")
-
-# Extract values
-roi_values <- reduce_atlas(atlas, brain_data, mean)
-
-# Add network information
-roi_values$network <- atlas$network[match(roi_values$region_id, atlas$ids)]
-
-# Summarize by network
-library(dplyr)
-network_summary <- roi_values %>%
-  group_by(network) %>%
-  summarise(
-    mean_value = mean(value),
-    sd_value = sd(value),
-    n_regions = n()
-  )
-
-print(network_summary)
-```
-
-## Tips and Best Practices
-
-1.  **Space Consistency**: Always ensure your atlas and data are in the
-    same space before analysis
-2.  **Resolution Choice**: Higher parcellation counts provide more
-    spatial detail but may reduce statistical power
-3.  **Visualization**: Use `interactive = TRUE` for exploratory
-    analysis, `FALSE` for publication figures
-4.  **Caching**: Atlas files are cached locally after first download to
-    speed up subsequent use
-5.  **Memory**: Large atlases at high resolution can be
-    memory-intensive; consider downsampling if needed
-
-## Summary
-
-The `neuroatlas` package provides a comprehensive toolkit for
-neuroimaging atlas work:
-
-- **Unified Interface**: Consistent functions across different atlases
-- **Flexible Options**: Multiple parcellation schemes and resolutions
-- **Integration**: Works seamlessly with neuroim2, ggseg, and
-  TemplateFlow
-- **Visualization**: Both 2D and 3D options for different atlases
-- **Analysis Ready**: Built-in functions for ROI extraction and data
-  reduction
-
-For more advanced usage, see the TemplateFlow integration vignette and
-the package documentation.
+At the time this article was built, that route is recorded as `planned`,
+not available. Do not interpret `outspace = "MNI152NLin2009cAsym"` as a
+certified nonlinear transformation until the plan reports an available
+backend.
+
+## Where should you go next?
+
+You now have the package’s central path:
+
+`atlas` + compatible `NeuroVol` -\> regional tibble -\> analysis or
+volume plot.
+
+Continue with:
+
+1.  [`vignette("atlas-visualization")`](../articles/atlas-visualization.md)
+    for volume figures and ROI colours.
+2.  [`vignette("surface-parcellations")`](../articles/surface-parcellations.md)
+    for the surface object model and parcel-level values.
+3.  [`vignette("surface-panels")`](../articles/surface-panels.md) for
+    publication-style comparison figures.
+4.  [`vignette("working-with-templateflow")`](../articles/working-with-templateflow.md)
+    when you need external template assets and understand their space
+    contract.
+
+The dilation and Wang visual-cortex articles are specialist workflows.
+They are not prerequisites for ordinary ROI analysis.

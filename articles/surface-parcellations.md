@@ -1,342 +1,219 @@
 # Surface Parcellations with neurosurf
 
-## What this vignette covers
+A surface parcellation answers a simple-looking question: *which
+cortical parcel owns each mesh vertex?* The answer involves three
+aligned pieces: surface geometry, one integer label per vertex, and
+region metadata. This article shows how `neuroatlas` keeps those pieces
+together and how to attach one statistic per parcel without changing the
+atlas.
 
-This guide focuses on loading **surface parcellations** as actual meshes
-(`neurosurf::LabeledNeuroSurface`)—not ggseg flats. We cover:
+The first surface-atlas call may download annotation files. For that
+reason, network-backed chunks are displayed but not run during package
+builds. Their outputs are real committed figures, generated from the
+code shown here.
 
-- Discovering available surface templates in TemplateFlow
-- Schaefer on fsaverage6 (packaged geometry)
-- Schaefer on fsaverage5/fsaverage (via TemplateFlow, when available)
-- Glasser MMP1.0 (via TemplateFlow, when available)
-- Loading raw surface geometry from TemplateFlow
-- Downloading surfaces to a local folder
-- What files are fetched, what the `data` slot contains, and how labels
-  map.
-- Minimal patterns to attach your own per-vertex values.
+## What is a surface atlas?
 
-## Discovering available surface templates
+[`schaefer_surf()`](../reference/schaefer_surf.md) returns a
+`surfatlas`. Its two labelled surfaces share one region catalogue:
 
-Before loading surfaces, you can query what’s available in TemplateFlow:
+| Object | Contents | Cardinality |
+|----|----|----|
+| `atl$lh_atlas` | left geometry plus an integer label at every vertex | vertices |
+| `atl$rh_atlas` | right geometry plus an integer label at every vertex | vertices |
+| `atl$ids`, `atl$labels`, `atl$hemi` | region identity and metadata | parcels |
 
-``` r
-# Find surface-related template spaces
-tflow_spaces(pattern = "fs")
-#> [1] "fsLR"      "fsaverage"
-
-# List available fsLR surfaces
-tflow_files("fsLR", query_args = list(hemi = "L"))
-
-# Filter by specific density and surface type
-tflow_files("fsLR", query_args = list(
-  hemi = "L",
-  density = "32k",
-  suffix = "midthickness"
-))
-
-# List fsaverage surfaces at a specific resolution (e.g., fsaverage6)
-tflow_files("fsaverage", query_args = list(
-  hemi = "L",
-  resolution = "06"  # fsaverage6
-))
-```
-
-Common query parameters for surfaces: - `hemi`: “L” or “R” - `density`:
-“32k”, “164k” (for fsLR) - `resolution`: “06” (fsaverage6), “05”
-(fsaverage5) - `suffix`: “pial”, “white”, “inflated”, “midthickness”,
-“sphere”
-
-## Schaefer surface atlases
+Load a 200-parcel Schaefer atlas on the bundled `fsaverage6` geometry
+like this:
 
 ``` r
-# 200 parcels, 7 networks, fsaverage6 inflated (packaged geometry, no TF needed)
-atl <- schaefer_surf(
-  parcels  = 200,
-  networks = 7,
-  space    = "fsaverage6",
-  surf     = "inflated"
-)
-```
 
-Returned structure:
-
-- `atl$lh_atlas`, `atl$rh_atlas`: `LabeledNeuroSurface` objects.
-- `slot(..., "data")`: integer parcel IDs per vertex.
-- `atl$labels` / `atl$orig_labels`: name lookups; `atl$network`: network
-  per ID.
-
-### Using TemplateFlow spaces (when available)
-
-Note: TemplateFlow surface support requires the `fsaverage` template to
-be available in your TemplateFlow installation. As of this writing,
-surface templates may have limited availability. Use `fsaverage6`
-(above) for reliable access to Schaefer atlases.
-
-``` r
-# fsaverage5 white surface; uses TemplateFlow geometry (if available)
-atl_tf <- schaefer_surf(
-  parcels  = 400,
-  networks = 17,
-  space    = "fsaverage5",
-  surf     = "white"
-)
-```
-
-If TemplateFlow surfaces are available, this uses the same labels/data
-layout as above.
-
-### Attaching your own values
-
-``` r
-vals <- rnorm(length(atl$ids))        # one value per parcel
-mapped <- map_atlas(atl, vals)        # returns LabeledNeuroSurface per hemi with data filled
-```
-
-[`map_atlas()`](../reference/map_atlas.md) writes your parcel values
-into the `data` slot of each hemisphere surface.
-
-## Glasser MMP1.0 surface atlas (when available)
-
-Note: Like Schaefer TemplateFlow surfaces, Glasser surface support
-requires the `fsaverage` template in TemplateFlow. Check availability
-before using.
-
-``` r
-# Requires fsaverage template in TemplateFlow
-glas <- glasser_surf(space = "fsaverage", surf = "pial")
-
-slot(glas$lh_atlas, "data")[1:5]  # parcel IDs
-glas$labels[1:5]                  # names for those IDs
-```
-
-If available, geometry comes from TemplateFlow (fsaverage
-pial/white/inflated/midthickness); labels come from the HCP-MMP1.0
-fsaverage annotations published on Figshare as the “HCP-MMP1_0 projected
-on fsaverage” dataset (ID 3498446; DOI: 10.6084/m9.figshare.3498446).
-The `data` vector length equals the vertex count of the mesh; each entry
-is the parcel ID at that vertex.
-
-## What’s in the `data` slot?
-
-- Schaefer / Glasser surface atlases: integer parcel IDs per vertex.
-- If you construct a `NeuroSurface` yourself (e.g., from
-  [`load_surface_template()`](../reference/load_surface_template.md)),
-  you supply the per-vertex numeric values.
-
-## Saving / reusing
-
-``` r
-saveRDS(atl, "schaefer200_7_fs6_inflated.rds")
-# reload later
-atl2 <- readRDS("schaefer200_7_fs6_inflated.rds")
-```
-
-### Sanity check: parcel surface renders
-
-We snapshot a labeled Schaefer surface to verify geometry+labels load.
-Runs only when TemplateFlow is available (for non-packaged spaces).
-
-``` r
-dir.create("figures", showWarnings = FALSE)
-png_path <- file.path("figures", "schaefer200_fs6_L_inflated.png")
+library(neuroatlas)
 
 atl <- schaefer_surf(
-  parcels  = 200,
+  parcels = 200,
   networks = 7,
-  space    = "fsaverage6",  # packaged geometry (no TF), keeps it fast
-  surf     = "inflated"
+  space = "fsaverage6",
+  surf = "inflated"
 )
 
-geom_l <- neurosurf::geometry(atl$lh_atlas)
-neurosurf::snapshot_surface(geom_l, file = png_path)
-png_path
+class(atl)
+class(atl$lh_atlas)
 ```
 
-If the image renders, the parcellated surface is displayable.
+The mesh geometry is bundled, while the Schaefer annotation is
+downloaded and cached on first use. Annotations supply the vertex
+labels; geometry alone is not a parcellation.
 
-## Loading raw surface geometry from TemplateFlow
+## How do you verify geometry and labels?
 
-To load just the surface geometry (without parcellation labels), use
-[`get_surface_template()`](../reference/get_template.md) or
-[`load_surface_template()`](../reference/load_surface_template.md):
+A grey silhouette proves only that a mesh can be projected. A useful
+diagnostic checks topology, label length, and region coverage together:
 
 ``` r
-# Get path to a surface file
-fslr_path <- get_surface_template(
-  template_id = "fsLR",
-  surface_type = "midthickness",
-  hemi = "L",
-  density = "32k"
-)
-print(fslr_path)
 
-# Load as a neurosurf SurfaceGeometry object
-fslr_geom <- load_surface_template(
-  template_id = "fsLR",
-  surface_type = "inflated",
-  hemi = "L",
-  density = "32k"
-)
+lh_geometry <- neurosurf::geometry(atl$lh_atlas)
+lh_labels <- as.integer(atl$lh_atlas@data)
 
-# Load both hemispheres at once
-both_hemi <- load_surface_template(
-  template_id = "fsLR",
-  surface_type = "pial",
-  hemi = "both",
-  density = "32k"
+diagnostic <- c(
+  vertices = nrow(neurosurf::vertices(lh_geometry)),
+  faces = ncol(lh_geometry@mesh$it),
+  vertex_labels = length(lh_labels),
+  labelled_regions = length(unique(lh_labels[lh_labels > 0]))
 )
-# Returns list with $L and $R
+diagnostic
+
+stopifnot(
+  diagnostic[["vertices"]] == diagnostic[["vertex_labels"]],
+  diagnostic[["faces"]] > 0,
+  diagnostic[["labelled_regions"]] == sum(atl$hemi == "left"),
+  all(unique(lh_labels[lh_labels > 0]) %in% atl$ids)
+)
 ```
 
-## Downloading surfaces to a local folder
-
-To copy TemplateFlow surfaces to a local directory:
+The resulting parcellation should look like this, with visible parcel
+boundaries and more than one label colour:
 
 ``` r
-# Get paths to surfaces (automatically downloaded to cache)
-files <- tflow_files("fsLR", query_args = list(hemi = "L", density = "32k"))
 
-# Copy to local folder
-dest_folder <- "~/my_surfaces/fsLR"
-dir.create(dest_folder, recursive = TRUE, showWarnings = FALSE)
-file.copy(files, dest_folder)
-
-# Or use a helper function for bulk downloads
-download_surfaces <- function(space, query_args, dest_folder) {
-  dir.create(dest_folder, recursive = TRUE, showWarnings = FALSE)
-  files <- tflow_files(space, query_args = query_args)
-  if (length(files) > 0) {
-    dest_paths <- file.path(dest_folder, basename(files))
-    file.copy(files, dest_paths, overwrite = TRUE)
-    message("Copied ", length(files), " files to ", dest_folder)
-  }
-  invisible(dest_paths)
-}
-
-# Download all fsLR 32k surfaces
-download_surfaces("fsLR", list(density = "32k"), "~/my_surfaces/fsLR_32k")
+plot_brain(
+  atl,
+  vals = seq(-2.5, 2.5, length.out = length(atl$ids)),
+  views = c("lateral", "medial"),
+  interactive = FALSE,
+  style = "ggseg_like",
+  colorbar = "right",
+  colorbar_title = "Example value",
+  title = "Schaefer-200 (7 networks) on fsaverage6"
+)
 ```
 
-## Common workflows
+![Schaefer 200-parcel atlas on left and right inflated fsaverage6
+surfaces in lateral and medial views. Parcels have distinct
+blue-to-orange values, visible white boundaries, and a vertical
+example-value colorbar.](figures/overview-schaefer-surface.png)
 
-- **Vertex-wise stats:** build your own `NeuroSurface` from
-  [`load_surface_template()`](../reference/load_surface_template.md) and
-  write stats into `data`.
-- **Parcel summaries:** use volumetric data with
-  [`reduce_atlas()`](../reference/reduce_atlas.md) or surface atlases
-  with [`map_atlas()`](../reference/map_atlas.md) to project parcel
-  statistics back onto the mesh for visualization.
+## How do you attach one value per parcel?
 
-## Dense vertex-wise overlays
-
-[`plot_brain()`](../reference/plot_brain.md) supports dense (per-vertex)
-overlays in addition to parcel-level colouring. You can pass a list with
-`lh` and `rh` numeric vectors — one value per vertex — and the result is
-a continuous colour map draped over the cortical surface.
+Keep the atlas and the data conceptually separate. A numeric vector
+supplied to [`plot_brain()`](../reference/plot_brain.md) must have
+exactly one value for every element of `atl$ids`:
 
 ``` r
-atl <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
 
-make_spatial_overlay <- function(atlas_hemi) {
-  verts <- neurosurf::vertices(neurosurf::geometry(atlas_hemi))
-  y <- verts[, 2]
-  z <- verts[, 3]
-  vals <- sin(y / 25) * cos(z / 30)
-  as.numeric(vals)
-}
+parcel_values <- seq(-2, 2, length.out = length(atl$ids))
+stopifnot(length(parcel_values) == length(atl$ids))
 
-ov <- list(
-  lh = make_spatial_overlay(atl$lh_atlas),
-  rh = make_spatial_overlay(atl$rh_atlas)
+plot_brain(
+  atl,
+  vals = parcel_values,
+  views = c("lateral", "medial"),
+  interactive = FALSE,
+  style = "ggseg_like",
+  colorbar = "bottom",
+  colorbar_title = "Standardized effect"
+)
+```
+
+[`map_atlas()`](../reference/map_atlas.md) is the tabular companion to
+this plot. It does **not** mutate the surface or return a labelled mesh:
+
+``` r
+
+mapped <- map_atlas(atl, parcel_values)
+mapped
+
+stopifnot(
+  nrow(mapped) == length(atl$ids),
+  identical(mapped$statistic, parcel_values),
+  identical(mapped$region, atl$labels),
+  identical(mapped$hemi, atl$hemi)
+)
+```
+
+Use the tibble for modelling and reporting; pass the original atlas plus
+the same value vector to [`plot_brain()`](../reference/plot_brain.md)
+for a surface figure.
+
+## How do you extract one surface ROI?
+
+[`get_roi()`](../reference/get_roi.md) selects vertices for one or more
+named regions and returns
+[`neurosurf::ROISurface`](https://bbuchsbaum.github.io/neurosurf/reference/ROISurface.html)
+objects. Labels may occur in both hemispheres, so make the side explicit
+when the question is unilateral:
+
+``` r
+
+region_name <- atl$labels[atl$hemi == "left"][1]
+roi <- get_roi(atl, label = region_name, hemi = "left")
+
+stopifnot(
+  length(roi) == 1L,
+  methods::is(roi[[1]], "ROISurface"),
+  length(roi[[1]]) > 0L
+)
+```
+
+Atlas-level subsetting is currently volume-only.
+`filter_atlas(atl, ...)` and `sub_atlas(atl, ...)` fail clearly for a
+surface atlas; use [`get_roi()`](../reference/get_roi.md) for surface
+regions rather than expecting a smaller `surfatlas`.
+
+## How do you use per-vertex data?
+
+Parcel values and vertex values are different data shapes. For an
+already surface-aligned continuous field, supply one vector per
+hemisphere through `overlay`:
+
+``` r
+
+vertex_values <- list(
+  lh = rep(0, nrow(neurosurf::vertices(
+    neurosurf::geometry(atl$lh_atlas)
+  ))),
+  rh = rep(0, nrow(neurosurf::vertices(
+    neurosurf::geometry(atl$rh_atlas)
+  )))
 )
 
 plot_brain(
   atl,
-  overlay         = ov,
-  overlay_alpha   = 0.7,
-  overlay_palette = "vik",
-  interactive     = FALSE
+  overlay = vertex_values,
+  interactive = FALSE,
+  style = "stat_publication",
+  colorbar = "bottom",
+  overlay_title = "Vertex statistic"
 )
 ```
 
-![](surface-parcellations_files/figure-html/overlay-dense-1.png)
+A `NeuroVol` is not automatically aligned merely because it can be
+sampled. The current [`plot_brain()`](../reference/plot_brain.md) volume
+projection cannot infer template identity from a raw `NeuroVol`, check
+compatibility, or consume a transformed white/pial pair. Passing a
+volume is therefore unchecked caller responsibility and is appropriate
+only when the volume already uses the resolved surface coordinates.
+`fsaverage`, `fsaverage5`, and `fsaverage6` use MNI305 coordinates,
+whereas most modern MNI volumes use MNI152 coordinates; do not project
+the latter directly.
+[`transform_vertices_to_volume()`](../reference/transform_vertices_to_volume.md)
+is useful for coordinate-level calculations, but it does not by itself
+create a [`plot_brain()`](../reference/plot_brain.md) projection
+geometry. A grid reslice does not establish correspondence.
 
-### Automatic NeuroVol projection
+## What about other atlases and templates?
 
-When `overlay` is a `NeuroVol` (e.g. a whole-brain statistical map),
-[`plot_brain()`](../reference/plot_brain.md) automatically projects it
-onto the surface via
-[`neurosurf::vol_to_surf()`](https://rdrr.io/pkg/neurosurf/man/vol_to_surf.html)
-— no manual preprocessing required. Here we build a synthetic volume
-with two positive “activation” blobs over frontal cortex and one
-negative blob over occipital cortex.
+[`glasser_surf()`](../reference/glasser_surf.md) has the same
+`surfatlas` contract, but uses 164k `fsaverage` geometry and downloads
+both geometry and annotations on first use. Raw geometry from
+[`load_surface_template()`](../reference/load_surface_template.md) has
+no atlas labels; the next article explains that distinction in detail.
 
-``` r
-spacing <- c(4, 4, 4)
-origin  <- c(-80, -120, -60)
-dims    <- c(40L, 50L, 40L)
+Continue with:
 
-sp  <- neuroim2::NeuroSpace(dims, spacing = spacing, origin = origin)
-arr <- array(0, dim = dims)
-
-for (i in seq_len(dims[1])) {
-  for (j in seq_len(dims[2])) {
-    for (k in seq_len(dims[3])) {
-      coord <- origin + (c(i, j, k) - 1) * spacing
-      d1 <- sum((coord - c(-20, 30, 40))^2)
-      d2 <- sum((coord - c( 20, 30, 40))^2)
-      d3 <- sum((coord - c(  0,-60, 20))^2)
-      arr[i, j, k] <- 3 * exp(-d1 / 800) +
-                       3 * exp(-d2 / 800) -
-                       2.5 * exp(-d3 / 600)
-    }
-  }
-}
-
-stat_vol <- neuroim2::NeuroVol(arr, sp)
-
-plot_brain(
-  atl,
-  overlay           = stat_vol,
-  overlay_threshold = 0.5,
-  overlay_palette   = "vik",
-  overlay_alpha     = 0.7,
-  interactive       = FALSE
-)
-```
-
-![](surface-parcellations_files/figure-html/overlay-vol-1.png)
-
-In practice you would load a real statistical map instead:
-
-``` r
-stat_vol <- neuroim2::read_vol("my_tstat.nii.gz")
-plot_brain(atl, overlay = stat_vol, overlay_threshold = 2,
-           overlay_palette = "vik", interactive = FALSE)
-```
-
-Two optional parameters control the volume-to-surface projection:
-
-- **`overlay_fun`**: interpolation function — `"avg"` (default), `"nn"`
-  (nearest-neighbour), or `"mode"` (most frequent label).
-- **`overlay_sampling`**: sampling strategy — `"midpoint"` (default,
-  halfway between white and pial), `"normal_line"` (multiple samples
-  along the surface normal), or `"thickness"` (cortical-thickness–aware
-  sampling).
-
-``` r
-plot_brain(
-  atl,
-  overlay          = stat_vol,
-  overlay_fun      = "nn",
-  overlay_sampling = "normal_line",
-  overlay_threshold = 2,
-  interactive       = FALSE
-)
-```
-
-## Notes on dependencies
-
-- fsaverage6 geometry is bundled; other spaces require TemplateFlow.
-- Chunk `eval = FALSE` by default; set to `TRUE` locally with network
-  and TemplateFlow.
+1.  [`vignette("surface-panels")`](../articles/surface-panels.md) for
+    shared legends and multi-map figures.
+2.  [`vignette("surface-templates")`](../articles/surface-templates.md)
+    for paths, geometry, and per-vertex data.
+3.  [`vignette("working-with-templateflow")`](../articles/working-with-templateflow.md)
+    for live asset discovery.

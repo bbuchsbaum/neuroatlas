@@ -45,13 +45,17 @@ voxels in existing parcels.
 
 The dilation process:
 
-- Identifies unassigned voxels within the mask that are adjacent to
-  existing parcels
+- Identifies unassigned voxels that lie within the mask
 
-- For each unassigned voxel, finds nearby assigned voxels within the
-  specified radius
+- For each unassigned voxel, finds assigned voxels within `radius`
+  (Euclidean distance, in voxel units)
 
-- Assigns the unassigned voxel to the nearest parcel
+- Assigns the voxel to a parcel by inverse-distance-weighted voting over
+  those neighbours (up to `maxn` of them)
+
+- Leaves a voxel unassigned when no parcel lies within `radius`, so
+  distant in-mask voxels (e.g. cerebellar grey matter for a cortical
+  atlas) are not absorbed
 
 - Respects mask boundaries to prevent dilation into unwanted regions
 
