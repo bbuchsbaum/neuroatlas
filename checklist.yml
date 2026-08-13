@@ -21,3 +21,4 @@ spelling:
   ignore:
   - .github
   - LICENSE.md
+  - neuroatlas_cheatsheet_v3.md

@@ -20,4 +20,10 @@ jobs:
     permissions:
       issues: write
     steps:
+      - name: Trust checkout in pkgcheck container
+        run: |
+          mkdir -p "$RUNNER_TEMP/_github_home"
+          git config --file "$RUNNER_TEMP/_github_home/.gitconfig" \
+            --add safe.directory /github/workspace
+
       - uses: ropensci-review-tools/pkgcheck-action@main

@@ -4,6 +4,7 @@
 *.gdsheet
 *.gpkg
 *.html
+!vignettes/albers-header.html
 *.mdb
 *.shp*
 *.shx
