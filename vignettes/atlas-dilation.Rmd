@@ -15,6 +15,7 @@ resource_files:
 - albers.js
 - albers-header.html
 - fonts
+
 vignette: |
   %\VignetteIndexEntry{Dilating Atlas Parcels Safely}
   %\VignetteEngine{knitr::rmarkdown}
@@ -48,10 +49,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r albers-classes, echo = FALSE, results = "asis"}
+```{r albers-classes, echo=FALSE, results='asis'}
 cat(sprintf(
   paste0(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");',
     'document.body.classList.add("palette-%s","preset-%s");',
     '});</script>'
   ),
@@ -59,6 +61,7 @@ cat(sprintf(
   params$preset
 ))
 ```
+
 
 A parcellation can leave small gaps between labelled regions. If those gaps
 are valid analysis voxels, regional summaries silently omit them. Dilation can

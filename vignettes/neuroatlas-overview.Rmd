@@ -16,6 +16,7 @@ resource_files:
 - albers-header.html
 - fonts
 - figures
+
 vignette: |
   %\VignetteIndexEntry{Getting Started with neuroatlas}
   %\VignetteEngine{knitr::rmarkdown}
@@ -49,10 +50,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r albers-classes, echo = FALSE, results = "asis"}
+```{r albers-classes, echo=FALSE, results='asis'}
 cat(sprintf(
   paste0(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");',
     'document.body.classList.add("palette-%s","preset-%s");',
     '});</script>'
   ),
@@ -60,6 +62,7 @@ cat(sprintf(
   params$preset
 ))
 ```
+
 
 You have a brain image and want to ask a regional question: *what value does
 this image take in each parcel, region, or hemisphere?* The difficult part is

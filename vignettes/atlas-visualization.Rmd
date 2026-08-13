@@ -42,7 +42,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r albers-classes, echo=FALSE, results='asis', eval=TRUE}
+```{r albers-classes, echo=FALSE, results='asis'}
 cat(sprintf(
   paste0(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
@@ -54,6 +54,7 @@ cat(sprintf(
   params$preset
 ))
 ```
+
 
 
 Every atlas in neuroatlas can be visualised with a single call to `plot()`.

@@ -5,8 +5,7 @@ template:
 articles:
 - title: Start Here
   navbar: ~
-  contents:
-  - neuroatlas-overview
+  contents: neuroatlas-overview
 - title: Core Visual Workflows
   contents:
   - atlas-visualization
@@ -18,5 +17,4 @@ articles:
   - working-with-templateflow
   - atlas-dilation
 - title: Specialist Atlases
-  contents:
-  - wang-visual-cortex
+  contents: wang-visual-cortex

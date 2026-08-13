@@ -185,16 +185,6 @@ plot_brain(
 MIT © Bradley Buchsbaum
 
 <!-- albersdown:theme-note:start -->
-
-## Albers theme
-
-This package uses the albersdown theme. Existing vignette theme hooks
-are replaced so `albers.css` and local `albers.js` render consistently
-on CRAN and GitHub Pages. The palette family is provided via
-`params$family` (default ‘red’). The pkgdown site uses
-`template: { package: albersdown }`. <!-- albersdown:theme-note:end -->
-
-<!-- albersdown:theme-note:start -->
 ## Albers theme
 This package uses the albersdown theme. Existing vignette theme hooks are replaced so `albers.css` and local `albers.js` render consistently on CRAN and GitHub Pages. The defaults are configured via `params$family` and `params$preset` (family = 'red', preset = 'interaction'). The pkgdown site uses `template: { package: albersdown }` together with generated `pkgdown/extra.css` and `pkgdown/extra.js` so the theme is linked and activated on site pages.
 <!-- albersdown:theme-note:end -->
