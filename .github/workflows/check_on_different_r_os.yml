@@ -27,6 +27,7 @@ jobs:
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      RGL_USE_NULL: true
       _R_CHECK_SYSTEM_CLOCK_: false
       RSPM: ${{ matrix.config.rspm }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -40,6 +41,10 @@ jobs:
           extra-repositories: https://inbo.r-universe.dev
 
       - uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Install XQuartz
+        if: runner.os == 'macOS'
+        run: brew install --cask xquartz
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
