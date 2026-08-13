@@ -2045,8 +2045,11 @@ build_surface_polygon_data <- function(surfatlas,
 #' @param fill_alpha Numeric in \code{[0, 1]}. Opacity of parcel fills.
 #'   Lower values can help the shading read more clearly. Default: \code{1}.
 #' @param overlay Vertex-wise overlay or a \code{NeuroVol}.
-#'   If a \code{NeuroVol}, it is automatically projected onto the surface
-#'   using \code{neurosurf::vol_to_surf()}.
+#'   If a \code{NeuroVol}, it is projected onto the surface using
+#'   \code{neurosurf::vol_to_surf()}. A raw \code{NeuroVol} does not carry a
+#'   template-space identifier that this function can enforce, so callers must
+#'   ensure it is already expressed in the coordinates of the resolved white
+#'   and pial surfaces. No cross-coordinate transform is applied here.
 #'   Otherwise, a list with \code{lh} and \code{rh} components (numeric
 #'   vectors matching the vertex count of each hemisphere mesh).
 #' @param overlay_threshold Optional absolute threshold for overlay values
@@ -3174,13 +3177,26 @@ plot_brain <- function(surfatlas,
       direction = "vertical"
     )
   }
-  dummy <- data.frame(x = 1, y = 1, fill = mean(lim))
+  # A single invisible point gives ggplot only one observed fill value. With
+  # explicit limits that can still train an empty guide in some ggplot2/
+  # patchwork combinations, leaving the allocated colorbar panel blank. Train
+  # the scale on both endpoints while keeping the marks themselves invisible.
+  dummy <- data.frame(
+    x = c(1, 1),
+    y = c(1, 1),
+    fill = as.numeric(lim)
+  )
   p <- ggplot2::ggplot(dummy, ggplot2::aes(x = x, y = y, fill = fill)) +
-    ggplot2::geom_point(alpha = 0, show.legend = TRUE) +
+    # A zero-area tile stays invisible in the panel without propagating an
+    # alpha of zero into the guide (which would erase the colorbar as well).
+    ggplot2::geom_tile(width = 0, height = 0, show.legend = TRUE) +
     scico::scale_fill_scico(
       palette = palette, limits = lim, oob = scales::squish,
       name = title,
-      breaks = breaks,
+      # `breaks = NULL` means "draw no breaks" in ggplot2 and suppresses the
+      # guide entirely. Use the scale default unless explicit breaks were
+      # requested (for example, to mark an overlay threshold).
+      breaks = if (is.null(breaks)) ggplot2::waiver() else breaks,
       guide = guide
     ) +
     ggplot2::theme_void() +

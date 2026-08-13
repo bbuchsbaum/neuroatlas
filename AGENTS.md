@@ -73,7 +73,7 @@ R package providing a unified framework for neuroimaging atlases and parcellatio
 - `neurosurf` — Surface-based operations and FreeSurfer annotation reading
 
 ### External
-- `reticulate` — Python bridge for TemplateFlow
+- `templateflow` — Pure-R TemplateFlow query and cache backend
 - `ggseg` / `ggsegSchaefer` / `ggsegGlasser` — Brain visualization
 - `tibble`, `dplyr`, `tidyr` — Data wrangling
 - `rlang` — Tidy evaluation (used in `filter_atlas`)

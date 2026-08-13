@@ -193,16 +193,19 @@ roi_attributes.atlas <- function(x, ...) {
 #'   Multiple conditions are combined with AND.
 #' @param .dots A list of quosures for standard evaluation (advanced use)
 #'
-#' @return A new atlas object of the same class containing only the matching ROIs.
+#' @return A new volume atlas object of the same class containing only the
+#'   matching ROIs.
 #'   The returned atlas has updated \code{ids}, \code{labels}, \code{hemi},
 #'   \code{orig_labels}, \code{cmap}, \code{network} (if present), and
-#'   \code{roi_metadata} fields. The underlying volume/surface data is also subset.
+#'   \code{roi_metadata} fields. The underlying volume data is also subset.
 #'
 #' @details
 #' The filter operation creates a new atlas containing only the specified ROIs.
 #' For volume atlases, voxels belonging to excluded ROIs are set to zero.
 #' ROI IDs are preserved (not renumbered) to maintain consistency with the
 #' original atlas labeling.
+#' Surface-atlas subsetting is not implemented; use \code{get_roi()} to extract
+#' labelled surface regions.
 #'
 #' @examples
 #' \dontrun{
@@ -231,6 +234,19 @@ filter_atlas <- function(x, ..., .dots = NULL) {
 #' @rdname filter_atlas
 #' @export
 filter_atlas.atlas <- function(x, ..., .dots = NULL) {
+  if (inherits(x, "surfatlas")) {
+    cli::cli_abort(
+      c(
+        "{.fn filter_atlas} is not supported for surface atlases.",
+        "i" = paste(
+          "Use {.fn get_roi} to extract labelled surface regions;",
+          "surface-atlas subsetting is not yet implemented."
+        )
+      ),
+      class = c("neuroatlas_error_unsupported", "neuroatlas_error")
+    )
+  }
+
   meta <- roi_metadata(x)
 
   # Capture filter expressions

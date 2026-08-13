@@ -299,7 +299,10 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
       c(
         "Could not obtain fsaverage (164k) surface geometry for the Wang atlas.",
         "i" = "The Wang atlas requires TemplateFlow fsaverage geometry (see {.fn get_surface_template}).",
-        "i" = "Check your TemplateFlow / reticulate setup."
+        "i" = paste(
+          "Check that the pure-R {.pkg templateflow} package is installed",
+          "and that the requested asset is cached or the network is available."
+        )
       ),
       class = c("neuroatlas_error_surface_geometry", "neuroatlas_error")
     )

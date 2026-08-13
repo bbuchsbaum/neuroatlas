@@ -15,6 +15,7 @@ resource_files:
 - albers.js
 - albers-header.html
 - fonts
+- figures
 
 vignette: |
   %\VignetteIndexEntry{Atlas Visualization with Optimal Colours}
@@ -24,15 +25,14 @@ vignette: |
 
 ```{r setup, include = FALSE}
 if (requireNamespace("ragg", quietly = TRUE)) knitr::opts_chunk$set(dev = "ragg_png")
-if (requireNamespace("systemfonts", quietly = TRUE)) albersdown::albers_register_fonts()
+if (requireNamespace("systemfonts", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  albersdown::albers_register_fonts()
+}
 if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 can_eval <- requireNamespace("neuroatlas", quietly = TRUE) &&
             requireNamespace("neuroim2", quietly = TRUE) &&
             requireNamespace("ggplot2", quietly = TRUE)
-can_surface_plot <- can_eval &&
-                    requireNamespace("neurosurf", quietly = TRUE) &&
-                    requireNamespace("patchwork", quietly = TRUE) &&
-                    requireNamespace("scico", quietly = TRUE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -42,7 +42,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r albers-classes, echo=FALSE, results='asis'}
+```{r albers-classes, echo=FALSE, results='asis', eval=TRUE}
 cat(sprintf(
   paste0(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
@@ -56,8 +56,6 @@ cat(sprintf(
 ```
 
 
-## Introduction
-
 Every atlas in neuroatlas can be visualised with a single call to `plot()`.
 Behind the scenes, `plot.atlas()` renders coloured parcels as volumetric
 slices using **neuroim2**'s `plot_montage()` and `plot_ortho()`, with
@@ -69,7 +67,7 @@ library(neuroatlas)
 
 ## Quick Start
 
-```{r quick-montage}
+```{r quick-montage, fig.alt = "Axial montage of the bundled FreeSurfer ASEG atlas, with subcortical and midline regions shown in distinct colours across twelve slices."}
 atlas <- get_aseg_atlas()
 plot(atlas)
 ```
@@ -80,7 +78,7 @@ uses network hues and hemisphere luminance differences.
 
 For a three-plane **orthogonal** view:
 
-```{r quick-ortho}
+```{r quick-ortho, fig.alt = "Orthogonal sagittal, coronal, and axial planes through the bundled ASEG atlas, with each anatomical region in a distinct colour."}
 plot(atlas, view = "ortho")
 ```
 
@@ -92,13 +90,14 @@ a colour legend is genuinely helpful. Pass `legend = TRUE` to add one below a
 montage; labels appearing in both hemispheres are disambiguated with
 `(L)`/`(R)`:
 
-```{r quick-legend, fig.height = 5}
+```{r quick-legend, fig.height = 5, fig.alt = "Axial ASEG montage with a compact region legend below the slices; left and right occurrences of repeated labels are distinguished."}
 plot(atlas, legend = TRUE)   # ASEG has 17 regions
 ```
 
-The legend is capped by `legend_max` (default 30), so it is silently skipped
-for large parcellations; raise `legend_max` to override. It is drawn for the
-montage view (each orthogonal plane shows a different subset of regions).
+The legend is capped by `legend_max` (default 30). A request above that limit
+emits a warning and omits the legend; raise `legend_max` to override. Legends
+are drawn for montage views, not orthogonal views whose planes contain
+different subsets of regions.
 
 ## Colour Algorithms
 
@@ -110,7 +109,7 @@ Pass the `method` argument to `plot()` to switch between them.
 Deterministic and fast. Assigns hues per network with anterior-posterior
 gradients and hemisphere luminance offsets.
 
-```{r rule-hcl}
+```{r rule-hcl, fig.alt = "Eight-slice ASEG montage using deterministic rule-based HCL colours to separate neighbouring anatomical regions."}
 plot(atlas, method = "rule_hcl", nslices = 8)
 ```
 
@@ -120,7 +119,7 @@ Optimises perceptual separation between spatially neighbouring ROIs across
 slice views. Best for publication figures where adjacent parcels must be
 easily distinguished.
 
-```{r maximin}
+```{r maximin, fig.alt = "Eight-slice ASEG montage using maximin colours selected to increase separation between spatially adjacent regions."}
 plot(atlas, method = "maximin_view", nslices = 8)
 ```
 
@@ -141,7 +140,7 @@ plot(schaefer, method = "network_harmony", nslices = 8)
 Projects ROI features to 2D (PCA or UMAP) and maps polar angle to hue,
 yielding globally structured gradients.
 
-```{r embedding}
+```{r embedding, fig.alt = "Eight-slice ASEG montage using colours derived from a two-dimensional embedding of region features."}
 plot(atlas, method = "embedding", nslices = 8)
 ```
 
@@ -152,14 +151,14 @@ region IDs) or as a tibble from `atlas_roi_colors()`.
 
 ### Named vector
 
-```{r custom-named}
+```{r custom-named, fig.alt = "Six-slice ASEG montage using a caller-supplied rainbow colour for each named region ID."}
 my_cols <- setNames(rainbow(length(atlas$ids)), atlas$ids)
 plot(atlas, colors = my_cols, nslices = 6)
 ```
 
 ### Pre-computed tibble
 
-```{r custom-tibble}
+```{r custom-tibble, fig.alt = "Six-slice ASEG montage reusing a precomputed table of maximin region colours."}
 color_tbl <- atlas_roi_colors(atlas, method = "maximin_view")
 head(color_tbl)
 plot(atlas, colors = color_tbl, nslices = 6)
@@ -182,7 +181,7 @@ This tibble can be joined with other atlas metadata for downstream analyses.
 
 Use `nslices` to control how many slices appear in the montage:
 
-```{r nslices}
+```{r nslices, fig.alt = "Compact four-slice ASEG montage demonstrating control of the number of displayed axial sections."}
 plot(atlas, nslices = 4)
 ```
 
@@ -193,46 +192,48 @@ over the static figure layout. You can move the colorbar, add figure
 titles, and replace the default facet labels without assembling the
 figure by hand afterward.
 
-```{r surface-layout, eval = can_surface_plot, fig.width = 8, fig.height = 4.5}
+```{r surface-layout-code, eval = FALSE}
 surf_atl <- schaefer_surf(
-  parcels = 100,
+  parcels = 200,
   networks = 7,
   space = "fsaverage6",
   surf = "inflated"
 )
 
-surf_vals <- seq(-1.5, 1.5, length.out = length(surf_atl$ids))
+surf_vals <- seq(-2, 2, length.out = length(surf_atl$ids))
 
 plot_brain(
   surf_atl,
   vals = surf_vals,
-  views = "lateral",
+  views = c("lateral", "medial"),
   interactive = FALSE,
   style = "ggseg_like",
   colorbar = "bottom",
-  colorbar_title = "Effect size",
-  title = "Schaefer surface map",
-  subtitle = "Static layout controls are built into plot_brain()",
+  colorbar_title = "Standardized effect",
+  title = "Parcel-level summary on fsaverage6",
+  subtitle = "Bottom colorbar plus concise panel labels",
   panel_labels = c(
-    "Left Lateral" = "Left hemisphere",
-    "Right Lateral" = "Right hemisphere"
+    "Left Lateral" = "LH lateral",
+    "Right Lateral" = "RH lateral",
+    "Left Medial" = "LH medial",
+    "Right Medial" = "RH medial"
   )
 )
 ```
 
-Because this example shows only lateral views, simplifying the facet
-labels to "Left hemisphere" and "Right hemisphere" is safe here. For a
-dedicated guide to multi-panel layout, shared legends, and the default
-hemisphere-orientation convention, see
+```{r surface-layout, echo = FALSE, out.width = "100%", fig.alt = "Schaefer parcels on left and right inflated hemispheres in lateral and medial views, coloured by one value per parcel with a horizontal effect-size colorbar."}
+knitr::include_graphics("figures/surface-panel-parcels.png")
+```
+
+Because this example mixes lateral and medial views, each short label retains
+both hemisphere and view. For a dedicated guide to multi-panel layout, shared
+legends, and the default hemisphere-orientation convention, see
 `vignette("surface-panels", package = "neuroatlas")`.
 
-## Existing Visualisation Tools
+## Which entry point should you use?
 
-For flatmap-style cortical visualisations (not volumetric), neuroatlas also
-provides:
-
-- `ggseg_schaefer()` --- ggseg-based Schaefer flatmaps
-- `plot_glasser()` --- Glasser atlas flatmaps
-
-These are complementary to `plot()` and remain available as standalone
-functions.
+Use `plot()` for volume atlases and `plot_brain()` for surface atlases. The
+older ggseg helpers are migration paths: `ggseg_schaefer()` is deprecated and
+`plot_glasser()` has been removed with a stop-level deprecation. New code
+should load a surface atlas with `schaefer_surf()` or `glasser_surf()` and pass
+it to `plot_brain()`.

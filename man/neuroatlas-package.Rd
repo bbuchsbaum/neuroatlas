@@ -52,11 +52,12 @@ rendering.
 
 \section{TemplateFlow Integration}{
 
-Access standardized neuroimaging templates:
+Access standardized neuroimaging templates through the pure-R
+`templateflow` backend:
 \describe{
-  \item{\code{\link{create_templateflow}}}{Initialize TemplateFlow connection}
+  \item{\code{\link{get_template}}}{Fetch a template asset}
   \item{\code{\link{tflow_spaces}}}{List available template spaces}
-  \item{\code{\link{install_templateflow}}}{Install Python TemplateFlow module}
+  \item{\code{\link{tflow_files}}}{Query template assets}
 }
 }
 

@@ -49,7 +49,7 @@ All R source code for the neuroatlas package. Contains S3 class definitions, gen
 
 | File | Description |
 |------|-------------|
-| `template_flow.R` | TemplateFlow Python bridge via reticulate; `get_template()`, `install_templateflow()` |
+| `template_flow.R` | Pure-R TemplateFlow queries; `get_template()`, `tflow_spaces()`, `tflow_files()` |
 | `fsaverage.R` | fsaverage surface template loading |
 | `data-schaefer.R` | Lazy data documentation for bundled Schaefer parcellation data |
 
@@ -79,7 +79,8 @@ All R source code for the neuroatlas package. Contains S3 class definitions, gen
 ### Common Pitfalls
 - `as.matrix()` on S4 objects may not dispatch in test environments — use `neuroim2::values()` instead
 - `%in%` on `ClusteredNeuroVol` objects may fail — convert to array first or use `@clusters`
-- TemplateFlow functions require Python/reticulate setup — always guard with `tryCatch` or `skip_on_cran()`
+- TemplateFlow functions use the pure-R `templateflow` package; guard network
+  downloads with `tryCatch` or `skip_on_cran()`
 
 ## Dependencies
 
@@ -91,7 +92,7 @@ All R source code for the neuroatlas package. Contains S3 class definitions, gen
 ### External
 - `neuroim2` — NeuroVol, NeuroSpace, ClusteredNeuroVol, ClusteredNeuroVec, ROIVol
 - `neurosurf` — `read_freesurfer_annot()` for surface atlas loading
-- `reticulate` — Python interop for TemplateFlow
+- `templateflow` — Pure-R TemplateFlow metadata, query, and cache access
 - `tibble`, `dplyr`, `rlang` — Data manipulation and tidy evaluation
 
 <!-- MANUAL: -->

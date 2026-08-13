@@ -3,14 +3,20 @@ template:
   light-switch: no
   package: albersdown
 articles:
-- title: Getting Started
+- title: Start Here
   navbar: ~
   contents:
   - neuroatlas-overview
+- title: Core Visual Workflows
+  contents:
   - atlas-visualization
-  - atlas-dilation
-  - surface-panels
   - surface-parcellations
+  - surface-panels
+- title: Templates and Spatial Operations
+  contents:
   - surface-templates
-  - wang-visual-cortex
   - working-with-templateflow
+  - atlas-dilation
+- title: Specialist Atlases
+  contents:
+  - wang-visual-cortex

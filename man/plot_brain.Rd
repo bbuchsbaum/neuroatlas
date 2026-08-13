@@ -230,8 +230,11 @@ Higher values concentrate shadows in more oblique regions. Default:
 Lower values can help the shading read more clearly. Default: \code{1}.}
 
 \item{overlay}{Vertex-wise overlay or a \code{NeuroVol}.
-If a \code{NeuroVol}, it is automatically projected onto the surface
-using \code{neurosurf::vol_to_surf()}.
+If a \code{NeuroVol}, it is projected onto the surface using
+\code{neurosurf::vol_to_surf()}. A raw \code{NeuroVol} does not carry a
+template-space identifier that this function can enforce, so callers must
+ensure it is already expressed in the coordinates of the resolved white
+and pial surfaces. No cross-coordinate transform is applied here.
 Otherwise, a list with \code{lh} and \code{rh} components (numeric
 vectors matching the vertex count of each hemisphere mesh).}
 

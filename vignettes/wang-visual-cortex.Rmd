@@ -3,7 +3,7 @@ title: 'Wang Visual Cortex Atlas: Surface and Volume'
 output:
   rmarkdown::html_vignette:
     toc: yes
-    toc_depth: 2.0
+    toc_depth: 2
     css: albers.css
     includes:
       in_header: albers-header.html
@@ -15,7 +15,7 @@ resource_files:
 - albers.js
 - albers-header.html
 - fonts
-
+- figures
 vignette: |
   %\VignetteIndexEntry{Wang Visual Cortex Atlas: Surface and Volume}
   %\VignetteEngine{knitr::rmarkdown}
@@ -23,46 +23,34 @@ vignette: |
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("ragg", quietly = TRUE)) knitr::opts_chunk$set(dev = "ragg_png")
-if (requireNamespace("systemfonts", quietly = TRUE)) albersdown::albers_register_fonts()
+if (requireNamespace("ragg", quietly = TRUE)) {
+  knitr::opts_chunk$set(dev = "ragg_png")
+}
+if (requireNamespace("systemfonts", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  albersdown::albers_register_fonts()
+}
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("albersdown", quietly = TRUE)) {
-  if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
+  ggplot2::theme_set(
+    albersdown::theme_albers(
+      family = params$family,
+      preset = params$preset
+    )
+  )
 }
-
-# Loading the Wang atlas (surface geometry, label overlays) requires a
-# network connection and a working TemplateFlow / reticulate setup, so the
-# heavy chunks are not evaluated during CRAN or offline builds. The code is
-# shown verbatim and is exactly what you would run interactively.
-can_eval <- requireNamespace("neuroatlas", quietly = TRUE)
-
-templateflow_ok <- FALSE
-try({
-  templateflow_ok <- reticulate::py_available(initialize = TRUE) &&
-    reticulate::py_module_available("templateflow")
-}, silent = TRUE)
-
-# Surface rendering needs the geometry (TemplateFlow) plus the plotting stack.
-wang_render <- templateflow_ok &&
-  requireNamespace("neurosurf", quietly = TRUE) &&
-  requireNamespace("ggplot2", quietly = TRUE) &&
-  requireNamespace("scico", quietly = TRUE)
-
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment  = "#>",
-  message  = FALSE,
-  warning  = FALSE,
-  echo     = TRUE,
-  eval     = FALSE  # opt chunks back in individually
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
-```{r albers-classes, echo=FALSE, results='asis'}
+```{r albers-classes, echo = FALSE, results = "asis"}
 cat(sprintf(
   paste0(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
-    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");',
     'document.body.classList.add("palette-%s","preset-%s");',
     '});</script>'
   ),
@@ -71,304 +59,290 @@ cat(sprintf(
 ))
 ```
 
+The Wang et al. (2015) atlas describes 25 retinotopic and functional visual
+areas per hemisphere. `neuroatlas` exposes two related products: a labelled
+`fsaverage` surface atlas and the authors' probabilistic volume distribution.
+They share a region vocabulary, but they are not interchangeable coordinate
+representations.
 
-```{r load, eval = can_eval}
+Network-backed chunks are displayed but not executed during package builds.
+The figures are committed outputs generated from the code shown.
+
+## Which product should you use?
+
+| Scientific question | Loader | Representation |
+|---|---|---|
+| where do areas lie on cortex? | `get_wang_atlas()` | `surfatlas` in `fsaverage` / MNI305 coordinates |
+| what is the maximum-probability voxel label? | `get_wang_prob_atlas(image = "maxprob")` | raw `NeuroVol` pair on the native ProbAtlas grid |
+| what probability does one area have at each voxel? | `get_wang_prob_atlas(image = "probability")` | raw continuous `NeuroVol` objects |
+
+Choose the representation from the analysis, not from which picture is easier
+to make.
+
+## How do you load the native surface atlas?
+
+`get_wang_atlas()` returns 50 regions: the same 25 area names in each
+hemisphere. The default midthickness geometry and label overlays may be
+downloaded and cached on first use.
+
+```{r load-surface, eval = FALSE}
 library(neuroatlas)
+
+wang <- get_wang_atlas(surf = "midthickness")
+meta <- roi_metadata(wang)
+
+stopifnot(
+  inherits(wang, "surfatlas"),
+  length(wang$ids) == 50L,
+  all(table(wang$hemi) == c(left = 25L, right = 25L)),
+  atlas_ref(wang)$template_space == "fsaverage",
+  atlas_ref(wang)$coord_space == "MNI305"
+)
 ```
 
-## The Wang visual topography atlas
-
-The Wang et al. (2015) atlas is a probabilistic map of human visual
-topography: 25 retinotopically- and functionally-defined areas spanning
-early visual cortex (`V1v`, `V1d`, `V2v`, `V2d`, `V3v`, `V3d`, `hV4`), the
-ventral stream (`VO1/2`, `PHC1/2`), the dorsal and lateral streams
-(`V3A`, `V3B`, `LO1/2`, `TO1/2`), the intraparietal sulcus (`IPS0`–`IPS5`,
-`SPL1`), and the frontal eye fields (`FEF`).
-
-The atlas is **surface-native**: it was estimated on the `fsaverage`
-cortical surface, and that is the representation `neuroatlas` returns by
-default. Visual areas tile the folded cortex along the calcarine sulcus and
-the ventral occipitotemporal surface, so a surface rendering is the most
-faithful way to look at them. But you will often need the same areas in a
-**volume (MNI)** to intersect them with fMRI statistics or other volumetric
-data. This vignette shows both: the native surface parcellation rendered
-with `plot_brain()`, and the volumetric maximum-probability maps overlaid on
-an MNI anatomical background with `neuroim2::plot_overlay()`.
-
-> **Heads up.** Loading the **surface** atlas pulls the label overlays from
-> GitHub and the `fsaverage` geometry from TemplateFlow; the **volume** maps
-> are downloaded (once, then cached) from the neuroatlas GitHub release. So the
-> network-backed chunks are shown but not run during package builds. All figures
-> here were generated with exactly the code displayed and committed to the
-> package so they render everywhere; run the code yourself (with a network
-> connection) to reproduce them.
-
-## Loading the surface atlas
-
-`get_wang_atlas()` returns a `surfatlas` object. Like every surface atlas in
-the package it carries one `LabeledNeuroSurface` per hemisphere
-(`lh_atlas` / `rh_atlas`) plus the shared bookkeeping fields (`ids`,
-`labels`, `hemi`, `name`). TemplateFlow does not distribute an *inflated*
-`fsaverage` mesh, so the surface choices are `"midthickness"` (default),
-`"pial"`, and `"white"`.
-
-```{r load-atlas, eval = wang_render}
-atl <- get_wang_atlas(surf = "midthickness")
-atl
-```
-
-The 25 areas appear twice in `labels` — once per hemisphere — so the object
-describes 50 regions in total:
-
-```{r inspect, eval = wang_render}
-length(atl$ids)              # 50: 25 areas x 2 hemispheres
-table(atl$hemi)              # how many per hemisphere
-head(atl$labels, 8)          # V1v, V1d, V2v, ...
-
-class(atl$lh_atlas)          # "LabeledNeuroSurface"
-length(atl$lh_atlas@data)    # one integer label per fsaverage vertex
-
-# Provenance is tracked on every atlas object
-atlas_ref(atl)$family        # "wang"
-```
-
-## Rendering ROIs on the cortical surface
-
-`plot_brain()` projects the parcellation to 2D and draws one polygon per
-area. With no `vals` it colours each area categorically — the natural way to
-see the full map. Visual cortex sits on the occipital pole, so the
-`medial` and `ventral` views are the informative ones (early visual and the
-ventral stream), with `lateral` catching the dorsal/`MT+` cluster.
-
-The Wang atlas labels only a fraction of cortex, so by default the areas
-would float on the page. Pass `background = TRUE` to draw the full cortical
-silhouette as a grey backdrop, placing the areas in anatomical context.
+The medial and ventral views reveal early and ventral visual cortex; lateral
+views show dorsal and lateral areas. `background = TRUE` keeps the unlabelled
+cortex visible as anatomical context.
 
 ```{r surface-parcellation-code, eval = FALSE}
 plot_brain(
-  atl,
-  views       = c("lateral", "medial", "ventral"),
+  wang,
+  views = c("lateral", "medial", "ventral"),
   interactive = FALSE,
-  style       = "ggseg_like",
-  background  = TRUE,   # grey cortex backdrop under the areas
-  title       = "Wang 2015 visual topography (fsaverage, midthickness)"
+  style = "ggseg_like",
+  background = TRUE,
+  title = "Wang 2015 visual topography (fsaverage, midthickness)"
 )
 ```
 
-```{r surface-parcellation-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Wang visual areas on the fsaverage midthickness surface in lateral, medial, and ventral views for both hemispheres. The 25 topographic areas form a coloured cluster at the occipital pole; the rest of cortex is unlabelled. A small separate patch (FEF) appears anteriorly."}
+```{r surface-parcellation, echo = FALSE, out.width = "100%", fig.alt = "Wang visual areas shown on lateral, medial, and ventral views of both fsaverage hemispheres. Coloured visual areas occupy occipital, ventral, and parietal cortex on a light grey anatomical surface."}
 knitr::include_graphics("figures/wang-parcellation.png")
 ```
 
-### Mapping a value onto the areas
+## How do you map area-level values?
 
-To show a per-area quantity — a decoding accuracy, a contrast estimate, an
-eccentricity summary — pass a numeric `vals` vector with one entry per region
-(`length(atl$ids)`). Here we fake an early-to-late visual hierarchy gradient
-just to demonstrate the colour mapping; in practice these are your data.
+Supply one value for every region ID. To pair homologous labels across
+hemispheres, map by label explicitly rather than assuming the two halves share
+an accidental row order:
 
 ```{r surface-values-code, eval = FALSE}
-# Synthetic "response amplitude": one value per area, paired across hemispheres
 set.seed(1)
-area_vals <- rnorm(25)
-vals <- area_vals[match(atl$labels, unique(atl$labels))]
+area_values <- stats::setNames(
+  stats::rnorm(length(unique(wang$labels))),
+  unique(wang$labels)
+)
+values <- unname(area_values[wang$labels])
+
+stopifnot(
+  length(values) == length(wang$ids),
+  identical(
+    values[wang$hemi == "left"],
+    values[wang$hemi == "right"]
+  )
+)
 
 plot_brain(
-  atl,
-  vals           = vals,
-  views          = c("medial", "ventral"),
-  interactive    = FALSE,
-  style          = "ggseg_like",
-  background     = TRUE,
-  palette        = "vik",
-  colorbar       = "bottom",
+  wang,
+  vals = values,
+  views = c("medial", "ventral"),
+  interactive = FALSE,
+  style = "ggseg_like",
+  background = TRUE,
+  palette = "vik",
+  colorbar = "right",
   colorbar_title = "Response (a.u.)",
-  title          = "Per-area values on the Wang atlas"
+  title = "Per-area values on the Wang atlas"
 )
 ```
 
-```{r surface-values-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "A synthetic per-area statistic mapped onto the Wang visual areas with a diverging colour scale; left and right hemispheres are symmetric because values are matched by area label."}
+```{r surface-values, echo = FALSE, out.width = "100%", fig.alt = "Synthetic area-level values mapped symmetrically onto medial and ventral views of the left and right Wang visual atlas, with a blue-to-orange response colorbar."}
 knitr::include_graphics("figures/wang-values.png")
 ```
 
-### Extracting a single area
+`get_roi(wang, label = "hV4")` returns one `ROISurface` per hemisphere. Use
+`hemi = "left"` or `hemi = "right"` when the analysis is unilateral.
 
-`get_roi()` pulls a labelled region off the surface as a
-`neurosurf::ROISurface` — its mesh vertices on the appropriate hemisphere.
-Because each hemisphere is its own mesh, a label present in both yields one ROI
-per hemisphere (`"<label>_left"` / `"<label>_right"`); pass `hemi` to restrict:
+## How do you inspect the volume product safely?
 
-```{r get-roi, eval = wang_render}
-roi <- get_roi(atl, label = "hV4")      # hV4_left and hV4_right
-roi[["hV4_left"]]
+A manifest is side-effect-free. It states the source, requested files, and
+whether those files are already cached:
 
-# Restrict to one hemisphere, or select by id (left 1-25, right 26-50)
-get_roi(atl, label = "V1v", hemi = "left")
-get_roi(atl, id = atl$ids[atl$labels == "hV4" & atl$hemi == "right"])
+```{r volume-manifest}
+library(neuroatlas)
+
+manifest <- get_wang_prob_atlas(
+  image = "maxprob",
+  hemi = "both",
+  path_only = TRUE
+)
+
+manifest$files[c("hemi", "member", "exists")]
 ```
 
-## The volumetric counterpart (MNI)
+Set `path_only = FALSE` to download and read the volumes. The left and right
+label maps must share a grid and must not overlap before they are combined:
 
-The same 25 areas are also available as **volumes** in MNI space: a
-per-hemisphere maximum-probability label volume plus, for each area, a
-continuous probability map. These come from the Wang et al. (2015)
-ProbAtlas_v4 distribution; `neuroatlas` downloads them (~0.7 MB) from its
-GitHub release on first use and caches them, so later calls are offline.
-`get_wang_prob_atlas()` (with the default `path_only = TRUE`) returns a
-manifest without downloading:
+```{r volume-load, eval = FALSE}
+wp <- get_wang_prob_atlas(
+  image = "maxprob",
+  hemi = "both",
+  path_only = FALSE
+)
 
-```{r prob-manifest, eval = can_eval}
-manifest <- get_wang_prob_atlas(image = "maxprob")
-manifest                        # shows the download URL and cache status
-head(manifest$files)
-```
+left <- as.array(wp$volumes$lh)
+right <- as.array(wp$volumes$rh)
 
-Set `path_only = FALSE` to fetch (first time) and read the volumes as
-`NeuroVol` objects:
+stopifnot(
+  identical(dim(left), dim(right)),
+  identical(
+    neuroim2::space(wp$volumes$lh),
+    neuroim2::space(wp$volumes$rh)
+  ),
+  !any(left > 0 & right > 0),
+  all(unique(left[left > 0]) %in% wp$labels$id),
+  all(unique(right[right > 0]) %in% wp$labels$id)
+)
 
-```{r prob-load, eval = FALSE}
-wp <- get_wang_prob_atlas(image = "maxprob", hemi = "both", path_only = FALSE)
-wp$volumes$lh                   # 0 = background, 1..25 = areas
-```
-
-> The volume coding labels areas 12/13 as `MST`/`hMT`; these are the same
-> regions as `TO2`/`TO1` in the surface naming above (the ids match). To use a
-> local copy instead of the download, pass its folder via `prob_dir`.
-
-### Overlaying the areas on an MNI background
-
-With the maximum-probability labels in hand we can paint them on an MNI
-anatomical template. We pull a `T1w` background from TemplateFlow, combine the
-two hemispheres (offsetting the right so it shares the surface atlas's 1–50
-id scheme), resample onto the template grid with nearest-neighbour
-interpolation (preserving integer ids), and overlay with
-`neuroim2::plot_overlay()`.
-
-```{r prob-overlay-code, eval = FALSE}
-# MNI152 anatomical background (1 mm). The ProbAtlas volumes are FSL-MNI; this
-# template shares the dimensions but not the exact affine, so we resample below.
-bg <- get_template("MNI152NLin6Asym", suffix = "T1w", resolution = "1")
-
-wp <- get_wang_prob_atlas(image = "maxprob", hemi = "both", path_only = FALSE)
-
-# Combine hemispheres: left = ids 1..25, right = ids 26..50
-la <- as.array(wp$volumes$lh)
-ra <- as.array(wp$volumes$rh); ra[ra > 0] <- ra[ra > 0] + 25L
-ov <- neuroim2::NeuroVol(la + ra, neuroim2::space(wp$volumes$lh))
-ov <- neuroim2::resample_to(ov, bg, method = "nearest")
-
-neuroim2::plot_overlay(
-  bg, ov,
-  zlevels   = round(seq(58, 118, length.out = 6)),
-  along     = 3L, ncol = 3L,
-  ov_cmap   = "batlow",
-  ov_thresh = 0.5,      # mask the 0 background; show labelled voxels only
-  ov_range  = "data",   # spread the area ids across the colour map
-  ov_alpha  = 0.95,
-  title     = "Wang 2015 maximum-probability visual areas on MNI152"
+right[right > 0] <- right[right > 0] + 25L
+labels <- neuroim2::NeuroVol(
+  left + right,
+  neuroim2::space(wp$volumes$lh)
 )
 ```
 
-```{r prob-overlay-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the Wang 2015 maximum-probability visual areas overlaid on an MNI152 T1-weighted template; each area is a distinct colour, localised to occipital and parietal cortex."}
-knitr::include_graphics("figures/wang-volume.png")
+Render the label map categorically on its **native grid** unless you have a
+validated anatomical reference in that same space. The zero background is
+omitted, and only areas present in the selected slices receive colours:
+
+```{r volume-figure-code, eval = FALSE}
+label_array <- as.array(labels)
+occupied <- which(label_array > 0, arr.ind = TRUE)
+slice_ids <- unique(as.integer(stats::quantile(
+  occupied[, 3],
+  probs = seq(0.08, 0.92, length.out = 6),
+  type = 1
+)))
+
+x_limits <- pmax(
+  1L,
+  pmin(dim(label_array)[1], range(occupied[, 1]) + c(-7L, 7L))
+)
+y_limits <- pmax(
+  1L,
+  pmin(dim(label_array)[2], range(occupied[, 2]) + c(-7L, 7L))
+)
+
+slice_data <- do.call(rbind, lapply(slice_ids, function(z) {
+  index <- which(label_array[, , z] > 0, arr.ind = TRUE)
+  data.frame(
+    x = index[, 1],
+    y = index[, 2],
+    region_id = label_array[cbind(index[, 1], index[, 2], z)],
+    slice = factor(z, levels = slice_ids)
+  )
+}))
+
+region_names <- c(
+  stats::setNames(paste0(wp$labels$label, " (L)"), wp$labels$id),
+  stats::setNames(paste0(wp$labels$label, " (R)"), wp$labels$id + 25L)
+)
+present_ids <- sort(unique(slice_data$region_id))
+region_palette <- stats::setNames(
+  grDevices::hcl.colors(length(present_ids), "Dynamic"),
+  present_ids
+)
+
+wang_figure <- ggplot2::ggplot(
+  slice_data,
+  ggplot2::aes(x, y, fill = factor(region_id))
+) +
+  ggplot2::geom_tile(width = 1, height = 1) +
+  ggplot2::facet_wrap(~slice, ncol = 3, labeller = ggplot2::label_both) +
+  ggplot2::coord_fixed(xlim = x_limits, ylim = y_limits, expand = FALSE) +
+  ggplot2::scale_fill_manual(
+    values = region_palette,
+    labels = region_names[as.character(present_ids)],
+    name = NULL,
+    drop = FALSE
+  ) +
+  ggplot2::labs(
+    title = "Wang 2015 maximum-probability labels",
+    subtitle = "Categorical areas on the native ProbAtlas_v4 voxel grid",
+    caption = paste(
+      "L and R identify hemisphere; numeric label order is not quantitative."
+    )
+  ) +
+  ggplot2::theme_void(base_size = 11) +
+  ggplot2::theme(
+    legend.position = "bottom",
+    legend.text = ggplot2::element_text(size = 6.5),
+    legend.key.size = grid::unit(0.28, "lines"),
+    legend.key.width = grid::unit(0.75, "lines"),
+    legend.box = "horizontal",
+    plot.title = ggplot2::element_text(
+      face = "bold", hjust = 0.5, size = 16
+    ),
+    plot.subtitle = ggplot2::element_text(hjust = 0.5, colour = "grey30"),
+    plot.caption = ggplot2::element_text(hjust = 0.5, colour = "grey35"),
+    strip.text = ggplot2::element_text(face = "bold", size = 10),
+    panel.background = ggplot2::element_rect(
+      fill = "white", colour = "grey85"
+    ),
+    plot.background = ggplot2::element_rect(fill = "white", colour = NA)
+  ) +
+  ggplot2::guides(
+    fill = ggplot2::guide_legend(nrow = 3, byrow = TRUE)
+  )
+
+wang_figure
 ```
 
-`plot_overlay()` also takes `ov_alpha_mode` if you want overlay opacity to
-track the underlying values — see `?neuroim2::plot_overlay`.
+```{r volume-figure, echo = FALSE, out.width = "100%", fig.alt = "Six tightly cropped axial slices through the Wang maximum-probability maps on their native grid. Visual areas present in each slice have categorical colours and left or right hemisphere labels; zero background is white."}
+knitr::include_graphics("figures/wang-volume-native.png")
+```
 
-## A fully automatic volumetric alternative
+This figure deliberately has no unrelated T1 background. Nearest-neighbour
+resampling preserves integer labels on a new grid; it does not prove that an
+FSL-MNI product and a different MNI template are anatomically registered.
 
-If you want visual-cortex ROIs in MNI **without** a manual download, two
-sibling atlases ship as ready-made volume parcellations and fetch
-automatically:
+## What about the other visual-cortex atlases?
 
-- `get_visfatlas()` — Rosenke et al. (2021) functional visual atlas, 33
-  regions in MNI (early visual, `hMT+`, and category-selective patches; note
-  it has no `hV4`).
-- `get_visual_atlas()` — a `V1`–`V5` relabelling of the Julich-Brain visual
-  subset.
-
-Both return standard volume `atlas` objects. To put them on an anatomical
-background, resample onto an MNI `T1w` template and overlay with
-`neuroim2::plot_overlay()` — the same recipe as the Wang maps above.
-
-The Julich-derived early visual atlas can also be rendered directly with the
-atlas `plot()` method:
+`get_visfatlas()` loads the 33-region Rosenke et al. functional visual atlas on
+its distributed 1 mm single-subject MNI grid. Its provenance records alignment
+to MNI colin27. `get_visual_atlas()` derives V1-V5 regions from Julich-Brain.
+Both return ordinary volume `atlas` objects and can be rendered directly:
 
 ```{r visual-atlas-code, eval = FALSE}
-visual <- get_visual_atlas()       # Julich-Brain visual subset, relabelled V1-V5
-plot(visual, nslices = 8, title = "Julich-derived V1-V5 visual atlas")
-```
-
-```{r visual-atlas-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the Julich-Brain visual subset relabelled as V1 through V5, shown as discrete volume atlas regions in MNI space."}
-knitr::include_graphics("figures/visual-atlas-mni.png")
-```
-
-For the larger functional `visfAtlas`, here is the MNI anatomical overlay:
-
-```{r visf-code, eval = FALSE}
-bg   <- get_template("MNI152NLin2009cAsym", suffix = "T1w", resolution = "2")
-visf <- get_visfatlas()                       # 33 regions, MNI (auto-download)
-
-# Densify the ClusteredNeuroVol to labels, then match the template grid
-vol  <- neuroatlas:::.get_atlas_volume(visf)
-ov   <- neuroim2::resample_to(vol, bg, method = "nearest")
-
-neuroim2::plot_overlay(
-  bg, ov,
-  ov_cmap  = "batlow", ov_thresh = 0.5, ov_alpha = 0.95, ov_range = "data",
-  along    = 3L, ncol = 3L,
-  title    = "visfAtlas functional visual areas on MNI152 (axial)"
-)
-```
-
-```{r visf-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the visfAtlas functional visual areas overlaid on an MNI152 T1-weighted template, with each region in a distinct colour, localised to occipitotemporal cortex."}
-knitr::include_graphics("figures/visfatlas-mni.png")
-```
-
-For a quick look without an anatomical backdrop, the volume `atlas` objects
-also work with the package's own `plot()` (montage or orthogonal view with
-automatic discrete ROI colours):
-
-```{r visfatlas-ortho-code, eval = FALSE}
 visf <- get_visfatlas()
+plot(visf, nslices = 8, title = "visfAtlas on its distributed voxel grid")
 
-# Fix the crosshair at the centre of the labelled voxels so all three planes
-# pass through visual cortex.
-plot(visf, view = "ortho", coord = c(91, 54, 74), unit = "index")
+julich_visual <- get_visual_atlas()
+plot(julich_visual, nslices = 8, title = "Julich-derived V1-V5")
 ```
 
-```{r visfatlas-ortho-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Three orthogonal planes through the visfAtlas labels in MNI index space, showing axial, coronal, and sagittal views with discrete ROI colours."}
-knitr::include_graphics("figures/visfatlas-ortho.png")
-```
+Do not resample `visfAtlas` onto `MNI152NLin2009cAsym` and call the result
+aligned: regridding is not a validated colin27-to-MNI2009 nonlinear transform.
+Inspect `atlas_ref()` and the transform plan before any cross-template overlay.
 
-```{r visfatlas-montage-code, eval = FALSE}
-plot(
-  get_visfatlas(),
-  nslices = 8,
-  title = "visfAtlas axial montage"
-)
-```
+## A representation checklist
 
-```{r visfatlas-montage-fig, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Axial montage of the visfAtlas labels rendered directly with plot.atlas and discrete ROI colours."}
-knitr::include_graphics("figures/visfatlas-montage.png")
-```
+Before analysis, record:
 
-## Choosing the right plotting entry point
+1. atlas product and citation;
+2. surface or volume representation;
+3. declared template and coordinate space;
+4. region-ID convention, including hemisphere offsets;
+5. any transform applied, with interpolation method and provenance.
 
-Three representations, three functions — worth keeping straight:
-
-| You have | Object | Plot with |
-|---|---|---|
-| Surface parcellation (`get_wang_atlas()`) | `surfatlas` | `plot_brain()` |
-| Volume *atlas* (`get_visfatlas()`, `get_visual_atlas()`) | `atlas` | `plot()` |
-| Raw label volume (`get_wang_prob_atlas(path_only = FALSE)`) | `NeuroVol` | `neuroim2::plot_overlay()` |
+That record is what makes the surface and volume versions scientifically
+traceable rather than merely visually similar.
 
 ## References
 
 Wang, L., Mruczek, R. E. B., Arcaro, M. J., & Kastner, S. (2015).
 Probabilistic Maps of Visual Topography in Human Cortex. *Cerebral Cortex*,
-25(10), 3911–3931. \doi{10.1093/cercor/bhu277}
+25(10), 3911-3931. \doi{10.1093/cercor/bhu277}
 
 Rosenke, M., van Hoof, R., van den Hurk, J., Grill-Spector, K., & Goebel, R.
 (2021). A Probabilistic Functional Atlas of Human Occipito-Temporal Visual
-Cortex. *Cerebral Cortex*, 31(1), 603–619. \doi{10.1093/cercor/bhaa246}
+Cortex. *Cerebral Cortex*, 31(1), 603-619. \doi{10.1093/cercor/bhaa246}

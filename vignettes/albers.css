@@ -17,7 +17,7 @@
   --bg: #efe7d6;
   --surface: #fbf7ee;
   --surface-strong: #f4eedf;
-  --muted: #7a7264;
+  --muted: #665f53;
   --border: #e0d6c0;
   --code-bg: #fbf7ee;
   --code-fg: #332f28;
@@ -204,7 +204,7 @@ body {
   --surface: #fbf7ee;
   --surface-strong: #f4eedf;
   --ink: #1f1b16;
-  --muted: #7a7264;
+  --muted: #665f53;
   --border: #e0d6c0;
   --code-bg: #fbf7ee;
   --code-fg: #332f28;
@@ -228,7 +228,7 @@ body {
   --surface: #ffffff;
   --surface-strong: #f7f8fa;
   --ink: #15181e;
-  --muted: #7b8494;
+  --muted: #5f6878;
   --border: #e3e6eb;
   --code-bg: #15181e;
   --code-fg: #c9d0dc;
@@ -646,6 +646,14 @@ body:has(> #TOC) > #TOC a:focus-visible {
   }
   body.albers-vignette::before,
   body:has(> #TOC)::before {
+    display: none;
+  }
+
+  /* The flat vignette DOM has no wrapper around the opening paragraphs, so
+     flex ordering would separate later sections from their figures. On phones,
+     keep the body in document order and collapse the navigation by default. */
+  body.albers-vignette > #TOC,
+  body:has(> #TOC) > #TOC {
     display: none;
   }
 }

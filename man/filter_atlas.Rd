@@ -18,10 +18,11 @@ Multiple conditions are combined with AND.}
 \item{.dots}{A list of quosures for standard evaluation (advanced use)}
 }
 \value{
-A new atlas object of the same class containing only the matching ROIs.
+A new volume atlas object of the same class containing only the
+  matching ROIs.
   The returned atlas has updated \code{ids}, \code{labels}, \code{hemi},
   \code{orig_labels}, \code{cmap}, \code{network} (if present), and
-  \code{roi_metadata} fields. The underlying volume/surface data is also subset.
+  \code{roi_metadata} fields. The underlying volume data is also subset.
 }
 \description{
 Subsets an atlas object to include only ROIs matching specified criteria.
@@ -32,6 +33,8 @@ The filter operation creates a new atlas containing only the specified ROIs.
 For volume atlases, voxels belonging to excluded ROIs are set to zero.
 ROI IDs are preserved (not renumbered) to maintain consistency with the
 original atlas labeling.
+Surface-atlas subsetting is not implemented; use \code{get_roi()} to extract
+labelled surface regions.
 }
 \examples{
 \dontrun{

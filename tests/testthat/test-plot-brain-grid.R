@@ -119,7 +119,9 @@ test_that(".make_colorbar_panel returns ggplot", {
   expect_s3_class(cb, "gg")
 
   gt <- ggplot2::ggplotGrob(cb)
-  expect_true(any(grepl("guide-box", gt$layout$name)))
+  guide_index <- which(grepl("guide-box-right", gt$layout$name))
+  expect_length(guide_index, 1L)
+  expect_gt(length(gt$grobs[[guide_index]]$grobs), 0L)
 })
 
 test_that(".make_colorbar_panel supports bottom orientation", {
@@ -134,6 +136,10 @@ test_that(".make_colorbar_panel supports bottom orientation", {
 
   gt <- ggplot2::ggplotGrob(cb)
   expect_true(any(grepl("guide-box", gt$layout$name)))
+
+  guide_index <- which(grepl("guide-box-bottom", gt$layout$name))
+  expect_length(guide_index, 1L)
+  expect_gt(length(gt$grobs[[guide_index]]$grobs), 0L)
 })
 
 test_that("plot_brain_grid passes titles through plot_brain", {

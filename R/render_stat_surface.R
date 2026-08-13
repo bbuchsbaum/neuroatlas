@@ -42,9 +42,25 @@
   metric
 }
 
+.surface_geometry_topology_equal <- function(x, y) {
+  if (!inherits(x, "SurfaceGeometry") || !inherits(y, "SurfaceGeometry")) {
+    return(FALSE)
+  }
+
+  x_vertices <- x@mesh$vb
+  y_vertices <- y@mesh$vb
+  x_faces <- x@mesh$it
+  y_faces <- y@mesh$it
+
+  identical(dim(x_vertices), dim(y_vertices)) &&
+    identical(dim(x_faces), dim(y_faces)) &&
+    identical(unname(x_faces), unname(y_faces))
+}
+
 .resolve_surface_anatomy <- function(surfatlas, hemi, override = NULL,
                                      source = NULL) {
   atlas_hemi <- surfatlas[[paste0(hemi, "_atlas")]]
+  display_geometry <- atlas_hemi@geometry
   n <- length(atlas_hemi@data)
   metric <- .surface_hemi_value(override, hemi) %||%
     .surface_hemi_value(surfatlas$anatomy_metric, hemi)
@@ -52,6 +68,7 @@
     metric_source <- source %||% surfatlas$anatomy_metric_source %||%
       "explicit_sulcal_or_curvature_metric"
     source_surface <- surfatlas$anatomy_metric_surface %||% "declared"
+    topology_verified <- FALSE
   } else {
     pair <- .resolve_overlay_surface_pair(surfatlas, hemi = hemi)
     source_geometry <- pair$white
@@ -70,23 +87,28 @@
     metric <- .compute_surface_curvature_cached(source_geometry, cache_key)
     metric_source <- "computed_mean_curvature"
     source_surface <- "white"
+    topology_verified <- .surface_geometry_topology_equal(
+      source_geometry,
+      display_geometry
+    )
   }
   if (is.null(metric) || !is.numeric(metric) || length(metric) != n) {
     metric <- rep(0, n)
     metric_source <- "neutral_fallback"
     source_surface <- NA_character_
+    topology_verified <- FALSE
   }
   list(metric = as.numeric(metric), provenance = list(
     source = metric_source,
     source_surface = source_surface,
     display_surface = surfatlas$surf_type %||% NA_character_,
-    topology_verified = length(metric) == n,
+    topology_verified = topology_verified && length(metric) == n,
     surface_space = surfatlas$surface_space %||% NA_character_,
     density = surfatlas$density %||% NA_character_,
     hemi = hemi,
     mesh_identity = rlang::hash(list(
-      atlas_hemi@geometry@mesh$vb[1:3, , drop = FALSE],
-      atlas_hemi@geometry@mesh$it
+      display_geometry@mesh$vb[1:3, , drop = FALSE],
+      display_geometry@mesh$it
     ))
   ))
 }

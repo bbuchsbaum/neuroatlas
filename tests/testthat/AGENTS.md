@@ -24,7 +24,7 @@ testthat (edition 3) test suite for the neuroatlas package. Tests cover atlas lo
 | `test-space-transforms.R` | Atlas resampling, outspace resolution, cross-space operations |
 | `test-subcortical-atlases.R` | Subcortical atlas loading and structure |
 | `test-surface-atlases.R` | Surface-based atlas loading (Schaefer/Glasser surfatlas) |
-| `test-templateflow-advanced.R` | TemplateFlow Python bridge integration |
+| `test-templateflow-advanced.R` | Pure-R TemplateFlow query integration |
 
 ## For AI Agents
 
@@ -53,7 +53,8 @@ devtools::load_all(); testthat::test_file(...)      # Correct single-file patter
 ### Common Pitfalls
 - `testthat::test_file()` alone won't find package functions — always `devtools::load_all()` first, or use `devtools::test()`
 - Warnings like "clustered volume only contains 1 partition" from neuroim2 are benign when subsetting to a single cluster
-- TemplateFlow tests may fail without Python/scipy installed — always guard with `skip_on_cran()` or `tryCatch`
+- TemplateFlow tests may require network access or an existing cache — always
+  guard with `skip_on_cran()` or `tryCatch`
 
 ### Adding New Tests
 1. Create `test-{feature}.R` in this directory

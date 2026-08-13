@@ -544,10 +544,21 @@ test_that("CPU backend records mask, anatomy, camera, and legend provenance", {
   expect_identical(prov$mask$lh$source, "toy_cortex_label")
   expect_equal(prov$mask$lh$n_medial_wall, 1)
   expect_identical(prov$anatomy$lh$source, "toy_sulc")
-  expect_true(prov$anatomy$lh$topology_verified)
+  expect_false(prov$anatomy$lh$topology_verified)
   expect_identical(prov$camera$`Left Lateral`$projection,
                    "canonical_orthographic")
   expect_identical(attr(p, "plot_brain_colorbar")$source, "overlay")
+})
+
+test_that("surface topology verification compares face connectivity", {
+  atl <- .make_plot_brain_overlay_test_atlas()
+  display <- atl$lh_atlas@geometry
+
+  expect_true(neuroatlas:::.surface_geometry_topology_equal(display, display))
+
+  changed <- display
+  changed@mesh$it <- changed@mesh$it[, ncol(changed@mesh$it):1, drop = FALSE]
+  expect_false(neuroatlas:::.surface_geometry_topology_equal(display, changed))
 })
 
 test_that("cortex masks never fall back to atlas label zero semantics", {

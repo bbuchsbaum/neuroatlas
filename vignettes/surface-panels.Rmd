@@ -15,6 +15,7 @@ resource_files:
 - albers.js
 - albers-header.html
 - fonts
+- figures
 
 vignette: |
   %\VignetteIndexEntry{Composing Surface Panel Figures}
@@ -24,30 +25,29 @@ vignette: |
 
 ```{r setup, include = FALSE}
 if (requireNamespace("ragg", quietly = TRUE)) knitr::opts_chunk$set(dev = "ragg_png")
-if (requireNamespace("systemfonts", quietly = TRUE)) albersdown::albers_register_fonts()
+if (requireNamespace("systemfonts", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  albersdown::albers_register_fonts()
+}
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("albersdown", quietly = TRUE)) {
-  if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
+  ggplot2::theme_set(
+    albersdown::theme_albers(
+      family = params$family,
+      preset = params$preset
+    )
+  )
 }
-
-can_plot <- requireNamespace("neuroatlas", quietly = TRUE) &&
-  requireNamespace("ggplot2", quietly = TRUE) &&
-  requireNamespace("neurosurf", quietly = TRUE)
-
-can_layout <- can_plot &&
-  requireNamespace("patchwork", quietly = TRUE) &&
-  requireNamespace("scico", quietly = TRUE)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   message = FALSE,
-  warning = FALSE,
-  eval = can_layout
+  warning = FALSE
 )
 ```
 
-```{r albers-classes, echo=FALSE, results='asis'}
+```{r albers-classes, echo=FALSE, results='asis', eval=TRUE}
 cat(sprintf(
   paste0(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
@@ -81,11 +81,12 @@ parcel values instead of building the figure by hand after plotting.
 ## What do you need before you start?
 
 For a parcel figure, you need a surface atlas and one numeric value per parcel.
-For a continuous figure, you use the same atlas to supply geometry, cortex
-mask, and anatomical provenance, then provide one value per surface vertex (or
-a `NeuroVol` that can be projected to the surface).
+For a continuous figure, use the same atlas to supply geometry, cortex mask,
+and anatomical provenance, then provide one value per surface vertex. The API
+also accepts a `NeuroVol`, but does not currently enforce that volume's
+coordinate-space compatibility; the limitation is made explicit below.
 
-```{r atlas-and-values}
+```{r atlas-and-values, eval = FALSE}
 atl <- schaefer_surf(
   parcels = 200,
   networks = 7,
@@ -96,10 +97,14 @@ atl <- schaefer_surf(
 parcel_vals <- seq(-2, 2, length.out = length(atl$ids))
 ```
 
+The first call may download and cache Schaefer annotation files. The figures
+below were generated from that exact configuration and are committed so the
+article remains useful during an offline build.
+
 For comparison figures, `plot_brain_grid()` takes a named list of those
 numeric vectors.
 
-```{r multiple-maps}
+```{r multiple-maps, eval = FALSE}
 vals_list <- list(
   Baseline = sin(seq_along(atl$ids) / 15),
   Follow_up = cos(seq_along(atl$ids) / 18),
@@ -113,7 +118,7 @@ vals_list <- list(
 Use `plot_brain()` when you want one figure with a few surface panels
 and a single legend.
 
-```{r single-figure, fig.width=8, fig.height=5, fig.alt="Surface panel figure with left and right hemisphere lateral and medial views plus a bottom colorbar"}
+```{r single-figure, eval = FALSE, fig.width=8, fig.height=5, fig.alt="Surface panel figure with left and right hemisphere lateral and medial views plus a bottom colorbar"}
 plot_brain(
   atl,
   vals = parcel_vals,
@@ -133,6 +138,10 @@ plot_brain(
 )
 ```
 
+```{r single-figure-output, echo = FALSE, out.width = "100%", fig.alt = "Schaefer parcels on left and right inflated hemispheres in lateral and medial views, coloured by one value per parcel with a horizontal standardized-effect colorbar."}
+knitr::include_graphics("figures/surface-panel-parcels.png")
+```
+
 This is the default static workflow when you want:
 
 - view-aware facet labels without post-hoc editing
@@ -148,10 +157,10 @@ statistic, and obtains the legend from the overlay rather than from a dummy
 base map.
 
 This example derives a smooth synthetic field from the inflated coordinates.
-Replace `stat_overlay` with your own `list(lh = ..., rh = ...)`, or pass a
-`NeuroVol` as `overlay` and let `plot_brain()` project it.
+Replace `stat_overlay` with your own `list(lh = ..., rh = ...)` after checking
+that each vector has one value per vertex.
 
-```{r continuous-overlay-data, include=FALSE}
+```{r continuous-overlay-data, include=FALSE, eval = FALSE}
 surface_statistic <- function(geometry) {
   xyz <- neurosurf::vertices(geometry)
   value <- sin(xyz[, 2] / 20) + cos(xyz[, 3] / 16)
@@ -172,7 +181,7 @@ stopifnot(
 )
 ```
 
-```{r continuous-figure, fig.width=10, fig.height=6.25, fig.alt="Four-view cortical surface figure showing a continuous signed statistic over subtle anatomy, with a neutral medial wall, orientation marks, and an overlay-derived bottom colorbar"}
+```{r continuous-figure, eval = FALSE, fig.width=10, fig.height=6.25, fig.alt="Four-view cortical surface figure showing a continuous signed statistic over subtle anatomy, with a neutral medial wall and an overlay-derived bottom colorbar"}
 stat_figure <- plot_brain(
   atl,
   overlay = stat_overlay,
@@ -185,13 +194,18 @@ stat_figure <- plot_brain(
   colorbar = "bottom",
   medial_wall = "shade",
   camera = "canonical",
+  orientation_labels = FALSE,
   title = "Continuous statistic on fsaverage6"
 )
 
 stat_figure
 ```
 
-```{r validate-continuous-figure, include=FALSE}
+```{r continuous-figure-output, echo = FALSE, out.width = "100%", fig.alt = "Continuous signed statistic projected across lateral and medial views of both hemispheres, with blue negative and orange positive regions, a neutral medial wall, and a horizontal z-score colorbar."}
+knitr::include_graphics("figures/surface-panel-continuous.png")
+```
+
+```{r validate-continuous-figure, include=FALSE, eval = FALSE}
 legend_meta <- attr(stat_figure, "plot_brain_colorbar")
 anatomy_meta <- attr(stat_figure, "plot_brain_anatomy")
 stopifnot(
@@ -199,29 +213,36 @@ stopifnot(
   identical(legend_meta$source, "overlay"),
   identical(legend_meta$lim, c(-2.5, 2.5)),
   identical(legend_meta$breaks, c(-2.5, -1, 0, 1, 2.5)),
-  anatomy_meta$anatomy$lh$topology_verified,
-  anatomy_meta$anatomy$rh$topology_verified
+  isTRUE(anatomy_meta$anatomy$lh$topology_verified),
+  isTRUE(anatomy_meta$anatomy$rh$topology_verified)
 )
 ```
 
 Notice that the threshold appears as marks at `-1` and `1`, while the colour
 limits remain exactly `[-2.5, 2.5]`. The cortex mask is independent of parcel
 values, so the medial wall cannot acquire overlay colour merely because an
-atlas uses label zero. Curvature is resolved from matched white geometry and
-transferred only after vertex correspondence is checked.
+atlas uses label zero. When curvature comes from separate white geometry, the
+returned provenance reports whether that mesh and the displayed mesh have
+identical vertex dimensions and face connectivity. An explicit anatomy vector
+cannot establish that topology by itself.
 
-When `overlay` is a volume, the publication preset uses trilinear sampling at
-five fractions from 0.1 through 0.9 of the white-to-pial ribbon, averages those
-depth samples, and applies no tangential smoothing unless you request it. The
-effective projection, mask, anatomy, camera, and legend sources are retained as
-attributes on the returned figure.
+`plot_brain()` can accept a `NeuroVol` as `overlay`, but the current projection
+path cannot read a template-space identity from that object and does not
+enforce or apply a cross-coordinate transform. Treat this as unchecked caller
+responsibility: use only a volume already expressed in the coordinates of the
+resolved white and pial surfaces. `fsaverage` surfaces use MNI305 coordinates,
+whereas most modern MNI volumes use MNI152 coordinates; do not pass such a
+volume directly. The sampling itself uses five fractions from 0.1 through 0.9
+of the white-to-pial ribbon, averages those depth samples, and applies no
+tangential smoothing unless requested. Projection, mask, anatomy, camera, and
+legend choices are retained as attributes on the returned figure.
 
 ## How do you compare several maps with one legend?
 
 Use `plot_brain_grid()` when each panel is a different map but the
 colour scale should mean the same thing everywhere.
 
-```{r grid-figure, fig.width=10, fig.height=7, fig.alt="Four-panel surface comparison figure with shared right-side colorbar and repeated hemisphere view labels"}
+```{r grid-figure, eval = FALSE, fig.width=10, fig.height=7, fig.alt="Three-panel surface comparison figure with shared right-side colorbar and repeated hemisphere view labels"}
 plot_brain_grid(
   atl,
   vals_list,
@@ -239,8 +260,12 @@ plot_brain_grid(
     "Right Medial" = "RH medial"
   ),
   style = "ggseg_like",
-  ncol = 2
+  ncol = 3
 )
+```
+
+```{r grid-figure-output, echo = FALSE, out.width = "100%", fig.alt = "Three Schaefer parcel maps arranged in one row: baseline, follow-up, and difference. Each map contains lateral and medial views of both hemispheres and all use one vertical z-score colorbar."}
+knitr::include_graphics("figures/surface-panel-grid.png")
 ```
 
 The arguments that matter most here are:
@@ -251,8 +276,9 @@ The arguments that matter most here are:
 - `panel_labels`: simplifies the repeated surface-view labels
 
 If you want each panel to optimise its own within-panel contrast, use
-`shared_scale = FALSE`. That can make weak patterns easier to see, but
-you lose strict colour comparability across panels.
+`shared_scale = FALSE, colorbar = FALSE`. That can make weak patterns easier to
+see, but you lose strict colour comparability across panels, so a single global
+colorbar would be misleading.
 
 ## How should you label the panels?
 

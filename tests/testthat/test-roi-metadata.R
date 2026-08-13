@@ -90,6 +90,19 @@ test_that("filter_atlas errors on empty result", {
   expect_error(filter_atlas(atlas, hemi == "nonexistent"))
 })
 
+test_that("filter_atlas rejects surface atlases clearly", {
+  surface_atlas <- structure(
+    list(ids = 1L, labels = "A", hemi = "left"),
+    class = c("surfatlas", "atlas")
+  )
+
+  expect_error(
+    filter_atlas(surface_atlas, hemi == "left"),
+    "not supported for surface atlases",
+    class = "neuroatlas_error_unsupported"
+  )
+})
+
 test_that("get_roi with hemi parameter works", {
   skip_on_cran()
 

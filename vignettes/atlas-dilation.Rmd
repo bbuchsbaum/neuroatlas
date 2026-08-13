@@ -1,11 +1,9 @@
 ---
-title: Dilating an Atlas to Cover Grey Matter
-author: neuroatlas Dev Team
-date: '`r Sys.Date()`'
+title: Dilating Atlas Parcels Safely
 output:
   rmarkdown::html_vignette:
     toc: yes
-    toc_depth: 2.0
+    toc_depth: 2
     css: albers.css
     includes:
       in_header: albers-header.html
@@ -17,32 +15,43 @@ resource_files:
 - albers.js
 - albers-header.html
 - fonts
-
 vignette: |
-  %\VignetteIndexEntry{Dilating an Atlas to Cover Grey Matter}
+  %\VignetteIndexEntry{Dilating Atlas Parcels Safely}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("ragg", quietly = TRUE)) knitr::opts_chunk$set(dev = "ragg_png")
-if (requireNamespace("systemfonts", quietly = TRUE)) albersdown::albers_register_fonts()
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
+if (requireNamespace("ragg", quietly = TRUE)) {
+  knitr::opts_chunk$set(dev = "ragg_png")
+}
+if (requireNamespace("systemfonts", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  albersdown::albers_register_fonts()
+}
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  ggplot2::theme_set(
+    albersdown::theme_albers(
+      family = params$family,
+      preset = params$preset
+    )
+  )
+}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  echo = TRUE,
-  eval = FALSE  # heavy + network-dependent; figures are pre-rendered
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 8,
+  fig.height = 4.5
 )
-
-suppressWarnings(suppressMessages(library(neuroatlas)))
 ```
 
-```{r albers-classes, echo=FALSE, results='asis'}
+```{r albers-classes, echo = FALSE, results = "asis"}
 cat(sprintf(
   paste0(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
-    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");',
     'document.body.classList.add("palette-%s","preset-%s");',
     '});</script>'
   ),
@@ -51,233 +60,218 @@ cat(sprintf(
 ))
 ```
 
+A parcellation can leave small gaps between labelled regions. If those gaps
+are valid analysis voxels, regional summaries silently omit them. Dilation can
+close the gaps, but only after you state two contracts: which voxels are
+eligible, and how far a parcel may grow.
 
-## Why dilate a parcellation?
+This article uses a tiny synthetic atlas so every assignment can be inspected
+and every claim is executed offline. The same rules apply to a whole-brain
+atlas.
 
-A hard parcellation such as Schaefer-400 is defined on one template at one
-resolution, and its parcels do not perfectly tile the cortical ribbon. Voxels
-slip through the cracks at parcel borders, deep in sulci, and wherever the
-parcellation's source data did not quite reach. When you summarise an image
-through such an atlas --- say with `reduce_atlas()` --- that uncovered grey
-matter is silently dropped: it belongs to no parcel, so it never enters any
-regional average.
+## What does dilation do?
 
-`dilate_atlas()` closes those gaps by **growing parcels outward into nearby
-unassigned voxels**, with two explicit constraints. These constraints are useful
-but they are not a substitute for an anatomical cortex mask:
+`dilate_atlas()` considers voxels that are inside a supplied mask but not
+already labelled. A candidate is assigned only when a labelled voxel lies
+within `radius`, measured in **voxel units**. When several parcels are nearby,
+inverse-distance-weighted voting over at most `maxn` neighbours chooses the
+label.
 
-1. **A grey-matter mask.** Parcels may only expand into voxels you mark as
-   valid. Supply a mask built from a tissue-probability map and the dilation
-   stays inside grey matter instead of bleeding into white matter, CSF, or the
-   space outside the brain.
-2. **A proximity radius.** A voxel is only claimed if a parcel lies within
-   `radius` voxels of it. Grey matter that is too far from any parcel --- for a
-   cortical atlas, that means the cerebellum and the depths of the subcortex ---
-   is left unassigned rather than absorbed by whatever cortical parcel happens
-   to be nearest. Grey matter that is near a cortical parcel can still be
-   claimed if your mask allows it.
+The function never decides what anatomy is appropriate. That is the mask's
+job.
 
-This vignette walks through the whole pipeline on real data: a Schaefer-400
-volume atlas, a TemplateFlow grey-matter probability map, and a T1-weighted
-template to plot against.
+## How do you build a transparent example?
 
-## The three ingredients
+Our atlas has two one-voxel parcels on a straight line. IDs are deliberately
+non-contiguous so a label-mapping error cannot pass unnoticed.
 
-```{r ingredients}
+```{r make-atlas}
 library(neuroatlas)
-library(neuroim2)
 
-# 1. The atlas to dilate: Schaefer-400, 7 networks, 2 mm (MNI152NLin6Asym)
-sch <- get_schaefer_atlas("400", "7", "2")
-
-# 2. A grey-matter probability map (TemplateFlow tissue probseg)
-gm <- get_template(
-  space = "MNI152NLin2009cAsym",
-  variant = "probseg",
-  label = "GM",
-  resolution = 2
+dims <- c(9L, 9L, 5L)
+space <- neuroim2::NeuroSpace(
+  dim = dims,
+  spacing = c(2, 2, 2),
+  origin = c(0, 0, 0)
 )
 
-# 3. A T1-weighted template, purely as an anatomical backdrop for figures
-t1 <- get_template(
-  space = "MNI152NLin6Asym",
-  variant = "brain",
-  modality = "T1w",
-  resolution = 2
+labels <- array(0L, dim = dims)
+labels[2, 5, 3] <- 1L
+labels[8, 5, 3] <- 5L
+
+toy_atlas <- structure(
+  list(
+    name = "two-parcel example",
+    atlas = neuroim2::NeuroVol(labels, space),
+    ids = c(1L, 5L),
+    labels = c("A", "B"),
+    orig_labels = c("A", "B"),
+    hemi = c(NA_character_, NA_character_)
+  ),
+  class = c("toy_atlas", "atlas")
 )
 ```
 
-## Getting everything onto one grid
+The eligible mask is a one-voxel-wide bridge between A and B. One additional
+voxel sits far away and demonstrates the radius guard.
 
-`dilate_atlas()` works voxel-by-voxel, so the mask must sit on exactly the same
-grid as the atlas. Two details matter here:
+```{r make-mask}
+eligible <- array(FALSE, dim = dims)
+eligible[2:8, 5, 3] <- TRUE
+eligible[9, 9, 5] <- TRUE
 
-- The Schaefer volume is distributed in **`MNI152NLin6Asym`** space (the FSL
-  MNI template).
-- TemplateFlow only ships the tissue-class grey-matter probability map in
-  **`MNI152NLin2009cAsym`** space.
-
-So the grey-matter map and the atlas start out in different MNI variants. We
-bring the map (and the T1) onto the atlas grid with `resample()`. These are
-both MNI variants, so an affine reslice aligns them to within a voxel or two ---
-good enough for building a grey-matter mask, though for a publication you might
-prefer a proper nonlinear transform between the two templates.
-
-```{r resample}
-sp    <- neuroim2::space(sch$atlas)   # the atlas grid
-gm_rs <- resample(gm, sp)             # GM probability on the atlas grid
-t1_rs <- resample(t1, sp)             # T1 on the atlas grid
+mask <- neuroim2::LogicalNeuroVol(eligible, space)
 ```
 
-## Building the grey-matter mask
-
-The mask is just the probability map thresholded at the level you consider
-"grey matter enough". Following the brief for this vignette we use
-`p > 0.33`: a permissive cut that captures the cortical ribbon plus a generous
-margin.
-
-```{r mask}
-gm_mask <- neuroim2::LogicalNeuroVol(gm_rs > 0.33, space = sp)
-```
-
-How much of that grey matter does the raw atlas already cover? Comparing the
-mask against the parcel labels shows the size of the problem:
-
-```{r coverage-before}
-av  <- as.vector(neuroim2::as.dense(sch$atlas))
-gmv <- as.vector(gm_rs) > 0.33
-
-sum(gmv)                 # grey-matter voxels (p > 0.33):        158,085
-sum(gmv & av > 0)        # already inside a Schaefer parcel:     111,688  (70.7%)
-sum(gmv & av == 0)       # grey matter with no parcel:            46,397  (29.3%)
-```
-
-Nearly **30%** of the grey-matter mask falls outside every parcel. Some of that
-is the thin shell of ribbon the parcellation just missed; some of it is grey
-matter a cortical atlas was never meant to cover (cerebellum, deep nuclei).
-The example below shows why those are different problems: a radius can prevent
-distant jumps, but only the mask decides what anatomy is eligible.
-
-## Dilating with a permissive grey-matter mask
-
-```{r dilate}
-dilated <- dilate_atlas(sch, gm_mask, radius = 4, maxn = 50)
-```
-
-`dilate_atlas()` finds every mask voxel that has no label, locates the parcel
-voxels within `radius` of it (Euclidean distance, **in voxel units** --- at
-2 mm, `radius = 4` reaches 8 mm), and assigns it to a parcel by
-inverse-distance-weighted voting over up to `maxn` neighbours. A voxel with no
-parcel inside the radius keeps no label. The return value is an ordinary atlas
-object --- same class, IDs, and labels as the input --- so it is a drop-in
-replacement everywhere the original atlas is used.
-
-At `radius = 4` the parcels grow to cover an extra **23,965** voxels inside the
-permissive `p > 0.33` mask, lifting mask coverage from 70.7% to **85.8%**:
-
-```{r coverage-after}
-dv <- as.vector(neuroim2::as.dense(dilated$atlas))
-
-sum(dv > 0) - sum(av > 0)   # voxels added by dilation:        23,965
-sum(gmv & dv > 0)           # grey matter now covered:        135,653  (85.8%)
-sum(gmv & dv == 0)          # grey matter still unassigned:    22,432
-```
-
-These counts are coverage of the permissive mask, not proof of cortical-only
-coverage. The yellow voxels below are everything dilation added. Some yellow is
-the desired cortical-ribbon shell around the original parcels (teal), but the
-inferior and middle slices also show the failure mode: nearby subcortical and
-cerebellar grey matter can be swept into a cortex-only atlas when it falls
-inside the radius.
-
-```{r fig-additions, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Three axial slices showing original Schaefer-400 parcels in teal and all voxels added by radius-four dilation in yellow, including desired cortical rim and nearby non-cortical spillover."}
-knitr::include_graphics("figures/dilation-additions.png")
-```
-
-## What the proximity radius leaves out
-
-The 22,432 grey-matter voxels left unassigned are the voxels in the mask with no
-parcel inside the radius. In this Schaefer example, they are concentrated in the
-deep subcortex and cerebellum because Schaefer is a **cortex-only** atlas. This
-figure demonstrates the radius guard against *distant* jumps. It does not imply
-that every voxel already assigned by dilation was anatomically cortical.
-
-```{r fig-guard, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Three axial slices highlighting in yellow the grey-matter voxels left unassigned after dilation because they are beyond the radius from any Schaefer parcel."}
-knitr::include_graphics("figures/dilation-guard.png")
-```
-
-You can see the trade-off directly by sweeping the radius. A larger radius fills
-more of the cortical ribbon, but it can also claim more nearby non-cortical grey
-matter when the mask includes it. A smaller radius is more conservative.
-Coverage of the `p > 0.33` mask (which starts at 70.7% before dilation):
-
-| `radius` (vox) | reach (mm) | voxels added | grey matter covered | left unassigned |
-|:--------------:|:----------:|-------------:|:-------------------:|----------------:|
-| 1              | 2          |       13,343 |        79.1%        |          33,054 |
-| 2              | 4          |       17,228 |        81.5%        |          29,169 |
-| 4 *(default)*  | 8          |       23,965 |        85.8%        |          22,432 |
-| 6              | 12         |       30,775 |        90.1%        |          15,622 |
-
-The same sweep is easier to understand if you look at the ROIs themselves. On
-this axial slice, white voxels are still unlabelled and coloured voxels carry
-their Schaefer parcel label. As the radius increases, parcels fill more of the
-nearby grey matter, including the same subcortical-adjacent territory that makes
-large-radius whole-GM dilation risky.
-
-```{r fig-radius-rois, echo = FALSE, eval = TRUE, out.width = "100%", fig.alt = "Four axial panels comparing Schaefer parcel labels before dilation and after radius-one, radius-four, and radius-six dilation on the same z equals 40 slice."}
-knitr::include_graphics("figures/dilation-radius-rois.png")
-```
-
-The unassigned remainder stays dominated by distant subcortical and cerebellar
-grey matter in this range. The added set, however, can already include nearby
-non-cortical voxels by `radius = 4`.
-
-## Choosing a radius (and a mask)
-
-The right `radius` depends on what you want dilation to do:
-
-- **Close small parcellation gaps only.** A tight radius (`1`--`2`) fills the
-  thin shell of ribbon between parcels and little else.
-- **Maximise grey-matter coverage.** A larger radius (`4`--`6`) recovers more of
-  the mask at the cost of pulling in grey matter near the cortical boundary
-  that may be subcortical or cerebellar.
-
-The radius is a *proximity* guard, not an *anatomical* one: it cannot tell
-cortex from cerebellum, only near from far. If you need a hard anatomical
-boundary --- for instance, to guarantee no cerebellar voxel is ever claimed,
-regardless of radius --- intersect the grey-matter mask with an anatomical mask
-before dilating:
-
-```{r cortex-mask}
-# Optional: restrict dilation to a cortical-ribbon mask of your choosing
-gm_mask_cortex <- neuroim2::LogicalNeuroVol(
-  (gm_rs > 0.33) & (cortex_mask > 0),
-  space = sp
+```{r validate-inputs, include = FALSE}
+stopifnot(
+  identical(dim(toy_atlas$atlas), dim(mask)),
+  identical(neuroim2::space(toy_atlas$atlas), neuroim2::space(mask)),
+  sum(labels > 0) == 2L,
+  sum(eligible) == 8L
 )
-dilated <- dilate_atlas(sch, gm_mask_cortex, radius = 4)
 ```
 
-## Using the dilated atlas
+## What changes with a small radius?
 
-Because the result is a regular atlas object, the dilated parcellation flows
-straight into the rest of the package. Region summaries computed through it now
-draw on the recovered ribbon rather than dropping it:
+A radius of one voxel grows each parcel by one grid step. The middle of the
+bridge and the distant candidate remain unassigned.
+
+```{r dilate-one}
+radius_one <- dilate_atlas(
+  toy_atlas,
+  mask,
+  radius = 1,
+  maxn = 2
+)
+
+before <- neuroim2::as.dense(toy_atlas$atlas)
+after_one <- neuroim2::as.dense(radius_one$atlas)
+
+c(
+  labelled_before = sum(before > 0),
+  labelled_after = sum(after_one > 0),
+  eligible = sum(eligible)
+)
+```
+
+```{r validate-one, include = FALSE}
+stopifnot(
+  after_one[3, 5, 3] == 1L,
+  after_one[7, 5, 3] == 5L,
+  after_one[5, 5, 3] == 0L,
+  after_one[9, 9, 5] == 0L,
+  setequal(unique(after_one[after_one > 0]), toy_atlas$ids)
+)
+```
+
+## What changes with a larger radius?
+
+At three voxels, every point along the bridge can reach a parcel. The distant
+voxel is still protected because it lies more than three grid steps from the
+nearest label.
+
+```{r dilate-three}
+radius_three <- dilate_atlas(
+  toy_atlas,
+  mask,
+  radius = 3,
+  maxn = 2
+)
+
+after_three <- neuroim2::as.dense(radius_three$atlas)
+
+c(
+  labelled_before = sum(before > 0),
+  labelled_after = sum(after_three > 0),
+  eligible = sum(eligible)
+)
+```
+
+```{r validate-three, include = FALSE}
+stopifnot(
+  all(after_three[2:8, 5, 3] > 0),
+  after_three[3, 5, 3] == 1L,
+  after_three[7, 5, 3] == 5L,
+  after_three[9, 9, 5] == 0L,
+  setequal(unique(after_three[after_three > 0]), toy_atlas$ids)
+)
+```
+
+The radius changed proximity, not anatomy. If the far voxel had been close
+enough, the algorithm would have labelled it because the mask declared it
+eligible.
+
+## How do you see the assignment?
+
+The table below shows the bridge from left to right. Zero means unassigned.
+
+```{r assignment-table}
+data.frame(
+  x = 2:8,
+  before = before[2:8, 5, 3],
+  radius_1 = after_one[2:8, 5, 3],
+  radius_3 = after_three[2:8, 5, 3]
+)
+```
+
+The midpoint is equidistant. Its label is a deterministic consequence of the
+grouped label ordering used to break an equal vote, so do not interpret a tie
+as anatomical evidence. In real work, inspect parcel boundaries and quantify
+sensitivity to radius.
+
+## What must be true for real data?
+
+Before dilating a real atlas, verify all of the following:
+
+1. **Same template space.** The atlas and mask describe the same anatomy.
+2. **Same voxel grid.** Dimensions and spatial geometry match exactly.
+3. **Appropriate mask.** A cortical atlas should use a cortical ribbon or an
+   equivalently justified mask, not an unrestricted whole-grey-matter mask.
+4. **Interpretable radius.** Convert voxel units to millimetres using the grid
+   spacing, and report both.
+5. **Stable identities.** The output contains only the input parcel IDs.
+6. **Sensitivity.** Report how many voxels are added and where they are added
+   for plausible radii.
+
+Grid resampling does not transform one anatomical template into another. For
+example, the nonlinear route between `MNI152NLin6Asym` and
+`MNI152NLin2009cAsym` is currently recorded as planned:
+
+```{r transform-status}
+atlas_transform_plan(
+  "MNI152NLin6Asym",
+  "MNI152NLin2009cAsym",
+  data_type = "voxel"
+)
+```
+
+Do not build a mask in one of those spaces, reslice it onto the other's grid,
+and treat the result as registered anatomy unless an actual validated transform
+has been applied.
+
+## How do you use the result?
+
+The returned object preserves the atlas class, IDs, and labels, so it can enter
+the same volume workflows as its input:
 
 ```{r downstream}
-# e.g. summarise a statistical map within the (now more complete) parcels
-roi_means <- reduce_atlas(dilated, stat_map, mean)
+image <- neuroim2::NeuroVol(
+  array(seq_len(prod(dims)), dim = dims),
+  space
+)
+
+reduce_atlas(radius_three, image, mean)
 ```
 
-## Reproducing the figures
+```{r validate-downstream, include = FALSE}
+summary <- reduce_atlas(radius_three, image, mean)
+stopifnot(
+  nrow(summary) == length(toy_atlas$ids),
+  all(is.finite(summary$value))
+)
+```
 
-The figures in this vignette are pre-rendered (the dilation takes a couple of
-minutes and the inputs are downloaded from TemplateFlow). The script that builds
-them lives at `data-raw/dilation-vignette-figures.R` in the package source and
-uses `neuroim2::plot_overlay()` to draw the parcel codes over the resampled T1.
-
-## See also
-
-- `get_schaefer_atlas()` --- the parcellation used here.
-- `get_template()` --- TemplateFlow tissue-probability maps and templates.
-- `reduce_atlas()` --- summarise data within atlas parcels.
-- The *Working with TemplateFlow* vignette for more on spaces and resolutions.
+Return to `vignette("neuroatlas-overview")` for the general reduction workflow,
+or read `vignette("working-with-templateflow")` before combining external
+templates and masks.

@@ -39,8 +39,8 @@ consistent, user-friendly functions.
 - **Network & graph tools**: `atlas_connectivity()`, `atlas_graph()` /
   `as_igraph()`, `atlas_hierarchy()`, and `spin_test()` spatial null
   models
-- **TemplateFlow integration**: Access standardized templates via the
-  Python TemplateFlow API
+- **TemplateFlow integration**: Access standardized templates through the
+  pure-R `templateflow` backend
 - **Visualization**: Publication-quality surface figures with
   `plot_brain()` / `plot_brain_grid()`, perceptually-optimised ROI
   palettes, the ggseg ecosystem, and an interactive `cluster_explorer()`
@@ -59,12 +59,12 @@ pak::pak("bbuchsbaum/neuroatlas")
 
 ### TemplateFlow Setup
 
-For TemplateFlow functionality, you’ll need Python with the templateflow
-package:
+TemplateFlow access uses the imported pure-R `templateflow` package. No
+Python or reticulate setup is required:
 
 ``` r
-# After installing neuroatlas:
-neuroatlas::install_templateflow()
+neuroatlas::tflow_spaces(pattern = "^MNI")
+neuroatlas::show_templateflow_cache_path()
 ```
 
 ## Quick Start
