@@ -1940,6 +1940,19 @@ build_surface_polygon_data <- function(surfatlas,
 #'   must equal the number of atlas regions (\code{length(surfatlas$ids)}).
 #'   When \code{NULL} (default), parcels are coloured using the ROI colour
 #'   system.
+#' @param data Optional data frame, tibble, or \code{parcel_data} object with
+#'   one row per parcel. When supplied, \code{value} is aligned to the atlas
+#'   with \code{\link{align_parcel_values}()} before rendering. Supply either
+#'   \code{data} or \code{vals}, not both.
+#' @param value Numeric column in \code{data}, supplied as a bare name or
+#'   character string.
+#' @param by Parcel-key specification for \code{data}. Use a shared column name
+#'   such as \code{"id"}, or map an atlas key to a differently named data
+#'   column with \code{c(id = "roi_index")}. Composite keys are supported.
+#'   When \code{NULL}, a safe unique key is inferred.
+#' @param allow_partial Logical. If \code{FALSE} (default), \code{data} must
+#'   contain every atlas parcel. If \code{TRUE}, missing parcels are rendered
+#'   with \code{NA} values. Unknown and duplicate keys always error.
 #' @param views Character vector of views to render. Any combination of
 #'   \code{"lateral"}, \code{"medial"}, \code{"dorsal"}, \code{"ventral"}.
 #'   Default: \code{c("lateral", "medial")}.
@@ -2152,6 +2165,20 @@ build_surface_polygon_data <- function(surfatlas,
 #' plot_brain(atl, vals = rnorm(200), palette = "vik")
 #' plot_brain(atl, views = "lateral", interactive = FALSE)
 #'
+#' results <- data.frame(
+#'   roi_index = rev(atl$ids),
+#'   estimate = seq(-2, 2, length.out = length(atl$ids))
+#' )
+#' plot_brain(
+#'   atl,
+#'   data = results,
+#'   value = estimate,
+#'   by = c(id = "roi_index"),
+#'   views = "medial",
+#'   hemis = "left",
+#'   interactive = FALSE
+#' )
+#'
 #' # Styling: rounded white parcel borders + thicker silhouette + network edges
 #' plot_brain(
 #'   atl,
@@ -2259,9 +2286,15 @@ plot_brain <- function(surfatlas,
                        background_color = "grey80",
                        depth_cull = TRUE,
                        bg = "white",
+                       data = NULL,
+                       value = NULL,
+                       by = NULL,
+                       allow_partial = FALSE,
                        ...) {
   style <- match.arg(style)
   overlay_present <- !is.null(overlay)
+  data_present <- !is.null(data)
+  value_supplied <- !missing(value)
 
   if (!is.logical(background) || length(background) != 1 || is.na(background)) {
     stop("'background' must be TRUE or FALSE.", call. = FALSE)
@@ -2344,6 +2377,29 @@ plot_brain <- function(surfatlas,
          call. = FALSE)
   }
 
+  if (data_present) {
+    if (!is.null(vals)) {
+      cli::cli_abort(
+        "Supply either {.arg data} or {.arg vals}, not both.",
+        class = c("neuroatlas_error_parcel_value", "neuroatlas_error")
+      )
+    }
+    value_col <- .parcel_value_column(rlang::enquo(value))
+    aligned <- .align_atlas_table(
+      atlas = surfatlas,
+      data = data,
+      by = by,
+      allow_partial = allow_partial
+    )
+    vals <- .parcel_value_from_aligned(aligned, surfatlas, value_col)
+  } else if (value_supplied || !is.null(by) ||
+             !identical(allow_partial, FALSE)) {
+    cli::cli_abort(
+      "{.arg value}, {.arg by}, and {.arg allow_partial} require {.arg data}.",
+      class = c("neuroatlas_error_parcel_value", "neuroatlas_error")
+    )
+  }
+
   surface_missing <- missing(surface)
   if (surface_missing && !is.null(surfatlas$surf_type) &&
       length(surfatlas$surf_type) == 1L && nzchar(surfatlas$surf_type)) {
@@ -2372,6 +2428,30 @@ plot_brain <- function(surfatlas,
   overlay_interpolation <- match.arg(overlay_interpolation)
   panel_layout <- match.arg(panel_layout)
   border_geom <- match.arg(border_geom)
+  if (!is.null(vals)) {
+    if ((!is.numeric(vals) && !is.integer(vals)) || !is.null(dim(vals))) {
+      stop("'vals' must be a numeric vector.", call. = FALSE)
+    }
+    if (length(vals) != length(surfatlas$ids)) {
+      stop("Length of 'vals' (", length(vals), ") must match number of atlas ",
+           "regions (", length(surfatlas$ids), ").",
+           call. = FALSE)
+    }
+    if (any(is.infinite(vals))) {
+      stop("'vals' may contain finite numbers or NA, but not infinite values.",
+           call. = FALSE)
+    }
+  }
+  if (data_present && !interactive && identical(static_backend, "cpu")) {
+    cli::cli_abort(
+      c(
+        "Parcel-level {.arg data} are not supported by {.code static_backend = 'cpu'}.",
+        "i" = "Use the default {.code static_backend = 'ggplot'} for parcel maps.",
+        "i" = "The CPU backend expects a vertex-wise {.arg overlay}."
+      ),
+      class = c("neuroatlas_error_unsupported", "neuroatlas_error")
+    )
+  }
   if (!interactive && identical(static_backend, "cpu")) {
     return(.plot_brain_cpu(
       surfatlas = surfatlas, overlay = overlay, views = views, hemis = hemis,
@@ -2447,15 +2527,21 @@ plot_brain <- function(surfatlas,
   }
 
   if (!is.null(vals)) {
-    if (length(vals) != length(surfatlas$ids)) {
-      stop("Length of 'vals' (", length(vals), ") must match number of atlas ",
-           "regions (", length(surfatlas$ids), ").",
-           call. = FALSE)
-    }
     if (!is.null(lim)) {
-      stopifnot(is.numeric(lim), length(lim) == 2)
+      if (!is.numeric(lim) || length(lim) != 2L || any(!is.finite(lim)) ||
+          lim[[1]] > lim[[2]]) {
+        stop("'lim' must contain two finite numeric values in increasing order.",
+             call. = FALSE)
+      }
     } else {
-      lim <- range(vals, na.rm = TRUE)
+      finite_vals <- vals[is.finite(vals)]
+      if (length(finite_vals) == 0L) {
+        stop("'vals' must contain at least one finite value.", call. = FALSE)
+      }
+      lim <- range(finite_vals)
+      if (lim[[1]] == lim[[2]]) {
+        lim <- lim + c(-1, 1) * max(abs(lim[[1]]) * 1e-8, 1e-8)
+      }
     }
   }
 

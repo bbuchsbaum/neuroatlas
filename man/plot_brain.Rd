@@ -82,6 +82,10 @@ plot_brain(
   background_color = "grey80",
   depth_cull = TRUE,
   bg = "white",
+  data = NULL,
+  value = NULL,
+  by = NULL,
+  allow_partial = FALSE,
   ...
 )
 }
@@ -364,6 +368,23 @@ far-side folds through the mesh.}
 
 \item{bg}{Character: background colour for the plot. Default: \code{"white"}.}
 
+\item{data}{Optional data frame, tibble, or \code{parcel_data} object with
+one row per parcel. When supplied, \code{value} is aligned to the atlas
+with \code{\link{align_parcel_values}()} before rendering. Supply either
+\code{data} or \code{vals}, not both.}
+
+\item{value}{Numeric column in \code{data}, supplied as a bare name or
+character string.}
+
+\item{by}{Parcel-key specification for \code{data}. Use a shared column name
+such as \code{"id"}, or map an atlas key to a differently named data
+column with \code{c(id = "roi_index")}. Composite keys are supported.
+When \code{NULL}, a safe unique key is inferred.}
+
+\item{allow_partial}{Logical. If \code{FALSE} (default), \code{data} must
+contain every atlas parcel. If \code{TRUE}, missing parcels are rendered
+with \code{NA} values. Unknown and duplicate keys always error.}
+
 \item{...}{Additional arguments (currently unused).}
 }
 \value{
@@ -383,6 +404,20 @@ atl <- schaefer_surf(200, 17)
 plot_brain(atl)
 plot_brain(atl, vals = rnorm(200), palette = "vik")
 plot_brain(atl, views = "lateral", interactive = FALSE)
+
+results <- data.frame(
+  roi_index = rev(atl$ids),
+  estimate = seq(-2, 2, length.out = length(atl$ids))
+)
+plot_brain(
+  atl,
+  data = results,
+  value = estimate,
+  by = c(id = "roi_index"),
+  views = "medial",
+  hemis = "left",
+  interactive = FALSE
+)
 
 # Styling: rounded white parcel borders + thicker silhouette + network edges
 plot_brain(

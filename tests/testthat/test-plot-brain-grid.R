@@ -106,6 +106,39 @@ test_that("plot_brain_grid independent scale passes NULL lim", {
   expect_null(env$captured_lims[[2]])
 })
 
+test_that("plot_brain_grid applies explicit limits with independent scaling", {
+  skip_if_not_installed("patchwork")
+  if (!requireNamespace("mockery", quietly = TRUE)) {
+    skip("Package 'mockery' is not installed")
+  }
+
+  mock_surfatlas <- structure(list(
+    ids = 1:2,
+    labels = c("A", "B"),
+    hemi = c("left", "right"),
+    name = "mock"
+  ), class = "surfatlas")
+
+  env <- new.env(parent = emptyenv())
+  env$captured_lims <- list()
+  mock_pb <- function(surfatlas, vals, lim, ...) {
+    env$captured_lims <- c(env$captured_lims, list(lim))
+    ggplot2::ggplot() + ggplot2::theme_void()
+  }
+
+  mockery::stub(plot_brain_grid, "plot_brain", mock_pb)
+  vals <- list(A = c(-5, 5), B = c(-1, 1))
+  plot_brain_grid(
+    mock_surfatlas,
+    vals,
+    shared_scale = FALSE,
+    lim = c(-10, 10),
+    colorbar = FALSE
+  )
+  expect_equal(env$captured_lims[[1]], c(-10, 10))
+  expect_equal(env$captured_lims[[2]], c(-10, 10))
+})
+
 test_that("plot_brain_grid errors on empty vals_list", {
   mock_surfatlas <- structure(list(ids = 1:2), class = "surfatlas")
   expect_error(plot_brain_grid(mock_surfatlas, list()), "non-empty")

@@ -6,7 +6,7 @@
 \usage{
 plot_brain_grid(
   surfatlas,
-  vals_list,
+  vals_list = NULL,
   views = c("lateral", "medial"),
   hemis = c("left", "right"),
   ncol = NULL,
@@ -19,6 +19,10 @@ plot_brain_grid(
   title = NULL,
   subtitle = NULL,
   caption = NULL,
+  data = NULL,
+  values = NULL,
+  by = NULL,
+  allow_partial = FALSE,
   ...
 )
 }
@@ -26,8 +30,10 @@ plot_brain_grid(
 \item{surfatlas}{A \code{surfatlas} object (e.g., from
 \code{\link{schaefer_surf}} or \code{\link{glasser_surf}}).}
 
-\item{vals_list}{A named list of numeric vectors, one per panel. Each
-vector must have length equal to the number of atlas regions.}
+\item{vals_list}{A list of numeric vectors, one per panel. Each
+vector must have length equal to the number of atlas regions. Optional
+when \code{data} and \code{values} are supplied. Names, when present,
+become the default panel titles.}
 
 \item{views}{Character vector of views passed to \code{\link{plot_brain}}.
 Default: \code{c("lateral", "medial")}.}
@@ -58,6 +64,19 @@ horizontal shared colorbar, or \code{FALSE} / \code{"none"} to omit it.}
 \item{title, subtitle, caption}{Optional overall plot annotations applied to
 the composed figure.}
 
+\item{data}{Optional data frame, tibble, or \code{parcel_data} object with
+one row per parcel. Supply either \code{data} or \code{vals_list}.}
+
+\item{values}{Character vector naming numeric columns in \code{data}; one
+brain map is produced for each column.}
+
+\item{by}{Parcel-key specification passed to
+\code{\link{align_parcel_values}()}.}
+
+\item{allow_partial}{Logical. If \code{FALSE} (default), \code{data} must
+contain every atlas parcel. If \code{TRUE}, missing parcels receive
+\code{NA} values.}
+
 \item{...}{Additional arguments passed to \code{\link{plot_brain}}.}
 }
 \value{
@@ -76,6 +95,17 @@ vals <- list(
   Contrast_B = rnorm(200)
 )
 plot_brain_grid(atl, vals)
+
+results <- data.frame(
+  id = rev(atl$ids),
+  Contrast_A = rnorm(200),
+  Contrast_B = rnorm(200)
+)
+plot_brain_grid(
+  atl,
+  data = results,
+  values = c("Contrast_A", "Contrast_B")
+)
 }
 
 }

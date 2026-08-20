@@ -81,7 +81,9 @@ parcel values instead of building the figure by hand after plotting.
 
 ## What do you need before you start?
 
-For a parcel figure, you need a surface atlas and one numeric value per parcel.
+For a parcel figure, you need a surface atlas and a keyed result table with one
+row per parcel. A positional numeric vector remains supported for code that
+already guarantees atlas order.
 For a continuous figure, use the same atlas to supply geometry, cortex mask,
 and anatomical provenance, then provide one value per surface vertex. The API
 also accepts a `NeuroVol`, but does not currently enforce that volume's
@@ -95,22 +97,30 @@ atl <- schaefer_surf(
   surf = "inflated"
 )
 
-parcel_vals <- seq(-2, 2, length.out = length(atl$ids))
+parcel_results <- tibble::tibble(
+  roi_index = atl$ids,
+  Baseline = sin(seq_along(atl$ids) / 15),
+  Follow_up = cos(seq_along(atl$ids) / 18)
+)
+parcel_results$Difference <-
+  parcel_results$Baseline - parcel_results$Follow_up
+parcel_results <- parcel_results[rev(seq_len(nrow(parcel_results))), ]
 ```
 
 The first call may download and cache Schaefer annotation files. The figures
 below were generated from that exact configuration and are committed so the
 article remains useful during an offline build.
 
-For comparison figures, `plot_brain_grid()` takes a named list of those
-numeric vectors.
+The deliberately reversed rows demonstrate that plotting uses `roi_index`, not
+table position. `plot_brain_grid()` can select several numeric columns from the
+same table.
 
 ```{r multiple-maps, eval = FALSE}
-vals_list <- list(
-  Baseline = sin(seq_along(atl$ids) / 15),
-  Follow_up = cos(seq_along(atl$ids) / 18),
-  Difference = sin(seq_along(atl$ids) / 15) -
-    cos(seq_along(atl$ids) / 18)
+plot_brain_grid(
+  atl,
+  data = parcel_results,
+  values = c("Baseline", "Follow_up", "Difference"),
+  by = c(id = "roi_index")
 )
 ```
 
@@ -122,7 +132,9 @@ and a single legend.
 ```{r single-figure, eval = FALSE, fig.width=8, fig.height=5, fig.alt="Surface panel figure with left and right hemisphere lateral and medial views plus a bottom colorbar"}
 plot_brain(
   atl,
-  vals = parcel_vals,
+  data = parcel_results,
+  value = Baseline,
+  by = c(id = "roi_index"),
   views = c("lateral", "medial"),
   interactive = FALSE,
   style = "ggseg_like",
@@ -246,7 +258,9 @@ colour scale should mean the same thing everywhere.
 ```{r grid-figure, eval = FALSE, fig.width=10, fig.height=7, fig.alt="Three-panel surface comparison figure with shared right-side colorbar and repeated hemisphere view labels"}
 plot_brain_grid(
   atl,
-  vals_list,
+  data = parcel_results,
+  values = c("Baseline", "Follow_up", "Difference"),
+  by = c(id = "roi_index"),
   views = c("lateral", "medial"),
   titles = c("Baseline", "Follow-up", "Difference"),
   shared_scale = TRUE,
@@ -303,8 +317,8 @@ Choose the style from the scientific object you are displaying:
 - use `style = "ggseg_like"` for parcel identities or parcel-valued estimates;
 - use `style = "stat_publication"` for a continuous vertex field or projected
   statistic volume;
-- keep the CPU backend for deterministic static reports and use the existing
-  interactive route for atlas exploration and hover behaviour.
+- use the default ggplot backend for parcel tables, and keep the CPU backend
+  for deterministic continuous vertex overlays.
 
 Then adjust:
 

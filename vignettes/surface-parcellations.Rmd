@@ -153,16 +153,21 @@ knitr::include_graphics("figures/overview-schaefer-surface.png")
 
 ## How do you attach one value per parcel?
 
-Keep the atlas and the data conceptually separate. A numeric vector supplied
-to `plot_brain()` must have exactly one value for every element of `atl$ids`:
+Keep the atlas and the results table conceptually separate. The safest workflow
+joins a stable result key to atlas metadata; it does not assume the rows already
+have atlas order. Here `roi_index` is deliberately reversed:
 
 ```{r parcel-values, eval = FALSE}
-parcel_values <- seq(-2, 2, length.out = length(atl$ids))
-stopifnot(length(parcel_values) == length(atl$ids))
+parcel_results <- tibble::tibble(
+  roi_index = rev(atl$ids),
+  estimate = rev(seq(-2, 2, length.out = length(atl$ids)))
+)
 
 plot_brain(
   atl,
-  vals = parcel_values,
+  data = parcel_results,
+  value = estimate,
+  by = c(id = "roi_index"),
   views = c("lateral", "medial"),
   interactive = FALSE,
   style = "ggseg_like",
@@ -171,23 +176,60 @@ plot_brain(
 )
 ```
 
+`by = c(id = "roi_index")` means “match atlas `id` to result
+`roi_index`.” If both tables use `id`, either write `by = "id"` or omit `by`;
+the function safely infers it. Full atlas names in `label_full` are another
+valid key. Short `label` values can repeat across hemispheres or networks in
+Schaefer atlases, so use a unique composite such as
+`by = c("label", "hemi", "network")` when full names or IDs are unavailable.
+
+| Result-table key | `by` | Assessment |
+|---|---|---|
+| `id` | omit, or `"id"` | Preferred: compact, stable, and unique |
+| `roi_index` | `c(id = "roi_index")` | Preferred when the ID column was renamed |
+| `label_full` | omit, or `"label_full"` | Safe when the full atlas labels are preserved exactly |
+| `label`, `hemi`, `network` | `c("label", "hemi", "network")` | Valid only when the combination is unique |
+| `label` alone | `"label"` | Usually unsafe for bilateral Schaefer atlases |
+
+Alignment is strict by default. Duplicate result keys, unknown parcels, and
+missing atlas parcels are errors. Use `allow_partial = TRUE` only when absent
+parcels are intentional; they are then shown as `NA`. You can inspect or reuse
+the exact vector sent to the renderer:
+
+```{r align-values, eval = FALSE}
+parcel_values <- align_parcel_values(
+  atl,
+  parcel_results,
+  value = estimate,
+  by = c(id = "roi_index")
+)
+
+stopifnot(
+  identical(names(parcel_values), as.character(atl$ids)),
+  identical(unname(parcel_values), seq(-2, 2, length.out = length(atl$ids)))
+)
+```
+
+Passing `vals = parcel_values` remains useful for code that already maintains
+atlas order, but a keyed table is safer at analysis boundaries.
+
 `map_atlas()` is the tabular companion to this plot. It does **not** mutate the
 surface or return a labelled mesh:
 
 ```{r map-values, eval = FALSE}
-mapped <- map_atlas(atl, parcel_values)
+mapped <- map_atlas(atl, unname(parcel_values))
 mapped
 
 stopifnot(
   nrow(mapped) == length(atl$ids),
-  identical(mapped$statistic, parcel_values),
+  identical(mapped$statistic, unname(parcel_values)),
   identical(mapped$region, atl$labels),
   identical(mapped$hemi, atl$hemi)
 )
 ```
 
-Use the tibble for modelling and reporting; pass the original atlas plus the
-same value vector to `plot_brain()` for a surface figure.
+Use the tibble for modelling and reporting; pass it directly to `plot_brain()`
+for a surface figure.
 
 ## How do you extract one surface ROI?
 
