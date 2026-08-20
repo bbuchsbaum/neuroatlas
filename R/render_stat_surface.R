@@ -247,7 +247,10 @@
     p <- ggplot2::ggplot() +
       ggplot2::annotation_raster(.surface_rgba_raster(rendered),
                                  xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
-      ggplot2::coord_fixed(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
+      ggplot2::coord_fixed(
+        ratio = render_height / render_width,
+        xlim = c(0, 1), ylim = c(0, 1), expand = FALSE
+      ) +
       ggplot2::theme_void() +
       ggplot2::ggtitle(display_label) +
       ggplot2::theme(

@@ -391,6 +391,52 @@ test_that("outer contour keeps only the largest exterior loop per panel", {
   )
 }
 
+.collect_cpu_raster_panels <- function(plot) {
+  if (inherits(plot, "patchwork")) {
+    panels <- list()
+    for (i in seq_len(length(plot))) {
+      panels <- c(panels, .collect_cpu_raster_panels(plot[[i]]))
+    }
+    return(panels)
+  }
+
+  has_raster <- inherits(plot, "ggplot") && any(vapply(
+    plot$layers,
+    function(layer) !is.null(layer$geom_params$raster),
+    logical(1)
+  ))
+  if (has_raster) list(plot) else list()
+}
+
+.measure_plot_panel_aspect <- function(plot, width, height) {
+  output <- tempfile(fileext = ".pdf")
+  grDevices::pdf(output, width = width, height = height)
+  on.exit({
+    grDevices::dev.off()
+    unlink(output)
+  }, add = TRUE)
+
+  grid::grid.newpage()
+  grid::grid.draw(ggplot2::ggplotGrob(plot))
+  grid::grid.force()
+  viewport_names <- grid::grid.ls(
+    viewports = TRUE,
+    print = FALSE
+  )$name
+  panel_name <- viewport_names[startsWith(viewport_names, "panel.")][1L]
+  if (is.na(panel_name)) {
+    stop("Rendered plot did not contain a panel viewport.")
+  }
+  grid::seekViewport(panel_name)
+  panel_width <- grid::convertWidth(
+    grid::unit(1, "npc"), "in", valueOnly = TRUE
+  )
+  panel_height <- grid::convertHeight(
+    grid::unit(1, "npc"), "in", valueOnly = TRUE
+  )
+  panel_width / panel_height
+}
+
 test_that("plot_brain leaves overlay threshold borders off by default", {
   atl <- .make_plot_brain_overlay_test_atlas()
   overlay <- list(lh = c(0, 2, 0, 2), rh = c(0, 2, 0, 2))
@@ -548,6 +594,85 @@ test_that("CPU backend records mask, anatomy, camera, and legend provenance", {
   expect_identical(prov$camera$`Left Lateral`$projection,
                    "canonical_orthographic")
   expect_identical(attr(p, "plot_brain_colorbar")$source, "overlay")
+})
+
+test_that("CPU panels preserve raster aspect across figure layouts", {
+  skip_if_not_installed("patchwork")
+  atl <- .make_plot_brain_overlay_test_atlas()
+  overlay <- list(lh = rep(4, 4), rh = rep(4, 4))
+  mask <- list(lh = rep(TRUE, 4), rh = rep(TRUE, 4))
+  anatomy <- list(lh = c(-1, 0, 1, 0), rh = c(-1, 0, 1, 0))
+  panel_labels <- c(
+    "Left Lateral" = "LH lateral",
+    "Left Medial" = "LH medial"
+  )
+
+  default_plot <- plot_brain(
+    atl, views = "lateral", hemis = "left", overlay = overlay,
+    overlay_lim = c(-4, 4), static_backend = "cpu",
+    cortex_mask = mask, anatomy_metric = anatomy,
+    orientation_labels = TRUE, panel_labels = panel_labels,
+    render_antialias = 1, interactive = FALSE, colorbar = FALSE
+  )
+  default_panel <- .collect_cpu_raster_panels(default_plot)[[1L]]
+  default_raster <- default_panel$layers[[1L]]$geom_params$raster
+  raster_aspect <- ncol(default_raster) / nrow(default_raster)
+
+  expect_equal(dim(default_raster), c(750L, 1200L))
+  expect_equal(default_panel$coordinates$ratio, 750 / 1200)
+  expect_equal(
+    .measure_plot_panel_aspect(default_panel, width = 8, height = 8),
+    raster_aspect,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    .measure_plot_panel_aspect(default_panel, width = 12, height = 5),
+    raster_aspect,
+    tolerance = 1e-6
+  )
+
+  layouts <- list(
+    list(colorbar = TRUE, position = "right"),
+    list(colorbar = "bottom", position = "bottom")
+  )
+  for (layout in layouts) {
+    composed <- plot_brain(
+      atl, views = c("lateral", "medial"), hemis = "left",
+      overlay = overlay, overlay_lim = c(-4, 4),
+      static_backend = "cpu", cortex_mask = mask,
+      anatomy_metric = anatomy, orientation_labels = TRUE,
+      panel_labels = panel_labels, render_width = 80,
+      render_height = 50, render_antialias = 1,
+      interactive = FALSE, colorbar = layout$colorbar,
+      title = paste("CPU", layout$position)
+    )
+
+    expect_s3_class(composed, "patchwork")
+    expect_silent(patchwork::patchworkGrob(composed))
+    panels <- .collect_cpu_raster_panels(composed)
+    expect_length(panels, 2L)
+    expect_setequal(
+      vapply(panels, function(panel) panel$labels$title, character(1)),
+      unname(panel_labels)
+    )
+
+    for (panel in panels) {
+      raster <- panel$layers[[1L]]$geom_params$raster
+      expect_equal(dim(raster), c(50L, 80L))
+      expect_equal(panel$coordinates$ratio, 50 / 80)
+      orientation_layers <- Filter(
+        function(layer) {
+          is.data.frame(layer$data) &&
+            all(c("x", "y", "label") %in% names(layer$data))
+        },
+        panel$layers
+      )
+      expect_length(orientation_layers, 1L)
+      orientation <- orientation_layers[[1L]]$data
+      expect_true(all(orientation$x >= 0 & orientation$x <= 1))
+      expect_true(all(orientation$y >= 0 & orientation$y <= 1))
+    }
+  }
 })
 
 test_that("surface topology verification compares face connectivity", {
