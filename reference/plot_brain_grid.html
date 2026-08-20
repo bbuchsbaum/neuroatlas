@@ -53,7 +53,7 @@ rendered by <code><a href="plot_brain.html">plot_brain</a></code>.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_brain_grid</span><span class="op">(</span></span>
 <span>  <span class="va">surfatlas</span>,</span>
-<span>  <span class="va">vals_list</span>,</span>
+<span>  vals_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  views <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lateral"</span>, <span class="st">"medial"</span><span class="op">)</span>,</span>
 <span>  hemis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"left"</span>, <span class="st">"right"</span><span class="op">)</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -66,6 +66,10 @@ rendered by <code><a href="plot_brain.html">plot_brain</a></code>.</p>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  values <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  allow_partial <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -80,8 +84,10 @@ rendered by <code><a href="plot_brain.html">plot_brain</a></code>.</p>
 
 
 <dt id="arg-vals-list">vals_list<a class="anchor" aria-label="anchor" href="#arg-vals-list"></a></dt>
-<dd><p>A named list of numeric vectors, one per panel. Each
-vector must have length equal to the number of atlas regions.</p></dd>
+<dd><p>A list of numeric vectors, one per panel. Each
+vector must have length equal to the number of atlas regions. Optional
+when <code>data</code> and <code>values</code> are supplied. Names, when present,
+become the default panel titles.</p></dd>
 
 
 <dt id="arg-views">views<a class="anchor" aria-label="anchor" href="#arg-views"></a></dt>
@@ -133,6 +139,27 @@ horizontal shared colorbar, or <code>FALSE</code> / <code>"none"</code> to omit 
 the composed figure.</p></dd>
 
 
+<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>Optional data frame, tibble, or <code>parcel_data</code> object with
+one row per parcel. Supply either <code>data</code> or <code>vals_list</code>.</p></dd>
+
+
+<dt id="arg-values">values<a class="anchor" aria-label="anchor" href="#arg-values"></a></dt>
+<dd><p>Character vector naming numeric columns in <code>data</code>; one
+brain map is produced for each column.</p></dd>
+
+
+<dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
+<dd><p>Parcel-key specification passed to
+<code><a href="align_parcel_values.html">align_parcel_values()</a></code>.</p></dd>
+
+
+<dt id="arg-allow-partial">allow_partial<a class="anchor" aria-label="anchor" href="#arg-allow-partial"></a></dt>
+<dd><p>Logical. If <code>FALSE</code> (default), <code>data</code> must
+contain every atlas parcel. If <code>TRUE</code>, missing parcels receive
+<code>NA</code> values.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to <code><a href="plot_brain.html">plot_brain</a></code>.</p></dd>
 
@@ -151,6 +178,17 @@ the composed figure.</p></dd>
 <span class="r-in"><span>  Contrast_B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_brain_grid</span><span class="op">(</span><span class="va">atl</span>, <span class="va">vals</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  Contrast_A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  Contrast_B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_brain_grid</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">atl</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">results</span>,</span></span>
+<span class="r-in"><span>  values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Contrast_A"</span>, <span class="st">"Contrast_B"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -23,12 +23,13 @@ figure by hand after plotting.
 
 ## What do you need before you start?
 
-For a parcel figure, you need a surface atlas and one numeric value per
-parcel. For a continuous figure, use the same atlas to supply geometry,
-cortex mask, and anatomical provenance, then provide one value per
-surface vertex. The API also accepts a `NeuroVol`, but does not
-currently enforce that volume’s coordinate-space compatibility; the
-limitation is made explicit below.
+For a parcel figure, you need a surface atlas and a keyed result table
+with one row per parcel. A positional numeric vector remains supported
+for code that already guarantees atlas order. For a continuous figure,
+use the same atlas to supply geometry, cortex mask, and anatomical
+provenance, then provide one value per surface vertex. The API also
+accepts a `NeuroVol`, but does not currently enforce that volume’s
+coordinate-space compatibility; the limitation is made explicit below.
 
 ``` r
 
@@ -39,24 +40,32 @@ atl <- schaefer_surf(
   surf = "inflated"
 )
 
-parcel_vals <- seq(-2, 2, length.out = length(atl$ids))
+parcel_results <- tibble::tibble(
+  roi_index = atl$ids,
+  Baseline = sin(seq_along(atl$ids) / 15),
+  Follow_up = cos(seq_along(atl$ids) / 18)
+)
+parcel_results$Difference <-
+  parcel_results$Baseline - parcel_results$Follow_up
+parcel_results <- parcel_results[rev(seq_len(nrow(parcel_results))), ]
 ```
 
 The first call may download and cache Schaefer annotation files. The
 figures below were generated from that exact configuration and are
 committed so the article remains useful during an offline build.
 
-For comparison figures,
-[`plot_brain_grid()`](../reference/plot_brain_grid.md) takes a named
-list of those numeric vectors.
+The deliberately reversed rows demonstrate that plotting uses
+`roi_index`, not table position.
+[`plot_brain_grid()`](../reference/plot_brain_grid.md) can select
+several numeric columns from the same table.
 
 ``` r
 
-vals_list <- list(
-  Baseline = sin(seq_along(atl$ids) / 15),
-  Follow_up = cos(seq_along(atl$ids) / 18),
-  Difference = sin(seq_along(atl$ids) / 15) -
-    cos(seq_along(atl$ids) / 18)
+plot_brain_grid(
+  atl,
+  data = parcel_results,
+  values = c("Baseline", "Follow_up", "Difference"),
+  by = c(id = "roi_index")
 )
 ```
 
@@ -69,7 +78,9 @@ figure with a few surface panels and a single legend.
 
 plot_brain(
   atl,
-  vals = parcel_vals,
+  data = parcel_results,
+  value = Baseline,
+  by = c(id = "roi_index"),
   views = c("lateral", "medial"),
   interactive = FALSE,
   style = "ggseg_like",
@@ -167,7 +178,9 @@ everywhere.
 
 plot_brain_grid(
   atl,
-  vals_list,
+  data = parcel_results,
+  values = c("Baseline", "Follow_up", "Difference"),
+  by = c(id = "roi_index"),
   views = c("lateral", "medial"),
   titles = c("Baseline", "Follow-up", "Difference"),
   shared_scale = TRUE,
@@ -227,8 +240,8 @@ Choose the style from the scientific object you are displaying:
   estimates;
 - use `style = "stat_publication"` for a continuous vertex field or
   projected statistic volume;
-- keep the CPU backend for deterministic static reports and use the
-  existing interactive route for atlas exploration and hover behaviour.
+- use the default ggplot backend for parcel tables, and keep the CPU
+  backend for deterministic continuous vertex overlays.
 
 Then adjust:
 

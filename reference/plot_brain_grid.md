@@ -9,7 +9,7 @@ patchwork. Each element of `vals_list` produces one panel rendered by
 ``` r
 plot_brain_grid(
   surfatlas,
-  vals_list,
+  vals_list = NULL,
   views = c("lateral", "medial"),
   hemis = c("left", "right"),
   ncol = NULL,
@@ -22,6 +22,10 @@ plot_brain_grid(
   title = NULL,
   subtitle = NULL,
   caption = NULL,
+  data = NULL,
+  values = NULL,
+  by = NULL,
+  allow_partial = FALSE,
   ...
 )
 ```
@@ -35,8 +39,10 @@ plot_brain_grid(
 
 - vals_list:
 
-  A named list of numeric vectors, one per panel. Each vector must have
-  length equal to the number of atlas regions.
+  A list of numeric vectors, one per panel. Each vector must have length
+  equal to the number of atlas regions. Optional when `data` and
+  `values` are supplied. Names, when present, become the default panel
+  titles.
 
 - views:
 
@@ -86,6 +92,26 @@ plot_brain_grid(
 
   Optional overall plot annotations applied to the composed figure.
 
+- data:
+
+  Optional data frame, tibble, or `parcel_data` object with one row per
+  parcel. Supply either `data` or `vals_list`.
+
+- values:
+
+  Character vector naming numeric columns in `data`; one brain map is
+  produced for each column.
+
+- by:
+
+  Parcel-key specification passed to
+  [`align_parcel_values()`](align_parcel_values.md).
+
+- allow_partial:
+
+  Logical. If `FALSE` (default), `data` must contain every atlas parcel.
+  If `TRUE`, missing parcels receive `NA` values.
+
 - ...:
 
   Additional arguments passed to [`plot_brain`](plot_brain.md).
@@ -104,5 +130,16 @@ vals <- list(
   Contrast_B = rnorm(200)
 )
 plot_brain_grid(atl, vals)
+
+results <- data.frame(
+  id = rev(atl$ids),
+  Contrast_A = rnorm(200),
+  Contrast_B = rnorm(200)
+)
+plot_brain_grid(
+  atl,
+  data = results,
+  values = c("Contrast_A", "Contrast_B")
+)
 } # }
 ```

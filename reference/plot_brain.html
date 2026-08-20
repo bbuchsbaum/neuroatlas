@@ -129,6 +129,10 @@ the legacy ggseg-based visualisation pipeline.</p>
 <span>  background_color <span class="op">=</span> <span class="st">"grey80"</span>,</span>
 <span>  depth_cull <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  bg <span class="op">=</span> <span class="st">"white"</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  value <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  allow_partial <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -563,6 +567,31 @@ far-side folds through the mesh.</p></dd>
 <dd><p>Character: background colour for the plot. Default: <code>"white"</code>.</p></dd>
 
 
+<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>Optional data frame, tibble, or <code>parcel_data</code> object with
+one row per parcel. When supplied, <code>value</code> is aligned to the atlas
+with <code><a href="align_parcel_values.html">align_parcel_values()</a></code> before rendering. Supply either
+<code>data</code> or <code>vals</code>, not both.</p></dd>
+
+
+<dt id="arg-value">value<a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>Numeric column in <code>data</code>, supplied as a bare name or
+character string.</p></dd>
+
+
+<dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
+<dd><p>Parcel-key specification for <code>data</code>. Use a shared column name
+such as <code>"id"</code>, or map an atlas key to a differently named data
+column with <code>c(id = "roi_index")</code>. Composite keys are supported.
+When <code>NULL</code>, a safe unique key is inferred.</p></dd>
+
+
+<dt id="arg-allow-partial">allow_partial<a class="anchor" aria-label="anchor" href="#arg-allow-partial"></a></dt>
+<dd><p>Logical. If <code>FALSE</code> (default), <code>data</code> must
+contain every atlas parcel. If <code>TRUE</code>, missing parcels are rendered
+with <code>NA</code> values. Unknown and duplicate keys always error.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments (currently unused).</p></dd>
 
@@ -582,6 +611,20 @@ far-side folds through the mesh.</p></dd>
 <span class="r-in"><span><span class="fu">plot_brain</span><span class="op">(</span><span class="va">atl</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_brain</span><span class="op">(</span><span class="va">atl</span>, vals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>, palette <span class="op">=</span> <span class="st">"vik"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_brain</span><span class="op">(</span><span class="va">atl</span>, views <span class="op">=</span> <span class="st">"lateral"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  roi_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atl</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_brain</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">atl</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">results</span>,</span></span>
+<span class="r-in"><span>  value <span class="op">=</span> <span class="va">estimate</span>,</span></span>
+<span class="r-in"><span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"roi_index"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  views <span class="op">=</span> <span class="st">"medial"</span>,</span></span>
+<span class="r-in"><span>  hemis <span class="op">=</span> <span class="st">"left"</span>,</span></span>
+<span class="r-in"><span>  interactive <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Styling: rounded white parcel borders + thicker silhouette + network edges</span></span></span>
 <span class="r-in"><span><span class="fu">plot_brain</span><span class="op">(</span></span></span>

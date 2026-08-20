@@ -6,6 +6,8 @@
   Transform Matrix
 - [`MNI305_to_MNI152`](MNI305_to_MNI152.md) : MNI305 to MNI152 Affine
   Transform Matrix
+- [`align_parcel_values()`](align_parcel_values.md) : Align a Parcel
+  Value Column to an Atlas
 - [`as_igraph()`](as_igraph.md) : Convert Atlas Connectivity to igraph
 - [`as_parcel_data()`](as_parcel_data.md) : Convert an Object to
   \`parcel_data\`

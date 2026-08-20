@@ -19,6 +19,7 @@
 <url><loc>/news/index.html</loc></url>
 <url><loc>/reference/MNI152_to_MNI305.html</loc></url>
 <url><loc>/reference/MNI305_to_MNI152.html</loc></url>
+<url><loc>/reference/align_parcel_values.html</loc></url>
 <url><loc>/reference/as_igraph.html</loc></url>
 <url><loc>/reference/as_parcel_data.html</loc></url>
 <url><loc>/reference/atlas_alignment.html</loc></url>

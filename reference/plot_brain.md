@@ -85,6 +85,10 @@ plot_brain(
   background_color = "grey80",
   depth_cull = TRUE,
   bg = "white",
+  data = NULL,
+  value = NULL,
+  by = NULL,
+  allow_partial = FALSE,
   ...
 )
 ```
@@ -499,6 +503,30 @@ plot_brain(
 
   Character: background colour for the plot. Default: `"white"`.
 
+- data:
+
+  Optional data frame, tibble, or `parcel_data` object with one row per
+  parcel. When supplied, `value` is aligned to the atlas with
+  [`align_parcel_values()`](align_parcel_values.md) before rendering.
+  Supply either `data` or `vals`, not both.
+
+- value:
+
+  Numeric column in `data`, supplied as a bare name or character string.
+
+- by:
+
+  Parcel-key specification for `data`. Use a shared column name such as
+  `"id"`, or map an atlas key to a differently named data column with
+  `c(id = "roi_index")`. Composite keys are supported. When `NULL`, a
+  safe unique key is inferred.
+
+- allow_partial:
+
+  Logical. If `FALSE` (default), `data` must contain every atlas parcel.
+  If `TRUE`, missing parcels are rendered with `NA` values. Unknown and
+  duplicate keys always error.
+
 - ...:
 
   Additional arguments (currently unused).
@@ -519,6 +547,20 @@ atl <- schaefer_surf(200, 17)
 plot_brain(atl)
 plot_brain(atl, vals = rnorm(200), palette = "vik")
 plot_brain(atl, views = "lateral", interactive = FALSE)
+
+results <- data.frame(
+  roi_index = rev(atl$ids),
+  estimate = seq(-2, 2, length.out = length(atl$ids))
+)
+plot_brain(
+  atl,
+  data = results,
+  value = estimate,
+  by = c(id = "roi_index"),
+  views = "medial",
+  hemis = "left",
+  interactive = FALSE
+)
 
 # Styling: rounded white parcel borders + thicker silhouette + network edges
 plot_brain(
