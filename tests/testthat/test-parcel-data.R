@@ -14,6 +14,30 @@ make_toy_parcel_atlas <- function() {
   atlas_obj
 }
 
+make_toy_volumetric_parcel_atlas <- function(clustered = FALSE) {
+  atlas_obj <- make_toy_parcel_atlas()
+  labels <- array(
+    c(0L, 1L, 1L, 2L, 2L, 3L, 3L, 0L),
+    dim = c(2, 2, 2)
+  )
+  space <- neuroim2::NeuroSpace(
+    dim = dim(labels),
+    spacing = c(2, 3, 4),
+    origin = c(-10, 5, 12)
+  )
+
+  if (clustered) {
+    mask <- neuroim2::LogicalNeuroVol(labels != 0L, space = space)
+    atlas_obj$atlas <- neuroim2::ClusteredNeuroVol(
+      mask = mask,
+      clusters = labels[labels != 0L]
+    )
+  } else {
+    atlas_obj$atlas <- neuroim2::NeuroVol(labels, space = space)
+  }
+  atlas_obj
+}
+
 test_that("parcel_data constructor validates and stores schema", {
   tbl <- tibble::tibble(
     id = c(1L, 2L),
@@ -94,6 +118,123 @@ test_that("align_parcel_values supports strings and full-label inference", {
 
   aligned <- align_parcel_values(atlas, values, value = "estimate")
   expect_equal(unname(aligned), c(1, 2, 3))
+})
+
+test_that("parcel_volume aligns values and preserves atlas space", {
+  atlas <- make_toy_volumetric_parcel_atlas()
+  values <- tibble::tibble(
+    roi_index = c(3L, 1L, 2L),
+    z_stat = c(30, 10, 20)
+  )
+
+  result <- parcel_volume(
+    atlas,
+    values,
+    value = z_stat,
+    by = c(id = "roi_index")
+  )
+  labels <- array(as.numeric(atlas$atlas), dim = dim(atlas$atlas))
+  expected <- array(NA_real_, dim = dim(labels))
+  expected[labels == 1L] <- 10
+  expected[labels == 2L] <- 20
+  expected[labels == 3L] <- 30
+
+  expect_s4_class(result, "NeuroVol")
+  expect_equal(array(as.numeric(result), dim = dim(result)), expected)
+  expect_equal(neuroim2::space(result), neuroim2::space(atlas$atlas))
+})
+
+test_that("parcel_volume distinguishes partial parcels from background", {
+  atlas <- make_toy_volumetric_parcel_atlas()
+  values <- tibble::tibble(
+    id = c(3L, 1L),
+    beta = c(0.3, 0.1)
+  )
+
+  expect_error(
+    parcel_volume(atlas, values, beta),
+    "missing 1 atlas parcel",
+    class = "neuroatlas_error_missing_parcel_key"
+  )
+
+  result <- parcel_volume(
+    atlas,
+    values,
+    value = "beta",
+    allow_partial = TRUE,
+    background = -99
+  )
+  labels <- array(as.numeric(atlas$atlas), dim = dim(atlas$atlas))
+  observed <- array(as.numeric(result), dim = dim(result))
+
+  expect_true(all(observed[labels == 0L] == -99))
+  expect_true(all(observed[labels == 1L] == 0.1))
+  expect_true(all(is.na(observed[labels == 2L])))
+  expect_true(all(observed[labels == 3L] == 0.3))
+})
+
+test_that("parcel_volume supports clustered atlas storage", {
+  dense_atlas <- make_toy_volumetric_parcel_atlas()
+  clustered_atlas <- make_toy_volumetric_parcel_atlas(clustered = TRUE)
+  values <- tibble::tibble(id = c(2L, 3L, 1L), statistic = c(2, 3, 1))
+
+  dense <- parcel_volume(dense_atlas, values, statistic, background = 0)
+  clustered <- parcel_volume(
+    clustered_atlas,
+    values,
+    statistic,
+    background = 0
+  )
+
+  expect_equal(as.numeric(clustered), as.numeric(dense))
+  expect_equal(
+    neuroim2::space(clustered),
+    neuroim2::space(clustered_atlas$atlas)
+  )
+})
+
+test_that("parcel_volume fails closed for invalid rendering inputs", {
+  atlas <- make_toy_volumetric_parcel_atlas()
+  values <- tibble::tibble(id = 1:3, statistic = c(1, 2, 3))
+
+  surface_atlas <- atlas
+  class(surface_atlas) <- c("toy_surface", "surfatlas", "atlas")
+  expect_error(
+    parcel_volume(surface_atlas, values, statistic),
+    "must be a volumetric",
+    class = "neuroatlas_error_parcel_volume"
+  )
+
+  expect_error(
+    parcel_volume(atlas, values, statistic, background = Inf),
+    "finite number or `NA_real_`",
+    class = "neuroatlas_error_parcel_volume"
+  )
+
+  values$statistic[[2]] <- Inf
+  expect_error(
+    parcel_volume(atlas, values, statistic),
+    "must not contain infinite values",
+    class = "neuroatlas_error_parcel_value"
+  )
+
+  atlas$atlas <- neuroim2::NeuroVol(
+    array(c(0L, 1L, 2L, 99L, 0L, 1L, 2L, 3L), dim = c(2, 2, 2)),
+    space = neuroim2::space(atlas$atlas)
+  )
+  values$statistic[[2]] <- 2
+  expect_error(
+    parcel_volume(atlas, values, statistic),
+    "Unknown parcel ID.*99",
+    class = "neuroatlas_error_parcel_volume"
+  )
+
+  atlas$atlas <- array(1:3, dim = c(3, 1, 1))
+  expect_error(
+    parcel_volume(atlas, values, statistic),
+    "Could not obtain a volume",
+    class = "neuroatlas_error_parcel_volume"
+  )
 })
 
 test_that("short labels must be unique or made composite", {

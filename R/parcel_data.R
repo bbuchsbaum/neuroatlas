@@ -349,6 +349,114 @@ align_parcel_values <- function(atlas,
 }
 
 
+#' Expand Parcel Values to a Volumetric Atlas
+#'
+#' Align one parcel-level metric to a volumetric atlas and expand it into a
+#' dense \code{neuroim2::NeuroVol} in the atlas's native grid and spatial
+#' reference.
+#'
+#' @param atlas A volumetric atlas object. Surface atlases are not supported.
+#' @param data A data frame, tibble, or \code{parcel_data} object containing
+#'   parcel keys and values.
+#' @param value A numeric value column, supplied as a bare name or string.
+#' @param by Parcel-key specification passed to
+#'   \code{\link{align_parcel_values}()}.
+#' @param allow_partial Logical. If \code{FALSE} (default), \code{data} must
+#'   contain every atlas parcel. If \code{TRUE}, missing parcels receive
+#'   \code{NA}. Unknown and duplicate parcel keys always error.
+#' @param background Numeric scalar used outside the atlas. The default is
+#'   \code{NA_real_}, which keeps background distinct from valid parcel values
+#'   such as zero.
+#'
+#' @return A dense \code{neuroim2::NeuroVol} containing the selected parcel
+#'   value at every voxel belonging to that parcel. Atlas space and geometry
+#'   are preserved.
+#'
+#' @details
+#' \code{parcel_volume()} uses the same strict key matching as
+#' \code{\link{align_parcel_values}()}. The input table remains the
+#' authoritative result; the returned volume is a deterministic rendering
+#' representation. Atlas voxels whose non-zero labels are absent from
+#' \code{atlas$ids} cause an error rather than being silently treated as
+#' background.
+#'
+#' @examples
+#' \dontrun{
+#' atlas <- get_aseg_atlas()
+#' results <- data.frame(
+#'   id = atlas$ids,
+#'   z_stat = stats::rnorm(length(atlas$ids))
+#' )
+#' z_map <- parcel_volume(atlas, results, z_stat)
+#' }
+#'
+#' @export
+parcel_volume <- function(atlas,
+                          data,
+                          value,
+                          by = NULL,
+                          allow_partial = FALSE,
+                          background = NA_real_) {
+  if (!inherits(atlas, "atlas") || inherits(atlas, "surfatlas")) {
+    cli::cli_abort(
+      "{.arg atlas} must be a volumetric {.cls atlas} object.",
+      class = c("neuroatlas_error_parcel_volume", "neuroatlas_error")
+    )
+  }
+  if (!is.numeric(background) || length(background) != 1L ||
+      is.nan(background) || (!is.na(background) && !is.finite(background))) {
+    cli::cli_abort(
+      "{.arg background} must be one finite number or `NA_real_`.",
+      class = c("neuroatlas_error_parcel_volume", "neuroatlas_error")
+    )
+  }
+
+  value_quo <- rlang::enquo(value)
+  value_col <- .parcel_value_column(value_quo)
+  vals <- rlang::inject(align_parcel_values(
+    atlas = atlas,
+    data = data,
+    value = !!value_quo,
+    by = by,
+    allow_partial = allow_partial
+  ))
+
+  if (any(is.infinite(vals))) {
+    cli::cli_abort(
+      "Parcel value column {.val {value_col}} must not contain infinite values.",
+      class = c("neuroatlas_error_parcel_value", "neuroatlas_error")
+    )
+  }
+
+  atlas_vol <- tryCatch(
+    .get_atlas_volume(atlas),
+    error = function(e) {
+      cli::cli_abort(
+        "Could not obtain a volume from {.arg atlas}.",
+        parent = e,
+        class = c("neuroatlas_error_parcel_volume", "neuroatlas_error")
+      )
+    }
+  )
+  labels <- .densify_atlas_vol(atlas_vol)
+  labelled <- !is.na(labels) & labels != 0L
+  unknown_ids <- setdiff(unique(labels[labelled]), atlas$ids)
+  if (length(unknown_ids) > 0L) {
+    cli::cli_abort(
+      c(
+        "Atlas volume contains parcel labels absent from {.field atlas$ids}.",
+        "x" = "Unknown parcel ID{?s}: {.val {unknown_ids}}."
+      ),
+      class = c("neuroatlas_error_parcel_volume", "neuroatlas_error")
+    )
+  }
+
+  out <- array(as.numeric(background), dim = dim(labels))
+  out[labelled] <- unname(vals[match(labels[labelled], atlas$ids)])
+  neuroim2::NeuroVol(out, space = neuroim2::space(atlas_vol))
+}
+
+
 #' Extract and validate one numeric value column from aligned parcels
 #' @keywords internal
 #' @noRd
