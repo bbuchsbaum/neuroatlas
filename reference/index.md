@@ -166,6 +166,8 @@
 - [`parcel_data()`](parcel_data.md) : Parcel-Level Data Container
 - [`parcel_values()`](parcel_values.md) : Extract Parcel Values Aligned
   to an Atlas
+- [`parcel_volume()`](parcel_volume.md) : Expand Parcel Values to a
+  Volumetric Atlas
 - [`plot(`*`<atlas>`*`)`](plot-methods.md)
   [`plot(`*`<glasser>`*`)`](plot-methods.md)
   [`plot(`*`<surfatlas>`*`)`](plot-methods.md) : Plot Glasser Atlas
