@@ -97,7 +97,8 @@ points and rarely needs to call these directly.</p>
 <span>  extra <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">ref</span>,</span>
 <span>  artifacts <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  history <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  history <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">new_surfatlas</span><span class="op">(</span></span>
@@ -116,7 +117,8 @@ points and rarely needs to call these directly.</p>
 <span>  extra <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">ref</span>,</span>
 <span>  artifacts <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  history <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  history <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -181,6 +183,12 @@ overwritten.</p></dd>
 
 <dt id="arg-history">history<a class="anchor" aria-label="anchor" href="#arg-history"></a></dt>
 <dd><p>Optional history tibble built via `.new_atlas_history()`.</p></dd>
+
+
+<dt id="arg-metadata">metadata<a class="anchor" aria-label="anchor" href="#arg-metadata"></a></dt>
+<dd><p>Internal metadata inputs: `source` template metadata,
+`processing` resampling receipt, `parameters` variant parameters, and
+`parents` metadata snapshots of resources used in a derivation.</p></dd>
 
 
 <dt id="arg-lh-atlas-rh-atlas">lh_atlas, rh_atlas<a class="anchor" aria-label="anchor" href="#arg-lh-atlas-rh-atlas"></a></dt>

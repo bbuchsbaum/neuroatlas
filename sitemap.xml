@@ -8,6 +8,7 @@
 <url><loc>/articles/atlas-visualization.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/articles/neuroatlas-overview.html</loc></url>
+<url><loc>/articles/resource-metadata.html</loc></url>
 <url><loc>/articles/surface-panels.html</loc></url>
 <url><loc>/articles/surface-parcellations.html</loc></url>
 <url><loc>/articles/surface-templates.html</loc></url>
@@ -24,6 +25,7 @@
 <url><loc>/reference/as_parcel_data.html</loc></url>
 <url><loc>/reference/atlas_alignment.html</loc></url>
 <url><loc>/reference/atlas_artifacts.html</loc></url>
+<url><loc>/reference/atlas_citations.html</loc></url>
 <url><loc>/reference/atlas_connectivity.html</loc></url>
 <url><loc>/reference/atlas_constructor.html</loc></url>
 <url><loc>/reference/atlas_coord_space.html</loc></url>
@@ -32,6 +34,7 @@
 <url><loc>/reference/atlas_graph.html</loc></url>
 <url><loc>/reference/atlas_hierarchy.html</loc></url>
 <url><loc>/reference/atlas_history.html</loc></url>
+<url><loc>/reference/atlas_metadata.html</loc></url>
 <url><loc>/reference/atlas_overlap.html</loc></url>
 <url><loc>/reference/atlas_provenance.html</loc></url>
 <url><loc>/reference/atlas_ref.html</loc></url>

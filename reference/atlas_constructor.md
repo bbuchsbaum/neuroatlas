@@ -37,7 +37,8 @@ new_atlas(
   extra = list(),
   ref,
   artifacts = NULL,
-  history = NULL
+  history = NULL,
+  metadata = list()
 )
 
 new_surfatlas(
@@ -56,7 +57,8 @@ new_surfatlas(
   extra = list(),
   ref,
   artifacts = NULL,
-  history = NULL
+  history = NULL,
+  metadata = list()
 )
 ```
 
@@ -120,6 +122,12 @@ new_surfatlas(
 - history:
 
   Optional history tibble built via \`.new_atlas_history()\`.
+
+- metadata:
+
+  Internal metadata inputs: \`source\` template metadata, \`processing\`
+  resampling receipt, \`parameters\` variant parameters, and \`parents\`
+  metadata snapshots of resources used in a derivation.
 
 - lh_atlas, rh_atlas:
 

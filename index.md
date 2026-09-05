@@ -47,9 +47,10 @@ consistent, user-friendly functions.
   perceptually-optimised ROI palettes, the ggseg ecosystem, and an
   interactive [`cluster_explorer()`](reference/cluster_explorer.md)
   Shiny app
-- **Provenance**: Every atlas carries structured space, family, and
-  source metadata ([`atlas_ref()`](reference/atlas_ref.md),
-  [`atlas_provenance()`](reference/atlas_provenance.md))
+- **Metadata**: Atlases and loaded templates carry identity, spatial
+  geometry, citations, source artifacts, and processing history
+  ([`atlas_metadata()`](reference/atlas_metadata.md),
+  [`template_metadata()`](reference/atlas_metadata.md)).
 
 ## Installation
 
@@ -81,13 +82,6 @@ library(neuroatlas)
 # Get a Schaefer atlas (200 parcels, 7 networks)
 schaefer <- get_schaefer_atlas(parcels = 200, networks = 7)
 print(schaefer)
-#> ══ Schaefer Atlas ══════════════════════════════════════════════════════════════
-#> Name: Schaefer-200-7networks
-#> Dimensions: 182 x 218 x 182
-#> Regions: 200
-#> Networks: 7
-#> Hemispheres: left: 100, right: 100
-#> Unique networks: 7
 
 # Extract a specific ROI by label (e.g. the first visual parcel)
 roi <- get_roi(schaefer, "Vis_1")
@@ -109,6 +103,22 @@ list_atlases()
 # Load any of them by id (with loader-specific arguments)
 schaefer <- get_atlas("schaefer2018", parcels = "100", networks = "7")
 ```
+
+### Identify and cite a resource
+
+``` r
+
+aseg <- get_aseg_atlas()
+atlas_metadata(aseg)       # Identity, current geometry, source, and modifications
+atlas_citations(aseg)      # R bibliography entries, ready for toBibtex()
+atlas_artifacts(aseg)      # Original files, license information, and checksums
+atlas_history(aseg)        # Recorded operations and their parameters
+```
+
+Metadata stay attached when objects are saved. Source-file geometry and
+current object geometry are recorded separately, and unknown provenance
+is explicit. See [Identify, cite, and trace an
+atlas](vignettes/resource-metadata.Rmd).
 
 ## Palette demos
 
@@ -201,9 +211,6 @@ MIT © Bradley Buchsbaum
 
 This package uses the albersdown theme. Existing vignette theme hooks
 are replaced so `albers.css` and local `albers.js` render consistently
-on CRAN and GitHub Pages. The defaults are configured via
-`params$family` and `params$preset` (family = ‘red’, preset =
-‘interaction’). The pkgdown site uses
-`template: { package: albersdown }` together with generated
-`pkgdown/extra.css` and `pkgdown/extra.js` so the theme is linked and
-activated on site pages.
+on CRAN and GitHub Pages. The palette family is provided via
+`params$family` (default ‘red’). The pkgdown site uses
+`template: { package: albersdown }`.

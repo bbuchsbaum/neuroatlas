@@ -15,6 +15,7 @@
 - [Surface Templates: Geometry vs. Data](surface-templates.md):
 - [Working with TemplateFlow in
   neuroatlas](working-with-templateflow.md):
+- [Identify, cite, and trace an atlas](resource-metadata.md):
 - [Dilating Atlas Parcels Safely](atlas-dilation.md):
 
 ### Specialist Atlases

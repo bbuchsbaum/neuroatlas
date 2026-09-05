@@ -39,22 +39,19 @@ library(neuroatlas)
 
 atlas <- get_atlas("aseg")
 atlas
-#> ── Atlas Summary ─────────────────────────────────────────── 
-#> 
-#> ❯ Name:   ASEG
-#> ❯ Model:  FreeSurferASEG [volume]
-#> ❯ Space:  MNI152NLin6Asym
-#> ❯ Source: bundled_extdata
-#> ❯ Provenance: 1 artifacts, 1 history steps
-#> ❯ Dimensions: 193 x 229 x 193
-#> ❯ Regions: 17
-#> 
-#> Structure Distribution:
-#> |- Left hemisphere:     7
-#> |- Right hemisphere:    8
-#> \- Bilateral/Midline:   2
-#> 
-#> ────────────────────────────────────────────────────────────
+#> <atlas metadata> ASEG
+#>   Description:   Bundled standard-space FreeSurfer subcortical labels.
+#>   Version:       not recorded
+#>   Content:       labels, volume
+#>   Regions:       17
+#>   Template:      MNI152_unspecified
+#>   Coord. space:  MNI152
+#>   Space basis:   inferred
+#>   Voxel size:    1 x 1 x 1 mm
+#>   Source:        bundled_extdata
+#>   License:       not recorded
+#>   Citation:      [atlas] Bruce Fischl et al. (2002); doi:10.1016/S0896-6273(02)00569-X
+#>   Modifications: none recorded
 ```
 
 The object contains 17 subcortical and midline regions on an

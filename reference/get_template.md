@@ -143,7 +143,8 @@ single
 or file path string.
 
 If \`load_as_path\` is \`TRUE\`, a character string (path). If
-\`load_as_path\` is \`FALSE\`, the result of \`as_neurovol\`.
+\`load_as_path\` is \`FALSE\`, a \`SurfaceGeometry\` with attached
+\[template_metadata()\].
 
 ## Details
 

@@ -14,6 +14,9 @@
 - [`atlas_alignment()`](atlas_alignment.md) : Atlas Alignment Lookup
 - [`atlas_artifacts()`](atlas_artifacts.md) : Get Atlas Artifact
   Metadata
+- [`atlas_citations()`](atlas_citations.md)
+  [`template_citations()`](atlas_citations.md) : Bibliographic
+  References for an Atlas or Template
 - [`atlas_connectivity()`](atlas_connectivity.md) : Compute Connectivity
   Matrix from Atlas Parcellations
 - [`atlas_coord_space()`](atlas_coord_space.md) : Atlas Coordinate-Space
@@ -24,6 +27,11 @@
   from an Atlas
 - [`atlas_hierarchy()`](atlas_hierarchy.md) : Atlas Hierarchy
 - [`atlas_history()`](atlas_history.md) : Get Atlas Processing History
+- [`atlas_metadata()`](atlas_metadata.md)
+  [`template_metadata()`](atlas_metadata.md)
+  [`validate_resource_metadata()`](atlas_metadata.md)
+  [`print(`*`<NeuroResourceMetadata>`*`)`](atlas_metadata.md) : Atlas
+  and Template Metadata
 - [`atlas_overlap()`](atlas_overlap.md) : Cross-Atlas Overlap Analysis
 - [`atlas_provenance()`](atlas_provenance.md)
   [`atlas_artifacts(`*`<atlas>`*`)`](atlas_provenance.md)

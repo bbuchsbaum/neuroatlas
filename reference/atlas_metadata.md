@@ -1,0 +1,105 @@
+# Atlas and Template Metadata
+
+A versioned, portable description of a loaded resource. Metadata are
+stored with the object and can be inspected without downloading files or
+resolving citations. Atlas objects store the record in \`x\$metadata\`;
+template volumes and surfaces use the \`neuroatlas_metadata\` attribute,
+preserving their class.
+
+## Usage
+
+``` r
+atlas_metadata(x, ...)
+
+# S3 method for class 'atlas'
+atlas_metadata(x, ...)
+
+# Default S3 method
+atlas_metadata(x, ...)
+
+# S3 method for class 'wang_prob_volumes'
+atlas_metadata(x, ...)
+
+template_metadata(x, ...)
+
+validate_resource_metadata(x)
+
+# S3 method for class 'NeuroResourceMetadata'
+print(x, ...)
+```
+
+## Arguments
+
+- x:
+
+  An atlas, or a template returned by \[get_template()\] or
+  \[load_surface_template()\]. For validation, a
+  \`NeuroResourceMetadata\` record.
+
+- ...:
+
+  Reserved for methods.
+
+## Value
+
+\`atlas_metadata()\` and \`template_metadata()\` return a
+\`NeuroResourceMetadata\` list with \`schema_version\`, \`kind\`,
+\`identity\`, \`content\`, \`spatial\`, \`provenance\`, \`citations\`,
+\`artifacts\`, \`history\`, and \`parents\`.
+\`validate_resource_metadata()\` returns its input invisibly.
+
+## Details
+
+\`identity\` describes the resource and its published version (unknown
+versions are \`NA\`). \`content\` describes the loaded representation,
+value type, selected parameters and current region count. \`spatial\`
+describes the current sampling geometry; \`artifacts\` retain
+source-space and resolution descriptors. A TemplateFlow resolution key
+is a query parameter, not a voxel size in millimetres.
+
+\`spatial\$basis\` records whether template identity is source-declared,
+inferred, user-supplied, or unknown. Geometry alone does not identify an
+anatomical template. Grid resampling does not establish registration to
+a different anatomical template.
+
+\`citations\` is a table with reference roles; \[atlas_citations()\] and
+\[template_citations()\] convert it to R \`bibentry\` objects.
+\`history\` contains structured parameters and software versions.
+\`parents\` retains metadata snapshots for composite resources. Missing
+historical metadata in legacy objects is reported conservatively; it is
+not reconstructed from the network.
+
+The older \[atlas_ref()\], \[atlas_artifacts()\] and \[atlas_history()\]
+accessors read this authoritative record. Legacy list fields are
+compatibility copies; do not edit them to change metadata. Metadata
+preservation is guaranteed for neuroatlas loaders and supported atlas
+operations, not arbitrary operations in other packages or direct
+replacement of an object's data.
+
+## Examples
+
+``` r
+a <- get_aseg_atlas()
+atlas_metadata(a)
+#> <atlas metadata> ASEG
+#>   Description:   Bundled standard-space FreeSurfer subcortical labels.
+#>   Version:       not recorded
+#>   Content:       labels, volume
+#>   Regions:       17
+#>   Template:      MNI152_unspecified
+#>   Coord. space:  MNI152
+#>   Space basis:   inferred
+#>   Voxel size:    1 x 1 x 1 mm
+#>   Source:        bundled_extdata
+#>   License:       not recorded
+#>   Citation:      [atlas] Bruce Fischl et al. (2002); doi:10.1016/S0896-6273(02)00569-X
+#>   Modifications: none recorded
+atlas_metadata(a)$spatial$voxel_size
+#> [1] 1 1 1
+atlas_citations(a)
+#> Fischl B, others (2002). “Whole brain segmentation: automated labeling
+#> of neuroanatomical structures in the human brain.” _Neuron_.
+#> doi:10.1016/S0896-6273(02)00569-X
+#> <https://doi.org/10.1016/S0896-6273%2802%2900569-X>. Role: atlas,
+#> <https://doi.org/10.1016/S0896-6273(02)00569-X>.
+```
