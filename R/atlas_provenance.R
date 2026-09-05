@@ -61,6 +61,7 @@ atlas_artifacts <- function(x, ...) {
 #' @rdname atlas_provenance
 #' @export
 atlas_artifacts.atlas <- function(x, ...) {
+  if (!is.null(x$metadata)) return(atlas_metadata(x)$artifacts)
   if (is.null(x$atlas_artifacts)) {
     return(.empty_atlas_artifacts())
   }
@@ -90,6 +91,7 @@ atlas_history <- function(x, ...) {
 #' @rdname atlas_provenance
 #' @export
 atlas_history.atlas <- function(x, ...) {
+  if (!is.null(x$metadata)) return(atlas_metadata(x)$history)
   if (is.null(x$atlas_history)) {
     return(.empty_atlas_history())
   }
@@ -130,10 +132,16 @@ print.atlas_provenance <- function(x, ...) {
     source_name = character(),
     source_url = character(),
     source_ref = character(),
+    source_version = character(),
     citation_doi = character(),
     license = character(),
+    license_url = character(),
     file_name = character(),
+    local_path = character(),
     sha256 = character(),
+    checksum = character(),
+    checksum_algorithm = character(),
+    checksum_basis = character(),
     template_space = character(),
     coord_space = character(),
     resolution = character(),
@@ -161,7 +169,9 @@ print.atlas_provenance <- function(x, ...) {
     to_coord_space = character(),
     status = character(),
     confidence = character(),
-    details = character()
+    details = character(),
+    parameters = list(),
+    software_version = character()
   )
 }
 
@@ -174,7 +184,7 @@ print.atlas_provenance <- function(x, ...) {
 
   for (nm in names(template)) {
     if (!nm %in% names(out)) {
-      out[[nm]] <- character(nrow(out))
+      out[[nm]] <- rep(NA_character_, nrow(out))
     }
     out[[nm]] <- as.character(out[[nm]])
   }
@@ -191,12 +201,16 @@ print.atlas_provenance <- function(x, ...) {
 
   for (nm in names(template)) {
     if (!nm %in% names(out)) {
-      out[[nm]] <- if (nm == "step") integer(nrow(out)) else character(nrow(out))
+      out[[nm]] <- if (nm == "step") integer(nrow(out)) else {
+        if (nm == "parameters") rep(list(list()), nrow(out)) else {
+          rep(NA_character_, nrow(out))
+        }
+      }
     }
   }
 
   out$step <- as.integer(out$step)
-  for (nm in setdiff(names(template), "step")) {
+  for (nm in setdiff(names(template), c("step", "parameters"))) {
     out[[nm]] <- as.character(out[[nm]])
   }
 
@@ -213,9 +227,12 @@ print.atlas_provenance <- function(x, ...) {
                                 source_name = NA_character_,
                                 source_url = NA_character_,
                                 source_ref = NA_character_,
+                                source_version = NA_character_,
                                 citation_doi = NA_character_,
                                 license = NA_character_,
+                                license_url = NA_character_,
                                 file_name = NA_character_,
+                                local_path = NA_character_,
                                 sha256 = NA_character_,
                                 template_space = NA_character_,
                                 coord_space = NA_character_,
@@ -227,6 +244,15 @@ print.atlas_provenance <- function(x, ...) {
                                 lineage = NA_character_,
                                 confidence = NA_character_,
                                 notes = NA_character_) {
+  terms <- .artifact_license(source_name, family)
+  if (is.na(license)) license <- terms[["license"]]
+  if (is.na(license_url)) license_url <- terms[["license_url"]]
+  receipt <- .file_receipt(local_path)
+  if (is.na(receipt$checksum) && identical(source_name, "neuroatlas")) {
+    bundled <- .bundled_file_receipt(file_name)
+    if (!is.null(bundled)) receipt <- bundled
+  }
+  if (is.na(sha256)) sha256 <- receipt$sha256
   tibble::tibble(
     role = as.character(role),
     family = as.character(family),
@@ -235,10 +261,16 @@ print.atlas_provenance <- function(x, ...) {
     source_name = as.character(source_name),
     source_url = as.character(source_url),
     source_ref = as.character(source_ref),
+    source_version = as.character(source_version),
     citation_doi = as.character(citation_doi),
     license = as.character(license),
+    license_url = as.character(license_url),
     file_name = as.character(file_name),
+    local_path = receipt$local_path,
     sha256 = as.character(sha256),
+    checksum = receipt$checksum,
+    checksum_algorithm = receipt$checksum_algorithm,
+    checksum_basis = receipt$checksum_basis,
     template_space = as.character(template_space),
     coord_space = as.character(coord_space),
     resolution = as.character(resolution),
@@ -263,7 +295,8 @@ print.atlas_provenance <- function(x, ...) {
                                to_coord_space = NA_character_,
                                status = "available",
                                confidence = NA_character_,
-                               details = NA_character_) {
+                               details = NA_character_,
+                               parameters = list()) {
   tibble::tibble(
     step = NA_integer_,
     action = as.character(action),
@@ -274,14 +307,17 @@ print.atlas_provenance <- function(x, ...) {
     to_coord_space = as.character(to_coord_space),
     status = as.character(status),
     confidence = as.character(confidence),
-    details = as.character(details)
+    details = as.character(details),
+    parameters = list(parameters),
+    software_version = as.character(utils::packageVersion("neuroatlas"))
   )
 }
 
 
 #' @keywords internal
 #' @noRd
-.attach_atlas_provenance <- function(x, artifacts = NULL, history = NULL) {
+.attach_atlas_provenance <- function(x, artifacts = NULL, history = NULL,
+                                    metadata_inputs = list()) {
   x$atlas_artifacts <- if (is.null(artifacts)) {
     .empty_atlas_artifacts()
   } else {
@@ -296,7 +332,8 @@ print.atlas_provenance <- function(x, ...) {
     hist
   }
 
-  x
+  meta <- .enrich_atlas_metadata(.build_atlas_metadata(x), metadata_inputs)
+  .store_atlas_metadata(x, meta)
 }
 
 
@@ -311,7 +348,8 @@ print.atlas_provenance <- function(x, ...) {
                                   to_coord_space = NA_character_,
                                   status = "available",
                                   confidence = NA_character_,
-                                  details = NA_character_) {
+                                  details = NA_character_,
+                                  parameters = list()) {
   if (is.null(representation)) {
     representation <- if (inherits(x, "surfatlas")) "surface" else "volume"
   }
@@ -325,17 +363,42 @@ print.atlas_provenance <- function(x, ...) {
     to_coord_space = to_coord_space,
     status = status,
     confidence = confidence,
-    details = details
+    details = details,
+    parameters = parameters
   )
 
-  hist <- if (is.null(x$atlas_history)) {
-    .empty_atlas_history()
-  } else {
-    .normalize_atlas_history(x$atlas_history)
-  }
-
+  meta <- atlas_metadata(x)
+  hist <- meta$history
   hist <- dplyr::bind_rows(hist, row)
   hist$step <- seq_len(nrow(hist))
-  x$atlas_history <- hist
-  x
+  meta$history <- hist
+  .refresh_atlas_metadata(x, meta)
+}
+
+# Hash the exact bytes read, at load time. R versions without tools::sha256sum
+# retain an explicitly labelled MD5 receipt; no new dependency is required.
+.file_receipt <- function(path) {
+  ret <- list(local_path = NA_character_, sha256 = NA_character_,
+              checksum = NA_character_, checksum_algorithm = NA_character_,
+              checksum_basis = NA_character_)
+  if (length(path) != 1L || is.na(path) || !file.exists(path) ||
+      dir.exists(path)) return(ret)
+  ret$local_path <- normalizePath(path, winslash = "/", mustWork = TRUE)
+  sha <- "sha256sum" %in% getNamespaceExports("tools")
+  hash <- if (sha) getExportedValue("tools", "sha256sum") else tools::md5sum
+  ret$checksum <- unname(hash(path))
+  ret$checksum_algorithm <- if (sha) "sha256" else "md5"
+  ret$checksum_basis <- "read_file"
+  if (sha) ret$sha256 <- ret$checksum
+  ret
+}
+
+.bundled_file_receipt <- function(file_name) {
+  path <- system.file("extdata", "resource_checksums.csv", package = "neuroatlas")
+  if (!nzchar(path) || is.na(file_name)) return(NULL)
+  manifest <- utils::read.csv(path, stringsAsFactors = FALSE)
+  row <- manifest[basename(manifest$resource) == file_name, , drop = FALSE]
+  if (nrow(row) != 1L) return(NULL)
+  list(local_path = NA_character_, sha256 = row$sha256, checksum = row$sha256,
+        checksum_algorithm = "sha256", checksum_basis = "source_manifest")
 }

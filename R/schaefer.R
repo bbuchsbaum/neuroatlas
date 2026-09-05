@@ -62,6 +62,8 @@ getmode <- function(v) {
 #' @export
 resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
                     min_neighbors=3) {
+  source_metadata <- attr(vol, "neuroatlas_metadata", exact = TRUE)
+  source_geometry <- .resource_geometry(vol, "volume")
   # Allow ClusteredNeuroVol by converting to dense volume, then rebuild
   is_cluster <- inherits(vol, "ClusteredNeuroVol")
   orig_label_map <- NULL
@@ -144,7 +146,11 @@ resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
   }
 
   if (!is_cluster) {
-    return(vol)
+    return(.finish_resource_resample(vol, source_metadata, list(
+      interpolation = if (interp == 0) "nearest" else "linear",
+      smooth = smooth, radius = radius, min_neighbors = min_neighbors,
+      input_grid = source_geometry, output_grid = .resource_geometry(vol, "volume")
+    )))
   }
 
   # Rebuild ClusteredNeuroVol with filtered label_map
@@ -157,11 +163,16 @@ resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
     names(label_map) <- as.character(final_labels)
   }
 
-  neuroim2::ClusteredNeuroVol(
+  result <- neuroim2::ClusteredNeuroVol(
     as.logical(vol),
     clusters = as.numeric(vol[vol != 0]),
     label_map = label_map
   )
+  .finish_resource_resample(result, source_metadata, list(
+    interpolation = if (interp == 0) "nearest" else "linear",
+    smooth = smooth, radius = radius, min_neighbors = min_neighbors,
+    input_grid = source_geometry, output_grid = .resource_geometry(result, "volume")
+  ))
 }
 
 #' Load Schaefer Atlas Volume
@@ -195,9 +206,13 @@ load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
       description = paste0("Schaefer volume (", fname, ")")
     )
     vol <- neuroim2::read_vol(des)
+    read_path <- des
     neuroim2::write_vol(vol, paste0(get_cache_dir(), "/", fname))
+  } else {
+    read_path <- pname
   }
 
+  attr(vol, "neuroatlas_file_receipt") <- .file_receipt(read_path)
   vol
 }
 
@@ -391,12 +406,14 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
   }
 
   vol <- load_schaefer_vol(parcels, networks, resolution, use_cache)
+  volume_receipt <- attr(vol, "neuroatlas_file_receipt")
 
   if (!is.null(outspace)) {
     #print(outspace)
     assertthat::assert_that(length(dim(outspace)) == 3)
     vol <- resample(vol, outspace, smooth)
   }
+  processing <- attr(vol, "neuroatlas_processing")
 
   labels <- schaefer_metainfo(parcels, networks, use_cache)
   vol_fname <- paste0(
@@ -477,6 +494,13 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
     )
   )
 
+  if (!is.null(volume_receipt)) {
+    for (nm in names(volume_receipt)) artifacts[[nm]][[1]] <- volume_receipt[[nm]]
+  }
+  label_path <- file.path(get_cache_dir(), label_fname)
+  receipt <- .file_receipt(label_path)
+  for (nm in names(receipt)) artifacts[[nm]][[2]] <- receipt[[nm]]
+
   history <- .new_atlas_history(
     action = "load",
     representation = "volume",
@@ -520,7 +544,10 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
     subclass = c("schaefer", "volatlas"),
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(processing = processing,
+                     parameters = list(parcels = as.integer(parcels),
+                                        networks = as.integer(networks)))
   )
 }
 
@@ -733,7 +760,17 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
       annot@labels <- annot@labels[-1]
     }
 
-    annot
+    .capture_surface_sources(
+      annot, annot_path,
+      bundled_geometry = .new_atlas_artifact(
+        role = paste0("geometry_", hemi), family = "template", model = "fsaverage6",
+        source_name = "neuroatlas", source_url = "data/fsaverage.rda",
+        source_ref = paste0("data/fsaverage.rda:", geom_name),
+        file_name = "fsaverage.rda",
+        local_path = system.file("data", "fsaverage.rda", package = "neuroatlas"),
+        template_space = "fsaverage6", density = "41k",
+        hemi = if (hemi == "lh") "left" else "right",
+        confidence = "uncertain", notes = "Bundled geometry; upstream release unrecorded."))
   }
 
   labels <- schaefer_metainfo(parcels, networks, use_cache = use_cache)
@@ -900,7 +937,11 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
       load_as_path = TRUE
     )
 
-    geom <- neurosurf::read_surf_geometry(surf_path)
+    geom <- .attach_template_metadata(
+      neurosurf::read_surf_geometry(surf_path), surf_path, mapping$template_id,
+      list(suffix = surf, hemi = hemi_tf, density = mapping$tf_density,
+           resolution = mapping$tf_resolution), representation = "surface"
+    )
 
     annot <- suppressWarnings(
       neurosurf::read_freesurfer_annot(annot_path, geom)
@@ -918,7 +959,7 @@ get_schaefer_surfatlas <- function(parcels=c("100","200","300","400","500","600"
       annot@labels <- annot@labels[-1]
     }
 
-    annot
+    .capture_surface_sources(annot, annot_path, geom)
   }
 
   labels <- schaefer_metainfo(parcels, networks, use_cache = use_cache)

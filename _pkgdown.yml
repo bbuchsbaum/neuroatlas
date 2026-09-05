@@ -15,6 +15,7 @@ articles:
   contents:
   - surface-templates
   - working-with-templateflow
+  - resource-metadata
   - atlas-dilation
 - title: Specialist Atlases
   contents: wang-visual-cortex

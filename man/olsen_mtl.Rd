@@ -16,9 +16,9 @@ A list with class 'atlas' containing:
 }
 }
 \source{
-Olsen, R. K., et al. (2013). The role of relational binding in item memory:
-Evidence from face recognition in a case of developmental amnesia.
-Journal of Neuroscience, 33(36), 14107-14111.
+Bundled `data/olsen_mtl.rda`, attributed to Rosanna Olsen and colleagues.
+The original atlas publication and redistribution terms have not been
+verified. Use [get_olsen_mtl()] to attach the available provenance record.
 }
 \usage{
 olsen_mtl

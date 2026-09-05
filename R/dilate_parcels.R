@@ -273,5 +273,16 @@ dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {
     # Preserve the class of the original atlas
     class(new_atlas) <- class(atlas)
 
-    new_atlas
+    if (is.null(new_atlas$metadata)) {
+      new_atlas <- .store_atlas_metadata(new_atlas, atlas_metadata(atlas))
+    }
+    .append_atlas_history(
+      new_atlas, action = "dilate", representation = "volume",
+      from_template_space = atlas_space(atlas),
+      to_template_space = atlas_space(atlas),
+      from_coord_space = atlas_coord_space(atlas),
+      to_coord_space = atlas_coord_space(atlas),
+      details = "Expanded parcel boundaries inside the supplied mask.",
+      parameters = list(radius = radius, maxn = maxn)
+    )
 }

@@ -19,7 +19,8 @@ new_atlas(
   extra = list(),
   ref,
   artifacts = NULL,
-  history = NULL
+  history = NULL,
+  metadata = list()
 )
 
 new_surfatlas(
@@ -38,7 +39,8 @@ new_surfatlas(
   extra = list(),
   ref,
   artifacts = NULL,
-  history = NULL
+  history = NULL,
+  metadata = list()
 )
 }
 \arguments{
@@ -74,6 +76,10 @@ overwritten.}
 \item{artifacts}{Optional artifacts tibble built via `.new_atlas_artifact()`.}
 
 \item{history}{Optional history tibble built via `.new_atlas_history()`.}
+
+\item{metadata}{Internal metadata inputs: `source` template metadata,
+`processing` resampling receipt, `parameters` variant parameters, and
+`parents` metadata snapshots of resources used in a derivation.}
 
 \item{lh_atlas, rh_atlas}{For surface atlases, the per-hemisphere
 `LabeledNeuroSurface` objects.}

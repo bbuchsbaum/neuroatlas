@@ -59,36 +59,7 @@ NULL
 #' @importFrom crayon bold blue green yellow red white
 #' @export
 print.schaefer <- function(x, ...) {
-  cat(cli::rule(crayon::bold("Schaefer Atlas"), line = 2), "\n")
-  cat(crayon::blue("Name:"), x$name, "\n")
-  
-  if (!is.null(x$atlas)) {
-    dims <- dim(x$atlas)
-    cat(crayon::blue("Dimensions:"), paste(dims, collapse = " x "), "\n")
-  }
-  
-  n_regions <- length(x$ids)
-  cat(crayon::blue("Regions:"), n_regions, "\n")
-  
-  # Extract network count from name
-  if (grepl("\\d+networks", x$name)) {
-    networks <- sub(".*-(\\d+)networks.*", "\\1", x$name)
-    cat(crayon::blue("Networks:"), networks, "\n")
-  }
-  
-  # Hemisphere distribution
-  if (!is.null(x$hemi)) {
-    hemi_table <- table(x$hemi)
-    hemi_str <- paste(names(hemi_table), hemi_table, sep = ": ", collapse = ", ")
-    cat(crayon::blue("Hemispheres:"), hemi_str, "\n")
-  }
-  
-  # Network distribution if available
-  if (!is.null(x$network)) {
-    unique_networks <- length(unique(x$network))
-    cat(crayon::blue("Unique networks:"), unique_networks, "\n")
-  }
-  
+  print(atlas_metadata(x))
   invisible(x)
 }
 

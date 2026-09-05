@@ -123,6 +123,7 @@ get_glasser_atlas <- function(outspace=NULL,
   if (!is.null(outspace)) {
     vol <- resample(vol, outspace)
   }
+  processing <- attr(vol, "neuroatlas_processing")
   
   # Download and process labels
   label_name <- "glasser360NodeNames.txt"
@@ -195,6 +196,7 @@ get_glasser_atlas <- function(outspace=NULL,
       source_ref = source_info$fname,
       citation_doi = "10.1038/nature18933",
       file_name = source_info$fname,
+      local_path = vol_path,
       template_space = native_space,
       coord_space = "MNI152",
       resolution = if (source == "mni2009c") "1mm" else NA_character_,
@@ -212,6 +214,7 @@ get_glasser_atlas <- function(outspace=NULL,
       source_ref = "glasser360NodeNames.txt",
       citation_doi = "10.1038/nature18933",
       file_name = "glasser360NodeNames.txt",
+      local_path = label_path,
       lineage = "Parcel label table used for stable Glasser naming.",
       confidence = "high"
     )
@@ -256,7 +259,8 @@ get_glasser_atlas <- function(outspace=NULL,
     subclass = "glasser",
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(processing = processing)
   )
 }
 
@@ -311,60 +315,9 @@ plot.glasser <- function(x, y, vals = NULL, thresh = c(0, 0), pos = FALSE,
 #' @importFrom cli rule symbol
 #' @export
 print.glasser <- function(x, ...) {
-  # Header with fancy border
-  cat(cli::rule(left = crayon::bold(crayon::blue("Glasser Atlas Summary")), 
-                col = "cyan", width = 65), "\n\n")
-  
-  # Basic info section
-  cat(crayon::yellow(cli::symbol$info), " ", 
-      crayon::bold("Atlas Type: "), 
-      crayon::white("Glasser Multi-Modal Parcellation"), "\n", sep="")
-  
-  cat(crayon::yellow(cli::symbol$info), " ",
-      crayon::bold("Resolution: "), 
-      crayon::white("MNI Space"), "\n", sep="")
-  
-  # Volume dimensions
-  dims <- dim(x$atlas)
-  cat(crayon::yellow(cli::symbol$info), " ",
-      crayon::bold("Dimensions: "), 
-      crayon::white(paste0(dims[1], " x ", dims[2], " x ", dims[3])), "\n\n", sep="")
-  
-  # Region counts
-  total_regions <- length(x$ids)
-  left_regions <- sum(x$hemi == "left")
-  right_regions <- sum(x$hemi == "right")
-  
-  cat(crayon::green(cli::symbol$circle_filled), " ",
-      crayon::bold("Region Summary:"), "\n", sep="")
-  
-  cat(crayon::blue("|-"), " Total Regions:      ", 
-      crayon::white(total_regions), "\n", sep="")
-  cat(crayon::blue("|-"), " Left Hemisphere:    ", 
-      crayon::white(left_regions), "\n", sep="")
-  cat(crayon::blue("\\-"), " Right Hemisphere:   ", 
-      crayon::white(right_regions), "\n\n", sep="")
-  
-  # Sample regions
-  cat(crayon::green(cli::symbol$circle_filled), " ",
-      crayon::bold("Example Regions:"), "\n", sep="")
-  
-  # Show first 3 regions from each hemisphere
-  left_examples <- head(x$labels[x$hemi == "left"], 3)
-  right_examples <- head(x$labels[x$hemi == "right"], 3)
-  
-  cat(crayon::blue("|-"), " Left:  ", 
-      crayon::white(paste(left_examples, collapse=", ")), "...\n", sep="")
-  cat(crayon::blue("\\-"), " Right: ", 
-      crayon::white(paste(right_examples, collapse=", ")), "...\n", sep="")
-  
-  # Footer
-  cat("\n", cli::rule(
-    left = crayon::blue(cli::symbol$info), 
-    right = "Use plot() for visualization",
-    col = "cyan", width = 65), "\n", sep="")
+  print(atlas_metadata(x))
+  invisible(x)
 }
-
 
 # Glasser surface atlas --------------------------------------------------------
 
@@ -829,5 +782,5 @@ glasser_surf <- function(space = "fsaverage",
     )
   }
 
-  annot
+  .capture_surface_sources(annot, annot_path, geom)
 }

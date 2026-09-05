@@ -360,11 +360,11 @@ test_that("Print methods provide accurate and formatted output", {
     output <- capture.output(print(aseg))
 
     # Should contain key information
-    expect_true(any(grepl("Atlas Summary", output)))
-    expect_true(any(grepl("Name:", output)))
-    expect_true(any(grepl("Dimensions:", output)))
+    expect_true(any(grepl("<atlas metadata>", output)))
+    expect_true(any(grepl(aseg$name, output, fixed = TRUE)))
+    expect_true(any(grepl("Voxel size:", output)))
     expect_true(any(grepl("Regions:", output)))
-    expect_true(any(grepl("hemisphere", output, ignore.case = TRUE)))
+    expect_true(any(grepl("Template:", output)))
   }
 
   # Test 2: print.schaefer method
@@ -375,7 +375,7 @@ test_that("Print methods provide accurate and formatted output", {
 
     # Schaefer-specific information
     expect_true(any(grepl("Schaefer", output)))
-    expect_true(any(grepl("Networks:", output)))
+    expect_true(any(grepl("networks=7", output)))
     expect_true(any(grepl("7", output)))  # Network count
   }
 
@@ -386,9 +386,9 @@ test_that("Print methods provide accurate and formatted output", {
 
     # Glasser-specific information
     expect_true(any(grepl("Glasser", output)))
-    expect_true(any(grepl("Multi-Modal Parcellation", output, ignore.case = TRUE)))
+    expect_true(any(grepl("Template:", output)))
     expect_true(any(grepl("360", output)))  # Region count
-    expect_true(any(grepl("Example Regions", output)))
+    expect_true(any(grepl("Citation:", output)))
   }
 
   # Test 4: CLI formatting elements

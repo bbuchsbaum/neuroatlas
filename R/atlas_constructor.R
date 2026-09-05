@@ -39,6 +39,9 @@
 #' @param ref An `atlas_ref` object created with [new_atlas_ref()].
 #' @param artifacts Optional artifacts tibble built via `.new_atlas_artifact()`.
 #' @param history Optional history tibble built via `.new_atlas_history()`.
+#' @param metadata Internal metadata inputs: `source` template metadata,
+#'   `processing` resampling receipt, `parameters` variant parameters, and
+#'   `parents` metadata snapshots of resources used in a derivation.
 #' @param lh_atlas,rh_atlas For surface atlases, the per-hemisphere
 #'   `LabeledNeuroSurface` objects.
 #' @param surf_type Surface type string (e.g. `"pial"`). Surface atlases only.
@@ -69,7 +72,8 @@ new_atlas <- function(name,
                       extra = list(),
                       ref,
                       artifacts = NULL,
-                      history = NULL) {
+                      history = NULL,
+                      metadata = list()) {
   ids <- as.integer(ids)
   n <- length(ids)
 
@@ -108,7 +112,7 @@ new_atlas <- function(name,
   reserved <- c(
     "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
     "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
-    "atlas_history", "space", "template_space", "coord_space",
+    "atlas_history", "metadata", "space", "template_space", "coord_space",
     "confidence"
   )
   if (length(extra) > 0L) {
@@ -132,7 +136,8 @@ new_atlas <- function(name,
   validate_atlas(ret)
 
   ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history,
+                                   metadata_inputs = metadata)
   ret
 }
 
@@ -154,7 +159,8 @@ new_surfatlas <- function(name,
                           extra = list(),
                           ref,
                           artifacts = NULL,
-                          history = NULL) {
+                          history = NULL,
+                          metadata = list()) {
   ids <- as.integer(ids)
   n <- length(ids)
   labels <- as.character(labels)
@@ -197,7 +203,7 @@ new_surfatlas <- function(name,
     reserved <- c(
       "surf_type", "surface_space", "lh_atlas", "rh_atlas", "name", "cmap",
       "ids", "labels", "orig_labels", "hemi", "network", "roi_metadata",
-      "atlas_ref", "atlas_artifacts", "atlas_history", "space",
+      "atlas_ref", "atlas_artifacts", "atlas_history", "metadata", "space",
       "template_space", "coord_space", "confidence"
     )
     drop <- extra_names %in% reserved
@@ -213,7 +219,8 @@ new_surfatlas <- function(name,
   validate_atlas(ret)
 
   ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history,
+                                   metadata_inputs = metadata)
   ret
 }
 

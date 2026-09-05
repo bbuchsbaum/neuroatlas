@@ -31,7 +31,7 @@ new_atlas_ref <- function(family,
                           provenance = NA_character_,
                           source = NA_character_,
                           lineage = NA_character_,
-                          confidence = c("exact", "high", "approximate", "uncertain"),
+                          confidence = c("uncertain", "exact", "high", "approximate"),
                           notes = NA_character_) {
   representation <- match.arg(representation)
   confidence <- match.arg(confidence)
@@ -111,6 +111,7 @@ atlas_ref <- function(x, ...) {
 #' @rdname atlas_ref
 #' @export
 atlas_ref.atlas <- function(x, ...) {
+  if (!is.null(x$metadata)) return(.metadata_ref(atlas_metadata(x)))
   if (!is.null(x$atlas_ref)) {
     return(validate_atlas_ref(x$atlas_ref))
   }

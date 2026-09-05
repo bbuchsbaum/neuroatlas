@@ -164,6 +164,7 @@ get_subcortical_atlas <- function(name,
   # Retrieve and optionally resample the atlas volume
   atlas_vol <- do.call(get_template,
                        c(tf_query, list(path_only = FALSE), list(...)))
+  source_metadata <- attr(atlas_vol, "neuroatlas_metadata")
 
   if (!is.null(outspace)) {
     resolved_space <- if (methods::is(outspace, "NeuroSpace")) {
@@ -173,6 +174,7 @@ get_subcortical_atlas <- function(name,
     }
     atlas_vol <- resample(atlas_vol, resolved_space, smooth = FALSE)
   }
+  processing <- attr(atlas_vol, "neuroatlas_processing")
 
   # Build atlas metadata from labels/ids
   ids <- sort(unique(as.vector(atlas_vol[atlas_vol != 0])))
@@ -229,6 +231,7 @@ get_subcortical_atlas <- function(name,
         source_url = "https://www.templateflow.org",
         source_ref = basename(label_path),
         file_name = basename(label_path),
+        local_path = label_path,
         lineage = "Label table paired with TemplateFlow atlas.",
         confidence = "high"
       )
@@ -283,7 +286,10 @@ get_subcortical_atlas <- function(name,
     ),
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(source = source_metadata, processing = processing,
+                     parameters = list(atlas = spec$atlas, desc = tf_desc,
+                                        resolution_key = res))
   )
 }
 

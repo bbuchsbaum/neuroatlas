@@ -90,6 +90,7 @@ get_fsl_atlas <- function(name,
   if (!is.null(outspace)) {
     vol <- resample(vol, outspace, smooth = FALSE)
   }
+  processing <- attr(vol, "neuroatlas_processing")
 
   values <- sort(unique(as.integer(as.vector(vol))))
   values <- values[values != 0L]
@@ -135,6 +136,7 @@ get_fsl_atlas <- function(name,
       source_url = xml_path,
       source_ref = basename(xml_path),
       file_name = basename(xml_path),
+      local_path = xml_path,
       template_space = "MNI152",
       coord_space = "MNI152",
       resolution = res_label,
@@ -153,6 +155,7 @@ get_fsl_atlas <- function(name,
       source_url = atlas_path,
       source_ref = basename(atlas_path),
       file_name = basename(atlas_path),
+      local_path = atlas_path,
       template_space = "MNI152",
       coord_space = "MNI152",
       resolution = res_label,
@@ -189,7 +192,9 @@ get_fsl_atlas <- function(name,
     ),
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(processing = processing,
+                     parameters = list(image = image, source_type = meta$type))
   )
 }
 
@@ -306,10 +311,12 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
   }
 
   vol <- do.call(get_template, c(tf_query, list(path_only = FALSE)))
+  source_metadata <- attr(vol, "neuroatlas_metadata")
   template_out <- .template_space_from_outspace(outspace, template_space)
   if (!is.null(outspace)) {
     vol <- resample(vol, outspace, smooth = FALSE)
   }
+  processing <- attr(vol, "neuroatlas_processing")
 
   ids <- sort(unique(as.integer(as.vector(vol))))
   ids <- ids[ids != 0L]
@@ -379,6 +386,7 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
         source_url = "https://www.templateflow.org",
         source_ref = basename(label_path),
         file_name = basename(label_path),
+        local_path = label_path,
         template_space = template_space,
         coord_space = "MNI152",
         resolution = paste0(as.integer(resolution), "mm"),
@@ -416,7 +424,10 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
     ),
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(source = source_metadata, processing = processing,
+                     parameters = list(type = type, threshold = threshold,
+                                        resolution_key = resolution))
   )
 }
 

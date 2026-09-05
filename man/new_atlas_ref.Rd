@@ -15,7 +15,7 @@ new_atlas_ref(
   provenance = NA_character_,
   source = NA_character_,
   lineage = NA_character_,
-  confidence = c("exact", "high", "approximate", "uncertain"),
+  confidence = c("uncertain", "exact", "high", "approximate"),
   notes = NA_character_
 )
 }

@@ -22,31 +22,32 @@ consistent, user-friendly functions.
 
 - **Many built-in atlases**: Schaefer (100-1000 parcels), Brainnetome
   (246 regions), Glasser (360 regions), Harvard-Oxford, Julich-Brain,
-  FreeSurfer ASEG, harmonized TemplateFlow/AtlasPack subcortical atlases,
-  Olsen MTL, and probabilistic visual-cortex atlases (Wang 2015,
-  visfAtlas, cytoarchitectonic V1-V5)
+  FreeSurfer ASEG, harmonized TemplateFlow/AtlasPack subcortical
+  atlases, Olsen MTL, and probabilistic visual-cortex atlases (Wang
+  2015, visfAtlas, cytoarchitectonic V1-V5)
 - **Surface & volume**: Work with both volumetric and surface-based
   parcellations through one consistent interface
-- **Atlas discovery**: Enumerate built-ins with `list_atlases()` and load
-  any of them by name with `get_atlas()`
+- **Atlas discovery**: Enumerate built-ins with `list_atlases()` and
+  load any of them by name with `get_atlas()`
 - **ROI analysis**: Extract and summarise regions with `get_roi()`,
   `map_atlas()`, `reduce_atlas()`, and `batch_reduce()`
 - **Atlas operations**: Combine and reshape parcellations with
   `merge_atlases()`, `filter_atlas()`, `dilate_atlas()`,
   `atlas_overlap()`, and resampling across spaces/resolutions
-- **Spatial queries**: Look up parcels by world, voxel, or MNI coordinate
-  with `query_point()`, `query_coord()`, and `query_vox()`
+- **Spatial queries**: Look up parcels by world, voxel, or MNI
+  coordinate with `query_point()`, `query_coord()`, and `query_vox()`
 - **Network & graph tools**: `atlas_connectivity()`, `atlas_graph()` /
   `as_igraph()`, `atlas_hierarchy()`, and `spin_test()` spatial null
   models
-- **TemplateFlow integration**: Access standardized templates through the
-  pure-R `templateflow` backend
+- **TemplateFlow integration**: Access standardized templates through
+  the pure-R `templateflow` backend
 - **Visualization**: Publication-quality surface figures with
   `plot_brain()` / `plot_brain_grid()`, perceptually-optimised ROI
   palettes, the ggseg ecosystem, and an interactive `cluster_explorer()`
   Shiny app
-- **Provenance**: Every atlas carries structured space, family, and
-  source metadata (`atlas_ref()`, `atlas_provenance()`)
+- **Metadata**: Atlases and loaded templates carry identity, spatial
+  geometry, citations, source artifacts, and processing history
+  (`atlas_metadata()`, `template_metadata()`).
 
 ## Installation
 
@@ -75,13 +76,6 @@ library(neuroatlas)
 # Get a Schaefer atlas (200 parcels, 7 networks)
 schaefer <- get_schaefer_atlas(parcels = 200, networks = 7)
 print(schaefer)
-#> ══ Schaefer Atlas ══════════════════════════════════════════════════════════════
-#> Name: Schaefer-200-7networks
-#> Dimensions: 182 x 218 x 182
-#> Regions: 200
-#> Networks: 7
-#> Hemispheres: left: 100, right: 100
-#> Unique networks: 7
 
 # Extract a specific ROI by label (e.g. the first visual parcel)
 roi <- get_roi(schaefer, "Vis_1")
@@ -102,6 +96,21 @@ list_atlases()
 # Load any of them by id (with loader-specific arguments)
 schaefer <- get_atlas("schaefer2018", parcels = "100", networks = "7")
 ```
+
+### Identify and cite a resource
+
+``` r
+aseg <- get_aseg_atlas()
+atlas_metadata(aseg)       # Identity, current geometry, source, and modifications
+atlas_citations(aseg)      # R bibliography entries, ready for toBibtex()
+atlas_artifacts(aseg)      # Original files, license information, and checksums
+atlas_history(aseg)        # Recorded operations and their parameters
+```
+
+Metadata stay attached when objects are saved. Source-file geometry and
+current object geometry are recorded separately, and unknown provenance
+is explicit. See [Identify, cite, and trace an
+atlas](vignettes/resource-metadata.Rmd).
 
 ## Palette demos
 
@@ -161,7 +170,7 @@ plot_brain(
   Static panel composition with `plot_brain()` and `plot_brain_grid()`
 - [Surface
   Templates](https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.html) -
-  Geometry vs. data on surface meshes
+  Geometry vs. data on surface meshes
 - [Surface
   Parcellations](https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html) -
   Surface-based atlas operations
@@ -185,6 +194,11 @@ plot_brain(
 MIT © Bradley Buchsbaum
 
 <!-- albersdown:theme-note:start -->
+
 ## Albers theme
-This package uses the albersdown theme. Existing vignette theme hooks are replaced so `albers.css` and local `albers.js` render consistently on CRAN and GitHub Pages. The defaults are configured via `params$family` and `params$preset` (family = 'red', preset = 'interaction'). The pkgdown site uses `template: { package: albersdown }` together with generated `pkgdown/extra.css` and `pkgdown/extra.js` so the theme is linked and activated on site pages.
-<!-- albersdown:theme-note:end -->
+
+This package uses the albersdown theme. Existing vignette theme hooks
+are replaced so `albers.css` and local `albers.js` render consistently
+on CRAN and GitHub Pages. The palette family is provided via
+`params$family` (default ‘red’). The pkgdown site uses
+`template: { package: albersdown }`. <!-- albersdown:theme-note:end -->

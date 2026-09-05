@@ -74,6 +74,10 @@ register_atlas <- function(id,
     aliases = as.character(aliases),
     description = as.character(description)
   )
+  spec$metadata <- .atlas_catalog_entry(family)
+  if (is.na(spec$description) && !is.null(spec$metadata)) {
+    spec$description <- spec$metadata$description
+  }
   class(spec) <- c("atlas_spec", "list")
 
   assign(spec$id, spec, envir = .neuroatlas_atlas_registry)

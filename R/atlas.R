@@ -3,57 +3,8 @@
 #' @importFrom cli rule symbol
 #' @export
 print.atlas <- function(x, ...) {
-  ref <- if (!is.null(x$atlas_ref)) atlas_ref(x) else NULL
-
-  # Header
-  cat(cli::rule(left = crayon::bold("Atlas Summary"), col = "cyan", width = 60), "\n\n")
-
-  # Basic info
-  cat(crayon::blue(cli::symbol$pointer), " ",
-      crayon::bold("Name:   "), crayon::white(x$name), "\n", sep="")
-  if (!is.null(ref)) {
-    cat(crayon::blue(cli::symbol$pointer), " ",
-        crayon::bold("Model:  "), crayon::white(ref$model),
-        crayon::white(paste0(" [", ref$representation, "]")), "\n", sep = "")
-    cat(crayon::blue(cli::symbol$pointer), " ",
-        crayon::bold("Space:  "), crayon::white(ref$template_space), "\n", sep = "")
-    if (!is.na(ref$source) && nzchar(ref$source)) {
-      cat(crayon::blue(cli::symbol$pointer), " ",
-          crayon::bold("Source: "), crayon::white(ref$source), "\n", sep = "")
-    }
-    cat(crayon::blue(cli::symbol$pointer), " ",
-        crayon::bold("Provenance: "),
-        crayon::white(paste0(nrow(atlas_artifacts(x)), " artifacts, ",
-                             nrow(atlas_history(x)), " history steps")),
-        "\n", sep = "")
-  }
-
-  # Volume info
-  dims <- dim(x$atlas)
-  cat(crayon::blue(cli::symbol$pointer), " ",
-      crayon::bold("Dimensions: "),
-      crayon::white(paste0(dims[1], " x ", dims[2], " x ", dims[3])), "\n", sep="")
-
-  # Region counts
-  cat(crayon::blue(cli::symbol$pointer), " ",
-      crayon::bold("Regions: "),
-      crayon::green(length(x$ids)), "\n", sep="")
-
-  # Hemisphere breakdown
-  left_count <- sum(x$hemi == "left", na.rm=TRUE)
-  right_count <- sum(x$hemi == "right", na.rm=TRUE)
-  bilateral_count <- sum(is.na(x$hemi))
-
-  cat("\n", crayon::bold("Structure Distribution:"), "\n", sep="")
-  cat(crayon::red("|-"), " Left hemisphere:     ",
-      crayon::white(left_count), "\n", sep="")
-  cat(crayon::red("|-"), " Right hemisphere:    ",
-      crayon::white(right_count), "\n", sep="")
-  cat(crayon::red("\\-"), " Bilateral/Midline:   ",
-      crayon::white(bilateral_count), "\n", sep="")
-
-  # Footer
-  cat("\n", cli::rule(col = "cyan", width = 60), "\n", sep="")
+  print(atlas_metadata(x))
+  invisible(x)
 }
 
 #' Create Cache Directory for Atlas Data
@@ -149,6 +100,21 @@ clear_cache <- function() {
 #' @export
 merge_atlases <- function(atlas1, atlas2) {
   assertthat::assert_that(all(dim(atlas1$atlas) == dim(atlas2$atlas)))
+  parents <- list(atlas1 = atlas_metadata(atlas1),
+                  atlas2 = atlas_metadata(atlas2))
+  sp1 <- neuroim2::space(atlas1$atlas)
+  sp2 <- neuroim2::space(atlas2$atlas)
+  if (!isTRUE(all.equal(neuroim2::trans(sp1), neuroim2::trans(sp2),
+                        tolerance = 1e-7))) {
+    stop("Cannot merge atlases on different voxel grids; align them first.")
+  }
+  space1 <- atlas_space(atlas1)
+  space2 <- atlas_space(atlas2)
+  known <- function(s) !is.na(s) && !s %in%
+    c("custom", "MNI152", "MNI152_custom", "MNI152_unspecified", "Unknown")
+  if (known(space1) && known(space2) && space1 != space2) {
+    stop("Cannot merge atlases with conflicting anatomical template identities.")
+  }
 
   vol_to_array <- function(x) {
     if (methods::is(x, "NeuroVol") || methods::is(x, "ClusteredNeuroVol")) {
@@ -198,7 +164,7 @@ merge_atlases <- function(atlas1, atlas2) {
 
 
 
-  cmap <- rbind(atlas1$cmap, atlas2$cmap)
+  cmap <- rbind(as.matrix(atlas1$cmap), as.matrix(atlas2$cmap))
   if (nrow(cmap) == length(c(atlas1$ids, shifted_ids))) {
     rownames(cmap) <- c(atlas1$ids, shifted_ids)
   }
@@ -214,7 +180,39 @@ merge_atlases <- function(atlas1, atlas2) {
   )
 
   class(ret) <- c(paste0(atlas1$name,"::", atlas2$name), "atlas")
-  ret
+  common_space <- if (identical(space1, space2)) space1 else NA_character_
+  ref <- new_atlas_ref(
+    "composite", ret$name, representation = "derived",
+    template_space = common_space,
+    coord_space = if (identical(atlas_coord_space(atlas1),
+                                atlas_coord_space(atlas2))) {
+      atlas_coord_space(atlas1)
+    } else NA_character_,
+    source = "merge_atlases", lineage = "Composite of two parent atlases.",
+    confidence = "uncertain"
+  )
+  ret <- .attach_atlas_ref(ret, ref)
+  ret <- .attach_atlas_provenance(
+    ret,
+    artifacts = dplyr::bind_rows(parents$atlas1$artifacts,
+                                 parents$atlas2$artifacts),
+    history = .new_atlas_history(
+      "merge", "volume", to_template_space = common_space,
+      details = "Merged parents; nonzero atlas2 labels take precedence.",
+      parameters = list(parent_ids = vapply(parents, function(p) p$identity$id,
+                                            character(1)),
+                         atlas2_id_map = remap,
+                         overlap = "atlas2_overwrites_atlas1")
+    )
+  )
+  meta <- ret$metadata
+  meta$parents <- parents
+  meta$citations <- .deduplicate_citations(dplyr::bind_rows(
+    parents$atlas1$citations, parents$atlas2$citations))
+  meta$identity$description <- "Composite atlas; both parent records retained."
+  meta$provenance$issues <- unique(c(parents$atlas1$provenance$issues,
+                                    parents$atlas2$provenance$issues))
+  .store_atlas_metadata(ret, meta)
 }
 
 

@@ -389,7 +389,15 @@ get_template <- function(space = "MNI152NLin2009cAsym",
   if (path_only) {
     return(file_path)
   } else {
-    return(as_neurovol(file_path))
+    if (grepl("\\.surf\\.gii$", file_path)) {
+      return(.attach_template_metadata(
+        .read_surface_template_geometry(file_path, hemi = query_args$hemi),
+        file_path, space, query_args, representation = "surface"
+      ))
+    }
+    return(.attach_template_metadata(
+      as_neurovol(file_path), file_path, space, query_args
+    ))
   }
 }
 
@@ -733,7 +741,8 @@ get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @param load_as_path Logical, whether to return only the path to the file.
 #'        Defaults to `TRUE`.
 #' @return If `load_as_path` is `TRUE`, a character string (path).
-#'         If `load_as_path` is `FALSE`, the result of `as_neurovol`.
+#'         If `load_as_path` is `FALSE`, a `SurfaceGeometry` with attached
+#'         [template_metadata()].
 #' @export
 #' @examples
 #' \donttest{
@@ -837,13 +846,19 @@ load_surface_template <- function(template_id, surface_type,
       load_as_path = TRUE
     )
 
-    .read_surface_template_geometry(surf_path, hemi = h)
+    .attach_template_metadata(
+      .read_surface_template_geometry(surf_path, hemi = h),
+      surf_path, template_id,
+      query = c(list(suffix = surface_type, hemi = h, density = density,
+                      resolution = resolution), list(...)),
+      representation = "surface"
+    )
   }
 
   if (identical(hemi, "both")) {
     ret <- list(L = fetch_one("L"), R = fetch_one("R"))
     class(ret) <- c("neuroatlas_surface_pair", "list")
-    return(ret)
+    return(.attach_template_pair_metadata(ret))
   }
 
   fetch_one(hemi)

@@ -97,6 +97,7 @@ get_visual_atlas <- function(outspace = NULL,
   if (!is.null(outspace)) {
     vol <- resample(vol, outspace, smooth)
   }
+  processing <- attr(vol, "neuroatlas_processing")
 
   actual_ids <- sort(unique(as.integer(vol[vol != 0])))
   keep2 <- match(actual_ids, vis_ids)
@@ -154,7 +155,8 @@ get_visual_atlas <- function(outspace = NULL,
     to_coord_space = "MNI152",
     status = "available",
     confidence = if (is.null(outspace)) "high" else "approximate",
-    details = "Extracted and relabeled Julich-Brain visual areas as V1-V5."
+    details = "Extracted and relabeled Julich-Brain visual areas as V1-V5.",
+    parameters = list(source_ids = actual_ids, labels = vis_area)
   )
 
   new_atlas(
@@ -168,7 +170,9 @@ get_visual_atlas <- function(outspace = NULL,
     subclass = c("visual", "volatlas"),
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(processing = processing,
+                     parents = list(julich = atlas_metadata(jul)))
   )
 }
 

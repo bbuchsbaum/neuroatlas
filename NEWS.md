@@ -1,5 +1,23 @@
 # neuroatlas 0.1.0.9000
 
+* Added a shared, versioned metadata record for atlases and loaded templates:
+  `atlas_metadata()`, `template_metadata()`, `atlas_citations()`, and
+  `template_citations()`. Records contain resource identity, actual geometry,
+  role-specific references, file receipts, and structured processing history.
+  Citation access and inspection work offline and survive R serialization.
+* Atlas summaries now consistently display spatial metadata and citation
+  information. Resampled atlases report their actual voxel spacing; original
+  source resolutions remain in artifact records. Grid resampling retains the
+  native anatomical template identity and records the requested grid separately.
+* Subsetting and dilation preserve metadata and record their parameters. Merges
+  retain both parent records and citations and reject conflicting grids or
+  known template identities. Probability-volume collections and surface
+  template pairs retain their component records.
+* Missing provenance defaults to uncertain. The bundled ASEG atlas now reports
+  `MNI152_unspecified`: header geometry does not verify the precise anatomical
+  template. Olsen's original atlas publication remains explicitly unverified.
+  See the new "Identify, cite, and trace an atlas" vignette.
+
 * `dilate_atlas()` now genuinely honours its `radius` argument. The
   previous implementation passed a fixed `k` to `Rnanoflann::nn(search =
   "radius")`, which returns the `k` nearest neighbours regardless of

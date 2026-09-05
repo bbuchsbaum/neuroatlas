@@ -75,6 +75,7 @@ get_visfatlas <- function(outspace = NULL,
     assertthat::assert_that(length(dim(outspace)) == 3)
     vol <- resample(vol, outspace, smooth)
   }
+  processing <- attr(vol, "neuroatlas_processing")
 
   actual_ids <- sort(unique(as.integer(vol[vol != 0])))
   if (length(actual_ids) == 0L) {
@@ -122,6 +123,7 @@ get_visfatlas <- function(outspace = NULL,
       source_ref = "visfAtlas_MNI152_volume.nii.gz",
       citation_doi = "10.1093/cercor/bhaa246",
       file_name = "visfAtlas_MNI152_volume.nii.gz",
+      local_path = vol_path,
       template_space = "MNI152",
       coord_space = "MNI152",
       resolution = "1mm",
@@ -171,7 +173,8 @@ get_visfatlas <- function(outspace = NULL,
     ),
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(processing = processing)
   )
 }
 

@@ -26,9 +26,9 @@
 #' }
 #'
 #' @source
-#' Olsen, R. K., et al. (2013). The role of relational binding in item memory:
-#' Evidence from face recognition in a case of developmental amnesia.
-#' Journal of Neuroscience, 33(36), 14107-14111.
+#' Bundled `data/olsen_mtl.rda`, attributed to Rosanna Olsen and colleagues.
+#' The original atlas publication and redistribution terms have not been
+#' verified. Use [get_olsen_mtl()] to attach the available provenance record.
 #'
 #' @examples
 #' \donttest{
@@ -133,15 +133,16 @@ get_olsen_mtl <- function(outspace=NULL) {
     family = "olsen",
     model = "OlsenMTL",
     source_name = "neuroatlas",
-    source_url = "inst/extdata/Olsen_MNI_MTL_prob33.nii.gz",
-    source_ref = "Olsen_MNI_MTL_prob33.nii.gz",
-    file_name = "Olsen_MNI_MTL_prob33.nii.gz",
+    source_url = "data/olsen_mtl.rda",
+    source_ref = "data/olsen_mtl.rda:olsen_mtl",
+    file_name = "olsen_mtl.rda",
+    local_path = system.file("data", "olsen_mtl.rda", package = "neuroatlas"),
     template_space = "MNI152_custom",
     coord_space = "MNI152",
     resolution = "1mm",
     lineage = "Bundled neuroatlas Olsen MTL atlas volume.",
     confidence = "uncertain",
-    notes = "Packaged in neuroatlas data."
+    notes = "Serialized package dataset; original atlas publication unverified."
   )
 
   history <- .new_atlas_history(
@@ -173,7 +174,10 @@ get_olsen_mtl <- function(outspace=NULL) {
   }
 
   ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history)
+  ret <- .attach_atlas_provenance(
+    ret, artifacts = artifacts, history = history,
+    metadata_inputs = list(processing = attr(ret$atlas, "neuroatlas_processing"))
+  )
   ret
 }
 
@@ -218,16 +222,8 @@ get_olsen_mtl <- function(outspace=NULL) {
 get_hipp_atlas <- function(outspace=NULL, apsections=1) {
   olsen_mtl <- NULL  # To avoid R CMD check NOTE
   # Load and potentially resample base atlas
-  x <- if (is.null(outspace)) {
-    utils::data("olsen_mtl", envir = environment())
-    olsen_mtl
-  } else {
-    utils::data("olsen_mtl", envir = environment())
-    atres <- resample(olsen_mtl$atlas, outspace)
-    tmp <- olsen_mtl
-    tmp$atlas <- atres
-    tmp
-  }
+  x <- get_olsen_mtl(outspace = outspace)
+  processing <- attr(x$atlas, "neuroatlas_processing")
   template_space <- .template_space_from_outspace(
     outspace,
     default_space = "MNI152_custom"
@@ -332,7 +328,8 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
       to_coord_space = "MNI152",
       status = "available",
       confidence = if (is.null(outspace)) "uncertain" else "approximate",
-      details = paste0("Derived hippocampal atlas with apsections=", apsections, ".")
+      details = paste0("Derived hippocampal atlas with apsections=", apsections, "."),
+      parameters = list(apsections = apsections)
     )
   )
 
@@ -347,6 +344,9 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
     subclass = "hippocampus",
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(processing = processing,
+                     parameters = list(apsections = apsections),
+                     parents = list(olsen_mtl = atlas_metadata(x)))
   )
 }

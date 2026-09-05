@@ -331,7 +331,7 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
   labs <- .wang_visual_labels()$label
   cols <- grDevices::rainbow(25)
 
-  methods::new(
+  result <- methods::new(
     "LabeledNeuroSurface",
     geometry = geom,
     indices = as.integer(seq_len(n_vertices)),
@@ -339,6 +339,12 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
     labels = as.character(labs),
     cols = as.character(cols)
   )
+  geom <- .attach_template_metadata(
+    geom, surf_path, "fsaverage",
+    list(suffix = surf, hemi = hemi_tf, density = "164k"),
+    representation = "surface"
+  )
+  .capture_surface_sources(result, mgz_path, geom)
 }
 
 
@@ -537,14 +543,17 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
   }
 
   files$path <- resolve_paths(cand_dirs)
+  downloaded <- rep(FALSE, nrow(files))
 
   # On a load (not a manifest) without an explicit prob_dir, fetch the volumes
   # from the neuroatlas GitHub release into the cache if any are missing.
   if (!isTRUE(path_only) && is.null(user_subj_vol_all) && any(is.na(files$path))) {
     dl <- .wang_prob_download(use_cache = use_cache)
     if (!is.null(dl)) {
+      missing <- is.na(files$path)
       cand_dirs <- unique(c(cand_dirs, dl))
       files$path <- resolve_paths(cand_dirs)
+      downloaded <- missing & !is.na(files$path)
     }
   }
   files$exists <- !is.na(files$path)
@@ -632,7 +641,79 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
     volumes = vols
   )
   class(ret) <- c("wang_prob_volumes", "list")
-  ret
+  .attach_wang_volume_metadata(ret, user_supplied = !is.null(prob_dir),
+                               downloaded = downloaded)
+}
+
+.attach_wang_volume_metadata <- function(x, user_supplied, downloaded) {
+  parents <- lapply(seq_along(x$volumes), function(i) {
+    vol <- x$volumes[[i]]
+    discrete <- identical(x$image, "maxprob")
+    ids <- if (discrete) {
+      values <- sort(unique(as.integer(as.vector(vol))))
+      values[values != 0L]
+    } else x$files$id[[i]]
+    reference <- new_atlas_ref(
+      "wang", "Wang2015", "volume", template_space = "MNI152_unspecified",
+      coord_space = "MNI152", source = if (user_supplied) "local_files" else {
+        if (downloaded[[i]]) "neuroatlas_release" else "cache"
+      }, provenance = .wang_prob_release_url(), confidence = "uncertain",
+      notes = "ProbAtlas_v4 volumes; precise MNI template identity unverified.")
+    item <- list(name = names(x$volumes)[[i]], ids = ids, atlas = vol,
+                  atlas_ref = reference,
+                  atlas_artifacts = .new_atlas_artifact(
+                    if (discrete) "summary_label_volume" else "probability_volume",
+                    "wang", "Wang2015", source_name = reference$source,
+                    source_url = reference$provenance,
+                    source_ref = x$files$member[[i]],
+                    file_name = basename(x$files$path[[i]]),
+                    local_path = x$files$path[[i]],
+                    source_version = if (downloaded[[i]]) "ProbAtlas_v4" else NA_character_,
+                    template_space = "MNI152_unspecified", hemi = x$files$hemi[[i]]),
+                  atlas_history = .new_atlas_history(
+                    "load", "volume", parameters = list(image = x$image,
+                      member = x$files$member[[i]], hemi = x$files$hemi[[i]])))
+    meta <- .build_atlas_metadata(item)
+    if (!downloaded[[i]]) {
+      meta$provenance$issues <- c(meta$provenance$issues,
+        "Local or cached files: original acquisition and release unrecorded.")
+    }
+    meta$content$value_type <- if (discrete) "labels" else "probability"
+    meta$identity$description <- if (discrete) {
+      "Wang ProbAtlas_v4 maximum-probability labels."
+    } else "Wang ProbAtlas_v4 per-area probability map."
+    meta
+  })
+  names(parents) <- names(x$volumes)
+  meta <- parents[[1]]
+  meta$identity$name <- x$dataset
+  meta$content$regions <- sum(vapply(parents, function(p) p$content$regions,
+                                    integer(1)))
+  meta$content$parameters <- list(image = x$image, hemi = x$hemi,
+                                  members = x$files$member)
+  meta$artifacts <- dplyr::bind_rows(lapply(parents, `[[`, "artifacts"))
+  meta$parents <- parents
+  grids_match <- vapply(parents, function(p) {
+    identical(p$spatial$dimensions, meta$spatial$dimensions) &&
+      identical(p$spatial$affine, meta$spatial$affine)
+  }, logical(1))
+  if (!all(grids_match)) {
+    meta$spatial$dimensions <- integer()
+    meta$spatial$voxel_size <- numeric()
+    meta$spatial$affine <- NULL
+    meta$spatial$resolution <- NA_character_
+    meta$provenance$issues <- c(meta$provenance$issues,
+      "Collection contains different grids; inspect the individual parent records.")
+  }
+  meta$history <- .new_atlas_history(
+    "load", "volume", parameters = meta$content$parameters)
+  meta$history$step <- 1L
+  validate_resource_metadata(meta)
+  x$metadata <- meta
+  for (i in seq_along(x$volumes)) {
+    attr(x$volumes[[i]], "neuroatlas_metadata") <- parents[[i]]
+  }
+  x
 }
 
 

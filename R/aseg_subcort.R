@@ -58,7 +58,7 @@ get_aseg_atlas <- function(outspace=NULL) {
   atlas <- neuroim2::read_vol(fname)
   template_space <- .template_space_from_outspace(
     outspace,
-    default_space = "MNI152NLin6Asym"
+    default_space = "MNI152_unspecified"
   )
 
   if (!is.null(outspace)) {
@@ -116,11 +116,10 @@ get_aseg_atlas <- function(outspace=NULL) {
     provenance = "inst/extdata/atlas_aparc_aseg_prob33.nii.gz",
     source = "bundled_extdata",
     lineage = "Bundled package atlas volume.",
-    confidence = if (is.null(outspace)) "high" else "approximate",
+    confidence = "uncertain",
     notes = paste(
-      "Header (193x229x193; 1mm; RAS) matches MNI152NLin6Asym.",
-      "FreeSurfer aparc+aseg uses FSL's MNI152 as standard space.",
-      "Confirmed via data-raw/audit_bundled_spaces.R."
+      "Bundled MNI-space atlas; original template lineage is not verified.",
+      "Header dimensions and spacing do not establish anatomical registration."
     )
   )
 
@@ -133,23 +132,24 @@ get_aseg_atlas <- function(outspace=NULL) {
     source_ref = "atlas_aparc_aseg_prob33.nii.gz",
     citation_doi = "10.1016/S0896-6273(02)00569-X",
     file_name = "atlas_aparc_aseg_prob33.nii.gz",
-    template_space = "MNI152NLin6Asym",
+    local_path = fname,
+    template_space = "MNI152_unspecified",
     coord_space = "MNI152",
     resolution = "1mm",
     lineage = "Bundled neuroatlas volume derived from FreeSurfer ASEG labels.",
-    confidence = "high",
+    confidence = "uncertain",
     notes = "Packaged in inst/extdata."
   )
 
   history <- .new_atlas_history(
     action = "load",
     representation = "volume",
-    from_template_space = "MNI152NLin6Asym",
-    to_template_space = "MNI152NLin6Asym",
+    from_template_space = "MNI152_unspecified",
+    to_template_space = "MNI152_unspecified",
     from_coord_space = "MNI152",
     to_coord_space = "MNI152",
     status = "available",
-    confidence = "high",
+    confidence = "uncertain",
     details = "Loaded bundled ASEG atlas."
   )
   if (!is.null(outspace)) {
@@ -158,7 +158,7 @@ get_aseg_atlas <- function(outspace=NULL) {
       .new_atlas_history(
         action = "resample",
         representation = "volume",
-        from_template_space = "MNI152NLin6Asym",
+        from_template_space = "MNI152_unspecified",
         to_template_space = template_space,
         from_coord_space = "MNI152",
         to_coord_space = "MNI152",
@@ -180,6 +180,7 @@ get_aseg_atlas <- function(outspace=NULL) {
     subclass = "aseg",
     ref = ref,
     artifacts = artifacts,
-    history = history
+    history = history,
+    metadata = list(processing = attr(atlas, "neuroatlas_processing"))
   )
 }

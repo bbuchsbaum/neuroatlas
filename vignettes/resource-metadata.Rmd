@@ -1,0 +1,171 @@
+---
+title: "Identify, cite, and trace an atlas"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: |
+  %\VignetteIndexEntry{Identify, cite, and trace an atlas}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
+library(neuroatlas)
+```
+
+An atlas object should tell you which resource you loaded, where its data came
+from, which coordinates it uses, and what to cite. That information stays with
+the object when you save it. Inspecting it does not contact a server.
+
+## Inspect a loaded atlas
+
+The bundled ASEG atlas makes a small, offline example:
+
+```{r inspect}
+a <- get_aseg_atlas()
+atlas_metadata(a)
+```
+
+The summary separates the atlas's identity from its current voxel geometry.
+`MNI152_unspecified` means that the precise anatomical template has not been
+verified. The voxel size and affine can still be measured from the data.
+Matching a familiar image's dimensions is insufficient evidence to name its
+registration target.
+
+The complete record has a stable schema:
+
+| Component | Contents |
+|:--|:--|
+| `identity` | Identifier, name, description, published version, species, coverage |
+| `content` | Volume or surface, labels or probabilities, variant parameters, region count |
+| `spatial` | Anatomical template, evidence basis, actual grid or mesh geometry |
+| `citations` | Bibliographic records with atlas, distribution, template, or software roles |
+| `artifacts` | Source files, release identifiers, license information, checksums |
+| `history` | Operations, structured parameters, and neuroatlas version |
+| `parents` | Metadata snapshots for composite and derived resources |
+
+```{r geometry}
+m <- atlas_metadata(a)
+m$spatial$voxel_size
+m$spatial$affine
+```
+
+Missing information is stored as `NA` and shown as "not recorded". A paper's
+publication year is not a data release version. Likewise, a source URL is not
+proof that downloaded bytes match a particular release.
+
+## Get the right references
+
+```{r citations}
+atlas_citations(a)
+utils::toBibtex(atlas_citations(a))
+```
+
+These are ordinary R `bibentry` objects. Use `role = "atlas"` to select the
+atlas publications, or inspect the citation table to see each reference's role:
+
+```{r citation-roles}
+m$citations[, c("role", "title", "doi")]
+```
+
+A projected atlas may require the original atlas publication, the distributed
+projection, and the reference template. For example, Glasser surface metadata
+include the original Glasser publication and the Mills Figshare projection,
+alongside references captured for the loaded TemplateFlow geometry.
+
+The catalog uses the distributor's recommended references where available,
+including [FSL's atlas references](https://fsl.fmrib.ox.ac.uk/fsl/docs/other/datasets.html).
+Olsen's original publication remains explicitly unverified. References without
+complete bibliographic fields remain title/URL entries; the accessor does not
+guess the missing fields or resolve them online.
+
+## Trace changes to the object
+
+Filtering keeps the original source records and adds a history step with the
+retained region identifiers:
+
+```{r subset}
+left <- filter_atlas(a, hemi == "left")
+atlas_metadata(left)$content$regions
+atlas_history(left)[, c("step", "action", "details")]
+tail(atlas_history(left)$parameters, 1)
+```
+
+Resampling changes the current grid while preserving the original artifact's
+resolution. Here the atlas is sampled at 2 mm:
+
+```{r resample}
+target <- neuroim2::NeuroSpace(
+  dim = as.integer(ceiling(dim(a$atlas) / 2)),
+  spacing = c(2, 2, 2),
+  origin = neuroim2::origin(neuroim2::space(a$atlas))
+)
+coarse <- get_aseg_atlas(outspace = target)
+atlas_ref(coarse)$resolution
+atlas_artifacts(coarse)$resolution
+tail(atlas_history(coarse)$parameters, 1)[[1]]$interpolation
+```
+
+Grid resampling does not perform anatomical registration. The native template
+identity is retained; a requested target grid is recorded separately as
+`spatial$sampling_reference` and in the resampling parameters. Supplying a
+different TemplateFlow name as `outspace` does not prove that a nonlinear warp
+to that template was applied.
+
+`dilate_atlas()` records its radius and neighbour limit. `merge_atlases()` keeps
+both parent metadata records and their references, records the identifier map
+and overlap rule, and rejects conflicting grids or known template identities.
+Surface subsetting remains unsupported; its existing diagnostic is unchanged.
+
+## Templates and probability maps
+
+Template volumes and surfaces use the same schema, attached as an attribute so
+their `NeuroVol` and `SurfaceGeometry` classes remain intact:
+
+```{r templates, eval=FALSE}
+t <- get_template("MNI152NLin2009cAsym", resolution = "01")
+template_metadata(t)
+template_citations(t)
+
+s <- load_surface_template("fsaverage", "pial", hemi = "both", density = "164k")
+template_metadata(s)$spatial$vertex_count
+template_metadata(s$L)$artifacts
+```
+
+These examples require TemplateFlow data and are not run when building this
+article. The loader captures the resolved filename and query, template
+description, available license and references, and actual geometry. A query's
+resolution key, such as `"01"`, is retained as a parameter; voxel sizes come from
+the image rather than interpreting that key as millimetres.
+`TemplateFlowVersion` is retained separately in provenance; it is not treated
+as the original template's published version.
+
+`get_wang_prob_atlas(path_only = FALSE)` also provides `atlas_metadata()` and
+`atlas_citations()`. Its record distinguishes probability maps from
+maximum-probability labels, and retains the individual volume records in
+`parents`. Path-only requests retain their existing path/manifest return types.
+
+## Save the evidence with your analysis
+
+```{r save, eval=FALSE}
+saveRDS(left, "left-aseg.rds")
+restored <- readRDS("left-aseg.rds")
+atlas_metadata(restored)
+```
+
+Artifact checksums describe source bytes, not the current in-memory atlas after
+modifications. R versions with `tools::sha256sum()` record SHA-256; older R
+versions record a labelled MD5 checksum. For installed bundled datasets,
+`checksum_basis = "source_manifest"` identifies the checksum of the source
+`.rda` file, which R may have converted to its lazy-load database. `read_file`
+identifies a file hashed at load time. A recorded checksum is a content identity,
+not an assertion that an upstream publisher supplied a matching checksum.
+
+The metadata record is authoritative. Existing `atlas_ref()`,
+`atlas_artifacts()`, and `atlas_history()` calls continue to work for atlas
+objects. Direct edits to legacy compatibility fields do not update the record.
+Old saved objects receive conservative metadata views with unknown provenance.
+Preservation is supported for neuroatlas's loaders and atlas operations;
+arbitrary data replacement or transformations in other packages may require
+their own provenance handling.

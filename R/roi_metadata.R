@@ -301,15 +301,13 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
   new_atlas <- .subset_atlas_data(x$atlas, keep_ids)
 
   # Build new atlas object
-  ret <- list(
-    name = x$name,
-    atlas = new_atlas,
-    cmap = new_cmap,
-    ids = new_ids,
-    labels = new_labels,
-    orig_labels = new_orig_labels,
-    hemi = new_hemi
-  )
+  ret <- x
+  ret$atlas <- new_atlas
+  ret$cmap <- new_cmap
+  ret$ids <- new_ids
+  ret$labels <- new_labels
+  ret$orig_labels <- new_orig_labels
+  ret$hemi <- new_hemi
 
   # Add network if present
   if (!is.null(new_network)) {
@@ -320,7 +318,8 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
   reserved <- c(
     "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
     "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
-    "atlas_history", "space", "template_space", "coord_space", "confidence"
+    "atlas_history", "metadata", "metadata_parameters", "metadata_processing",
+    "space", "template_space", "coord_space", "confidence"
   )
   extra_names <- setdiff(names(x), reserved)
   n_old <- length(x$ids)
@@ -355,7 +354,8 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
     to_coord_space = if (!is.null(x$atlas_ref)) x$atlas_ref$coord_space else NA_character_,
     status = "available",
     confidence = if (!is.null(x$atlas_ref)) x$atlas_ref$confidence else "uncertain",
-    details = paste0("Kept ", length(new_ids), " of ", length(x$ids), " ROIs.")
+    details = paste0("Kept ", length(new_ids), " of ", length(x$ids), " ROIs."),
+    parameters = list(keep_ids = new_ids)
   )
 
   # Preserve original class
@@ -455,7 +455,8 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
   reserved <- c(
     "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
     "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
-    "atlas_history", "space", "template_space", "coord_space", "confidence"
+    "atlas_history", "metadata", "metadata_parameters", "metadata_processing",
+    "space", "template_space", "coord_space", "confidence"
   )
   extra_names <- setdiff(names(x), reserved)
   for (nm in extra_names) {
