@@ -6,7 +6,7 @@ Authors@R:
            comment = c(ORCID = "0000-0002-1108-4866"))
 Description: Provides a unified interface to access and work with various
     neuroimaging atlases and parcellations including Schaefer, Brainnetome,
-    Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow
+    Glasser, HCPex, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow
     for standardized template access and supports interactive brain surface
     visualisation via triangle-mesh rendering with 'ggplot2' and 'ggiraph'.
 License: MIT + file LICENSE
@@ -117,6 +117,7 @@ Collate:
     'fsl_atlas.R'
     'ggschaefer.R'
     'glasser.R'
+    'hcpex.R'
     'neuroatlas-package.R'
     'olsen_mtl.R'
     'parcel_data.R'

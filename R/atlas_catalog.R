@@ -40,6 +40,25 @@
       citations = .resource_citation(
         "A multi-modal parcellation of human cerebral cortex",
         "10.1038/nature18933", "Matthew F. Glasser and others", "2016", "Nature")),
+    hcpex = list(
+      description = "Extended HCP cortical and subcortical parcellation.",
+      coverage = "cerebral cortex and subcortex",
+      version = "1.1",
+      citations = dplyr::bind_rows(
+        .resource_citation(
+          paste("An extended Human Connectome Project multimodal",
+                "parcellation atlas of the human cortex and subcortical areas"),
+          "10.1007/s00429-021-02421-6", "Chu-Chung Huang and others", "2022",
+          "Brain Structure and Function"),
+        .resource_citation(
+          paste("Extensive Cortical Connectivity of the Human Hippocampal",
+                "Memory System: Beyond the \"What\" and \"Where\" Dual Stream Model"),
+          "10.1093/cercor/bhab113", "Chu-Chung Huang and others", "2021",
+          "Cerebral Cortex"),
+        .resource_citation(
+          "A multi-modal parcellation of human cerebral cortex",
+          "10.1038/nature18933", "Matthew F. Glasser and others", "2016",
+          "Nature"))),
     aseg = list(
       description = "Bundled standard-space FreeSurfer subcortical labels.",
       coverage = "subcortex and brainstem",
@@ -135,7 +154,7 @@
   )
   if (!is.null(entry)) {
     entry$species <- "Homo sapiens"
-    entry$version <- NA_character_
+    entry$version <- entry$version %||% NA_character_
     if (family == "subcortical") {
       entry$citations <- dplyr::bind_rows(entry$citations, .resource_citation(
         "AtlasPack: harmonized neuroimaging atlases", role = "distribution",

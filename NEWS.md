@@ -1,5 +1,12 @@
 # neuroatlas 0.1.0.9000
 
+* Added `get_hcpex_atlas()` and `get_atlas("hcpex")` for HCPex v1.1:
+  360 cortical and 66 subcortical regions at 1 or 2 mm in the source-declared
+  MNI152NLin2009cAsym space. Downloads use a pinned upstream revision and
+  checksum-verified caching. Native IDs, abbreviations, full names, colors,
+  hemisphere, and cortical/subcortical membership are available for ROI work;
+  metadata includes citations, license, file receipts, and resampling history.
+
 * Added a shared, versioned metadata record for atlases and loaded templates:
   `atlas_metadata()`, `template_metadata()`, `atlas_citations()`, and
   `template_citations()`. Records contain resource identity, actual geometry,

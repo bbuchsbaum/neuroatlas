@@ -244,6 +244,15 @@ get_atlas <- function(name, ...) {
     representation = "surface"
   )
   register_atlas(
+    id = "hcpex",
+    label = "HCPex 426-region cortical and subcortical atlas",
+    family = "hcpex",
+    loader = "get_hcpex_atlas",
+    default_space = "MNI152NLin2009cAsym",
+    representation = "volume",
+    aliases = c("hcpex426", "hcp_extended")
+  )
+  register_atlas(
     id = "brainnetome",
     label = "Brainnetome 246-region atlas",
     family = "brainnetome",
