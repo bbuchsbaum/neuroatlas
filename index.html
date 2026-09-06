@@ -12,8 +12,8 @@
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <script src="extra.js"></script><meta property="og:title" content="Neuroimaging Atlases and Parcellations">
-<meta name="description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Brainnetome, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
-<meta property="og:description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Brainnetome, Glasser, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
+<meta name="description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Brainnetome, Glasser, HCPex, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
+<meta property="og:description" content="Provides a unified interface to access and work with various neuroimaging atlases and parcellations including Schaefer, Brainnetome, Glasser, HCPex, FreeSurfer ASEG, and Olsen MTL atlases. Integrates with TemplateFlow for standardized template access and supports interactive brain surface visualisation via triangle-mesh rendering with ggplot2 and ggiraph.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -66,7 +66,7 @@
 </h2>
 <ul>
 <li>
-<strong>Many built-in atlases</strong>: Schaefer (100-1000 parcels), Brainnetome (246 regions), Glasser (360 regions), Harvard-Oxford, Julich-Brain, FreeSurfer ASEG, harmonized TemplateFlow/AtlasPack subcortical atlases, Olsen MTL, and probabilistic visual-cortex atlases (Wang 2015, visfAtlas, cytoarchitectonic V1-V5)</li>
+<strong>Many built-in atlases</strong>: Schaefer (100-1000 parcels), Brainnetome (246 regions), Glasser (360 regions), HCPex (426 regions), Harvard-Oxford, Julich-Brain, FreeSurfer ASEG, harmonized TemplateFlow/AtlasPack subcortical atlases, Olsen MTL, and probabilistic visual-cortex atlases (Wang 2015, visfAtlas, cytoarchitectonic V1-V5)</li>
 <li>
 <strong>Surface &amp; volume</strong>: Work with both volumetric and surface-based parcellations through one consistent interface</li>
 <li>
@@ -135,9 +135,21 @@
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_atlas.html">get_atlas</a></span><span class="op">(</span><span class="st">"schaefer2018"</span>, parcels <span class="op">=</span> <span class="st">"100"</span>, networks <span class="op">=</span> <span class="st">"7"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="hcpex-cortex-and-subcortex">HCPex: cortex and subcortex<a class="anchor" aria-label="anchor" href="#hcpex-cortex-and-subcortex"></a>
+</h3>
+<p><a href="https://github.com/wayalan/HCPex" class="external-link">HCPex</a> adds 66 subcortical regions to the 360 cortical regions of HCP-MMP1.0. Load the upstream v1.1 volume at 1 or 2 mm:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">hcp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_atlas.html">get_atlas</a></span><span class="op">(</span><span class="st">"hcpex"</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">hcp</span>, label <span class="op">=</span> <span class="st">"V1_L"</span><span class="op">)</span></span>
+<span><span class="va">subcortex</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/filter_atlas.html">filter_atlas</a></span><span class="op">(</span><span class="va">hcp</span>, <span class="va">division</span> <span class="op">==</span> <span class="st">"subcortical"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/roi_metadata.html">roi_metadata</a></span><span class="op">(</span><span class="va">subcortex</span><span class="op">)</span>  <span class="co"># Abbreviations, full names, hemisphere, and colors</span></span>
+<span><span class="fu"><a href="reference/atlas_citations.html">atlas_citations</a></span><span class="op">(</span><span class="va">hcp</span><span class="op">)</span></span></code></pre></div>
+<p>The source declares MNI152NLin2009cAsym template space. HCPex uses its own region ordering; reorder matrices from original HCP-MMP1.0 order before mapping them to this atlas. Downloads are cached and checked against pinned checksums. The upstream atlas data are licensed under GPL-3.0.</p>
+</div>
+<div class="section level3">
 <h3 id="identify-and-cite-a-resource">Identify and cite a resource<a class="anchor" aria-label="anchor" href="#identify-and-cite-a-resource"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">aseg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_aseg_atlas.html">get_aseg_atlas</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/atlas_metadata.html">atlas_metadata</a></span><span class="op">(</span><span class="va">aseg</span><span class="op">)</span>       <span class="co"># Identity, current geometry, source, and modifications</span></span>
 <span><span class="fu"><a href="reference/atlas_citations.html">atlas_citations</a></span><span class="op">(</span><span class="va">aseg</span><span class="op">)</span>      <span class="co"># R bibliography entries, ready for toBibtex()</span></span>
@@ -150,7 +162,7 @@
 <h2 id="palette-demos">Palette demos<a class="anchor" aria-label="anchor" href="#palette-demos"></a>
 </h2>
 <p><code>neuroatlas</code> includes perceptually-optimised palettes for atlas ROIs. For instance, you can generate a slice-aware palette for the Schaefer 200×7 atlas and feed it directly into <code><a href="reference/plot_brain.html">plot_brain()</a></code>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
@@ -201,6 +213,11 @@
 <td>Glasser</td>
 <td><code><a href="reference/get_glasser_atlas.html">get_glasser_atlas()</a></code></td>
 <td>360-region multi-modal cortical parcellation (surface via <code><a href="reference/glasser_surf.html">glasser_surf()</a></code>)</td>
+</tr>
+<tr>
+<td>HCPex</td>
+<td><code><a href="reference/get_hcpex_atlas.html">get_hcpex_atlas()</a></code></td>
+<td>360 cortical and 66 subcortical regions, native 1/2 mm volumes in MNI152NLin2009cAsym</td>
 </tr>
 <tr>
 <td>Harvard-Oxford</td>

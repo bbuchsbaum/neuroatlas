@@ -9,10 +9,11 @@ consistent, user-friendly functions.
 ## Features
 
 - **Many built-in atlases**: Schaefer (100-1000 parcels), Brainnetome
-  (246 regions), Glasser (360 regions), Harvard-Oxford, Julich-Brain,
-  FreeSurfer ASEG, harmonized TemplateFlow/AtlasPack subcortical
-  atlases, Olsen MTL, and probabilistic visual-cortex atlases (Wang
-  2015, visfAtlas, cytoarchitectonic V1-V5)
+  (246 regions), Glasser (360 regions), HCPex (426 regions),
+  Harvard-Oxford, Julich-Brain, FreeSurfer ASEG, harmonized
+  TemplateFlow/AtlasPack subcortical atlases, Olsen MTL, and
+  probabilistic visual-cortex atlases (Wang 2015, visfAtlas,
+  cytoarchitectonic V1-V5)
 - **Surface & volume**: Work with both volumetric and surface-based
   parcellations through one consistent interface
 - **Atlas discovery**: Enumerate built-ins with
@@ -104,6 +105,27 @@ list_atlases()
 schaefer <- get_atlas("schaefer2018", parcels = "100", networks = "7")
 ```
 
+### HCPex: cortex and subcortex
+
+[HCPex](https://github.com/wayalan/HCPex) adds 66 subcortical regions to
+the 360 cortical regions of HCP-MMP1.0. Load the upstream v1.1 volume at
+1 or 2 mm:
+
+``` r
+
+hcp <- get_atlas("hcpex", resolution = 2)
+get_roi(hcp, label = "V1_L")
+subcortex <- filter_atlas(hcp, division == "subcortical")
+roi_metadata(subcortex)  # Abbreviations, full names, hemisphere, and colors
+atlas_citations(hcp)
+```
+
+The source declares MNI152NLin2009cAsym template space. HCPex uses its
+own region ordering; reorder matrices from original HCP-MMP1.0 order
+before mapping them to this atlas. Downloads are cached and checked
+against pinned checksums. The upstream atlas data are licensed under
+GPL-3.0.
+
 ### Identify and cite a resource
 
 ``` r
@@ -160,6 +182,7 @@ of both hemispheres.](reference/figures/README-roi-palette.png)
 | Schaefer | [`get_schaefer_atlas()`](reference/get_schaefer_atlas.md) | Cortical parcellations (100-1000 regions, 7 or 17 networks); surface via [`get_schaefer_surfatlas()`](reference/get_schaefer_surfatlas.md) |
 | Brainnetome | [`get_brainnetome_atlas()`](reference/get_brainnetome_atlas.md) | 246-region connectional atlas with Yeo network and cytoarchitectonic metadata |
 | Glasser | [`get_glasser_atlas()`](reference/get_glasser_atlas.md) | 360-region multi-modal cortical parcellation (surface via [`glasser_surf()`](reference/glasser_surf.md)) |
+| HCPex | [`get_hcpex_atlas()`](reference/get_hcpex_atlas.md) | 360 cortical and 66 subcortical regions, native 1/2 mm volumes in MNI152NLin2009cAsym |
 | Harvard-Oxford | [`get_harvard_oxford_atlas()`](reference/get_harvard_oxford_atlas.md) | Cortical/subcortical structural atlases via TemplateFlow or FSL |
 | Julich-Brain | [`get_julich_brain_atlas()`](reference/get_julich_brain_atlas.md) | FSL Julich-Brain cytoarchitectonic atlas |
 | ASEG | [`get_aseg_atlas()`](reference/get_aseg_atlas.md) | FreeSurfer subcortical segmentation |
@@ -308,6 +331,8 @@ on CRAN and GitHub Pages. The palette family is provided via
   [`get_harvard_oxford_subcortical_atlas()`](get_harvard_oxford_atlas.md)
   [`get_harvard_oxford_cortical_subcortical_atlas()`](get_harvard_oxford_atlas.md)
   : Load a Harvard-Oxford Atlas
+- [`get_hcpex_atlas()`](get_hcpex_atlas.md) : Load the Extended HCP
+  Atlas (HCPex)
 - [`get_hipp_atlas()`](get_hipp_atlas.md) : Extract Hippocampal
   Parcellation
 - [`get_julich_brain_atlas()`](get_julich_brain_atlas.md) : Load a

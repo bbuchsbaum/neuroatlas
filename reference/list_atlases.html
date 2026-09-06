@@ -65,7 +65,7 @@ registry. Useful for discovery from scripts, vignettes, and Shiny apps.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">list_atlases</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 16 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 17 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    id                         label  family representation default_space aliases</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> aseg                       FreeS… aseg   volume         MNI152NLin6A… <span style="color: #949494;">"</span>frees…</span>
@@ -75,15 +75,16 @@ registry. Useful for discovery from scripts, vignettes, and Shiny apps.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> harvard_oxford             Harva… harva… volume         MNI152NLin6A… <span style="color: #949494;">"</span>ho,ha…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> harvard_oxford_cortical    Harva… harva… volume         MNI152NLin6A… <span style="color: #949494;">"</span>ho_co…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> harvard_oxford_subcortical Harva… harva… volume         MNI152NLin6A… <span style="color: #949494;">"</span>ho_su…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> hippocampus                Hippo… olsen  derived        MNI152_custom <span style="color: #949494;">"</span>hipp<span style="color: #949494;">"</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> julich_brain               Julic… julic… volume         MNI152        <span style="color: #949494;">"</span>jueli…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> olsen_mtl                  Olsen… olsen  volume         MNI152_custom <span style="color: #949494;">"</span>olsen…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> schaefer                   Schae… schae… volume         MNI152NLin6A… <span style="color: #949494;">"</span>schae…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> schaefer_surf              Schae… schae… surface        fsaverage6    <span style="color: #949494;">"</span>schae…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> subcortical                Subco… subco… volume         MNI152NLin6A… <span style="color: #949494;">"</span>atlas…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> visfatlas                  visfA… visfa… volume         MNI152        <span style="color: #949494;">"</span>rosen…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> visual                     Early… visual derived        MNI152        <span style="color: #949494;">"</span>early…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span> wang                       Wang … wang   surface        fsaverage     <span style="color: #949494;">"</span>wang2…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> hcpex                      HCPex… hcpex  volume         MNI152NLin20… <span style="color: #949494;">"</span>hcpex…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> hippocampus                Hippo… olsen  derived        MNI152_custom <span style="color: #949494;">"</span>hipp<span style="color: #949494;">"</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> julich_brain               Julic… julic… volume         MNI152        <span style="color: #949494;">"</span>jueli…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> olsen_mtl                  Olsen… olsen  volume         MNI152_custom <span style="color: #949494;">"</span>olsen…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> schaefer                   Schae… schae… volume         MNI152NLin6A… <span style="color: #949494;">"</span>schae…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> schaefer_surf              Schae… schae… surface        fsaverage6    <span style="color: #949494;">"</span>schae…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> subcortical                Subco… subco… volume         MNI152NLin6A… <span style="color: #949494;">"</span>atlas…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> visfatlas                  visfA… visfa… volume         MNI152        <span style="color: #949494;">"</span>rosen…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span> visual                     Early… visual derived        MNI152        <span style="color: #949494;">"</span>early…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span> wang                       Wang … wang   surface        fsaverage     <span style="color: #949494;">"</span>wang2…</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -91,6 +91,8 @@
   [`get_harvard_oxford_subcortical_atlas()`](get_harvard_oxford_atlas.md)
   [`get_harvard_oxford_cortical_subcortical_atlas()`](get_harvard_oxford_atlas.md)
   : Load a Harvard-Oxford Atlas
+- [`get_hcpex_atlas()`](get_hcpex_atlas.md) : Load the Extended HCP
+  Atlas (HCPex)
 - [`get_hipp_atlas()`](get_hipp_atlas.md) : Extract Hippocampal
   Parcellation
 - [`get_julich_brain_atlas()`](get_julich_brain_atlas.md) : Load a

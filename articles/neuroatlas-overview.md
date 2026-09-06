@@ -90,7 +90,7 @@ other registered families without loading them:
 ``` r
 
 list_atlases()[c("id", "label", "representation", "default_space")]
-#> # A tibble: 16 × 4
+#> # A tibble: 17 × 4
 #>    id                         label                 representation default_space
 #>    <chr>                      <chr>                 <chr>          <chr>        
 #>  1 aseg                       FreeSurfer ASEG subc… volume         MNI152NLin6A…
@@ -100,15 +100,16 @@ list_atlases()[c("id", "label", "representation", "default_space")]
 #>  5 harvard_oxford             Harvard-Oxford corti… volume         MNI152NLin6A…
 #>  6 harvard_oxford_cortical    Harvard-Oxford corti… volume         MNI152NLin6A…
 #>  7 harvard_oxford_subcortical Harvard-Oxford subco… volume         MNI152NLin6A…
-#>  8 hippocampus                Hippocampus (derived… derived        MNI152_custom
-#>  9 julich_brain               Julich-Brain cytoarc… volume         MNI152       
-#> 10 olsen_mtl                  Olsen MTL atlas       volume         MNI152_custom
-#> 11 schaefer                   Schaefer2018 cortica… volume         MNI152NLin6A…
-#> 12 schaefer_surf              Schaefer2018 cortica… surface        fsaverage6   
-#> 13 subcortical                Subcortical atlases … volume         MNI152NLin6A…
-#> 14 visfatlas                  visfAtlas probabilis… volume         MNI152       
-#> 15 visual                     Early visual cortex … derived        MNI152       
-#> 16 wang                       Wang 2015 probabilis… surface        fsaverage
+#>  8 hcpex                      HCPex 426-region cor… volume         MNI152NLin20…
+#>  9 hippocampus                Hippocampus (derived… derived        MNI152_custom
+#> 10 julich_brain               Julich-Brain cytoarc… volume         MNI152       
+#> 11 olsen_mtl                  Olsen MTL atlas       volume         MNI152_custom
+#> 12 schaefer                   Schaefer2018 cortica… volume         MNI152NLin6A…
+#> 13 schaefer_surf              Schaefer2018 cortica… surface        fsaverage6   
+#> 14 subcortical                Subcortical atlases … volume         MNI152NLin6A…
+#> 15 visfatlas                  visfAtlas probabilis… volume         MNI152       
+#> 16 visual                     Early visual cortex … derived        MNI152       
+#> 17 wang                       Wang 2015 probabilis… surface        fsaverage
 ```
 
 ## How do you select regions?
