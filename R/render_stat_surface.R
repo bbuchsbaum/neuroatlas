@@ -74,14 +74,17 @@
     source_surface <- surfatlas$anatomy_metric_surface %||% "declared"
     topology_verified <- FALSE
   } else {
+    # Omit density_override so fsaverage6 hits the packaged white mesh.
     source_geometry <- if (identical(surfatlas$surf_type, "white")) {
       display_geometry
     } else {
       .load_overlay_surface_geometry(
         surface_space = surfatlas$surface_space %||% "fsaverage6",
-        surface_type = "white", hemi = hemi,
-        density_override = surfatlas$density %||% NULL
+        surface_type = "white", hemi = hemi
       )
+    }
+    if (!is.null(source_geometry)) {
+      source_geometry <- .repair_legacy_surface_geometry(source_geometry)
     }
     if (is.null(source_geometry)) {
       return(list(metric = rep(0, n), provenance = list(
