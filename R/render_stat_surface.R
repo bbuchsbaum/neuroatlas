@@ -37,7 +37,7 @@
   if (exists(cache_key, envir = .surface_anatomy_cache, inherits = FALSE)) {
     return(get(cache_key, envir = .surface_anatomy_cache, inherits = FALSE))
   }
-  metric <- tryCatch(neurosurf::curvature(geometry), error = function(e) NULL)
+  metric <- tryCatch(neurosurf::anatomical_curvature(geometry), error = function(e) NULL)
   assign(cache_key, metric, envir = .surface_anatomy_cache)
   metric
 }
@@ -65,13 +65,32 @@
   metric <- .surface_hemi_value(override, hemi) %||%
     .surface_hemi_value(surfatlas$anatomy_metric, hemi)
   if (!is.null(metric)) {
+    if (!is.numeric(metric) || length(metric) != n || any(!is.finite(metric))) {
+      stop("Anatomy metric for ", hemi, " must contain one finite value per vertex.",
+           call. = FALSE)
+    }
     metric_source <- source %||% surfatlas$anatomy_metric_source %||%
       "explicit_sulcal_or_curvature_metric"
     source_surface <- surfatlas$anatomy_metric_surface %||% "declared"
     topology_verified <- FALSE
   } else {
-    pair <- .resolve_overlay_surface_pair(surfatlas, hemi = hemi)
-    source_geometry <- pair$white
+    source_geometry <- if (identical(surfatlas$surf_type, "white")) {
+      display_geometry
+    } else {
+      .load_overlay_surface_geometry(
+        surface_space = surfatlas$surface_space %||% "fsaverage6",
+        surface_type = "white", hemi = hemi,
+        density_override = surfatlas$density %||% NULL
+      )
+    }
+    if (is.null(source_geometry)) {
+      return(list(metric = rep(0, n), provenance = list(
+        source = "neutral_fallback", source_surface = NA_character_,
+        display_surface = surfatlas$surf_type %||% NA_character_,
+        topology_verified = FALSE, hemi = hemi,
+        reason = "matching_white_geometry_unavailable"
+      )))
+    }
     mesh_identity <- rlang::hash(list(
       source_geometry@mesh$vb[1:3, , drop = FALSE],
       source_geometry@mesh$it
@@ -84,7 +103,11 @@
       "mean_curvature",
       mesh_identity
     ))
-    metric <- .compute_surface_curvature_cached(source_geometry, cache_key)
+    metric <- if (.surface_geometry_topology_equal(source_geometry, display_geometry)) {
+      .compute_surface_curvature_cached(source_geometry, cache_key)
+    } else {
+      NULL
+    }
     metric_source <- "computed_mean_curvature"
     source_surface <- "white"
     topology_verified <- .surface_geometry_topology_equal(
@@ -92,7 +115,8 @@
       display_geometry
     )
   }
-  if (is.null(metric) || !is.numeric(metric) || length(metric) != n) {
+  if (is.null(metric) || !is.numeric(metric) || length(metric) != n ||
+      any(!is.finite(metric))) {
     metric <- rep(0, n)
     metric_source <- "neutral_fallback"
     source_surface <- NA_character_
@@ -101,6 +125,7 @@
   list(metric = as.numeric(metric), provenance = list(
     source = metric_source,
     source_surface = source_surface,
+    smoothing_iterations = if (metric_source == "computed_mean_curvature") 5L else 0L,
     display_surface = surfatlas$surf_type %||% NA_character_,
     topology_verified = topology_verified && length(metric) == n,
     surface_space = surfatlas$surface_space %||% NA_character_,
@@ -162,7 +187,11 @@
                             orientation_labels,
                             render_width,
                             render_height,
-                            render_antialias) {
+                            render_antialias,
+                            anatomy_style = "publication",
+                            anatomy_midpoint = NULL,
+                            anatomy_invert = FALSE,
+                            anatomy_range = c(0.72, 0.90)) {
   if (is.null(overlay)) {
     stop("static_backend = 'cpu' currently requires a continuous overlay.",
          call. = FALSE)
@@ -199,7 +228,8 @@
     0.25 * abs(overlay_threshold %||% 0),
     0.06 * max(abs(overlay_lim))
   )
-  palette <- scico::scico(256, palette = overlay_palette)
+  palette <- if (length(overlay_palette) > 1L) overlay_palette else
+    scico::scico(256, palette = overlay_palette)
   panels <- list()
   provenance <- list(mask = list(), anatomy = list(), camera = list(),
                      projection = projection_meta)
@@ -223,6 +253,10 @@
       geometry = atlas_hemi@geometry,
       vertex_values = values,
       anatomy_metric = anatomy$metric,
+      anatomy_style = anatomy_style,
+      anatomy_midpoint = anatomy_midpoint,
+      anatomy_invert = anatomy_invert,
+      anatomy_range = anatomy_range,
       cortex_mask = domain$mask,
       camera = view,
       camera_mode = camera,
@@ -269,7 +303,12 @@
     }
     panels[[length(panels) + 1L]] <- p
     provenance$mask[[hk]] <- domain$provenance
-    provenance$anatomy[[hk]] <- anatomy$provenance
+    provenance$anatomy[[hk]] <- c(anatomy$provenance, list(
+      style = anatomy_style,
+      midpoint = anatomy_midpoint,
+      invert = anatomy_invert,
+      gray_range = anatomy_range
+    ))
     provenance$camera[[default_label]] <- rendered$camera
   }
   if (!requireNamespace("patchwork", quietly = TRUE)) {
@@ -309,4 +348,25 @@
   attr(out, "plot_brain_anatomy") <- provenance
   attr(out, "plot_brain_backend") <- "cpu_barycentric"
   out
+}
+
+#' Resolve an anatomical underlay for a surface atlas
+#'
+#' Uses an explicit metric, then the atlas anatomy metric, otherwise curvature
+#' computed on matching white geometry with five adjacency averaging steps.
+#' Supplied metrics are used unchanged. The result can be shared by static and
+#' interactive renderers. No curvature is inferred from an inflated surface.
+#' @param surfatlas A surface atlas.
+#' @param hemi Hemisphere, lh or rh (left and right are also accepted).
+#' @param metric Optional finite per-vertex metric overriding the atlas.
+#' @param source Optional provenance label for the supplied metric.
+#' @return A list with metric and provenance. Unavailable computed anatomy is
+#'   neutral, with source recorded as neutral_fallback.
+#' @export
+surface_anatomy <- function(surfatlas, hemi = "lh",
+                            metric = NULL, source = NULL) {
+  hemi <- match.arg(hemi, c("lh", "rh", "left", "right"))
+  hemi <- switch(hemi, left = "lh", right = "rh", hemi)
+  if (!inherits(surfatlas, "surfatlas")) stop("Expected a surface atlas.")
+  .resolve_surface_anatomy(surfatlas, hemi, override = metric, source = source)
 }

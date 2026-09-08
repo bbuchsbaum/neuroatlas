@@ -2132,6 +2132,8 @@ build_surface_polygon_data <- function(surfatlas,
 #'   sulcal metric is preferred; otherwise the CPU backend computes curvature
 #'   on matched white geometry and verifies vertex correspondence.
 #' @param anatomy_metric_source Provenance label for an explicit metric.
+#' @param anatomy_style,anatomy_midpoint,anatomy_invert,anatomy_range CPU underlay
+#'   controls passed to [neurosurf::render_surface_rgba()].
 #' @param medial_wall Explicit medial-wall policy: neutral shade, mask, or
 #'   independent outline.
 #' @param camera Strict canonical orthographic or slightly oblique presentation
@@ -2290,6 +2292,10 @@ plot_brain <- function(surfatlas,
                        value = NULL,
                        by = NULL,
                        allow_partial = FALSE,
+                       anatomy_style = "publication",
+                       anatomy_midpoint = NULL,
+                       anatomy_invert = FALSE,
+                       anatomy_range = c(0.72, 0.90),
                        ...) {
   style <- match.arg(style)
   overlay_present <- !is.null(overlay)
@@ -2471,6 +2477,10 @@ plot_brain <- function(surfatlas,
       cortex_mask = cortex_mask, cortex_mask_source = cortex_mask_source,
       anatomy_metric = anatomy_metric,
       anatomy_metric_source = anatomy_metric_source,
+      anatomy_style = anatomy_style,
+      anatomy_midpoint = anatomy_midpoint,
+      anatomy_invert = anatomy_invert,
+      anatomy_range = anatomy_range,
       medial_wall = medial_wall, camera = camera,
       orientation_labels = orientation_labels,
       render_width = render_width, render_height = render_height,
@@ -3272,12 +3282,17 @@ plot_brain <- function(surfatlas,
     y = c(1, 1),
     fill = as.numeric(lim)
   )
+  color_scale <- if (length(palette) > 1L) {
+    function(...) ggplot2::scale_fill_gradientn(colours = palette, ...)
+  } else {
+    function(...) scico::scale_fill_scico(palette = palette, ...)
+  }
   p <- ggplot2::ggplot(dummy, ggplot2::aes(x = x, y = y, fill = fill)) +
     # A zero-area tile stays invisible in the panel without propagating an
     # alpha of zero into the guide (which would erase the colorbar as well).
     ggplot2::geom_tile(width = 0, height = 0, show.legend = TRUE) +
-    scico::scale_fill_scico(
-      palette = palette, limits = lim, oob = scales::squish,
+    color_scale(
+      limits = lim, oob = scales::squish,
       name = title,
       # `breaks = NULL` means "draw no breaks" in ggplot2 and suppresses the
       # guide entirely. Use the scale default unless explicit breaks were
