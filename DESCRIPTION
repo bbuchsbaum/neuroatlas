@@ -1,6 +1,6 @@
 Package: neuroatlas
 Title: Neuroimaging Atlases and Parcellations
-Version: 0.1.0.9001
+Version: 0.1.0.9002
 Authors@R: 
     person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1108-4866"))
@@ -28,7 +28,7 @@ Imports:
     memoise,
     methods,
     neuroim2,
-    neurosurf,
+    neurosurf (>= 0.1.0.9001),
     rlang,
     Rnanoflann,
     scales,

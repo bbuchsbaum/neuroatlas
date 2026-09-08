@@ -86,6 +86,10 @@ plot_brain(
   value = NULL,
   by = NULL,
   allow_partial = FALSE,
+  anatomy_style = "publication",
+  anatomy_midpoint = NULL,
+  anatomy_invert = FALSE,
+  anatomy_range = c(0.72, 0.9),
   ...
 )
 }
@@ -384,6 +388,9 @@ When \code{NULL}, a safe unique key is inferred.}
 \item{allow_partial}{Logical. If \code{FALSE} (default), \code{data} must
 contain every atlas parcel. If \code{TRUE}, missing parcels are rendered
 with \code{NA} values. Unknown and duplicate keys always error.}
+
+\item{anatomy_style, anatomy_midpoint, anatomy_invert, anatomy_range}{CPU underlay
+controls passed to [neurosurf::render_surface_rgba()].}
 
 \item{...}{Additional arguments (currently unused).}
 }
