@@ -248,7 +248,7 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
   )
 
   if (!is.null(atlas_obj)) {
-    return(atlas_obj)
+    return(.resolve_ggseg_atlas_object(atlas_obj))
   }
 
   data_env <- new.env(parent = emptyenv())
@@ -264,7 +264,9 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
   )
 
   if (exists(atlas_string, envir = data_env, inherits = FALSE)) {
-    return(get(atlas_string, envir = data_env, inherits = FALSE))
+    return(.resolve_ggseg_atlas_object(
+      get(atlas_string, envir = data_env, inherits = FALSE)
+    ))
   }
 
   if (is.null(data_error)) {
@@ -277,4 +279,66 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
     "data() fallback error [", data_error, "]",
     call. = FALSE
   )
+}
+
+#' Resolve callable ggseg atlas constructors to concrete atlas objects
+#' @keywords internal
+#' @noRd
+.resolve_ggseg_atlas_object <- function(atlas_obj) {
+  if (is.function(atlas_obj)) {
+    atlas_obj <- atlas_obj()
+  }
+  atlas_obj
+}
+
+#' Flatten ggseg atlas geometry into x/y rows with hemi and view
+#'
+#' Supports legacy flat `data.frame`/`sf` atlas `$data` (with `side`/`hemi`)
+#' and ggseg >= 2.2 nested `ggseg_atlas_data` objects (`$geom` polygons).
+#'
+#' @keywords internal
+#' @noRd
+.ggseg_atlas_xy_data <- function(gg_atlas) {
+  data_obj <- gg_atlas$data
+
+  if (is.data.frame(data_obj) || inherits(data_obj, "sf")) {
+    out <- as.data.frame(data_obj)
+    if ("side" %in% names(out) && !"view" %in% names(out)) {
+      out$view <- out$side
+    }
+    if (!all(c("x", "y") %in% names(out)) && inherits(data_obj, "sf")) {
+      xy <- sf::st_coordinates(sf::st_geometry(data_obj))
+      out$x <- xy[, "X"]
+      out$y <- xy[, "Y"]
+    }
+    return(out)
+  }
+
+  if (is.list(data_obj) && !is.null(data_obj$geom)) {
+    geom <- data_obj$geom
+    parts <- lapply(seq_len(nrow(geom)), function(i) {
+      label <- as.character(geom$label[[i]])
+      pts <- geom$geometry[[i]]
+      if (!is.data.frame(pts) || !nrow(pts)) {
+        return(NULL)
+      }
+      hemi <- if (grepl("^lh[_.]", label)) {
+        "left"
+      } else if (grepl("^rh[_.]", label)) {
+        "right"
+      } else {
+        NA_character_
+      }
+      pts$hemi <- hemi
+      pts$label <- label
+      pts
+    })
+    out <- dplyr::bind_rows(parts)
+    if (!nrow(out)) {
+      stop("ggseg atlas geometry contained no polygon vertices", call. = FALSE)
+    }
+    return(out)
+  }
+
+  stop("Unrecognized ggseg atlas data format", call. = FALSE)
 }

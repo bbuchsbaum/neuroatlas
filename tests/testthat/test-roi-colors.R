@@ -12,8 +12,8 @@ make_palette_test_rois <- function() {
 
 test_that("roi_colors_maximin_view produces deterministic palette", {
   rois <- make_palette_test_rois()
-  pal <- roi_colors_maximin_view(
-    rois,
+  args <- list(
+    rois = rois,
     hemi_col = "hemi",
     network_col = "network",
     pair_col = "pair_id",
@@ -22,15 +22,23 @@ test_that("roi_colors_maximin_view produces deterministic palette", {
     sigma_xy = 20,
     sigma_slice = 8
   )
+  pal <- do.call(roi_colors_maximin_view, args)
+  pal_again <- do.call(roi_colors_maximin_view, args)
   expect_equal(names(pal), c("roi", "color"))
+  expect_equal(nrow(pal), nrow(rois))
   expect_true(all(nchar(pal$color) == 7))
-  expect_snapshot_value(pal, style = "json2")
+  expect_true(all(grepl("^#[0-9A-Fa-f]{6}$", pal$color)))
+  # Exact hex values can differ across platforms due to floating-point
+  # Lab distance ordering; keep a same-seed determinism gate instead.
+  expect_equal(pal, pal_again)
+  # Paired ROIs share a colour under pair_col.
+  expect_equal(pal$color[c(1, 3, 5, 7, 9, 11)], pal$color[c(2, 4, 6, 8, 10, 12)])
 })
 
 test_that("roi_colors_network_harmony organizes by network", {
   rois <- make_palette_test_rois()
-  pal <- roi_colors_network_harmony(
-    rois,
+  args <- list(
+    rois = rois,
     network_col = "network",
     hemi_col = "hemi",
     seed = 42,
@@ -40,8 +48,12 @@ test_that("roi_colors_network_harmony organizes by network", {
     candidate_multiplier = 1.1,
     hue_width = 40
   )
+  pal <- do.call(roi_colors_network_harmony, args)
+  pal_again <- do.call(roi_colors_network_harmony, args)
   expect_equal(nrow(pal), nrow(rois))
-  expect_snapshot_value(pal, style = "json2")
+  expect_equal(names(pal), c("roi", "color"))
+  expect_true(all(grepl("^#[0-9A-Fa-f]{6}$", pal$color)))
+  expect_equal(pal, pal_again)
 })
 
 test_that("roi_colors_rule_hcl honours hemisphere luminance", {
