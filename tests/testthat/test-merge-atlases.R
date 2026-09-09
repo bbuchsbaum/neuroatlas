@@ -9,4 +9,6 @@ test_that("merge_atlases combines ids and preserves dimensions", {
   expect_true(inherits(merged, "atlas"))
   expect_equal(length(merged$ids), length(a1$ids) + length(a2$ids))
   expect_equal(dim(merged$atlas), dim(a1$atlas))
+  expect_s3_class(merged$cmap, "data.frame")
+  expect_equal(nrow(merged$cmap), length(merged$ids))
 })

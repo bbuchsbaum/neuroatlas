@@ -46,8 +46,8 @@
       n_vert <- ncol(geom@mesh$vb)
       methods::new(
         "LabeledNeuroSurface",
-        labels = character(),
-        cols = character(),
+        labels = "cortex",
+        cols = "#888888",
         geometry = geom,
         indices = seq_len(n_vert),
         data = rep(as.numeric(parcel_id), n_vert)
@@ -111,14 +111,13 @@
 
 .summarize_ggseg_panel_extents <- function(atlas_string = "schaefer7_100") {
   gg_atlas <- neuroatlas:::.load_ggseg_schaefer_atlas(atlas_string)
-  dat <- gg_atlas$data
-  dat <- dat[dat$side %in% c("lateral", "medial"), , drop = FALSE]
+  dat <- neuroatlas:::.ggseg_atlas_xy_data(gg_atlas)
+  dat <- dat[dat$view %in% c("lateral", "medial"), , drop = FALSE]
 
-  by_panel <- split(dat, interaction(dat$hemi, dat$side, drop = TRUE))
+  by_panel <- split(dat, interaction(dat$hemi, dat$view, drop = TRUE))
 
   rows <- lapply(names(by_panel), function(key) {
     sub <- by_panel[[key]]
-    bb <- sf::st_bbox(sub)
     parts <- strsplit(key, ".", fixed = TRUE)[[1]]
     hemi <- parts[1]
     view <- parts[2]
@@ -127,10 +126,10 @@
       panel = paste(tools::toTitleCase(hemi), tools::toTitleCase(view)),
       hemi = hemi,
       view = view,
-      xmin = as.numeric(bb[["xmin"]]),
-      xmax = as.numeric(bb[["xmax"]]),
-      ymin = as.numeric(bb[["ymin"]]),
-      ymax = as.numeric(bb[["ymax"]]),
+      xmin = min(sub$x, na.rm = TRUE),
+      xmax = max(sub$x, na.rm = TRUE),
+      ymin = min(sub$y, na.rm = TRUE),
+      ymax = max(sub$y, na.rm = TRUE),
       stringsAsFactors = FALSE
     )
   })

@@ -367,8 +367,8 @@ test_that("outer contour keeps only the largest exterior loop per panel", {
   geom <- neurosurf::SurfaceGeometry(vert = verts, faces = faces, hemi = "lh")
   hemi_surf <- methods::new(
     "LabeledNeuroSurface",
-    labels = character(),
-    cols = character(),
+    labels = "cortex",
+    cols = "#888888",
     geometry = geom,
     indices = seq_len(nrow(verts)),
     data = rep(1, nrow(verts))

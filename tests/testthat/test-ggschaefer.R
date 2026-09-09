@@ -108,6 +108,89 @@ test_that(".load_ggseg_schaefer_atlas uses namespace object when available", {
   expect_identical(out, ns$schaefer17_400)
 })
 
+test_that(".load_ggseg_schaefer_atlas resolves callable atlas constructors", {
+  ns <- new.env(parent = emptyenv())
+  ns$schaefer17_400 <- function() list(name = "from_callable", data = list())
+
+  out <- neuroatlas:::.load_ggseg_schaefer_atlas(
+    "schaefer17_400",
+    namespace_env = ns,
+    data_loader = function(...) stop("unused")
+  )
+
+  expect_equal(out$name, "from_callable")
+  expect_false(is.function(out))
+})
+
+test_that(".ggseg_atlas_xy_data flattens nested ggseg geom polygons", {
+  gg_atlas <- list(
+    data = list(
+      geom = tibble::tibble(
+        label = c("lh_A", "rh_B"),
+        geometry = list(
+          tibble::tibble(
+            view = c("lateral", "medial"),
+            x = c(0, 1),
+            y = c(2, 3)
+          ),
+          tibble::tibble(
+            view = c("lateral", "medial"),
+            x = c(4, 5),
+            y = c(6, 7)
+          )
+        )
+      )
+    )
+  )
+
+  out <- neuroatlas:::.ggseg_atlas_xy_data(gg_atlas)
+  expect_equal(nrow(out), 4L)
+  expect_setequal(out$hemi, c("left", "right"))
+  expect_setequal(out$view, c("lateral", "medial"))
+  expect_true(all(c("x", "y", "hemi", "view", "label") %in% names(out)))
+})
+
+test_that(".ggseg_atlas_xy_data supports legacy flat side/hemi tables", {
+  gg_atlas <- list(
+    data = data.frame(
+      hemi = c("left", "right"),
+      side = c("lateral", "medial"),
+      x = c(1, 2),
+      y = c(3, 4),
+      stringsAsFactors = FALSE
+    )
+  )
+
+  out <- neuroatlas:::.ggseg_atlas_xy_data(gg_atlas)
+  expect_equal(out$view, c("lateral", "medial"))
+  expect_equal(out$hemi, c("left", "right"))
+})
+
+test_that(".ggseg_atlas_xy_data expands legacy sf polygons per feature", {
+  skip_if_not_installed("sf")
+
+  poly_left <- sf::st_polygon(list(rbind(
+    c(0, 0), c(2, 0), c(2, 1), c(0, 1), c(0, 0)
+  )))
+  poly_right <- sf::st_polygon(list(rbind(
+    c(10, 0), c(13, 0), c(13, 2), c(10, 2), c(10, 0)
+  )))
+  gg_atlas <- list(
+    data = sf::st_sf(
+      hemi = c("left", "right"),
+      side = c("lateral", "medial"),
+      geometry = sf::st_sfc(poly_left, poly_right)
+    )
+  )
+
+  out <- neuroatlas:::.ggseg_atlas_xy_data(gg_atlas)
+  expect_gt(nrow(out), 2L)
+  expect_setequal(out$hemi, c("left", "right"))
+  expect_setequal(out$view, c("lateral", "medial"))
+  expect_equal(range(out$x[out$hemi == "left"]), c(0, 2))
+  expect_equal(range(out$x[out$hemi == "right"]), c(10, 13))
+})
+
 test_that(".load_ggseg_schaefer_atlas falls back to data()", {
   ns <- new.env(parent = emptyenv())
 
