@@ -307,9 +307,26 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
       out$view <- out$side
     }
     if (!all(c("x", "y") %in% names(out)) && inherits(data_obj, "sf")) {
-      xy <- sf::st_coordinates(sf::st_geometry(data_obj))
-      out$x <- xy[, "X"]
-      out$y <- xy[, "Y"]
+      geoms <- sf::st_geometry(data_obj)
+      parts <- lapply(seq_along(geoms), function(i) {
+        xy <- sf::st_coordinates(geoms[[i]])
+        if (!nrow(xy)) {
+          return(NULL)
+        }
+        data.frame(
+          x = xy[, "X"],
+          y = xy[, "Y"],
+          hemi = if ("hemi" %in% names(out)) out$hemi[[i]] else NA_character_,
+          view = if ("view" %in% names(out)) out$view[[i]] else NA_character_,
+          stringsAsFactors = FALSE
+        )
+      })
+      expanded <- dplyr::bind_rows(parts)
+      if (!nrow(expanded)) {
+        stop("ggseg sf atlas geometry contained no polygon vertices",
+             call. = FALSE)
+      }
+      return(expanded)
     }
     return(out)
   }
