@@ -307,9 +307,16 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
       out$view <- out$side
     }
     if (!all(c("x", "y") %in% names(out)) && inherits(data_obj, "sf")) {
+      # st_coordinates() returns one row per vertex; expand feature attrs to match
       xy <- sf::st_coordinates(sf::st_geometry(data_obj))
+      lid <- grep("^L", colnames(xy), value = TRUE)
+      if (length(lid)) {
+        feature_id <- xy[, lid[length(lid)]]
+        out <- out[feature_id, , drop = FALSE]
+      }
       out$x <- xy[, "X"]
       out$y <- xy[, "Y"]
+      rownames(out) <- NULL
     }
     return(out)
   }
