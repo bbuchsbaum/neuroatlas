@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "artifact_release": "transform-artifacts-v1",
+  "status": "draft_requires_benchmark_and_review",
+  "release_approval": {
+    "approved": false,
+    "approved_by": null,
+    "approved_at_utc": null,
+    "reason": "Numeric release thresholds must be calibrated against the frozen identity baseline and the independent official TemplateFlow transform before a neuroatlas-built candidate is evaluated."
+  },
+  "invariants": {
+    "all_metrics_finite": true,
+    "nonpositive_jacobians_allowed": 0,
+    "nonfinite_jacobians_allowed": 0,
+    "target_geometry_must_match_exactly": true,
+    "label_interpolation": "GenericLabel",
+    "scalar_interpolation": "Linear",
+    "probability_interpolation": "Linear",
+    "no_unexpected_label_ids": true
+  },
+  "evidence": {
+    "candidate_registration_qa": ["MI", "CC", "brain_mask_dice", "HOCPA_label_dice", "jacobian"],
+    "independent_reader": "neurotransform::read_transform(type = 'ants_h5')",
+    "software_provenance": {
+      "development_smoke": "Record the observed package version and immutable Git RemoteSha for niflowr and neurotransform; moving GitHub main is allowed only for non-production smoke evidence.",
+      "release": "Candidate provenance must record immutable source commits for niflowr and neurotransform. A moving development reference alone is not release evidence."
+    },
+    "baselines": ["identity_no_warp", "official_templateflow_h5"],
+    "visual_qa": {
+      "required": true,
+      "renderer": "neuroim2 registration-QC plots",
+      "panels": [
+        "source and target native orthogonal views",
+        "target versus warped-source checkerboard",
+        "target and warped-mask edge overlay",
+        "target and warped-label edge overlay",
+        "target-background Jacobian-minus-one overlay"
+      ],
+      "interpretation": "Qualitative review evidence; it never replaces numerical, direction, or deformation gates."
+    },
+    "landmarks": "A reviewed, stratified physical-coordinate landmark file is required before approval.",
+    "grids": [
+      "MNI152NLin6Asym_res-01",
+      "MNI152NLin6Asym_res-02",
+      "MNI152NLin2009cAsym_res-01",
+      "MNI152NLin2009cAsym_res-02"
+    ]
+  },
+  "thresholds": null,
+  "failure_behavior": "qualification and release assembly must fail closed while release_approval.approved is false or thresholds is null"
+}
