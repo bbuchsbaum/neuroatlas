@@ -827,7 +827,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @param hemis Character vector of hemispheres.
 #' @param surface Character: surface type (unused; kept for signature parity).
 #' @param projection_smooth Non-negative integer smoothing iterations.
-#' @return A tibble with columns \code{x, y, poly_id, panel}, or \code{NULL}.
+#' @return A tibble with columns \code{x, y, poly_id, panel, view}, or
+#'   \code{NULL}.
 #' @keywords internal
 #' @noRd
 .build_surface_silhouette_data <- function(surfatlas, views, hemis, surface,
@@ -887,7 +888,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
         merged$poly_id <- merged$poly_id + global_offset
         global_offset <- max(merged$poly_id)
         merged$panel <- panel_label
-        out[[length(out) + 1L]] <- merged[, c("x", "y", "poly_id", "panel")]
+        merged$view <- v
+        out[[length(out) + 1L]] <- merged[, c("x", "y", "poly_id", "panel",
+                                             "view")]
       }
     }
   }
@@ -1615,8 +1618,8 @@ build_surface_polygon_data <- function(surfatlas,
 
 #' Compute panel-wise layout transforms for projected brain polygons
 #'
-#' @param poly_data Polygon data with columns \code{panel}, \code{view},
-#'   \code{x}, \code{y}.
+#' @param poly_data Full cortex silhouette data with columns \code{panel},
+#'   \code{view}, \code{x}, \code{y}, independent of parcel coverage.
 #' @param panel_layout Character scalar: \code{"native"} or
 #'   \code{"presentation"}.
 #' @return A tibble with per-panel transform parameters, or \code{NULL}.
@@ -1992,7 +1995,8 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{"native"} (default) preserves raw projected units;
 #'   \code{"presentation"} recentres each panel, rotates dorsal/ventral views
 #'   to horizontal, and normalises per-panel scale for a cleaner ggseg-like
-#'   grid.
+#'   grid. Placement, scale, and panel limits use the full cortex silhouette,
+#'   regardless of parcel coverage or whether \code{background} is drawn.
 #' @param style Visual preset. \code{"default"} keeps existing behaviour.
 #'   \code{"ggseg_like"} enables a cleaner publication style and, unless
 #'   explicitly overridden, switches \code{panel_layout} to
@@ -2135,6 +2139,8 @@ build_surface_polygon_data <- function(surfatlas,
 #'   sulcal metric is preferred; otherwise the CPU backend computes curvature
 #'   on matched white geometry and verifies vertex correspondence.
 #' @param anatomy_metric_source Provenance label for an explicit metric.
+#' @param anatomy_style,anatomy_midpoint,anatomy_invert,anatomy_range CPU underlay
+#'   controls passed to [neurosurf::render_surface_rgba()].
 #' @param vals_threshold Optional non-negative magnitude for the CPU parcel
 #'   renderer (\code{static_backend = "cpu"} with \code{vals}): parcels with
 #'   \code{abs(vals)} below it stay unfilled, and the colorbar greys out the
@@ -2143,8 +2149,9 @@ build_surface_polygon_data <- function(surfatlas,
 #'   named list of its settings for the CPU parcel renderer.
 #' @param medial_wall Explicit medial-wall policy: neutral shade, mask, or
 #'   independent outline.
-#' @param camera Strict canonical orthographic or slightly oblique presentation
-#'   camera.
+#' @param camera Camera for \code{static_backend = "cpu"}: strict canonical
+#'   orthographic or slightly oblique presentation. The ggplot backend always
+#'   uses canonical projections; use \code{panel_layout} to arrange its panels.
 #' @param orientation_labels Draw small anterior/posterior marks in CPU panels.
 #' @param render_width,render_height Per-panel CPU raster dimensions.
 #' @param render_antialias CPU supersampling factor.
@@ -2299,6 +2306,10 @@ plot_brain <- function(surfatlas,
                        value = NULL,
                        by = NULL,
                        allow_partial = FALSE,
+                       anatomy_style = "publication",
+                       anatomy_midpoint = NULL,
+                       anatomy_invert = FALSE,
+                       anatomy_range = c(0.72, 0.90),
                        vals_threshold = NULL,
                        parcel_style = NULL,
                        ...) {
@@ -2504,6 +2515,10 @@ plot_brain <- function(surfatlas,
       cortex_mask = cortex_mask, cortex_mask_source = cortex_mask_source,
       anatomy_metric = anatomy_metric,
       anatomy_metric_source = anatomy_metric_source,
+      anatomy_style = anatomy_style,
+      anatomy_midpoint = anatomy_midpoint,
+      anatomy_invert = anatomy_invert,
+      anatomy_range = anatomy_range,
       medial_wall = medial_wall, camera = camera,
       orientation_labels = orientation_labels,
       render_width = render_width, render_height = render_height,
@@ -2620,13 +2635,24 @@ plot_brain <- function(surfatlas,
   # This controls both grouping and optional polygon-level interactive ids.
   group_col <- if (outline) "face_id" else "poly_id"
 
-  # Optional panel-wise layout normalisation for presentation use.
+  # Use the full cortex for presentation layout, even when it is not drawn.
+  # Sparse or asymmetric parcel coverage must not move or enlarge the anatomy.
+  silhouette_data <- NULL
+  if (isTRUE(background) || panel_layout == "presentation") {
+    silhouette_data <- .build_surface_silhouette_data_memo(
+      surfatlas, views, hemis, surface,
+      projection_smooth = projection_smooth,
+      depth_cull = depth_cull
+    )
+  }
   panel_transforms <- .compute_panel_layout_transforms(
-    poly_data,
+    silhouette_data,
     panel_layout = panel_layout
   )
   if (!is.null(panel_transforms)) {
     poly_data <- .apply_panel_layout_to_points(poly_data, panel_transforms)
+    silhouette_data <- .apply_panel_layout_to_points(silhouette_data,
+                                                     panel_transforms)
     if (!is.null(boundary_data) && nrow(boundary_data) > 0) {
       boundary_data <- .apply_panel_layout_to_segments(boundary_data,
                                                        panel_transforms)
@@ -2711,27 +2737,16 @@ plot_brain <- function(surfatlas,
   )
   panel_label_map <- stats::setNames(panel_display_labels, panel_levels)
   poly_data$panel <- factor(poly_data$panel, levels = panel_levels)
+  if (!is.null(silhouette_data)) {
+    silhouette_data$panel <- factor(silhouette_data$panel, levels = panel_levels)
+  }
 
   # Optional grey cortex backdrop: the full hemisphere silhouette drawn under
   # the parcellation, so sparse atlases (e.g. Wang visual areas) are shown in
   # anatomical context rather than floating on the page.
-  base_data <- NULL
+  base_data <- if (isTRUE(background)) silhouette_data else NULL
   bg_shade_data <- NULL
   if (isTRUE(background)) {
-    base_data <- .build_surface_silhouette_data_memo(
-      surfatlas, views, hemis, surface,
-      projection_smooth = projection_smooth,
-      depth_cull = depth_cull
-    )
-    if (!is.null(base_data) && nrow(base_data) > 0) {
-      if (!is.null(panel_transforms)) {
-        base_data <- .apply_panel_layout_to_points(base_data, panel_transforms)
-      }
-      base_data$panel <- factor(base_data$panel, levels = panel_levels)
-    } else {
-      base_data <- NULL
-    }
-
     # Per-face lambertian shading over the whole cortex gives the grey backdrop
     # real sulcal/gyral depth (otherwise it reads as a flat silhouette).
     bg_shade_data <- .build_surface_background_data_memo(
@@ -2768,6 +2783,13 @@ plot_brain <- function(surfatlas,
       fill = background_color,
       colour = background_color,
       linewidth = poly_lwd,
+      inherit.aes = FALSE
+    )
+  } else if (!is.null(panel_transforms)) {
+    # Keep the same anatomical frame when the backdrop is hidden.
+    p <- p + ggplot2::geom_blank(
+      data = silhouette_data,
+      mapping = ggplot2::aes(x = x, y = y),
       inherit.aes = FALSE
     )
   }
@@ -3305,12 +3327,17 @@ plot_brain <- function(surfatlas,
     y = c(1, 1),
     fill = as.numeric(lim)
   )
+  color_scale <- if (length(palette) > 1L) {
+    function(...) ggplot2::scale_fill_gradientn(colours = palette, ...)
+  } else {
+    function(...) scico::scale_fill_scico(palette = palette, ...)
+  }
   p <- ggplot2::ggplot(dummy, ggplot2::aes(x = x, y = y, fill = fill)) +
     # A zero-area tile stays invisible in the panel without propagating an
     # alpha of zero into the guide (which would erase the colorbar as well).
     ggplot2::geom_tile(width = 0, height = 0, show.legend = TRUE) +
-    scico::scale_fill_scico(
-      palette = palette, limits = lim, oob = scales::squish,
+    color_scale(
+      limits = lim, oob = scales::squish,
       name = title,
       # `breaks = NULL` means "draw no breaks" in ggplot2 and suppresses the
       # guide entirely. Use the scale default unless explicit breaks were

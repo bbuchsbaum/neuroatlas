@@ -299,6 +299,11 @@
   surface_type <- match.arg(surface_type)
   hemi <- match.arg(hemi)
 
+  if (identical(surface_space, "fsaverage-std8") &&
+      is.null(density_override) && is.null(resolution_override)) {
+    return(neurosurf::load_fsaverage_std8(surface_type)[[hemi]])
+  }
+
   # Fast packaged fallback for fsaverage6 surfaces.
   if (identical(surface_space, "fsaverage6") &&
       is.null(density_override) &&

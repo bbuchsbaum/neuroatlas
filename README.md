@@ -46,9 +46,10 @@ consistent, user-friendly functions.
 - **TemplateFlow integration**: Access standardized templates through
   the pure-R `templateflow` backend
 - **Visualization**: Publication-quality surface figures with
-  `plot_brain()` / `plot_brain_grid()`, perceptually-optimised ROI
-  palettes, the ggseg ecosystem, and an interactive `cluster_explorer()`
-  Shiny app
+  `plot_brain()` / `plot_brain_grid()`, sulcal shading from
+  topology-checked white-surface curvature (`surface_anatomy()`),
+  perceptually-optimised ROI palettes, the ggseg ecosystem, and an
+  interactive `cluster_explorer()` Shiny app
 - **Metadata**: Atlases and loaded templates carry identity, spatial
   geometry, citations, source artifacts, and processing history
   (`atlas_metadata()`, `template_metadata()`).
@@ -202,6 +203,26 @@ plot_brain(
 ```
 
 <img src="man/figures/README-roi-palette.png" alt="Schaefer-200 (7-network) parcellation on the fsaverage6 surface with a perceptually-optimised maximin colour palette; lateral and medial views of both hemispheres." width="100%" />
+
+### Anatomical shading
+
+CPU renders of inflated surfaces shade sulci and gyri from mean
+curvature of the matching white mesh. Shading is applied only when the
+two meshes share a topology. Use `surface_anatomy()` to inspect the
+metric and its provenance, or to supply your own per-vertex sulcal
+depth. Tune the underlay with the `anatomy_*` arguments of
+`plot_brain()`:
+
+``` r
+anat <- surface_anatomy(schaefer_surface, hemi = "lh")
+anat$provenance$source  # "computed_mean_curvature"
+
+plot_brain(
+  schaefer_surface,
+  interactive = FALSE,
+  anatomy_range = c(0.65, 0.92)
+)
+```
 
 ## Available Atlases
 

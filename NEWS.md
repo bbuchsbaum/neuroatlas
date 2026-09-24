@@ -33,6 +33,17 @@
 
 # neuroatlas 0.1.0.9000
 
+* New `surface_anatomy()` resolves the sulcal shading metric shared by the
+  CPU surface renderers: mean curvature of the matching white mesh, used only
+  when its topology matches the display mesh, with explicit provenance.
+  Default `fsaverage6` atlases use the packaged white mesh and need no
+  TemplateFlow download.
+
+* `plot_brain(panel_layout = "presentation")` now uses the full cortex
+  silhouette for panel placement, scale, and framing. Sparse atlases such as
+  Wang retain their anatomical position and size, with consistent framing
+  whether or not `background = TRUE` is used.
+
 * Added `get_hcpex_atlas()` and `get_atlas("hcpex")` for HCPex v1.1:
   360 cortical and 66 subcortical regions at 1 or 2 mm in the source-declared
   MNI152NLin2009cAsym space. Downloads use a pinned upstream revision and

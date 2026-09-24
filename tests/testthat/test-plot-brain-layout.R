@@ -109,6 +109,154 @@
     )
 }
 
+make_toy_sparse_panel_atlas <- function(sparse = TRUE) {
+  skip_if_not_installed("neurosurf")
+
+  # A closed box with a short posterior strip and a long unlabelled body.
+  # Its known bounds provide an independent reference for panel framing.
+  verts <- do.call(rbind, lapply(c(-104, -84, 80), function(y) {
+    cbind(x = c(-20, 20, 20, -20), y = y, z = c(-40, -40, 40, 40))
+  }))
+  faces <- do.call(rbind, lapply(c(0L, 4L), function(offset) {
+    do.call(rbind, lapply(seq_len(4L), function(i) {
+      a <- offset + i
+      b <- offset + (i %% 4L) + 1L
+      rbind(c(a, b + 4L, b), c(a, a + 4L, b + 4L))
+    }))
+  }))
+  faces <- rbind(faces, c(1, 2, 3), c(1, 3, 4),
+                 c(9, 11, 10), c(9, 12, 11))
+
+  make_hemi <- function(hemi, id) {
+    # Deliberately different hemisphere sizes and offsets.
+    xyz <- if (hemi == "lh") verts else verts * 1.3 + 17
+    geom <- neurosurf::SurfaceGeometry(
+      vert = xyz, faces = faces - 1L, hemi = hemi
+    )
+    methods::new(
+      "LabeledNeuroSurface", labels = "cortex", cols = "#888888",
+      geometry = geom, indices = seq_len(nrow(verts)),
+      data = if (sparse) c(rep(id, 4), rep(0, 8)) else rep(id, 12)
+    )
+  }
+
+  structure(list(
+    name = "toy_sparse_panels", ids = 1:2,
+    labels = c("LeftParcel", "RightParcel"),
+    orig_labels = c("LeftParcel", "RightParcel"),
+    hemi = c("left", "right"), surf_type = "inflated",
+    lh_atlas = make_hemi("lh", 1), rh_atlas = make_hemi("rh", 2)
+  ), class = c("surfatlas", "atlas"))
+}
+
+test_that("presentation framing follows cortex, independently of parcel coverage", {
+  sparse <- make_toy_sparse_panel_atlas()
+  dense <- make_toy_sparse_panel_atlas(sparse = FALSE)
+  views <- c("lateral", "medial", "dorsal", "ventral")
+  ranges <- function(p) {
+    lapply(ggplot2::ggplot_build(p)$layout$panel_params, function(panel) {
+      c(panel$x.range, panel$y.range)
+    })
+  }
+
+  for (outline in c(FALSE, TRUE)) {
+    draw <- function(atl, background = FALSE) {
+      plot_brain(
+        atl, vals = c(1, 2), views = views, interactive = FALSE,
+        panel_layout = "presentation", background = background,
+        outline = outline, shading = FALSE, shading_strength = 0,
+        border = FALSE, colorbar = FALSE
+      )
+    }
+    p_sparse <- draw(sparse)
+    p_dense <- draw(dense)
+    p_bg <- draw(sparse, background = TRUE)
+
+    # Toggling the backdrop or labelling more cortex must not move or zoom it.
+    expect_equal(p_sparse$data, p_bg$data)
+    expect_equal(ranges(p_sparse), ranges(p_bg))
+    expect_equal(ranges(p_sparse), ranges(p_dense))
+    expect_length(ranges(p_sparse), 8L)
+
+    backdrop <- p_bg$layers[[1]]$data
+    ext <- backdrop |>
+      dplyr::group_by(panel) |>
+      dplyr::summarise(cx = (min(x) + max(x)) / 2,
+                       cy = (min(y) + max(y)) / 2,
+                       width = max(x) - min(x), .groups = "drop")
+    expect_equal(ext$cx, rep(0, 8), tolerance = 1e-12)
+    expect_equal(ext$cy, rep(0, 8), tolerance = 1e-12)
+    expect_equal(ext$width, rep(1, 8), tolerance = 1e-12)
+
+    # Posterior parcels retain their anatomical position, rather than being
+    # enlarged and centred as though they covered the entire hemisphere.
+    parcels <- .summarize_panel_extents(p_sparse$data)
+    expect_true(all(parcels$width < 0.12))
+    expect_true(all(abs(parcels$cx) > 0.39))
+    expect_equal(parcels$cy, rep(0, 8), tolerance = 1e-12)
+  }
+})
+
+test_that("presentation keeps smoothed anatomy and overlay layers aligned", {
+  sparse <- make_toy_sparse_panel_atlas()
+  dense <- make_toy_sparse_panel_atlas(sparse = FALSE)
+  draw <- function(atl) {
+    plot_brain(
+      atl, views = c("lateral", "dorsal"), hemis = "right",
+      panel_layout = "presentation", projection_smooth = 1L,
+      depth_cull = FALSE, background = TRUE, outer_contour = TRUE,
+      overlay = list(rh = rep(2, 12)), overlay_lim = c(0, 3),
+      overlay_border = TRUE, border_geom = "segment",
+      interactive = FALSE, colorbar = FALSE
+    )
+  }
+  p_sparse <- draw(sparse)
+  p_dense <- draw(dense)
+  expect_setequal(as.character(p_sparse$data$panel),
+                  c("Right Lateral", "Right Dorsal"))
+
+  for (column in c("shade", "overlay_value", "contour_id")) {
+    layer_data <- function(p) {
+      layers <- Filter(function(layer) {
+        is.data.frame(layer$data) && column %in% names(layer$data)
+      }, p$layers)
+      expect_length(layers, 1L)
+      layers[[1]]$data
+    }
+    expect_equal(layer_data(p_sparse), layer_data(p_dense))
+  }
+
+  # Parcel boundary endpoints must still coincide with parcel vertices.
+  edges <- Filter(function(layer) {
+    is.data.frame(layer$data) && "edge_type" %in% names(layer$data)
+  }, p_sparse$layers)
+  expect_gt(length(edges), 0L)
+  for (layer in edges) {
+    for (panel in unique(layer$data$panel)) {
+      dat <- layer$data[layer$data$panel == panel, ]
+      poly <- p_sparse$data[p_sparse$data$panel == panel, ]
+      xy <- rbind(dat[, c("x", "y")],
+                  stats::setNames(dat[, c("xend", "yend")], c("x", "y")))
+      matched <- vapply(seq_len(nrow(xy)), function(i) {
+        any(abs(poly$x - xy$x[i]) < 1e-12 &
+              abs(poly$y - xy$y[i]) < 1e-12)
+      }, logical(1))
+      expect_true(all(matched))
+    }
+  }
+})
+
+test_that("native layout preserves projected parcel coordinates", {
+  atl <- make_toy_sparse_panel_atlas()
+  raw <- build_surface_polygon_data(atl, merged = FALSE)$polygons
+  p <- plot_brain(atl, outline = TRUE, interactive = FALSE)
+  expect_equal(p$data$x, raw$x)
+  expect_equal(p$data$y, raw$y)
+  expect_false(any(vapply(p$layers, function(layer) {
+    inherits(layer$geom, "GeomBlank")
+  }, logical(1))))
+})
+
 .summarize_ggseg_panel_extents <- function(atlas_string = "schaefer7_100") {
   gg_atlas <- neuroatlas:::.load_ggseg_schaefer_atlas(atlas_string)
   dat <- neuroatlas:::.ggseg_atlas_xy_data(gg_atlas)

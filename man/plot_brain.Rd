@@ -86,6 +86,10 @@ plot_brain(
   value = NULL,
   by = NULL,
   allow_partial = FALSE,
+  anatomy_style = "publication",
+  anatomy_midpoint = NULL,
+  anatomy_invert = FALSE,
+  anatomy_range = c(0.72, 0.9),
   vals_threshold = NULL,
   parcel_style = NULL,
   ...
@@ -150,7 +154,8 @@ click-to-surface workflows.}
 \code{"native"} (default) preserves raw projected units;
 \code{"presentation"} recentres each panel, rotates dorsal/ventral views
 to horizontal, and normalises per-panel scale for a cleaner ggseg-like
-grid.}
+grid. Placement, scale, and panel limits use the full cortex silhouette,
+regardless of parcel coverage or whether \code{background} is drawn.}
 
 \item{style}{Visual preset. \code{"default"} keeps existing behaviour.
 \code{"ggseg_like"} enables a cleaner publication style and, unless
@@ -343,8 +348,9 @@ on matched white geometry and verifies vertex correspondence.}
 \item{medial_wall}{Explicit medial-wall policy: neutral shade, mask, or
 independent outline.}
 
-\item{camera}{Strict canonical orthographic or slightly oblique presentation
-camera.}
+\item{camera}{Camera for \code{static_backend = "cpu"}: strict canonical
+orthographic or slightly oblique presentation. The ggplot backend always
+uses canonical projections; use \code{panel_layout} to arrange its panels.}
 
 \item{orientation_labels}{Draw small anterior/posterior marks in CPU panels.}
 
@@ -389,6 +395,9 @@ When \code{NULL}, a safe unique key is inferred.}
 \item{allow_partial}{Logical. If \code{FALSE} (default), \code{data} must
 contain every atlas parcel. If \code{TRUE}, missing parcels are rendered
 with \code{NA} values. Unknown and duplicate keys always error.}
+
+\item{anatomy_style, anatomy_midpoint, anatomy_invert, anatomy_range}{CPU underlay
+controls passed to [neurosurf::render_surface_rgba()].}
 
 \item{vals_threshold}{Optional non-negative magnitude for the CPU parcel
 renderer (\code{static_backend = "cpu"} with \code{vals}): parcels with
