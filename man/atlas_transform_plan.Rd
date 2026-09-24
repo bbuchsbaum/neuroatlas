@@ -8,7 +8,9 @@ atlas_transform_plan(
   from_space,
   to_space,
   data_type = c("parcel", "vertex", "voxel"),
-  mode = c("auto", "strict")
+  mode = c("auto", "strict"),
+  available_only = FALSE,
+  provider = c("auto", "neuroatlas", "templateflow")
 )
 }
 \arguments{
@@ -21,6 +23,12 @@ atlas_transform_plan(
 
 \item{mode}{Planning mode. `"auto"` returns `NULL` if no route exists,
 `"strict"` errors.}
+
+\item{available_only}{Restrict routing to available edges. The default also
+shows planned routes for diagnostic compatibility. Execution always uses
+available edges only; retired edges are never selected.}
+
+\item{provider}{Provider filter, `"auto"`, `"neuroatlas"`, or `"templateflow"`.}
 }
 \value{
 A list of class `"atlas_transform_plan"` with fields:
@@ -31,7 +39,7 @@ and `warnings`.
 In `mode = "auto"`, returns `NULL` (with warning) if no route exists.
 }
 \description{
-Computes a direct or two-hop transform plan between spaces using the packaged
+Computes a transform route between spaces using the packaged
 transform registry.
 }
 \details{

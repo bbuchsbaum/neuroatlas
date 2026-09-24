@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "provider": "templateflow",
+  "qualification_scope": "upstream_transform_application",
+  "status": "frozen_before_baseline_measurements",
+  "scope": "Verify application of the published TemplateFlow MNI152NLin6Asym and MNI152NLin2009cAsym H5 pair. This is not qualification of a neuroatlas-built registration or independent re-establishment of anatomical accuracy.",
+  "required_cells": ["forward_1mm", "forward_2mm", "inverse_1mm", "inverse_2mm"],
+  "point_error_max_mm": 0.001,
+  "roundtrip_error_max_mm": 0.5,
+  "scalar_error_bound": "Euclidean norm of maximum physical per-axis source intensity gradients times 0.001 mm, plus 0.000001 for floating point storage. Compared on the source interpolation interior; all-grid and boundary discrepancies are retained separately.",
+  "probability_bound": [-0.000001, 1.000001],
+  "nonpositive_jacobians_allowed": 0,
+  "nonfinite_jacobians_allowed": 0,
+  "invariants": ["target_geometry_exact", "label_ids_preserved", "label_oracle_agreement", "finite_outputs", "point_support_complete", "independent_reader_pass", "probability_channels_preserved"],
+  "identity_improvement": ["mi_cost", "cc_cost", "mask_dice"],
+  "visual_review": "Both directions on both grids; pinned evidence receipts required.",
+  "label_overlap_interpretation": "Harvard-Oxford labels in the target template were mapped upstream. Their overlap is concordance, not independent anatomical ground truth.",
+  "upstream_references": [
+    "https://www.templateflow.org/python-client/master/notebooks/02_visualisation.html",
+    "https://www.templateflow.org/python-client/0.5.2/index.html"
+  ]
+}

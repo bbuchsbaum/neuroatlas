@@ -67,7 +67,10 @@ render_visual_qa <- function(source_image,
                              target_labels,
                              warped_labels,
                              jacobian,
-                             output_dir) {
+                             output_dir,
+                             source_space = "MNI152NLin6Asym",
+                             target_space = "MNI152NLin2009cAsym",
+                             label_interpolation = "GenericLabel") {
   require_visual_qa_packages()
   source <- neuroim2::read_vol(source_image)
   target <- neuroim2::read_vol(target_image)
@@ -93,7 +96,7 @@ render_visual_qa <- function(source_image,
     neuroim2::plot_ortho(
       source,
       style = "report",
-      title = "Before: source template MNI152NLin6Asym",
+      title = paste("Before: source template", source_space),
       caption = "Native-grid context only; this panel is not an alignment comparison."
     )
   })
@@ -101,7 +104,7 @@ render_visual_qa <- function(source_image,
     neuroim2::plot_ortho(
       target,
       style = "report",
-      title = "Before: fixed template MNI152NLin2009cAsym",
+      title = paste("Before: fixed template", target_space),
       caption = "Native-grid context only; the candidate comparison is on this target grid."
     )
   })
@@ -135,7 +138,7 @@ render_visual_qa <- function(source_image,
       fixed_color = "#00d5ff",
       moving_color = "#ff3b30",
       title = "After: HOCPA label-boundary agreement",
-      subtitle = "Cyan = target labels; red = warped source labels (GenericLabel interpolation).",
+      subtitle = paste0("Cyan = target labels; red = warped source labels (", label_interpolation, " interpolation)."),
       caption = "This supplements, but does not replace, per-label Dice and ID-integrity checks."
     )
   })

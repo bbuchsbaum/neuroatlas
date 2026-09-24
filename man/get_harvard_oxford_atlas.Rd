@@ -44,9 +44,8 @@ or `"02"`; FSL accepts values such as `"1mm"` and `"2mm"`.}
 \item{path_only}{Return resolved paths and metadata without loading image
 data.}
 
-\item{download}{Logical; for `get_julich_brain_atlas()`, download the
-Julich-Brain atlas archive into the neuroatlas cache when `fsl_dir` is
-unset.}
+\item{...}{Arguments passed by the convenience wrappers to
+`get_harvard_oxford_atlas()`.}
 }
 \value{
 An `atlas` object, or path metadata when `path_only = TRUE`.

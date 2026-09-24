@@ -1,3 +1,4 @@
+testthat::skip_if_not(dir.exists(testthat::test_path("..", "..", "data-raw", "transform-artifacts-v1")), "artifact build scripts are source-repository only")
 artifact_v1_path <- function(...) {
   normalizePath(file.path(testthat::test_path(), "..", "..", "data-raw", "transform-artifacts-v1", ...), mustWork = TRUE)
 }
@@ -6,7 +7,7 @@ test_that("V1 transform inputs are fully pinned", {
   skip_if_not_installed("jsonlite")
   routes <- jsonlite::read_json(artifact_v1_path("routes.json"), simplifyVector = FALSE)
   expect_identical(routes$artifact_release, "transform-artifacts-v1")
-  expect_identical(routes$status, "inputs_frozen_not_built")
+  expect_identical(routes$status, "inputs_frozen")
   expect_length(routes$routes, 1L)
 
   route <- routes$routes[[1L]]
@@ -14,7 +15,7 @@ test_that("V1 transform inputs are fully pinned", {
   expect_identical(route$target_space, "MNI152NLin2009cAsym")
   expect_identical(route$registration$preset, "precise")
   expect_identical(route$registration$random_seed, 1L)
-  expect_identical(route$registration$threads, 8L)
+  expect_identical(route$registration$threads, 1L)
   expect_identical(route$registration$niflowr_development_ref,
                    "github:bbuchsbaum/niflowr@main")
   expect_match(route$registration$niflowr_last_observed_commit, "^[0-9a-f]{7,40}$")
@@ -31,9 +32,12 @@ test_that("V1 transform inputs are fully pinned", {
 test_that("V1 qualification fails closed until calibrated thresholds are approved", {
   skip_if_not_installed("jsonlite")
   policy <- jsonlite::read_json(artifact_v1_path("qualification-policy.json"), simplifyVector = FALSE)
-  expect_identical(policy$status, "draft_requires_benchmark_and_review")
-  expect_false(policy$release_approval$approved)
-  expect_null(policy$thresholds)
+  source(artifact_v1_path("scripts", "qualification-gates.R"), local = TRUE)
+  if (isTRUE(policy$release_approval$approved)) {
+    expect_length(qualification_policy_errors(policy), 0L)
+  } else {
+    expect_true(length(qualification_policy_errors(policy)) > 0L)
+  }
   expect_identical(policy$invariants$nonpositive_jacobians_allowed, 0L)
   expect_identical(policy$invariants$nonfinite_jacobians_allowed, 0L)
   expect_true(policy$evidence$visual_qa$required)

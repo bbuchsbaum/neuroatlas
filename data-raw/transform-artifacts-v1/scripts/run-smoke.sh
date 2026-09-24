@@ -5,7 +5,7 @@ set -euo pipefail
 : "${RS_OUTPUTS_JSON:?campaign wrapper did not provide RS_OUTPUTS_JSON}"
 artifact_root="${NEUROATLAS_TRANSFORM_ARTIFACT_ROOT:-$PWD}"
 readonly expected_smoke_sha256="47cf2716f25ccc305e05ca96f5414cf9c380d34116ac5d50dbb48b833943fcbd"
-readonly expected_common_sha256="aa735b195cc201addabd68472c0716b44d4c252c1e62c6b7dc5acf0dffde912e"
+readonly expected_common_sha256="44c892b4e2837bb235312bc98b59ce96ac505d2ef09cb0fafaf97e8a7f8bdb90"
 
 verify_source() {
   local path="$1"

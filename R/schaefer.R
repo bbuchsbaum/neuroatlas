@@ -385,9 +385,9 @@ schaefer_metainfo <- function(parcels, networks, use_cache = TRUE,
 #'   Default: FALSE
 #' @param use_cache Logical. Whether to cache downloaded files. Default: TRUE
 #' @param cache_dir Optional directory for Schaefer volume and label assets.
-#'   When NULL, uses the code{neuroatlas.schaefer.cache_dir} option, then the
-#'   code{neuroatlas.cache_dir} option, and finally the platform cache directory.
-#'   Ignored when code{use_cache = FALSE}, which uses transient files only.
+#'   When `NULL`, uses the `neuroatlas.schaefer.cache_dir` option, then the
+#'   `neuroatlas.cache_dir` option, and finally the platform cache directory.
+#'   Ignored when `use_cache = FALSE`, which uses transient files only.
 #' @param ... Additional arguments (currently unused, included for consistency
 #'   with convenience functions)
 #'
@@ -510,11 +510,13 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
       )
     }
     if (any(transform_plan$steps$transform_type != "identity")) {
-      stop(
-        "Schaefer atlas cannot be mapped from '", source_template_space,
-        "' to '", template_space, "': this route has no registered execution ",
-        "backend for labelled voxel data."
-      )
+      if (isTRUE(smooth)) {
+        stop("Cross-template label transforms require smooth = FALSE.")
+      }
+      transform <- get_template_transform(source_template_space, template_space)
+      native <- get_schaefer_atlas(parcels, networks, resolution,
+                                   use_cache = use_cache, cache_dir = cache_dir)
+      return(apply_template_transform(native, transform, target = outspace))
     }
   }
 

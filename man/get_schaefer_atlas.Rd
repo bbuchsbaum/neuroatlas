@@ -235,9 +235,9 @@ Default: FALSE}
 \item{use_cache}{Logical. Whether to cache downloaded files. Default: TRUE}
 
 \item{cache_dir}{Optional directory for Schaefer volume and label assets.
-When NULL, uses the code{neuroatlas.schaefer.cache_dir} option, then the
-code{neuroatlas.cache_dir} option, and finally the platform cache directory.
-Ignored when code{use_cache = FALSE}, which uses transient files only.}
+When `NULL`, uses the `neuroatlas.schaefer.cache_dir` option, then the
+`neuroatlas.cache_dir` option, and finally the platform cache directory.
+Ignored when `use_cache = FALSE`, which uses transient files only.}
 
 \item{...}{Additional arguments (currently unused, included for consistency
 with convenience functions)}

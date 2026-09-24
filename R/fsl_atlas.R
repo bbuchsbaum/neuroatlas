@@ -217,9 +217,8 @@ get_fsl_atlas <- function(name,
 #' @param path_only Return resolved paths and metadata without loading image
 #'   data.
 #'
-#' @param download Logical; for `get_julich_brain_atlas()`, download the
-#'   Julich-Brain atlas archive into the neuroatlas cache when `fsl_dir` is
-#'   unset.
+#' @param ... Arguments passed by the convenience wrappers to
+#'   `get_harvard_oxford_atlas()`.
 #'
 #' @return An `atlas` object, or path metadata when `path_only = TRUE`.
 #' @export
@@ -457,6 +456,9 @@ get_harvard_oxford_cortical_subcortical_atlas <- function(...) {
 #' uses the XML/image files under `$FSLDIR/data/atlases`.
 #'
 #' @inheritParams get_fsl_atlas
+#' @param download Download the Julich-Brain atlas archive into the neuroatlas
+#'   cache when `fsl_dir` is unset.
+#' @param ... Additional arguments passed to `get_fsl_atlas()`.
 #'
 #' @return An `atlas` object, or path metadata when `path_only = TRUE`.
 #' @export

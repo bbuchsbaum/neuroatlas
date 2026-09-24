@@ -5,6 +5,7 @@ runtime_packages <- c("RNifti", "niflowr", "neurotransform", "neuroim2", "hdf5r"
 invisible(lapply(runtime_packages, require_namespace))
 route_id <- route_id_from_args_or_campaign()
 route <- route_by_id(route_id)
+assert_release_software(route)
 outputs <- read_campaign_json("RS_OUTPUTS_JSON", required = FALSE)
 if (length(outputs) == 0L) {
   stop("build.R must be run through a campaign with declared outputs.", call. = FALSE)
@@ -53,26 +54,36 @@ invisible(mapply(assert_file_receipt, paths, inputs, SIMPLIFY = FALSE))
 out_dir <- dirname(outputs$forward)
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 prefix <- file.path(out_dir, "niflowr_")
-old_threads <- Sys.getenv("ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS", unset = NA_character_)
-on.exit({
-  if (is.na(old_threads)) Sys.unsetenv("ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS") else {
-    Sys.setenv(ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS = old_threads)
-  }
-}, add = TRUE)
-Sys.setenv(ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS = as.character(route$registration$threads))
-
-result <- niflowr::ni_ants_register_to_template(
+# Pass execution controls into the clean container, not only the host R process.
+registration_env <- list(
+  ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS = as.character(route$registration$threads),
+  ANTS_RANDOM_SEED = as.character(route$registration$random_seed)
+)
+registration_args <- list(
   fixed_image = paths$target_image,
   moving_image = paths$source_image,
   output_prefix = prefix,
   preset = route$registration$preset,
   fixed_image_mask = paths$target_mask,
   random_seed = route$registration$random_seed,
+  .env = registration_env,
   .engine = route$registration$engine,
   .profile = route$registration$profile,
-  timeout = route$registration$timeout_seconds,
-  echo = TRUE
+  timeout = route$registration$timeout_seconds
 )
+plan <- do.call(niflowr::ni_ants_register_to_template,
+                c(registration_args, list(dry_run = TRUE, echo = FALSE)))
+for (name in names(registration_env)) {
+  argument <- paste0(name, "=", registration_env[[name]])
+  index <- which(plan$execution$args == argument)
+  if (length(index) != 1L || index <= 1L ||
+      plan$execution$args[[index - 1L]] != "--env" ||
+      !identical(plan$environment[[name]], registration_env[[name]])) {
+    stop("Registration execution plan does not forward ", name, ".")
+  }
+}
+result <- do.call(niflowr::ni_ants_register_to_template,
+                  c(registration_args, list(echo = TRUE)))
 
 copy_output <- function(from, to) {
   if (!file.exists(from) || !file.copy(from, to, copy.date = TRUE)) {
@@ -89,6 +100,7 @@ write_json(
     route_id = route_id,
     attempt_id = Sys.getenv("RS_ATTEMPT_ID", unset = NA_character_),
     registration = route$registration,
+    execution_environment = registration_env,
     niflowr = list(
       development_ref = route$registration$niflowr_development_ref,
       last_observed_commit = route$registration$niflowr_last_observed_commit,
@@ -98,7 +110,8 @@ write_json(
     runtime_files = runtime_file_receipts,
     inputs = lapply(paths, function(path) list(path = path, bytes = unname(file.info(path)$size), sha256 = sha256_file(path))),
     outputs = lapply(outputs[c("forward", "inverse", "warped_image")], function(path) list(path = path, bytes = unname(file.info(path)$size), sha256 = sha256_file(path))),
-    niflowr_result = result
+    native_provenance = file_receipt(result$runtime$provenance_path),
+    niflowr_result = read_json(result$runtime$provenance_path)
   ),
   outputs$provenance
 )

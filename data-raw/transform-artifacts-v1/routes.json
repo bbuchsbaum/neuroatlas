@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "artifact_release": "transform-artifacts-v1",
-  "status": "inputs_frozen_not_built",
+  "status": "inputs_frozen",
   "input_inventory": {
     "observed_utc": "2026-09-19",
     "templateflow_package_version": "0.1.0",
@@ -32,9 +32,42 @@
           "bytes": 3293998,
           "sha256": "72f8edc99d7e696da7717db20b73897d8da5909d7f30b1c9a7e2a79e9f64ff2f",
           "geometry": {
-            "dim": [182, 218, 182],
-            "voxel_size_mm": [1, 1, 1],
-            "affine": [[1, 0, 0, -91], [0, 1, 0, -126], [0, 0, 1, -72], [0, 0, 0, 1]]
+            "dim": [
+              182,
+              218,
+              182
+            ],
+            "voxel_size_mm": [
+              1,
+              1,
+              1
+            ],
+            "affine": [
+              [
+                1,
+                0,
+                0,
+                -91
+              ],
+              [
+                0,
+                1,
+                0,
+                -126
+              ],
+              [
+                0,
+                0,
+                1,
+                -72
+              ],
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
           }
         },
         "mask": {
@@ -77,9 +110,42 @@
           "bytes": 3472309,
           "sha256": "97cee2cf7f51388d76d7b3632c8375d688d0fa171e1bede81fcef23726bb3d73",
           "geometry": {
-            "dim": [193, 229, 193],
-            "voxel_size_mm": [1, 1, 1],
-            "affine": [[1, 0, 0, -96], [0, 1, 0, -132], [0, 0, 1, -78], [0, 0, 0, 1]]
+            "dim": [
+              193,
+              229,
+              193
+            ],
+            "voxel_size_mm": [
+              1,
+              1,
+              1
+            ],
+            "affine": [
+              [
+                1,
+                0,
+                0,
+                -96
+              ],
+              [
+                0,
+                1,
+                0,
+                -132
+              ],
+              [
+                0,
+                0,
+                1,
+                -78
+              ],
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
           }
         },
         "mask": {
@@ -106,11 +172,16 @@
       },
       "registration": {
         "builder": "niflowr::ni_ants_register_to_template",
+        "software_commits": {
+          "niflowr": "3fe349389c659595c4ed21af7d48641486604c5d",
+          "neurotransform": "9e7550d45d6d6b06155b27717057f4137aaf666e",
+          "neuroim2": "e3f0d64b91a5a92962acd653369d5f9a7df885ea"
+        },
         "niflowr_development_ref": "github:bbuchsbaum/niflowr@main",
         "niflowr_last_observed_commit": "3fe3493",
         "preset": "precise",
         "random_seed": 1,
-        "threads": 8,
+        "threads": 1,
         "engine": "apptainer",
         "profile": "ants",
         "timeout_seconds": 14400,

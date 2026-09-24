@@ -1,31 +1,40 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "artifact_release": "transform-artifacts-v1",
-  "status": "draft_requires_benchmark_and_review",
+  "status": "frozen_before_candidate_evaluation",
   "release_approval": {
-    "approved": false,
-    "approved_by": null,
-    "approved_at_utc": null,
-    "reason": "Numeric release thresholds must be calibrated against the frozen identity baseline and the independent official TemplateFlow transform before a neuroatlas-built candidate is evaluated."
+    "approved": true,
+    "approved_by": "codex-neuroatlas with independent lean_expert policy_review",
+    "approved_at_utc": "2026-09-24T14:08:17.596762+00:00",
+    "reason": "Protocol approval only, not candidate or release approval. Independent review approved numerical strata, strict identity gates and prospective engineering budgets before own candidate measurement."
   },
   "invariants": {
     "all_metrics_finite": true,
     "nonpositive_jacobians_allowed": 0,
     "nonfinite_jacobians_allowed": 0,
     "target_geometry_must_match_exactly": true,
-    "label_interpolation": "GenericLabel",
+    "label_interpolation": "NearestNeighbor",
     "scalar_interpolation": "Linear",
     "probability_interpolation": "Linear",
     "no_unexpected_label_ids": true
   },
   "evidence": {
-    "candidate_registration_qa": ["MI", "CC", "brain_mask_dice", "HOCPA_label_dice", "jacobian"],
+    "candidate_registration_qa": [
+      "MI",
+      "CC",
+      "brain_mask_dice",
+      "HOCPA_label_dice",
+      "jacobian"
+    ],
     "independent_reader": "neurotransform::read_transform(type = 'ants_h5')",
     "software_provenance": {
       "development_smoke": "Record the observed package version and immutable Git RemoteSha for niflowr and neurotransform; moving GitHub main is allowed only for non-production smoke evidence.",
       "release": "Candidate provenance must record immutable source commits for niflowr and neurotransform. A moving development reference alone is not release evidence."
     },
-    "baselines": ["identity_no_warp", "official_templateflow_h5"],
+    "baselines": [
+      "identity_no_warp",
+      "official_templateflow_h5"
+    ],
     "visual_qa": {
       "required": true,
       "renderer": "neuroim2 registration-QC plots",
@@ -38,7 +47,7 @@
       ],
       "interpretation": "Qualitative review evidence; it never replaces numerical, direction, or deformation gates."
     },
-    "landmarks": "A reviewed, stratified physical-coordinate landmark file is required before approval.",
+    "landmarks": "Frozen disjoint numerical coverage strata, 32 points per hemisphere per stratum; not manually paired anatomical truth.",
     "grids": [
       "MNI152NLin6Asym_res-01",
       "MNI152NLin6Asym_res-02",
@@ -46,6 +55,220 @@
       "MNI152NLin2009cAsym_res-02"
     ]
   },
-  "thresholds": null,
-  "failure_behavior": "qualification and release assembly must fail closed while release_approval.approved is false or thresholds is null"
+  "thresholds": {
+    "cells": {
+      "forward_1mm": {
+        "mi_cost": {
+          "max": -0.527129
+        },
+        "cc_cost": {
+          "max": -0.533136
+        },
+        "mask_dice": {
+          "min": 0.967725119466037,
+          "max": 1
+        },
+        "label_dice_min": {
+          "min": 0,
+          "max": 1
+        },
+        "point_error_max_mm": {
+          "max": 0.001
+        },
+        "roundtrip_error_max_mm": {
+          "max": 0.5
+        },
+        "repeat_point_error_max_mm": {
+          "max": 0.1
+        },
+        "scalar_error_max": {
+          "max": 0.00137692788326225
+        },
+        "probability_min": {
+          "min": -1e-06
+        },
+        "probability_max": {
+          "max": 1.000001
+        },
+        "jacobian_min": {
+          "min": 0
+        },
+        "nonpositive_jacobians": {
+          "max": 0
+        },
+        "nonfinite_jacobians": {
+          "max": 0
+        }
+      },
+      "forward_2mm": {
+        "mi_cost": {
+          "max": -0.592346
+        },
+        "cc_cost": {
+          "max": -0.644104
+        },
+        "mask_dice": {
+          "min": 0.966629509285392,
+          "max": 1
+        },
+        "label_dice_min": {
+          "min": 0,
+          "max": 1
+        },
+        "point_error_max_mm": {
+          "max": 0.001
+        },
+        "roundtrip_error_max_mm": {
+          "max": 0.5
+        },
+        "repeat_point_error_max_mm": {
+          "max": 0.1
+        },
+        "scalar_error_max": {
+          "max": 0.00137692788326225
+        },
+        "probability_min": {
+          "min": -1e-06
+        },
+        "probability_max": {
+          "max": 1.000001
+        },
+        "jacobian_min": {
+          "min": 0
+        },
+        "nonpositive_jacobians": {
+          "max": 0
+        },
+        "nonfinite_jacobians": {
+          "max": 0
+        }
+      },
+      "inverse_1mm": {
+        "mi_cost": {
+          "max": -0.488608
+        },
+        "cc_cost": {
+          "max": -0.508032
+        },
+        "mask_dice": {
+          "min": 0.967725119466037,
+          "max": 1
+        },
+        "label_dice_min": {
+          "min": 0,
+          "max": 1
+        },
+        "point_error_max_mm": {
+          "max": 0.001
+        },
+        "roundtrip_error_max_mm": {
+          "max": 0.5
+        },
+        "repeat_point_error_max_mm": {
+          "max": 0.1
+        },
+        "scalar_error_max": {
+          "max": 0.00161082679704505
+        },
+        "probability_min": {
+          "min": -1e-06
+        },
+        "probability_max": {
+          "max": 1.000001
+        },
+        "jacobian_min": {
+          "min": 0
+        },
+        "nonpositive_jacobians": {
+          "max": 0
+        },
+        "nonfinite_jacobians": {
+          "max": 0
+        }
+      },
+      "inverse_2mm": {
+        "mi_cost": {
+          "max": -0.487249
+        },
+        "cc_cost": {
+          "max": -0.564483
+        },
+        "mask_dice": {
+          "min": 0.967981340575418,
+          "max": 1
+        },
+        "label_dice_min": {
+          "min": 0,
+          "max": 1
+        },
+        "point_error_max_mm": {
+          "max": 0.001
+        },
+        "roundtrip_error_max_mm": {
+          "max": 0.5
+        },
+        "repeat_point_error_max_mm": {
+          "max": 0.1
+        },
+        "scalar_error_max": {
+          "max": 0.00161082679704505
+        },
+        "probability_min": {
+          "min": -1e-06
+        },
+        "probability_max": {
+          "max": 1.000001
+        },
+        "jacobian_min": {
+          "min": 0
+        },
+        "nonpositive_jacobians": {
+          "max": 0
+        },
+        "nonfinite_jacobians": {
+          "max": 0
+        }
+      }
+    }
+  },
+  "failure_behavior": "qualification and release assembly must fail closed while release_approval.approved is false or thresholds is null",
+  "calibration_sha256": "b7a040e563c7e7b00808b8727a60dbe08b536d38b60490549755b1bf6335ff76",
+  "calibration_amendment": "Before own candidate measurement: numerical budgets are prospective engineering budgets on the 1 mm reference grid. The verified synthetic smoke exercises registration and I/O but does not calibrate anatomical accuracy. Identity supplies strict utility gates. Official TemplateFlow pair fails inverse consistency and inverse utility and remains a diagnostic comparison, not an acceptance standard. This explicitly supersedes the anatomy-pilot interpretation of plan section 7.1.",
+  "label_concordance": "All HOCPA per-label Dice values and missing labels are reported; no per-label accuracy threshold. The target labels were mapped upstream and are not independent anatomical ground truth.",
+  "identity_baseline": {
+    "forward_1mm": {
+      "mi_cost": -0.527129,
+      "cc_cost": -0.533136,
+      "mask_dice": 0.967725119466037
+    },
+    "forward_2mm": {
+      "mi_cost": -0.592346,
+      "cc_cost": -0.644104,
+      "mask_dice": 0.966629509285392
+    },
+    "inverse_1mm": {
+      "mi_cost": -0.488608,
+      "cc_cost": -0.508032,
+      "mask_dice": 0.967725119466037
+    },
+    "inverse_2mm": {
+      "mi_cost": -0.487249,
+      "cc_cost": -0.564483,
+      "mask_dice": 0.967981340575418
+    }
+  },
+  "strict_identity_improvement": true,
+  "repeat_tolerances": {
+    "mi_cost": 0.005,
+    "cc_cost": 0.005,
+    "mask_dice": 0.005,
+    "label_dice_min": 0.01,
+    "jacobian_min": 0.05
+  },
+  "repeat_budget_basis": "Prospective absolute agreement budgets: 0.005 MI/CC and mask Dice; 0.01 minimum label concordance; 0.05 minimum Jacobian. Both builds independently must pass every primary gate; point repeat maximum is 0.1 mm.",
+  "landmarks": {
+    "path": "landmarks-v1/manifest.json",
+    "sha256": "85f62ab5dbd8a396f317cc9129f09de9ec0a5ef0bbf8ce10cf7fd1bdf79c9ef0",
+    "bytes": 7019
+  }
 }

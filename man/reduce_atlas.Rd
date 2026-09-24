@@ -31,6 +31,10 @@ row per time point.}
 
 \item{format}{Character string specifying output format: "wide" or "long". 
 If NULL (default), uses "long" for NeuroVol and "wide" for NeuroVec.}
+
+\item{level}{Optional grouping level used by methods.}
+
+\item{by}{Optional grouping variable used by methods.}
 }
 \value{
 A \code{tibble} with format depending on the \code{format} parameter:

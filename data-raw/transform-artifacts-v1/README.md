@@ -65,17 +65,27 @@ release assembly always re-hashes them locally after transfer.
 
 ## Qualification and distribution gate
 
-`qualification-policy.json` is deliberately unapproved. It specifies
-non-negotiable invariants (finite metrics, no non-positive/non-finite
-Jacobians, exact target geometry, label integrity) and required independent
-evidence, but leaves numeric thresholds absent until calibration against the
-identity baseline and official TemplateFlow H5. This prevents candidate-driven
-threshold selection. A policy update must record the calibration data,
-threshold rationale, reviewer, and timestamp before qualification can run.
+`qualification-policy.json` now freezes the identity baselines and prospective
+engineering thresholds after independent review. Its approval concerns the
+protocol only. Candidate and repeat must independently improve MI, CC and mask
+Dice over identity on all four direction/grid cells, satisfy numerical and
+deformation gates, and agree within the frozen repeat tolerances. The official
+TemplateFlow pair failed calibration; it remains diagnostic evidence.
+
+`landmarks-v1/` contains the reviewed coordinate files, input receipts and policy
+review. The five disjoint numerical strata have 32 points per hemisphere each.
+These are numerical coverage probes, not paired anatomical truth. Regenerating
+them reproduced identical CSV bytes. `materialize-landmarks.R` refuses to replace
+an existing frozen output directory.
+
+The build, calibration and qualification campaign templates are separate.
+Current run IDs, scheduler receipts and retained failures are in
+`campaign-work-log.md`. Qualification outputs alone do not confer release
+eligibility: the visual and numerical landmark reviews must bind exact evidence.
 
 Qualification also renders a compact visual dashboard with `neuroim2`: native
 source/target context, target-versus-warped checkerboard, brain-mask and HOCPA
-label-boundary overlays, and Jacobian-minus-one overlay. It is a required human
+label-boundary overlays, and Jacobian-minus-one overlay. It is a required
 review artifact and Release asset, but never a substitute for the numerical
 gates. The dashboard is self-contained HTML plus PNG files and a checksummed
 manifest, so it can be reviewed without a live R session.
@@ -84,8 +94,26 @@ Once the policy passes, release assembly produces two H5 assets,
 `transform-artifacts-v1.json`, compact QA/provenance files, and `SHA256SUMS`.
 Publish those as immutable GitHub Release assets. Only then may the packaged
 space registry change these routes from `planned` to `available`; the runtime
-resolver will download into the user cache and verify the release manifest
-before exposing an artifact to `neurotransform`.
+resolver will download into the user cache and verify the published byte count
+and SHA-256 checksum before exposing an artifact to `neurotransform`.
+
+## Public-asset integration
+
+`scripts/verify-live-release.R` exercises the installed candidate package with
+an empty dedicated transform cache. It downloads both directions through
+`get_template_transform()`, applies a scalar and label image on each 2 mm grid,
+compares against the separately executed native ANTs qualification outputs, and
+reopens the artifacts offline to check identical label application.
+
+The four arguments are the local work root, an empty cache directory, a new
+JSON report path, and the assembled release-evidence directory. The latter must
+contain its reviewed `qa.json` and `raw/{forward,inverse}_2mm/` files
+`scalar-linear.nii.gz`, `labels-nearest.nii.gz`, and
+`label-oracle-allowed-differences.nii.gz`. Inputs, candidates and native references
+are bound to qualified receipts; the reviewed QA is bound to the manifest
+fetched from the public release. Label disagreements are allowed only at the
+frozen tie/edge locations. The check must pass after anonymous publication and before
+committing available registry rows. Large artifacts stay out of package tests.
 
 ## Remoteslurm issue protocol
 

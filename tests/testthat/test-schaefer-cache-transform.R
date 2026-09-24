@@ -96,9 +96,8 @@ test_that("Schaefer transient loads do not materialise a default cache", {
 
 
 test_that("Schaefer volumes use configured or transient storage as requested", {
-  source_file <- testthat::test_path(
-    "..", "..", "inst", "extdata", "atlas_aparc_aseg_prob33.nii.gz"
-  )
+  source_file <- system.file("extdata", "atlas_aparc_aseg_prob33.nii.gz",
+                             package = "neuroatlas")
   cache_dir <- tempfile("neuroatlas-schaefer-cache-")
   dir.create(cache_dir)
   cache_file <- file.path(
@@ -181,6 +180,9 @@ test_that("Schaefer 400/17 wrapper forwards the configured cache", {
 
 
 test_that("Schaefer rejects a named target with only a planned warp", {
+  plan <- atlas_transform_plan("MNI152NLin6Asym", "MNI152NLin2009cAsym")
+  plan$status <- "planned"
+  plan$steps$status[] <- "planned"
   calls <- new.env(parent = emptyenv())
   calls$resolve <- 0L
   calls$load <- 0L
@@ -189,6 +191,7 @@ test_that("Schaefer rejects a named target with only a planned warp", {
   )
 
   testthat::local_mocked_bindings(
+    atlas_transform_plan = function(...) plan,
     .resolve_template_input = function(input, target_type) {
       calls$resolve <- calls$resolve + 1L
       target_space
@@ -239,6 +242,8 @@ test_that("Schaefer rejects an available route without an execution backend", {
 
 
 test_that("neurosurf is optional at package load", {
+  skip_if_not(file.exists(testthat::test_path("..", "..", "DESCRIPTION")),
+              "source package metadata check")
   description <- read.dcf(testthat::test_path("..", "..", "DESCRIPTION"))
   imports <- trimws(strsplit(description[1, "Imports"], ",")[[1]])
   suggests <- trimws(strsplit(description[1, "Suggests"], ",")[[1]])

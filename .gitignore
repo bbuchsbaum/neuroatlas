@@ -64,3 +64,4 @@ data-raw/transform-artifacts-v1-work/
 data-raw/transform-artifacts-v1/niflowr.nibi.yml
 data-raw/transform-artifacts-v1/niflowr.lock.yml
 data-raw/transform-artifacts-v1/campaign.nibi-smoke.generated.toml
+data-raw/transform-artifacts-v1/campaign.*.generated.toml

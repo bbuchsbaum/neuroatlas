@@ -1,3 +1,14 @@
+# neuroatlas 0.1.0.9003
+
+* Added `get_template_transform()`, `apply_template_transform()`, and
+  `transform_atlas()` for explicit template-space routes and target grids.
+  Routes compose before a single resampling pass. Label IDs and metadata are
+  retained, probability channels are never renormalized, and provenance records
+  the artifact hashes, grids, and interpolation.
+* Added verified transform caching with atomic downloads, offline operation,
+  and cache cleanup restricted to neuroatlas-owned files. The route planner
+  handles longer paths and can restrict resolution to executable releases.
+
 # neuroatlas 0.1.0.9000
 
 * `plot_brain(panel_layout = "presentation")` now uses the full cortex

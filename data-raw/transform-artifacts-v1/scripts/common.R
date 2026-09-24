@@ -69,7 +69,8 @@ read_json <- function(path) {
 write_json <- function(value, path) {
   require_namespace("jsonlite")
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  jsonlite::write_json(value, path, auto_unbox = TRUE, pretty = TRUE, null = "null")
+  jsonlite::write_json(value, path, auto_unbox = TRUE, pretty = TRUE,
+                       null = "null", digits = NA)
   invisible(path)
 }
 
@@ -77,16 +78,21 @@ sha256_file <- function(path) {
   if (!file.exists(path) || dir.exists(path)) {
     stop("Cannot hash missing regular file: ", path, call. = FALSE)
   }
-  if ("sha256sum" %in% getNamespaceExports("tools")) {
-    return(unname(tools::sha256sum(path)))
+  require_namespace("digest")
+  digest::digest(file = path, algo = "sha256", serialize = FALSE)
+}
+
+assert_release_software <- function(route) {
+  for (package in names(route$registration$software_commits)) {
+    expected <- route$registration$software_commits[[package]]
+    actual <- package_receipt(package)$remote_sha
+    if (!is.character(expected) || !grepl("^[0-9a-f]{40}$", expected) ||
+        !identical(expected, actual)) {
+      stop("Unpinned or unexpected ", package, " source revision: ", actual,
+           "; expected ", expected, call. = FALSE)
+    }
   }
-  output <- suppressWarnings(system2("sha256sum", path, stdout = TRUE, stderr = TRUE))
-  status <- attr(output, "status")
-  digest <- if (length(output)) sub("[[:space:]].*$", "", output[[1L]]) else ""
-  if (!is.null(status) || !grepl("^[0-9a-f]{64}$", digest)) {
-    stop("Could not compute SHA-256 for ", path, call. = FALSE)
-  }
-  digest
+  invisible(TRUE)
 }
 
 file_receipt <- function(path) {
