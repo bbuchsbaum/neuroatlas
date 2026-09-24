@@ -1,3 +1,4 @@
+url: https://bbuchsbaum.github.io/neuroatlas/
 template:
   bootstrap: 5
   light-switch: no
@@ -20,11 +21,3 @@ articles:
   - atlas-dilation
 - title: Specialist Atlases
   contents: wang-visual-cortex
-reference:
-- title: Template transforms
-  contents:
-  - get_template_transform
-  - apply_template_transform
-  - transform_atlas
-  - transform_cache_path
-  - clear_transform_cache

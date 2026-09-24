@@ -12,3 +12,14 @@ test_that("explicit anatomy is validated and retains its source", {
   expect_error(surface_anatomy(atlas, "lh", c(1,2)), "one finite")
   expect_error(surface_anatomy(atlas, "lh", c(1,NA,2)), "one finite")
 })
+
+test_that("default fsaverage6 anatomy uses the packaged white mesh", {
+  skip_on_cran()
+  atlas <- get_schaefer_surfatlas(parcels = 100, networks = 7,
+                                  surf = "inflated")
+  expect_identical(atlas$density, "41k")
+  resolved <- surface_anatomy(atlas, "lh")
+  expect_identical(resolved$provenance$source, "computed_mean_curvature")
+  expect_true(resolved$provenance$topology_verified)
+  expect_gt(stats::sd(resolved$metric), 0)
+})

@@ -77,11 +77,18 @@
     source_geometry <- if (identical(surfatlas$surf_type, "white")) {
       display_geometry
     } else {
-      .load_overlay_surface_geometry(
-        surface_space = surfatlas$surface_space %||% "fsaverage6",
+      surface_space <- surfatlas$surface_space %||% "fsaverage6"
+      # Only override density when it departs from the space default, so the
+      # packaged fsaverage6 white mesh stays reachable without TemplateFlow.
+      density <- surfatlas$density %||% NULL
+      if (identical(density, .surface_template_defaults(surface_space)$density)) {
+        density <- NULL
+      }
+      .repair_legacy_surface_geometry(.load_overlay_surface_geometry(
+        surface_space = surface_space,
         surface_type = "white", hemi = hemi,
-        density_override = surfatlas$density %||% NULL
-      )
+        density_override = density
+      ))
     }
     if (is.null(source_geometry)) {
       return(list(metric = rep(0, n), provenance = list(
