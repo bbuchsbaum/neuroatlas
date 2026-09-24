@@ -87,7 +87,7 @@
 <li>
 <strong>TemplateFlow integration</strong>: Access standardized templates through the pure-R <code>templateflow</code> backend</li>
 <li>
-<strong>Visualization</strong>: Publication-quality surface figures with <code><a href="reference/plot_brain.html">plot_brain()</a></code> / <code><a href="reference/plot_brain_grid.html">plot_brain_grid()</a></code>, perceptually-optimised ROI palettes, the ggseg ecosystem, and an interactive <code><a href="reference/cluster_explorer.html">cluster_explorer()</a></code> Shiny app</li>
+<strong>Visualization</strong>: Publication-quality surface figures with <code><a href="reference/plot_brain.html">plot_brain()</a></code> / <code><a href="reference/plot_brain_grid.html">plot_brain_grid()</a></code>, sulcal shading from topology-checked white-surface curvature (<code><a href="reference/surface_anatomy.html">surface_anatomy()</a></code>), perceptually-optimised ROI palettes, the ggseg ecosystem, and an interactive <code><a href="reference/cluster_explorer.html">cluster_explorer()</a></code> Shiny app</li>
 <li>
 <strong>Metadata</strong>: Atlases and loaded templates carry identity, spatial geometry, citations, source artifacts, and processing history (<code><a href="reference/atlas_metadata.html">atlas_metadata()</a></code>, <code><a href="reference/atlas_metadata.html">template_metadata()</a></code>).</li>
 </ul>
@@ -200,6 +200,20 @@
 <span>  style <span class="op">=</span> <span class="st">"ggseg_like"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-roi-palette.png" alt="Schaefer-200 (7-network) parcellation on the fsaverage6 surface with a perceptually-optimised maximin colour palette; lateral and medial views of both hemispheres." width="100%"></p>
+<div class="section level3">
+<h3 id="anatomical-shading">Anatomical shading<a class="anchor" aria-label="anchor" href="#anatomical-shading"></a>
+</h3>
+<p>CPU renders of inflated surfaces shade sulci and gyri from mean curvature of the matching white mesh. Shading is applied only when the two meshes share a topology. Use <code><a href="reference/surface_anatomy.html">surface_anatomy()</a></code> to inspect the metric and its provenance, or to supply your own per-vertex sulcal depth. Tune the underlay with the <code>anatomy_*</code> arguments of <code><a href="reference/plot_brain.html">plot_brain()</a></code>:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">anat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/surface_anatomy.html">surface_anatomy</a></span><span class="op">(</span><span class="va">schaefer_surface</span>, hemi <span class="op">=</span> <span class="st">"lh"</span><span class="op">)</span></span>
+<span><span class="va">anat</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">source</span>  <span class="co"># "computed_mean_curvature"</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/plot_brain.html">plot_brain</a></span><span class="op">(</span></span>
+<span>  <span class="va">schaefer_surface</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  anatomy_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.65</span>, <span class="fl">0.92</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="available-atlases">Available Atlases<a class="anchor" aria-label="anchor" href="#available-atlases"></a>

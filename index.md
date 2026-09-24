@@ -56,6 +56,8 @@ consistent, user-friendly functions.
   [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
   /
   [`plot_brain_grid()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain_grid.md),
+  sulcal shading from topology-checked white-surface curvature
+  ([`surface_anatomy()`](https://bbuchsbaum.github.io/neuroatlas/reference/surface_anatomy.md)),
   perceptually-optimised ROI palettes, the ggseg ecosystem, and an
   interactive
   [`cluster_explorer()`](https://bbuchsbaum.github.io/neuroatlas/reference/cluster_explorer.md)
@@ -230,6 +232,29 @@ plot_brain(
 ![Schaefer-200 (7-network) parcellation on the fsaverage6 surface with a
 perceptually-optimised maximin colour palette; lateral and medial views
 of both hemispheres.](reference/figures/README-roi-palette.png)
+
+### Anatomical shading
+
+CPU renders of inflated surfaces shade sulci and gyri from mean
+curvature of the matching white mesh. Shading is applied only when the
+two meshes share a topology. Use
+[`surface_anatomy()`](https://bbuchsbaum.github.io/neuroatlas/reference/surface_anatomy.md)
+to inspect the metric and its provenance, or to supply your own
+per-vertex sulcal depth. Tune the underlay with the `anatomy_*`
+arguments of
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md):
+
+``` r
+
+anat <- surface_anatomy(schaefer_surface, hemi = "lh")
+anat$provenance$source  # "computed_mean_curvature"
+
+plot_brain(
+  schaefer_surface,
+  interactive = FALSE,
+  anatomy_range = c(0.65, 0.92)
+)
+```
 
 ## Available Atlases
 

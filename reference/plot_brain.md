@@ -89,6 +89,10 @@ plot_brain(
   value = NULL,
   by = NULL,
   allow_partial = FALSE,
+  anatomy_style = "publication",
+  anatomy_midpoint = NULL,
+  anatomy_invert = FALSE,
+  anatomy_range = c(0.72, 0.9),
   vals_threshold = NULL,
   parcel_style = NULL,
   ...
@@ -184,7 +188,9 @@ plot_brain(
   Panel coordinate layout strategy: `"native"` (default) preserves raw
   projected units; `"presentation"` recentres each panel, rotates
   dorsal/ventral views to horizontal, and normalises per-panel scale for
-  a cleaner ggseg-like grid.
+  a cleaner ggseg-like grid. Placement, scale, and panel limits use the
+  full cortex silhouette, regardless of parcel coverage or whether
+  `background` is drawn.
 
 - style:
 
@@ -467,7 +473,9 @@ plot_brain(
 
 - camera:
 
-  Strict canonical orthographic or slightly oblique presentation camera.
+  Camera for `static_backend = "cpu"`: strict canonical orthographic or
+  slightly oblique presentation. The ggplot backend always uses
+  canonical projections; use `panel_layout` to arrange its panels.
 
 - orientation_labels:
 
@@ -535,6 +543,10 @@ plot_brain(
   Logical. If `FALSE` (default), `data` must contain every atlas parcel.
   If `TRUE`, missing parcels are rendered with `NA` values. Unknown and
   duplicate keys always error.
+
+- anatomy_style, anatomy_midpoint, anatomy_invert, anatomy_range:
+
+  CPU underlay controls passed to \[neurosurf::render_surface_rgba()\].
 
 - vals_threshold:
 

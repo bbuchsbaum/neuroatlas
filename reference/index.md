@@ -266,6 +266,8 @@
   : Select a Subset of Atlas Regions
 - [`subcortical_atlas_options()`](https://bbuchsbaum.github.io/neuroatlas/reference/subcortical_atlas_options.md)
   : Subcortical Atlas Options (TemplateFlow-backed)
+- [`surface_anatomy()`](https://bbuchsbaum.github.io/neuroatlas/reference/surface_anatomy.md)
+  : Resolve an anatomical underlay for a surface atlas
 - [`template_to_coord_space()`](https://bbuchsbaum.github.io/neuroatlas/reference/template_to_coord_space.md)
   : Get Coordinate Space for Any Template
 - [`tflow_files()`](https://bbuchsbaum.github.io/neuroatlas/reference/tflow_files.md)
