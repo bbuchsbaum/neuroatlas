@@ -185,3 +185,18 @@ test_that("planning terminates cyclic graphs and rejects planned-only execution"
                                     available_only = TRUE),
                "No transform route")
 })
+
+
+test_that("qualified MNI routes resolve to executable release artifacts", {
+  spaces <- c("MNI152NLin6Asym", "MNI152NLin2009cAsym")
+  for (from in spaces) {
+    to <- setdiff(spaces, from)
+    plan <- atlas_transform_plan(from, to, available_only = TRUE,
+                                 provider = "neuroatlas", mode = "strict")
+    expect_identical(plan$status, "available")
+    expect_equal(plan$n_steps, 1L)
+    expect_identical(plan$steps$qualification, "passed")
+    expect_identical(plan$steps$convention, "ants_image_pullback_ras")
+    expect_no_error(neuroatlas:::.validate_transform_artifact(plan$steps))
+  }
+})

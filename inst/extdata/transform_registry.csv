@@ -1,13 +1,13 @@
-from_space,to_space,transform_type,backend,confidence,reversible,data_files,status,notes
-MNI305,MNI152,affine,internal_affine,exact,TRUE,NA,available,FreeSurfer mni152.register.dat
-MNI152,MNI305,affine,internal_affine,exact,TRUE,NA,available,Inverse of FreeSurfer mni152.register.dat
-MNI152NLin6Asym,MNI152NLin2009cAsym,nonlinear_warp,templateflow_ants,high,TRUE,from-MNI152NLin6Asym_to-MNI152NLin2009cAsym_mode-image_xfm.h5,planned,TemplateFlow composite warp
-MNI152NLin2009cAsym,MNI152NLin6Asym,nonlinear_warp,templateflow_ants,high,TRUE,from-MNI152NLin2009cAsym_to-MNI152NLin6Asym_mode-image_xfm.h5,planned,TemplateFlow composite warp inverse
-fsaverage,fsaverage6,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Downsample 164k to 41k on registration sphere
-fsaverage6,fsaverage,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Upsample 41k to 164k on registration sphere
-fsaverage,fsaverage5,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Downsample 164k to 10k on registration sphere
-fsaverage5,fsaverage,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Upsample 10k to 164k on registration sphere
-fsaverage,fsLR_32k,sphere_resample,workbench,high,TRUE,fs_LR-deformed_to-fsaverage.?H.sphere.reg.surf.gii,planned,HCP sphere registration via Workbench
-fsLR_32k,fsaverage,sphere_resample,workbench,high,TRUE,fsaverage_to-fs_LR.?H.sphere.reg.surf.gii,planned,HCP sphere registration via Workbench
-MNI152NLin2009cAsym,fsaverage,vol2surf,neurosurf,approximate,FALSE,NA,planned,Requires white and pial surfaces
-fsaverage,MNI152NLin2009cAsym,surf2vol,ribbon_fill,approximate,FALSE,NA,planned,Requires ribbon mask construction
+from_space,to_space,transform_type,backend,confidence,reversible,data_files,status,notes,artifact_id,artifact_version,provider,url,sha256,size_bytes,format,convention,qualification,qualification_scope,qa_url,license
+MNI305,MNI152,affine,internal_affine,exact,TRUE,NA,available,FreeSurfer mni152.register.dat,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+MNI152,MNI305,affine,internal_affine,exact,TRUE,NA,available,Inverse of FreeSurfer mni152.register.dat,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+MNI152NLin6Asym,MNI152NLin2009cAsym,nonlinear_warp,neurotransform,high,TRUE,tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5,available,neuroatlas ANTs pair; qualified on 1 mm and 2 mm target grids,tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm,transform-artifacts-v1,neuroatlas,https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5,8275d687c4230f56fcc45d7c6ac603e0f8b6685ae95beeeae9434df3e552909c,89954288,ants_h5,ants_image_pullback_ras,passed,template_pair_1mm_2mm,https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/qa.json,https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/LICENSES.md
+MNI152NLin2009cAsym,MNI152NLin6Asym,nonlinear_warp,neurotransform,high,TRUE,tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5,available,neuroatlas ANTs pair; qualified on 1 mm and 2 mm target grids,tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm,transform-artifacts-v1,neuroatlas,https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5,ac0bf960d3674c13d24450aa43573cfc3605dc5ac251635c2b345dd4d446246d,89958649,ants_h5,ants_image_pullback_ras,passed,template_pair_1mm_2mm,https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/qa.json,https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/LICENSES.md
+fsaverage,fsaverage6,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Downsample 164k to 41k on registration sphere,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+fsaverage6,fsaverage,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Upsample 41k to 164k on registration sphere,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+fsaverage,fsaverage5,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Downsample 164k to 10k on registration sphere,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+fsaverage5,fsaverage,sphere_resample,sphere_nn,exact,TRUE,fsaverage/surf/?h.sphere.reg,available,Upsample 10k to 164k on registration sphere,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+fsaverage,fsLR_32k,sphere_resample,workbench,high,TRUE,fs_LR-deformed_to-fsaverage.?H.sphere.reg.surf.gii,planned,HCP sphere registration via Workbench,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+fsLR_32k,fsaverage,sphere_resample,workbench,high,TRUE,fsaverage_to-fs_LR.?H.sphere.reg.surf.gii,planned,HCP sphere registration via Workbench,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+MNI152NLin2009cAsym,fsaverage,vol2surf,neurosurf,approximate,FALSE,NA,planned,Requires white and pial surfaces,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+fsaverage,MNI152NLin2009cAsym,surf2vol,ribbon_fill,approximate,FALSE,NA,planned,Requires ribbon mask construction,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
