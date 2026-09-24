@@ -307,3 +307,31 @@ already-validated root-checkout fix now also reaches the focused delivery
 branch: compare both as matrices while retaining every value, dimension and
 column name. The actual cached-atlas test passed all 23 assertions with
 `NOT_CRAN=true`. No runtime or qualification file changed.
+
+
+### Windows cache portability and hosted checks
+
+Hosted checks at `a7fe49f` passed on macOS release, Linux oldrel, and Linux
+devel; pkgdown and both automated reviews also passed. Windows correctly
+exposed an unhandled drive-root case in cache safety, plus three assertions
+that confused equivalent path spellings (separators and short/long names).
+The cache now checks POSIX, drive, UNC share/server and device roots before
+filesystem access and again after normalization, with portable separator
+handling. TemplateFlow paths remain forbidden. Path tests compare canonical
+identities and still require absolute paths and successful application after a
+working-directory change. All 112 focused assertions passed with no warnings or
+skips; an independent bounded cache review found no blocker. Full source tests
+passed 1,425 assertions (41 baseline/environment warnings, 87 skips).
+
+The network-enabled checklist's package tests passed, then its style phase
+crashed in upstream `checklist::select_lintr_file`: absent organization metadata
+for `bbuchsbaum` produces a length-zero `org$get_git`, which is passed to `if`.
+The upstream selector reaches this failure before checking a local `.lintr`.
+This is separate from R CMD check and transform qualification. No repository
+check, threshold, or style requirement was disabled to hide the failure.
+
+After the Windows cache correction, CRAN-like check03 again completed with
+0 errors, 0 warnings and 0 notes. Both real published H5 assets also reopened
+and verified offline through the changed cache code; receipt:
+`transform-artifacts-v1-work/cache-portability-live.json`. Registration artifacts,
+interpolation, transform conventions and scientific qualification are unchanged.
