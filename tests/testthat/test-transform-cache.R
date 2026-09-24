@@ -104,6 +104,20 @@ test_that("unsafe artifact paths and clear requests are refused", {
 })
 
 
+test_that("filesystem roots and TemplateFlow paths are rejected before access", {
+  local_mocked_bindings(.transform_cache_is_symlink = function(...) {
+    stop("filesystem accessed")
+  }, .package = "neuroatlas")
+  paths <- c("/", "//", "C:/", "C:\\", "C:",
+    "//server", "//server/share/", "\\\\server\\share",
+    "\\\\?\\C:\\", "C:\\work\\TemplateFlow\\transforms",
+    file.path(tempdir(), "templateflow", "transforms"))
+  for (path in paths) {
+    expect_error(clear_transform_cache(cache_dir = path), "Unsafe")
+  }
+})
+
+
 test_that("clear removes only owned artifacts and refuses active locks", {
   cache <- tempfile("transform-cache-")
   on.exit(unlink(cache, recursive = TRUE), add = TRUE)

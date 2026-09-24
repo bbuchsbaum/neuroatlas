@@ -55,7 +55,7 @@ test_that("atlas_alignment detects same representation across templates", {
   expect_equal(aln$relation, "same_representation_different_template")
   expect_equal(aln$method, "nonlinear_warp")
   expect_equal(aln$confidence, "high")
-  expect_equal(aln$status, "planned")
+  expect_equal(aln$status, "available")
   expect_true(aln$requires_transform)
 })
 

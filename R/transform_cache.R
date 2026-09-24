@@ -272,37 +272,34 @@ clear_transform_cache <- function(artifact_version = NULL,
       !nzchar(cache_dir)) {
     stop("cache_dir must be a non-empty character scalar.", call. = FALSE)
   }
+  cache_dir <- path.expand(cache_dir)
+  if (.unsafe_transform_cache_path(cache_dir)) {
+    stop("Unsafe transform cache directory.", call. = FALSE)
+  }
   if (.transform_cache_is_symlink(cache_dir)) {
     stop("Unsafe symbolic link at transform cache directory.", call. = FALSE)
   }
-  cache_dir <- path.expand(cache_dir)
   if (!grepl("^(/|[A-Za-z]:[/\\\\]|\\\\\\\\)", cache_dir)) {
     cache_dir <- file.path(getwd(), cache_dir)
   }
-  root <- .transform_cache_canonical_path(cache_dir)
-  components <- strsplit(root, "/", fixed = TRUE)[[1L]]
-  if (grepl("^([A-Za-z]:)?/$|^//[^/]+/[^/]+/?$", root) ||
-      .transform_cache_is_symlink(root) ||
-      any(tolower(components) == "templateflow")) {
+  root <- normalizePath(cache_dir, winslash = "/", mustWork = FALSE)
+  if (.unsafe_transform_cache_path(root) || .transform_cache_is_symlink(root)) {
     stop("Unsafe transform cache directory.", call. = FALSE)
   }
   root
 }
 
 
-#' Canonical forward-slash path, resolving the deepest existing ancestor so
-#' Windows short names and separators match `normalizePath()` of the parent.
 #' @keywords internal
 #' @noRd
-.transform_cache_canonical_path <- function(path) {
-  if (file.exists(path)) {
-    return(normalizePath(path, winslash = "/", mustWork = TRUE))
-  }
-  parent <- dirname(path)
-  if (identical(parent, path)) {
-    return(normalizePath(path, winslash = "/", mustWork = FALSE))
-  }
-  file.path(.transform_cache_canonical_path(parent), basename(path))
+.unsafe_transform_cache_path <- function(path) {
+  # Check before filesystem access as well as after canonicalization. In
+  # particular, '/' resolves to a drive root on Windows, and UNC share roots
+  # must never be treated as dedicated caches.
+  path <- chartr("\\", "/", path)
+  components <- strsplit(path, "/", fixed = TRUE)[[1L]]
+  grepl("^(/+|[A-Za-z]:/*|//[^/]+(/[^/]+)?/*)$", path) ||
+    grepl("^//[?.]/", path) || any(tolower(components) == "templateflow")
 }
 
 

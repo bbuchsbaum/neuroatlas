@@ -157,13 +157,18 @@ aligned <- transform_atlas(
 attr(aligned, "neuroatlas_transform")$lost_label_ids
 ```
 
-This nonlinear example requires the qualified transform release.
-Available artifacts are downloaded once and checked against pinned
-SHA-256 digests. Subsequent calls can use `offline = TRUE` with a cached
-transform and an explicit target grid. For scalar or probability
-volumes, use `get_template_transform()` and `apply_template_transform()`
-with explicit sampling semantics. Probability channels are interpolated
-independently without renormalization.
+Both MNI152NLin6Asym / MNI152NLin2009cAsym directions are available from
+the [qualified artifact
+release](https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1).
+Qualification covers 1 mm and 2 mm target grids. Each transform is about
+86 MiB, downloaded once and checked against its pinned SHA-256 digest.
+Subsequent calls can use `offline = TRUE` with a cached transform and an
+explicit target grid. For scalar or probability volumes, use
+`get_template_transform()` and `apply_template_transform()` with
+explicit sampling semantics. Probability channels are interpolated
+independently without renormalization. Template-derived artifacts have
+separate [distribution
+conditions](https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/LICENSES.md).
 
 An image-space transform does not establish correspondence between
 different parcellations. Use `atlas_overlap()` after alignment to

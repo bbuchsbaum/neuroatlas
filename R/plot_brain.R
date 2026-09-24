@@ -1980,9 +1980,12 @@ build_surface_polygon_data <- function(surfatlas,
 #'   \code{ggiraph::girafe} widget with hover tooltips. If \code{FALSE},
 #'   returns a static \code{ggplot2} object.
 #' @param static_backend Static renderer: the existing \code{"ggplot"} polygon
-#'   path or deterministic \code{"cpu"} barycentric rasterization. The CPU
-#'   path is intended for continuous publication overlays and requires no
-#'   OpenGL or browser.
+#'   path or deterministic \code{"cpu"} rasterization. With a vertex
+#'   \code{overlay} the CPU path renders continuous publication overlays; with
+#'   parcel \code{vals} (and no overlay) it renders a publication parcel map
+#'   through [neurosurf::render_surface_parcels()]: smooth antialiased parcel
+#'   edges, a sulcal-depth underlay, soft lighting, a light medial wall, and an
+#'   automatically arranged figure. Neither needs OpenGL or a browser.
 #' @param data_id_mode Interactive data-id granularity (when
 #'   \code{interactive = TRUE}): \code{"parcel"} (default) uses parcel ids;
 #'   \code{"polygon"} encodes panel + parcel + polygon/face id for
@@ -2138,6 +2141,12 @@ build_surface_polygon_data <- function(surfatlas,
 #' @param anatomy_metric_source Provenance label for an explicit metric.
 #' @param anatomy_style,anatomy_midpoint,anatomy_invert,anatomy_range CPU underlay
 #'   controls passed to [neurosurf::render_surface_rgba()].
+#' @param vals_threshold Optional non-negative magnitude for the CPU parcel
+#'   renderer (\code{static_backend = "cpu"} with \code{vals}): parcels with
+#'   \code{abs(vals)} below it stay unfilled, and the colorbar greys out the
+#'   sub-threshold band.
+#' @param parcel_style Optional [neurosurf::surface_parcel_style()] object or
+#'   named list of its settings for the CPU parcel renderer.
 #' @param medial_wall Explicit medial-wall policy: neutral shade, mask, or
 #'   independent outline.
 #' @param camera Camera for \code{static_backend = "cpu"}: strict canonical
@@ -2301,7 +2310,12 @@ plot_brain <- function(surfatlas,
                        anatomy_midpoint = NULL,
                        anatomy_invert = FALSE,
                        anatomy_range = c(0.72, 0.90),
+                       vals_threshold = NULL,
+                       parcel_style = NULL,
                        ...) {
+  render_size_missing <- c(width = missing(render_width),
+                           height = missing(render_height),
+                           antialias = missing(render_antialias))
   style <- match.arg(style)
   overlay_present <- !is.null(overlay)
   data_present <- !is.null(data)
@@ -2462,6 +2476,25 @@ plot_brain <- function(surfatlas,
       ),
       class = c("neuroatlas_error_unsupported", "neuroatlas_error")
     )
+  }
+  if (!interactive && identical(static_backend, "cpu") && !overlay_present &&
+      !is.null(vals)) {
+    return(.plot_brain_cpu_parcels(
+      surfatlas = surfatlas, vals = vals, views = views, hemis = hemis,
+      palette = palette, lim = lim, threshold = vals_threshold,
+      colorbar_position = if (isTRUE(colorbar)) "auto" else
+        .normalize_colorbar_position(colorbar),
+      colorbar_title = colorbar_title,
+      title = title, subtitle = subtitle, caption = caption,
+      panel_labels = panel_labels, bg = bg,
+      cortex_mask = cortex_mask, anatomy_metric = anatomy_metric,
+      camera = camera,
+      render_width = if (render_size_missing[["width"]]) 900L else render_width,
+      render_height = if (render_size_missing[["height"]]) 620L else render_height,
+      render_antialias = if (render_size_missing[["antialias"]]) 3L else
+        render_antialias,
+      parcel_style = parcel_style
+    ))
   }
   if (!interactive && identical(static_backend, "cpu")) {
     return(.plot_brain_cpu(

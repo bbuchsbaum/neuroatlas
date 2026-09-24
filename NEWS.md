@@ -1,5 +1,18 @@
+# neuroatlas 0.1.0.9004
+
+* `plot_brain(static_backend = "cpu", vals = ...)` now renders publication
+  parcel maps with `neurosurf::render_surface_parcels()`: smooth antialiased
+  parcel edges, a sulcal-depth underlay with soft lighting, a flat medial wall
+  drawn only in medial views, and a figure whose layout (2x2 grid or single
+  row, colorbar below or beside) adapts to the device. New arguments
+  `vals_threshold` (unfills sub-threshold parcels and greys that band of the
+  colorbar) and `parcel_style`. The CPU backend previously rejected `vals`.
+
 # neuroatlas 0.1.0.9003
 
+* Enabled the qualified `MNI152NLin6Asym` / `MNI152NLin2009cAsym` ANTs
+  transform pair in both directions, with published artifact hashes, input and
+  software provenance, and qualification on 1 mm and 2 mm target grids.
 * Added `get_template_transform()`, `apply_template_transform()`, and
   `transform_atlas()` for explicit template-space routes and target grids.
   Routes compose before a single resampling pass. Label IDs and metadata are

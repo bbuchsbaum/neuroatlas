@@ -251,3 +251,87 @@ rendering commits. Its source suite passed 1,388 assertions after correcting
 two pre-existing empty-label synthetic surface fixtures for the installed
 neurosurf validity contract. Its package check had 0 errors and 0 warnings;
 the worktree's .git pointer file is now explicitly excluded from package builds.
+
+
+## 2026-09-24 - qualified release and public runtime integration
+
+Deterministic build04 (Nibi job 22607432) and qualification02 (22609692)
+completed under the unchanged frozen policy. All eight candidate/repeat cells
+passed numerical gates; repeat point differences were zero. The maximum
+independent-engine point error was 0.000473169 mm and the largest within-engine
+roundtrip error was 0.078175498 mm. All masked Jacobians were finite and positive.
+An independent reviewer inspected all 24 visual panels and the hash-bound
+numerical/landmark evidence, returning passing visual and numerical reviews.
+
+The immutable `transform-artifacts-v1` release is published at
+<https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1>.
+Its tag points to `49c85c940fc886d9ed3bd5ac8f733b111cac23f2`; the qualification
+implementation is `eb9ed73d0f1f9befd51b95d5a534691c0c77e500` (the later commit only
+repairs documentation configuration). All 13 draft assets were downloaded and
+verified before publication. Anonymous downloads of the public manifest and
+both H5 files subsequently matched the pinned byte counts and SHA-256 hashes.
+The evidence archive retains the original failed runs, original measurement
+QA, reviews, native references, provenance, policy, and separate distribution
+conditions. No failed qualification was relabelled as passing.
+
+An installed candidate package then loaded both transforms through the public
+API from an empty cache. At 2 mm, it reproduced native ANTs scalar outputs to
+1.73e-14, with zero label disagreements in either direction, exact target
+geometry, and byte-identical label arrays when reopened offline. Receipt:
+`transform-artifacts-v1-work/live-public-integration.json`, SHA-256
+`bab3443752e4ad2c5a4185697d74b2c1891dce1717ecc8a149743b24d402509a`.
+A separate installed-package `transform_atlas()` smoke test warped the real
+Schaefer 200 / 7-network atlas into MNI152NLin2009cAsym at 2 mm. All 200 labels
+remained present, semantic identities were preserved, target geometry was exact,
+and metadata retained the source identity and verified transform artifact.
+Receipt: `transform-artifacts-v1-work/live-schaefer-integration.json`, SHA-256
+`ae8f14b48c33b9d04027e72c8cea68bfa54945b6f7994179344a658fae8f671b`.
+
+Both nonlinear registry rows are now available with exact public receipts.
+Qualification is limited to this template pair on the tested 1 mm and 2 mm
+grids. It does not establish subject registration, arbitrary extrapolation,
+or correspondence between different parcellation schemes. Coarse-grid label
+roundtrip Dice and the inverse 2 mm HOCPA minimum concordance (0.577864) remain
+visible diagnostics, not claims of independent anatomical ground truth.
+
+Final activation source suite: 1,413 assertions passed, zero failures, 41
+baseline/environment warnings and 87 skips. `devtools::check()` with CRAN
+checks completed with 0 errors, 0 warnings and 0 notes. The complete pkgdown
+site built successfully (10 articles plus their index), including the updated
+transform article and public API reference. The pre-existing README logo path
+warning remains; it does not prevent the documentation build.
+
+The master checklist run at `d7b4908` exposed one pre-existing network-test
+failure: merged colors were compared as a data frame against a matrix. The
+already-validated root-checkout fix now also reaches the focused delivery
+branch: compare both as matrices while retaining every value, dimension and
+column name. The actual cached-atlas test passed all 23 assertions with
+`NOT_CRAN=true`. No runtime or qualification file changed.
+
+
+### Windows cache portability and hosted checks
+
+Hosted checks at `a7fe49f` passed on macOS release, Linux oldrel, and Linux
+devel; pkgdown and both automated reviews also passed. Windows correctly
+exposed an unhandled drive-root case in cache safety, plus three assertions
+that confused equivalent path spellings (separators and short/long names).
+The cache now checks POSIX, drive, UNC share/server and device roots before
+filesystem access and again after normalization, with portable separator
+handling. TemplateFlow paths remain forbidden. Path tests compare canonical
+identities and still require absolute paths and successful application after a
+working-directory change. All 112 focused assertions passed with no warnings or
+skips; an independent bounded cache review found no blocker. Full source tests
+passed 1,425 assertions (41 baseline/environment warnings, 87 skips).
+
+The network-enabled checklist's package tests passed, then its style phase
+crashed in upstream `checklist::select_lintr_file`: absent organization metadata
+for `bbuchsbaum` produces a length-zero `org$get_git`, which is passed to `if`.
+The upstream selector reaches this failure before checking a local `.lintr`.
+This is separate from R CMD check and transform qualification. No repository
+check, threshold, or style requirement was disabled to hide the failure.
+
+After the Windows cache correction, CRAN-like check03 again completed with
+0 errors, 0 warnings and 0 notes. Both real published H5 assets also reopened
+and verified offline through the changed cache code; receipt:
+`transform-artifacts-v1-work/cache-portability-live.json`. Registration artifacts,
+interpolation, transform conventions and scientific qualification are unchanged.
