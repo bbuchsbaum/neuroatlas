@@ -1,5 +1,8 @@
 # neuroatlas 0.1.0.9003
 
+* Enabled the qualified `MNI152NLin6Asym` / `MNI152NLin2009cAsym` ANTs
+  transform pair in both directions, with published artifact hashes, input and
+  software provenance, and qualification on 1 mm and 2 mm target grids.
 * Added `get_template_transform()`, `apply_template_transform()`, and
   `transform_atlas()` for explicit template-space routes and target grids.
   Routes compose before a single resampling pass. Label IDs and metadata are
