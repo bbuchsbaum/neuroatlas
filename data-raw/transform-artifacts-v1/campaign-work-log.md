@@ -300,3 +300,10 @@ checks completed with 0 errors, 0 warnings and 0 notes. The complete pkgdown
 site built successfully (10 articles plus their index), including the updated
 transform article and public API reference. The pre-existing README logo path
 warning remains; it does not prevent the documentation build.
+
+The master checklist run at `d7b4908` exposed one pre-existing network-test
+failure: merged colors were compared as a data frame against a matrix. The
+already-validated root-checkout fix now also reaches the focused delivery
+branch: compare both as matrices while retaining every value, dimension and
+column name. The actual cached-atlas test passed all 23 assertions with
+`NOT_CRAN=true`. No runtime or qualification file changed.
