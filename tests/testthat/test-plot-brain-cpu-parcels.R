@@ -187,3 +187,25 @@ test_that("parcel preparation is cached per atlas and settings", {
   d <- .parcel_surface_prep(atl, "rh")
   expect_true(nzchar(d$anatomy_source))
 })
+
+test_that("inflated fsaverage6 atlases get the sulcal-depth underlay", {
+  skip_if_not_installed("neurosurf")
+  env <- new.env()
+  utils::data("fsaverage", package = "neuroatlas", envir = env)
+  skip_if(is.null(env$fsaverage$lh_inflated), "packaged fsaverage6 meshes unavailable")
+  geom <- env$fsaverage$lh_inflated
+  n <- ncol(geom@mesh$vb)
+  hemi_surf <- methods::new("LabeledNeuroSurface", labels = "p1", cols = "#888888",
+                            geometry = geom, indices = seq_len(n),
+                            data = rep(1L, n))
+  # Mirrors get_schaefer_surfatlas(): a declared density must not divert the
+  # white-mesh lookup away from the packaged meshes.
+  atl <- list(ids = 1L, lh_atlas = hemi_surf, rh_atlas = hemi_surf,
+              surf_type = "inflated", surface_space = "fsaverage6",
+              density = "41k")
+  class(atl) <- c("surfatlas", "atlas")
+  anatomy <- .resolve_parcel_anatomy(atl, "lh")
+  expect_identical(anatomy$source, "sulcal_proxy_white_vs_display")
+  expect_length(anatomy$metric, n)
+  expect_true(all(is.finite(anatomy$metric)))
+})

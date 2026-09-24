@@ -24,12 +24,10 @@
   }
   surf_type <- surfatlas$surf_type %||% "inflated"
   if (!identical(surf_type, "white")) {
+    # Same white-surface lookup as the stat renderer (packaged fsaverage6
+    # meshes first, TemplateFlow otherwise).
     white <- tryCatch(
-      .load_overlay_surface_geometry(
-        surface_space = surfatlas$surface_space %||% "fsaverage6",
-        surface_type = "white", hemi = hemi,
-        density_override = surfatlas$density %||% NULL
-      ),
+      .resolve_overlay_surface_pair(surfatlas, hemi = hemi)$white,
       error = function(e) NULL
     )
     if (!is.null(white) && .surface_geometry_topology_equal(white, display)) {
@@ -287,7 +285,7 @@ makeContent.parcel_brain_figure <- function(x) {
       ) * size / grid::get.gpar("fontsize")$fontsize, 1))
     }
     ticks <- .parcel_colorbar_ticks(cb$lim, cb$threshold)
-    tick_w <- text_w(ticks$labels, 8.5 * em)
+    tick_w <- text_w(ticks$labels, 9 * em)
     title_w <- if (is.null(cb$title)) 0 else text_w(cb$title, 9.5 * em)
     m$cb_right_w <- 0.3 * em + max(0.1 * em + 0.08 * em + tick_w, title_w) +
       0.05 * em
@@ -440,7 +438,16 @@ makeContent.parcel_brain_figure <- function(x) {
   ticks <- .parcel_colorbar_ticks(cb$lim, cb$threshold)
   pos <- (ticks$at - cb$lim[1]) / diff(cb$lim)
   tick_gp <- grid::gpar(col = muted, lwd = 0.5)
-  text_gp <- grid::gpar(fontsize = 8.5 * em, col = muted)
+  # Threshold ticks mark the inferential boundary, so they are set bold.
+  thr <- cb$threshold
+  is_thr <- if (!is.null(thr) && thr > 0) {
+    abs(abs(ticks$at) - thr) < 1e-9
+  } else {
+    rep(FALSE, length(ticks$at))
+  }
+  text_gp <- grid::gpar(fontsize = 9 * em,
+                        col = ifelse(is_thr, ink, muted),
+                        fontface = ifelse(is_thr, "bold", "plain"))
   title_gp <- grid::gpar(fontsize = 9.5 * em, col = ink)
   if (identical(cb$position, "right")) {
     bh <- min(2.2 * em, fig_h * 0.5)
@@ -468,8 +475,8 @@ makeContent.parcel_brain_figure <- function(x) {
     }
     return(out)
   }
-  bw <- min(2.6 * em, max(1.2 * em, 0.4 * (grid_right - grid_left)))
-  bh <- 0.09 * em
+  bw <- min(3.6 * em, max(1.4 * em, 0.45 * (grid_right - grid_left)))
+  bh <- 0.1 * em
   cx <- (grid_left + grid_right) / 2
   cy <- max(bottom + 0.28 * em, grid_bottom - 0.3 * em)
   tx <- cx - bw / 2 + bw * pos
