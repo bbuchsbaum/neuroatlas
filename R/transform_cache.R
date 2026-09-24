@@ -279,13 +279,30 @@ clear_transform_cache <- function(artifact_version = NULL,
   if (!grepl("^(/|[A-Za-z]:[/\\\\]|\\\\\\\\)", cache_dir)) {
     cache_dir <- file.path(getwd(), cache_dir)
   }
-  root <- normalizePath(cache_dir, mustWork = FALSE)
+  root <- .transform_cache_canonical_path(cache_dir)
   components <- strsplit(root, "/", fixed = TRUE)[[1L]]
-  if (identical(root, "/") || .transform_cache_is_symlink(root) ||
+  if (grepl("^([A-Za-z]:)?/$|^//[^/]+/[^/]+/?$", root) ||
+      .transform_cache_is_symlink(root) ||
       any(tolower(components) == "templateflow")) {
     stop("Unsafe transform cache directory.", call. = FALSE)
   }
   root
+}
+
+
+#' Canonical forward-slash path, resolving the deepest existing ancestor so
+#' Windows short names and separators match `normalizePath()` of the parent.
+#' @keywords internal
+#' @noRd
+.transform_cache_canonical_path <- function(path) {
+  if (file.exists(path)) {
+    return(normalizePath(path, winslash = "/", mustWork = TRUE))
+  }
+  parent <- dirname(path)
+  if (identical(parent, path)) {
+    return(normalizePath(path, winslash = "/", mustWork = FALSE))
+  }
+  file.path(.transform_cache_canonical_path(parent), basename(path))
 }
 
 

@@ -59,7 +59,7 @@ test_that("Schaefer labels use an explicit cache and preserve source receipts", 
   )
   expect_identical(
     attr(cached_labels, "neuroatlas_file_receipt")$local_path,
-    normalizePath(cache_file)
+    normalizePath(cache_file, winslash = "/")
   )
 })
 
@@ -118,7 +118,7 @@ test_that("Schaefer volumes use configured or transient storage as requested", {
   )
   expect_identical(
     attr(cached, "neuroatlas_file_receipt")$local_path,
-    normalizePath(cache_file)
+    normalizePath(cache_file, winslash = "/")
   )
 
   transient_dir <- tempfile("neuroatlas-schaefer-cache-")

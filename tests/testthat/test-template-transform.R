@@ -309,7 +309,8 @@ test_that("a resolved transform survives working-directory changes", {
     .package = "neuroatlas"
   )
   transform <- get_template_transform("A", "B", cache_dir = "relative-cache")
-  expect_identical(transform$cache_dir, file.path(normalizePath(root), "relative-cache"))
+  expect_identical(transform$cache_dir,
+                   file.path(normalizePath(root, winslash = "/"), "relative-cache"))
   setwd(old_dir)
   source <- template_transform_volume(array(seq_len(64), c(4, 4, 4)), "A")
   target <- neuroim2::NeuroSpace(c(4, 4, 4))
