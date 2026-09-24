@@ -1,0 +1,163 @@
+# Deliberately non-submittable until Nibi discovery completes. Replace both
+# __NIBI_*__ roots and create niflowr.nibi.yml plus its lockfile only after:
+#   remoteslurm connect nibi
+#   rslurm --json -H nibi info
+# Do not copy another cluster's account, partition, memory, or module policy.
+schema = 1
+name = "neuroatlas-transforms"
+host = "nibi"
+
+[workspace]
+remote_root = "__NIBI_REMOTE_ROOT__"
+output_root = "__NIBI_OUTPUT_ROOT__"
+
+[inventories.routes]
+key = ["route_id"]
+rows = [
+  { route_id = "mni152nlin6asym-to-mni152nlin2009casym" }
+]
+
+[environments.nibi_ants]
+preamble = '''
+module load apptainer/1.4.5
+module load hdf5/1.14.2
+export R_LIBS_USER="${PROJECT:?PROJECT must be set}/neuroatlas-transform-artifacts-v1/R-library${R_LIBS_USER:+:${R_LIBS_USER}}"
+export NEUROATLAS_TRANSFORM_ARTIFACT_ROOT="$PWD"
+export NEUROATLAS_TRANSFORM_WORK_ROOT="$PWD"
+export APPTAINER_CACHEDIR="${SCRATCH:?SCRATCH must be set}/neuroatlas-transform-artifacts-v1/apptainer-cache"
+mkdir -p "$APPTAINER_CACHEDIR"
+'''
+
+[stages.build]
+foreach = "routes"
+script = "scripts/run-build.sh"
+environment = "nibi_ants"
+
+[stages.build.execution]
+mode = "array"
+max_array_size = 1
+max_concurrent = 1
+
+[stages.build.resources]
+time = "05:00:00"
+cpus_per_task = 8
+mem = "32G"
+
+[[stages.build.outputs]]
+name = "forward"
+kind = "file"
+path = "{route_id}/build/tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5"
+cardinality = "exactly_one"
+min_bytes = 1024
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+stable_dimensions = ["existence", "size", "mtime", "sha256"]
+
+[[stages.build.outputs]]
+name = "inverse"
+kind = "file"
+path = "{route_id}/build/tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5"
+cardinality = "exactly_one"
+min_bytes = 1024
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+stable_dimensions = ["existence", "size", "mtime", "sha256"]
+
+[[stages.build.outputs]]
+name = "warped_image"
+kind = "file"
+path = "{route_id}/build/tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_desc-warped_T1w.nii.gz"
+cardinality = "exactly_one"
+min_bytes = 1024
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+
+[[stages.build.outputs]]
+name = "provenance"
+kind = "file"
+path = "{route_id}/build/build-provenance.json"
+cardinality = "exactly_one"
+min_bytes = 1
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+
+[[stages.build.validators]]
+kind = "command"
+argv = ["Rscript", "scripts/validate-build-output.R", "{output:forward}", "{output:inverse}", "{output:warped_image}", "{output:provenance}"]
+timeout = 600
+files = ["scripts/validate-build-output.R"]
+env = { R_LIBS_USER = "__NIBI_REMOTE_ROOT__/R-library" }
+
+[stages.qualify]
+foreach = "routes"
+script = "scripts/run-qualification.sh"
+environment = "nibi_ants"
+needs = [{ stage = "build", on = ["route_id"], require = "verified" }]
+
+[stages.qualify.execution]
+mode = "array"
+max_array_size = 1
+max_concurrent = 1
+
+[stages.qualify.resources]
+time = "02:00:00"
+cpus_per_task = 4
+mem = "16G"
+
+[[stages.qualify.outputs]]
+name = "qa_json"
+kind = "file"
+path = "{route_id}/qualification/qa.json"
+cardinality = "exactly_one"
+min_bytes = 1
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+
+[[stages.qualify.outputs]]
+name = "qa_report"
+kind = "file"
+path = "{route_id}/qualification/report.html"
+cardinality = "exactly_one"
+min_bytes = 1
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+
+[[stages.qualify.outputs]]
+name = "qa_visual_manifest"
+kind = "file"
+path = "{route_id}/qualification/visual/visual-qa.json"
+cardinality = "exactly_one"
+min_bytes = 1
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+
+[[stages.qualify.outputs]]
+name = "qa_visual_report"
+kind = "file"
+path = "{route_id}/qualification/visual/index.html"
+cardinality = "exactly_one"
+min_bytes = 1
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+
+[[stages.qualify.validators]]
+kind = "command"
+argv = ["Rscript", "scripts/validate-qualification-output.R", "{output:qa_json}", "{output:qa_report}", "{output:qa_visual_manifest}", "{output:qa_visual_report}"]
+timeout = 120
+files = ["scripts/validate-qualification-output.R"]
+env = { R_LIBS_USER = "__NIBI_REMOTE_ROOT__/R-library" }

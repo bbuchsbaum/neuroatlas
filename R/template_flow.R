@@ -1029,10 +1029,14 @@ clear_templateflow_cache <- function(confirm = TRUE) {
 #' cat("TemplateFlow cache is at:", show_templateflow_cache_path(), "\n")
 show_templateflow_cache_path <- function() {
   if (requireNamespace("templateflow", quietly = TRUE)) {
-    tryCatch(
-      return(templateflow::tf_home()),
-      error = function(e) NULL
-    )
+    cache_path <- tryCatch({
+      client <- templateflow::tf_client()
+      client$cache$config$root
+    }, error = function(e) NULL)
+    if (is.character(cache_path) && length(cache_path) == 1L &&
+        !is.na(cache_path) && nzchar(cache_path)) {
+      return(cache_path)
+    }
   }
   # Fallback to legacy path
   .neuroatlas_cache_dir("templateflow")

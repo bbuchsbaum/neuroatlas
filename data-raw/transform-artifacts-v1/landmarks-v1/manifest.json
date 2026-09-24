@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "role": "numerical_physical_coordinate_probes",
+  "interpretation": "Coverage strata only; not manually paired anatomical truth. HOSPA shares the NLin6 label index table in both templates.",
+  "selection": "32 deterministic maximin samples per hemisphere per disjoint stratum from at most 4096 uniformly indexed candidates; precedence near_edge, boundary, subcortical, cortical, central; x=0 excluded.",
+  "definitions": {
+    "central": "remaining brain-mask voxels in the nearest quartile to the mask physical centroid",
+    "cortical": "brain-mask voxels with nonzero HOCPA th25 label",
+    "subcortical": "brain-mask voxels labelled thalamus, caudate, putamen, pallidum, brainstem, hippocampus, amygdala or accumbens by HOSPA th25",
+    "boundary": "remaining brain-mask voxels within 2 mm of mask exterior",
+    "near_edge": "brain-mask voxels within 5 mm of any physical bounding-box face of the brain mask; this is mask extent, not displacement-grid extrapolation"
+  },
+  "hospa_label_table": {
+    "path": "/Users/bbuchsbaum/Library/Caches/templateflow/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_atlas-HOSPA_dseg.tsv",
+    "bytes": 678,
+    "sha256": "0503599182be67d206deb8b6c6d3288fa9eecba3e1a158008c649d1836573d25"
+  },
+  "cells": {
+    "source_1": {
+      "file": "source_1.csv",
+      "receipt": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1/landmarks-v1/source_1.csv",
+        "bytes": 12961,
+        "sha256": "716060bbc931845e6f8ff820854acaf9f9375dd64516c1d35f4a9e81cedd265a"
+      },
+      "mask": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_desc-brain_mask.nii.gz",
+        "bytes": 149930,
+        "sha256": "6d540075dac093fa5070a929dc5ea52795d54cc9ab57fe1272086dc70314b428"
+      },
+      "cortical": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+        "bytes": 266805,
+        "sha256": "1b4d9cb8b7ae0c9734d01af39a6977aa27c88d6c645d85bcef2fb803734d67c5"
+      },
+      "subcortical": {
+        "path": "/Users/bbuchsbaum/Library/Caches/templateflow/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-HOSPA_desc-th25_dseg.nii.gz",
+        "bytes": 258131,
+        "sha256": "4a8c9c8036c10c637d46b2c2a8e63d64c26ccd57e0b8ed236b7f875985981a7e"
+      },
+      "counts": {
+        "boundary": 64,
+        "central": 64,
+        "cortical": 64,
+        "near_edge": 64,
+        "subcortical": 64
+      },
+      "hemispheres": {
+        "-1": 160,
+        "1": 160
+      }
+    },
+    "source_2": {
+      "file": "source_2.csv",
+      "receipt": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1/landmarks-v1/source_2.csv",
+        "bytes": 12615,
+        "sha256": "fe08fca197d3b3eccbc4b2c950c15c69d582505d9e001726e57b56b4c80c81ad"
+      },
+      "mask": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_mask.nii.gz",
+        "bytes": 28557,
+        "sha256": "e4e2b284170271afdafe26ac0997b2af5a0f5ddac35e28a7e796b52e8bc5adb1"
+      },
+      "cortical": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_atlas-HOCPA_desc-th25_dseg.nii.gz",
+        "bytes": 50120,
+        "sha256": "b34746e73c87de08ca92503d5bf2aaee2b1e481925a271397c63686237a16b41"
+      },
+      "subcortical": {
+        "path": "/Users/bbuchsbaum/Library/Caches/templateflow/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_atlas-HOSPA_desc-th25_dseg.nii.gz",
+        "bytes": 47599,
+        "sha256": "29fb7de1c25210a7c51a750c9f18cf45fbdf34b7d50b289a1d2b6401d2d15500"
+      },
+      "counts": {
+        "boundary": 64,
+        "central": 64,
+        "cortical": 64,
+        "near_edge": 64,
+        "subcortical": 64
+      },
+      "hemispheres": {
+        "-1": 160,
+        "1": 160
+      }
+    },
+    "target_1": {
+      "file": "target_1.csv",
+      "receipt": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1/landmarks-v1/target_1.csv",
+        "bytes": 13046,
+        "sha256": "26e50c7ae48f59acebbac7f9824964770f4ce0c850406a0b2c8da61b8ae752af"
+      },
+      "mask": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz",
+        "bytes": 159538,
+        "sha256": "e40bb1816736504d4c25abc243c1c8503df1d308f64c048318aa4b829e09a7ae"
+      },
+      "cortical": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+        "bytes": 278168,
+        "sha256": "ace9462a9a132851b73b92882d040ffee968ba5399b5154345571ad4c1a6da2d"
+      },
+      "subcortical": {
+        "path": "/Users/bbuchsbaum/Library/Caches/templateflow/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_atlas-HOSPA_desc-th25_dseg.nii.gz",
+        "bytes": 276673,
+        "sha256": "294160208c98f93a8e1cf282282df4e9bae7979cb846a49d91335a7ee09fe7ee"
+      },
+      "counts": {
+        "boundary": 64,
+        "central": 64,
+        "cortical": 64,
+        "near_edge": 64,
+        "subcortical": 64
+      },
+      "hemispheres": {
+        "-1": 160,
+        "1": 160
+      }
+    },
+    "target_2": {
+      "file": "target_2.csv",
+      "receipt": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1/landmarks-v1/target_2.csv",
+        "bytes": 14557,
+        "sha256": "49832696cf50ddc922fd82ac585f1e7d9ba57eb82a36ef76e4d139108663b826"
+      },
+      "mask": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-brain_mask.nii.gz",
+        "bytes": 29576,
+        "sha256": "7a71e9ce99d2af7b68bb5c163908c8e25f4c7a198806fb0893a5c1759b480ecd"
+      },
+      "cortical": {
+        "path": "/Users/bbuchsbaum/code/neuroatlas/data-raw/transform-artifacts-v1-work/inputs/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_atlas-HOCPA_desc-th25_dseg.nii.gz",
+        "bytes": 53430,
+        "sha256": "aca7a8d1b1893892f46f9bdf90dbd49d6b65ce11ffc4e4f5db0c92526255f224"
+      },
+      "subcortical": {
+        "path": "/Users/bbuchsbaum/Library/Caches/templateflow/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_atlas-HOSPA_desc-th25_dseg.nii.gz",
+        "bytes": 52039,
+        "sha256": "e6c3fa32721b0cb68f53c04dffc95c4cac49b0bffbf3b96ce35c1f3512098767"
+      },
+      "counts": {
+        "boundary": 64,
+        "central": 64,
+        "cortical": 64,
+        "near_edge": 64,
+        "subcortical": 64
+      },
+      "hemispheres": {
+        "-1": 160,
+        "1": 160
+      }
+    }
+  }
+}

@@ -112,3 +112,76 @@ test_that("print.atlas_transform_plan returns invisibly", {
   plan <- atlas_transform_plan("MNI305", "MNI152")
   expect_invisible(print(plan))
 })
+
+
+plan_route <- function(from, to, status = "available", confidence = "high",
+                       artifact_id = paste(from, to, sep = "-"),
+                       provider = "neuroatlas") {
+  data.frame(
+    from_space = from, to_space = to, transform_type = "nonlinear",
+    backend = "ants", confidence = confidence, reversible = FALSE,
+    data_files = NA_character_, status = status, notes = "test route",
+    artifact_id = artifact_id, artifact_version = "v1", provider = provider,
+    url = "https://example.org/releases/v1/transform.h5",
+    sha256 = paste(rep("a", 64), collapse = ""), size_bytes = 1,
+    format = "ants_h5", qualification = "passed", qa_url = NA_character_,
+    license = "CC0", convention = "ants_image_pullback_ras",
+    stringsAsFactors = FALSE
+  )
+}
+
+
+test_that("execution planning prefers an available multi-hop route to planned direct", {
+  registry <- rbind(
+    plan_route("A", "D", status = "planned", artifact_id = "planned-direct"),
+    plan_route("A", "B", artifact_id = "available-a-b"),
+    plan_route("B", "C", artifact_id = "available-b-c"),
+    plan_route("C", "D", artifact_id = "available-c-d")
+  )
+  local_mocked_bindings(.space_transform_registry = function() registry,
+                        .package = "neuroatlas")
+
+  plan <- atlas_transform_plan("A", "D", mode = "strict", available_only = TRUE)
+  expect_identical(plan$status, "available")
+  expect_identical(plan$n_steps, 3L)
+  expect_identical(plan$steps$artifact_id,
+                   c("available-a-b", "available-b-c", "available-c-d"))
+})
+
+
+test_that("planning ignores retired edges and has a deterministic tie break", {
+  registry <- rbind(
+    plan_route("A", "D", status = "retired", artifact_id = "retired"),
+    plan_route("A", "B", artifact_id = "z-first"),
+    plan_route("B", "D", artifact_id = "z-second"),
+    plan_route("A", "C", artifact_id = "a-first"),
+    plan_route("C", "D", artifact_id = "a-second")
+  )
+  local_mocked_bindings(.space_transform_registry = function() registry,
+                        .package = "neuroatlas")
+
+  first <- atlas_transform_plan("A", "D", mode = "strict")
+  registry <- registry[c(5, 3, 1, 4, 2), ]
+  second <- atlas_transform_plan("A", "D", mode = "strict")
+  expect_identical(first$steps$artifact_id, c("a-first", "a-second"))
+  expect_identical(second$steps$artifact_id, first$steps$artifact_id)
+  expect_false(any(first$steps$status == "retired"))
+})
+
+
+test_that("planning terminates cyclic graphs and rejects planned-only execution", {
+  registry <- rbind(
+    plan_route("A", "B", artifact_id = "a-b"),
+    plan_route("B", "A", artifact_id = "b-a"),
+    plan_route("A", "C", artifact_id = "a-c"),
+    plan_route("C", "D", artifact_id = "c-d")
+  )
+  local_mocked_bindings(.space_transform_registry = function() registry,
+                        .package = "neuroatlas")
+  expect_identical(atlas_transform_plan("A", "D", mode = "strict")$n_steps, 2L)
+
+  registry$status[] <- "planned"
+  expect_error(atlas_transform_plan("A", "D", mode = "strict",
+                                    available_only = TRUE),
+               "No transform route")
+})

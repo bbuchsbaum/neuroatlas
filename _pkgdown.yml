@@ -15,7 +15,16 @@ articles:
   contents:
   - surface-templates
   - working-with-templateflow
+  - template-transforms
   - resource-metadata
   - atlas-dilation
 - title: Specialist Atlases
   contents: wang-visual-cortex
+reference:
+- title: Template transforms
+  contents:
+  - get_template_transform
+  - apply_template_transform
+  - transform_atlas
+  - transform_cache_path
+  - clear_transform_cache

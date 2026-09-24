@@ -9,7 +9,11 @@
 #' @return
 #' A data frame with one row per transform route and columns:
 #' `from_space`, `to_space`, `transform_type`, `backend`, `confidence`,
-#' `reversible`, `data_files`, `status`, and `notes`.
+#' `reversible`, `data_files`, `status`, and `notes`. Artifact-backed routes also
+#' record `artifact_id`, `artifact_version`, `provider`, `url`, `sha256`,
+#' `size_bytes`, `format`, `convention`, `qualification`, `qualification_scope`,
+#' `qa_url`, and `license`. These fields are missing for routes without a
+#' downloadable artifact.
 #'
 #' @examples
 #' # All known routes
@@ -30,7 +34,7 @@ space_transform_manifest <- function(status = NULL) {
 
 #' Plan a Transform Between Spaces
 #'
-#' Computes a direct or two-hop transform plan between spaces using the packaged
+#' Computes a transform route between spaces using the packaged
 #' transform registry.
 #'
 #' Space identifiers are normalized internally, so aliases such as `"fslr32k"`
@@ -42,6 +46,10 @@ space_transform_manifest <- function(status = NULL) {
 #'   `"voxel"`). Used for advisory warnings.
 #' @param mode Planning mode. `"auto"` returns `NULL` if no route exists,
 #'   `"strict"` errors.
+#' @param available_only Restrict routing to available edges. The default also
+#'   shows planned routes for diagnostic compatibility. Execution always uses
+#'   available edges only; retired edges are never selected.
+#' @param provider Provider filter, `"auto"`, `"neuroatlas"`, or `"templateflow"`.
 #'
 #' @return
 #' A list of class `"atlas_transform_plan"` with fields:
@@ -62,14 +70,21 @@ space_transform_manifest <- function(status = NULL) {
 atlas_transform_plan <- function(from_space,
                                  to_space,
                                  data_type = c("parcel", "vertex", "voxel"),
-                                 mode = c("auto", "strict")) {
+                                 mode = c("auto", "strict"),
+                                 available_only = FALSE,
+                                 provider = c("auto", "neuroatlas", "templateflow")) {
   data_type <- match.arg(data_type)
   mode <- match.arg(mode)
+  provider <- match.arg(provider)
+  assertthat::assert_that(is.logical(available_only),
+                         length(available_only) == 1L, !is.na(available_only))
 
-  if (!is.character(from_space) || length(from_space) != 1L || !nzchar(from_space)) {
+  if (!is.character(from_space) || length(from_space) != 1L ||
+      is.na(from_space) || !nzchar(from_space)) {
     stop("'from_space' must be a non-empty character scalar")
   }
-  if (!is.character(to_space) || length(to_space) != 1L || !nzchar(to_space)) {
+  if (!is.character(to_space) || length(to_space) != 1L ||
+      is.na(to_space) || !nzchar(to_space)) {
     stop("'to_space' must be a non-empty character scalar")
   }
 
@@ -104,16 +119,16 @@ atlas_transform_plan <- function(from_space,
   }
 
   reg <- .space_transform_registry()
-  direct <- .find_direct_space_route(reg, from_space, to_space)
-
-  if (!is.null(direct)) {
-    plan <- .build_transform_plan(from_space, to_space, direct, data_type)
-    return(structure(plan, class = c("atlas_transform_plan", "list")))
+  reg <- reg[reg$status %in% if (available_only) "available" else {
+    c("available", "candidate", "planned")
+  }, , drop = FALSE]
+  if (provider != "auto") {
+    reg <- reg[reg$backend %in% c("identity", "internal_affine") |
+                 (!is.na(reg$provider) & reg$provider == provider), , drop = FALSE]
   }
-
-  two_hop <- .find_two_hop_space_route(reg, from_space, to_space)
-  if (!is.null(two_hop)) {
-    plan <- .build_transform_plan(from_space, to_space, two_hop, data_type)
+  route <- .find_space_route(reg, from_space, to_space)
+  if (!is.null(route)) {
+    plan <- .build_transform_plan(from_space, to_space, route, data_type)
     return(structure(plan, class = c("atlas_transform_plan", "list")))
   }
 
@@ -162,7 +177,49 @@ print.atlas_transform_plan <- function(x, ...) {
   reg$to_space <- vapply(reg$to_space, .normalize_space_id, character(1))
   reg$confidence <- tolower(reg$confidence)
   reg$status <- tolower(reg$status)
+  fields <- c("artifact_id", "artifact_version", "provider", "url", "sha256",
+              "format", "qualification", "qualification_scope", "qa_url",
+              "license", "convention")
+  for (field in setdiff(fields, names(reg))) reg[[field]] <- NA_character_
+  if (!"size_bytes" %in% names(reg)) reg$size_bytes <- NA_real_
   reg
+}
+
+# Enumerate simple paths in the small, package-owned template graph. Rank all
+# available paths before diagnostic candidates, then direct/fewer-hop routes,
+# confidence, and stable artifact identity. Input CSV order never breaks ties.
+.find_space_route <- function(reg, from_space, to_space) {
+  paths <- list()
+  visit <- function(node, visited, indices) {
+    outgoing <- which(reg$from_space == node & !reg$to_space %in% visited)
+    for (i in outgoing) {
+      next_indices <- c(indices, i)
+      next_node <- reg$to_space[[i]]
+      if (identical(next_node, to_space)) {
+        paths[[length(paths) + 1L]] <<- reg[next_indices, , drop = FALSE]
+      } else {
+        visit(next_node, c(visited, next_node), next_indices)
+      }
+    }
+  }
+  visit(from_space, from_space, integer())
+  if (!length(paths)) return(NULL)
+  rank_status <- c(available = 0, candidate = 1, planned = 2)
+  rank_conf <- c(exact = 0, high = 1, approximate = 2, uncertain = 3)
+  status <- vapply(paths, function(p) max(rank_status[p$status]), numeric(1))
+  confidence <- vapply(paths, function(p) {
+    vals <- rank_conf[p$confidence]
+    vals[is.na(vals)] <- 3
+    max(vals)
+  }, numeric(1))
+  keys <- vapply(paths, function(p) {
+    ids <- p$artifact_id
+    if (is.null(ids)) ids <- rep(NA_character_, nrow(p))
+    fallback <- paste(p$from_space, p$to_space, p$backend, p$data_files, sep = ":")
+    ids[is.na(ids)] <- fallback[is.na(ids)]
+    paste(ids, collapse = "/")
+  }, character(1))
+  paths[[order(status, vapply(paths, nrow, integer(1)), confidence, keys)[[1L]]]]
 }
 
 
@@ -288,7 +345,7 @@ print.atlas_transform_plan <- function(x, ...) {
 #' @keywords internal
 #' @noRd
 .route_score <- function(route_df) {
-  status_rank <- c(available = 0, planned = 1)
+  status_rank <- c(available = 0, candidate = 1, planned = 2, retired = 3)
   conf_rank <- c(exact = 0, high = 1, approximate = 2, uncertain = 3)
 
   status_vals <- status_rank[route_df$status]
@@ -307,13 +364,13 @@ print.atlas_transform_plan <- function(x, ...) {
 #' @keywords internal
 #' @noRd
 .build_transform_plan <- function(from_space, to_space, steps, data_type) {
-  status_rank <- c(available = 0, planned = 1)
+  status_rank <- c(available = 0, candidate = 1, planned = 2, retired = 3)
   conf_rank <- c(exact = 0, high = 1, approximate = 2, uncertain = 3)
   status_names <- names(status_rank)
   conf_names <- names(conf_rank)
 
   warnings <- character(0)
-  if (any(steps$status == "planned")) {
+  if (any(steps$status != "available")) {
     warnings <- c(warnings, "Plan includes unimplemented/planned transform step(s).")
   }
   if (any(steps$confidence %in% c("approximate", "uncertain"))) {
@@ -340,6 +397,9 @@ print.atlas_transform_plan <- function(x, ...) {
     to_space = to_space,
     steps = steps,
     n_steps = nrow(steps),
+    download_bytes = if ("size_bytes" %in% names(steps)) {
+      sum(steps$size_bytes)
+    } else NA_real_,
     status = total_status,
     confidence = total_conf,
     warnings = unique(warnings)

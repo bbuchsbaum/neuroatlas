@@ -553,9 +553,9 @@ test_that("color map handling works correctly across atlas operations", {
     # Original colors should be preserved
     # First atlas colors (ignore row names which may differ after merge)
     n1 <- length(atlas1$ids)
-    merged_cmap_subset <- merged$cmap[1:n1, ]
+    merged_cmap_subset <- merged$cmap[seq_len(n1), , drop = FALSE]
     rownames(merged_cmap_subset) <- NULL
-    atlas1_cmap <- atlas1$cmap
+    atlas1_cmap <- as.matrix(atlas1$cmap)
     rownames(atlas1_cmap) <- NULL
     expect_equal(merged_cmap_subset, atlas1_cmap)
   }

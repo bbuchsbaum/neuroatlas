@@ -5,6 +5,54 @@ schaefer_path <- list(
   rpath = "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/"
 )
 
+#' Resolve the Schaefer asset cache
+#'
+#' @param cache_dir Optional explicit cache directory.
+#' @param create Whether to create the directory when it does not exist.
+#' @return A cache directory path.
+#' @keywords internal
+#' @noRd
+.schaefer_cache_dir <- function(cache_dir = NULL, create = TRUE) {
+  if (is.null(cache_dir)) {
+    cache_dir <- getOption("neuroatlas.schaefer.cache_dir")
+  }
+  if (is.null(cache_dir)) {
+    cache_dir <- getOption("neuroatlas.cache_dir")
+  }
+  if (is.null(cache_dir)) {
+    return(.neuroatlas_cache_dir("schaefer", create = create))
+  }
+
+  if (!is.character(cache_dir) || length(cache_dir) != 1L ||
+      is.na(cache_dir) || !nzchar(cache_dir)) {
+    stop("'cache_dir' must be NULL or a non-empty character path.")
+  }
+
+  cache_dir <- path.expand(cache_dir)
+  if (isTRUE(create) && !dir.exists(cache_dir)) {
+    dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+  if (isTRUE(create) && !dir.exists(cache_dir)) {
+    stop("Could not create Schaefer cache directory: ", cache_dir)
+  }
+  cache_dir
+}
+
+
+#' @keywords internal
+#' @noRd
+.schaefer_source_note <- function(source) {
+  if (is.null(source) || is.null(source$storage)) {
+    return(NA_character_)
+  }
+  note <- paste0("source_storage=", source$storage)
+  if (!is.null(source$cache_dir) && !is.na(source$cache_dir)) {
+    note <- paste0(note, "; cache_dir=", source$cache_dir)
+  }
+  note
+}
+
+
 #' Find Mode of a Vector
 #'
 #' @description
@@ -187,12 +235,18 @@ resample <- function(vol, outspace, smooth=FALSE, interp=0, radius=NULL,
 #' @return A NeuroVol object containing the atlas
 #' @keywords internal
 #' @noRd
-load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
+load_schaefer_vol <- function(parcels, networks, resolution,
+                              use_cache = TRUE, cache_dir = NULL) {
   fname <- paste0("Schaefer2018_", parcels, "Parcels_",
                  networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz")
+  cache_dir <- if (isTRUE(use_cache)) {
+    .schaefer_cache_dir(cache_dir)
+  } else {
+    NULL
+  }
+  pname <- if (!is.null(cache_dir)) file.path(cache_dir, fname) else NULL
 
-  vol <- if (use_cache) {
-    pname <- paste0(get_cache_dir(), "/", fname)
+  vol <- if (!is.null(pname)) {
     if (file.exists(pname)) {
       neuroim2::read_vol(pname)
     }
@@ -200,35 +254,51 @@ load_schaefer_vol <- function(parcels, networks, resolution, use_cache=TRUE) {
 
   if (is.null(vol)) {
     path <- paste0(schaefer_path$rpath, fname)
-    des <- paste0(tempdir(), "/", fname)
+    des <- tempfile("neuroatlas-schaefer-", fileext = ".nii.gz")
     .neuroatlas_download(
       url = path, dest = des,
       description = paste0("Schaefer volume (", fname, ")")
     )
     vol <- neuroim2::read_vol(des)
     read_path <- des
-    neuroim2::write_vol(vol, paste0(get_cache_dir(), "/", fname))
+    source_storage <- "transient_download"
+    if (!is.null(pname)) {
+      neuroim2::write_vol(vol, pname)
+      source_storage <- "transient_download_materialized_to_configured_cache"
+    }
   } else {
     read_path <- pname
+    source_storage <- "configured_cache"
   }
 
   attr(vol, "neuroatlas_file_receipt") <- .file_receipt(read_path)
+  attr(vol, "neuroatlas_source") <- list(
+    storage = source_storage,
+    cache_dir = if (is.null(cache_dir)) NA_character_ else normalizePath(cache_dir)
+  )
   vol
 }
 
 #' @noRd
 #' @keywords internal
-load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
+load_schaefer_labels <- function(parcels, networks, use_cache = TRUE,
+                                 cache_dir = NULL) {
   label_name <- paste0("Schaefer2018_", parcels, "Parcels_", networks, "Networks_order.txt")
+  cache_dir <- if (isTRUE(use_cache)) {
+    .schaefer_cache_dir(cache_dir)
+  } else {
+    NULL
+  }
+  label_path <- if (!is.null(cache_dir)) file.path(cache_dir, label_name) else NULL
   labels <- NULL
-  if (use_cache) {
-    if (file.exists(paste0(get_cache_dir(), "/", label_name))) {
-      labels <- read.table(paste0(get_cache_dir(), "/", label_name), header=FALSE, as.is=TRUE)
+  if (!is.null(label_path)) {
+    if (file.exists(label_path)) {
+      labels <- read.table(label_path, header = FALSE, as.is = TRUE)
     }
   }
 
   if (is.null(labels)) {
-    des2 <- paste0(tempdir(), "/", label_name)
+    des2 <- tempfile("neuroatlas-schaefer-labels-", fileext = ".txt")
     url <- paste0(schaefer_path$rpath, "/freeview_lut/", label_name)
     message("downloading: ", url)
     .neuroatlas_download(
@@ -237,21 +307,36 @@ load_schaefer_labels <- function(parcels, networks, use_cache=TRUE) {
       description = paste0("Schaefer labels (", label_name, ")")
     )
     labels <- read.table(des2, header = FALSE, as.is = TRUE)
-    file.copy(des2, paste0(get_cache_dir(), "/", label_name), overwrite = TRUE)
+    read_path <- des2
+    source_storage <- "transient_download"
+    if (!is.null(label_path)) {
+      if (!file.copy(des2, label_path, overwrite = TRUE)) {
+        stop("Could not cache Schaefer label table at ", label_path)
+      }
+      source_storage <- "transient_download_materialized_to_configured_cache"
+    }
+  } else {
+    read_path <- label_path
+    source_storage <- "configured_cache"
   }
 
+  attr(labels, "neuroatlas_file_receipt") <- .file_receipt(read_path)
+  attr(labels, "neuroatlas_source") <- list(
+    storage = source_storage,
+    cache_dir = if (is.null(cache_dir)) NA_character_ else normalizePath(cache_dir)
+  )
   labels
 }
 
 
 #' @noRd
 #' @keywords internal
-schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
-  #browser()
-  labels = load_schaefer_labels(parcels, networks, use_cache)
+schaefer_metainfo <- function(parcels, networks, use_cache = TRUE,
+                              cache_dir = NULL) {
+  labels <- load_schaefer_labels(parcels, networks, use_cache, cache_dir)
+  label_receipt <- attr(labels, "neuroatlas_file_receipt", exact = TRUE)
+  label_source <- attr(labels, "neuroatlas_source", exact = TRUE)
 
-  #browser()
-  full_label <- labels[,2]
   labels <- labels[, 1:5]
   names(labels) <- c("roinum", "label", "red", "green", "blue")
   labels$label <- gsub(paste0(networks, "Networks", "_"), "", labels$label)
@@ -265,8 +350,9 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
   labels$hemi[hemi == "LH"] <- "left"
   labels$hemi[hemi == "RH"] <- "right"
 
+  attr(labels, "neuroatlas_file_receipt") <- label_receipt
+  attr(labels, "neuroatlas_source") <- label_source
   labels
-
 }
 
 #' Load Schaefer Brain Parcellation Atlas
@@ -298,6 +384,10 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' @param smooth Logical. Whether to smooth parcel boundaries after resampling.
 #'   Default: FALSE
 #' @param use_cache Logical. Whether to cache downloaded files. Default: TRUE
+#' @param cache_dir Optional directory for Schaefer volume and label assets.
+#'   When `NULL`, uses the `neuroatlas.schaefer.cache_dir` option, then the
+#'   `neuroatlas.cache_dir` option, and finally the platform cache directory.
+#'   Ignored when `use_cache = FALSE`, which uses transient files only.
 #' @param ... Additional arguments (currently unused, included for consistency
 #'   with convenience functions)
 #'
@@ -342,7 +432,7 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' \code{\link{get_schaefer_surfatlas}} for surface-based version
 #'
 #' @section Convenience Functions:
-#' Shorthand functions are provided for common Schaefer atlas configurations. These functions call \code{get_schaefer_atlas} with the \code{parcels} and \code{networks} arguments pre-set. They all accept \code{resolution} (default "2"), \code{outspace}, \code{smooth}, \code{use_cache}, and \code{...} arguments.
+#' Shorthand functions are provided for common Schaefer atlas configurations. These functions call \code{get_schaefer_atlas} with the \code{parcels} and \code{networks} arguments pre-set. They all accept \code{resolution} (default "2"), \code{outspace}, \code{smooth}, \code{use_cache}, \code{cache_dir}, and \code{...} arguments.
 #' \itemize{
 #'   \item \code{sy_100_7()}: 100 parcels, 7 networks.
 #'   \item \code{sy_100_17()}: 100 parcels, 17 networks.
@@ -370,7 +460,8 @@ schaefer_metainfo <- function(parcels, networks, use_cache=TRUE) {
 #' @export
 get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","700","800","900","1000"),
                               networks=c("7","17"), resolution=c("1","2"),
-                              outspace=NULL, smooth=FALSE, use_cache=TRUE) {
+                              outspace=NULL, smooth=FALSE, use_cache=TRUE,
+                              cache_dir = NULL) {
 
   parcels <- match.arg(as.character(parcels),
                       choices = c("100","200","300","400","500","600","700","800","900","1000"))
@@ -378,35 +469,62 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
                        choices = c("7","17"))
   resolution <- match.arg(as.character(resolution),
                          choices = c("1","2"))
+  source_template_space <- "MNI152NLin6Asym"
+  named_template_target <- is.character(outspace) && length(outspace) == 1L ||
+    is.list(outspace) && !is.null(outspace$space) &&
+    is.character(outspace$space) && length(outspace$space) == 1L
   template_space <- .template_space_from_outspace(
-    outspace,
-    default_space = "MNI152NLin6Asym"
+    outspace, default_space = source_template_space
   )
+  transform_plan <- NULL
 
-  # Resolve outspace if it's not NULL and not already a NeuroSpace (T6.1.4)
+  # Resolve named targets before deriving the atlas identity. A NeuroSpace is
+  # an explicit grid without a declared template identity and remains a valid
+  # grid-only resampling target.
   if (!is.null(outspace) && !methods::is(outspace, "NeuroSpace")) {
     message("Attempting to resolve 'outspace' argument via TemplateFlow...")
-    # We need .resolve_template_input to be available.
-    # Assuming it's exported from neuroatlas or accessible.
-    # If it's internal, this call would need neuroatlas:::.resolve_template_input
-    # For now, assuming it becomes an exported utility or is otherwise accessible.
-    # If this file is part of the same package, direct call might work if NAMESPACE handles it.
     resolved_outspace <- tryCatch({
       .resolve_template_input(outspace, target_type = "NeuroSpace")
     }, error = function(e) {
       stop("Failed to resolve 'outspace' via TemplateFlow: ", conditionMessage(e),
            "\n'outspace' must be a NeuroSpace object, a TemplateFlow space ID string, or a list of get_template() arguments.")
-      return(NULL) # Should be caught by stop
     })
 
     if (is.null(resolved_outspace) || !methods::is(resolved_outspace, "NeuroSpace")) {
-        stop("Resolution of 'outspace' did not result in a valid NeuroSpace object.")
+      stop("Resolution of 'outspace' did not result in a valid NeuroSpace object.")
     }
-    outspace <- resolved_outspace # Replace original outspace with the resolved NeuroSpace
+    outspace <- resolved_outspace
   }
 
-  vol <- load_schaefer_vol(parcels, networks, resolution, use_cache)
+  if (isTRUE(named_template_target)) {
+    transform_plan <- atlas_transform_plan(
+      source_template_space, template_space, data_type = "voxel", mode = "strict"
+    )
+    template_space <- transform_plan$to_space
+
+    if (!identical(transform_plan$status, "available")) {
+      stop(
+        "Schaefer atlas cannot be mapped from '", source_template_space,
+        "' to '", template_space, "': the required transform is planned or ",
+        "unavailable. A target-grid resample is not an anatomical template transform."
+      )
+    }
+    if (any(transform_plan$steps$transform_type != "identity")) {
+      if (isTRUE(smooth)) {
+        stop("Cross-template label transforms require smooth = FALSE.")
+      }
+      transform <- get_template_transform(source_template_space, template_space)
+      native <- get_schaefer_atlas(parcels, networks, resolution,
+                                   use_cache = use_cache, cache_dir = cache_dir)
+      return(apply_template_transform(native, transform, target = outspace))
+    }
+  }
+
+  vol <- load_schaefer_vol(
+    parcels, networks, resolution, use_cache = use_cache, cache_dir = cache_dir
+  )
   volume_receipt <- attr(vol, "neuroatlas_file_receipt")
+  volume_source <- attr(vol, "neuroatlas_source", exact = TRUE)
 
   if (!is.null(outspace)) {
     #print(outspace)
@@ -415,7 +533,11 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
   }
   processing <- attr(vol, "neuroatlas_processing")
 
-  labels <- schaefer_metainfo(parcels, networks, use_cache)
+  labels <- schaefer_metainfo(
+    parcels, networks, use_cache = use_cache, cache_dir = cache_dir
+  )
+  label_receipt <- attr(labels, "neuroatlas_file_receipt", exact = TRUE)
+  label_source <- attr(labels, "neuroatlas_source", exact = TRUE)
   vol_fname <- paste0(
     "Schaefer2018_", parcels, "Parcels_",
     networks, "Networks_order_FSLMNI152_", resolution, "mm.nii.gz"
@@ -454,7 +576,11 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
     provenance = "https://github.com/ThomasYeoLab/CBIG",
     source = "cbig_mni",
     lineage = "Computed on fsaverage6 and sampled to MNI volume in CBIG release.",
-    confidence = if (is.null(outspace)) "high" else "approximate",
+    confidence = if (is.null(outspace) || !is.null(transform_plan)) {
+      "high"
+    } else {
+      "approximate"
+    },
     notes = "CBIG filenames use FSLMNI152_*mm naming."
   )
 
@@ -497,9 +623,11 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
   if (!is.null(volume_receipt)) {
     for (nm in names(volume_receipt)) artifacts[[nm]][[1]] <- volume_receipt[[nm]]
   }
-  label_path <- file.path(get_cache_dir(), label_fname)
-  receipt <- .file_receipt(label_path)
-  for (nm in names(receipt)) artifacts[[nm]][[2]] <- receipt[[nm]]
+  if (!is.null(label_receipt)) {
+    for (nm in names(label_receipt)) artifacts[[nm]][[2]] <- label_receipt[[nm]]
+  }
+  artifacts$notes[[1]] <- .schaefer_source_note(volume_source)
+  artifacts$notes[[2]] <- .schaefer_source_note(label_source)
 
   history <- .new_atlas_history(
     action = "load",
@@ -526,8 +654,18 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
         from_coord_space = "MNI152",
         to_coord_space = "MNI152",
         status = "available",
-        confidence = "approximate",
-        details = paste0("Resampled atlas with smooth=", smooth, ".")
+        confidence = if (is.null(transform_plan)) "approximate" else "high",
+        details = paste0("Resampled atlas with smooth=", smooth, "."),
+        parameters = list(
+          interpolation = "nearest",
+          smooth = smooth,
+          transform = if (is.null(transform_plan)) {
+            "grid_only"
+          } else {
+            transform_plan$steps
+          },
+          geometry = processing
+        )
       )
     )
   }
@@ -601,7 +739,6 @@ get_schaefer_atlas <- function(parcels=c("100","200","300","400","500","600","70
 #' @seealso
 #' \code{\link{get_schaefer_atlas}} for volumetric version
 #'
-#' @importFrom neurosurf read_freesurfer_annot
 #' @importFrom downloader download
 #' @importFrom utils data
 #' @export
@@ -1219,140 +1356,140 @@ schaefer_surf_options <- function() {
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_100_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_100_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "100", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_100_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_100_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "100", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_200_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_200_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "200", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_200_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_200_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "200", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_300_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_300_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "300", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_300_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_300_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "300", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_400_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_400_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "400", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_400_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_400_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "400", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_500_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_500_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "500", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_500_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_500_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "500", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_600_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_600_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "600", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_600_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_600_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "600", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_700_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_700_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "700", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_700_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_700_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "700", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_800_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_800_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "800", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_800_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_800_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "800", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_900_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_900_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "900", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_900_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_900_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "900", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_1000_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_1000_7 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "1000", networks = "7", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }
 
 #' @rdname get_schaefer_atlas
 #' @export
-sy_1000_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, ...) {
+sy_1000_17 <- function(resolution = "2", outspace = NULL, smooth = FALSE, use_cache = TRUE, cache_dir = NULL, ...) {
   get_schaefer_atlas(parcels = "1000", networks = "17", resolution = resolution,
-                     outspace = outspace, smooth = smooth, use_cache = use_cache, ...)
+                     outspace = outspace, smooth = smooth, use_cache = use_cache, cache_dir = cache_dir, ...)
 }

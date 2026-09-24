@@ -1,0 +1,2 @@
+# Preserve the frozen upstream label table, including its empty TSV field.
+data-raw/transform-artifacts-v1/landmarks-v1/tpl-MNI152NLin6Asym_atlas-HOSPA_dseg.tsv -text -whitespace

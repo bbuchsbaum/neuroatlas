@@ -1,0 +1,54 @@
+# Deliberately non-submittable until Nibi discovery completes. Replace both
+# __NIBI_*__ roots and create niflowr.nibi.yml plus its lockfile only after:
+#   remoteslurm connect nibi
+#   rslurm --json -H nibi info
+# Do not copy another cluster's account, partition, memory, or module policy.
+schema = 1
+name = "neuroatlas-transforms-calibration-v1"
+host = "nibi"
+
+[workspace]
+remote_root = "__NIBI_REMOTE_ROOT__"
+output_root = "__NIBI_OUTPUT_ROOT__"
+
+[inventories.routes]
+key = ["route_id"]
+rows = [{ route_id = "mni152nlin6asym-to-mni152nlin2009casym" }]
+
+[environments.nibi_ants]
+preamble = '''
+module load apptainer/1.4.5
+module load hdf5/1.14.2
+export R_LIBS_USER="${PROJECT:?PROJECT must be set}/neuroatlas-transform-artifacts-v1/R-library${R_LIBS_USER:+:${R_LIBS_USER}}"
+export NEUROATLAS_TRANSFORM_ARTIFACT_ROOT="$PWD"
+export NEUROATLAS_TRANSFORM_WORK_ROOT="$PWD"
+export APPTAINER_CACHEDIR="${SCRATCH:?SCRATCH must be set}/neuroatlas-transform-artifacts-v1/apptainer-cache"
+mkdir -p "$APPTAINER_CACHEDIR"
+'''
+
+[stages.calibrate]
+foreach = "routes"
+script = "scripts/run-calibration.sh"
+environment = "nibi_ants"
+
+[stages.calibrate.execution]
+mode = "array"
+max_array_size = 1
+max_concurrent = 1
+
+[stages.calibrate.resources]
+time = "03:00:00"
+cpus_per_task = 4
+mem = "32G"
+
+[[stages.calibrate.outputs]]
+name = "calibration"
+kind = "file"
+path = "{route_id}/calibration.json"
+cardinality = "exactly_one"
+min_bytes = 1024
+sha256 = true
+stable_for = 5
+settle_timeout = 120
+settle_interval = 1
+stable_dimensions = ["existence", "size", "mtime", "sha256"]

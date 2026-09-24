@@ -1,0 +1,20 @@
+# Copy to niflowr.nibi.yml only after `rslurm --json -H nibi info` identifies
+# the real Nibi workspace policy. Replace every __NIBI_*__ value, then create
+# and validate niflowr.lock.yml on Nibi before submitting a production build.
+runtime:
+  engine: apptainer
+  prefer: apptainer
+  lockfile: niflowr.lock.yml
+  lock_enforce: true
+paths:
+  in_root: __NIBI_REMOTE_ROOT__/inputs
+  out_root: __NIBI_OUTPUT_ROOT__
+  work_root: __NIBI_REMOTE_ROOT__/work
+apptainer:
+  cleanenv: true
+  containall: true
+  use_sif: true
+  sif_dir: __NIBI_REMOTE_ROOT__/containers
+profiles:
+  ants:
+    apptainer_uri: docker://antsx/ants@sha256:59c45f54a1f1dc69134f63bec91a726e41c71c64a16cc21cda0b54526910a3c3

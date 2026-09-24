@@ -1,0 +1,103 @@
+# A separate output root is required. Smoke artifacts are campaign evidence,
+# never transform-release evidence. Fill the roots only after Nibi discovery.
+schema = 1
+name = "neuroatlas-transform-smoke"
+host = "nibi"
+
+[workspace]
+remote_root = "__NIBI_SMOKE_REMOTE_ROOT__"
+output_root = "__NIBI_SMOKE_OUTPUT_ROOT__"
+
+[inventories.routes]
+key = ["route_id"]
+rows = [{ route_id = "synthetic-testing-only" }]
+
+[environments.nibi_ants]
+preamble = '''
+module load apptainer/1.4.5
+module load hdf5/1.14.2
+export R_LIBS_USER="${PROJECT:?PROJECT must be set}/neuroatlas-transform-artifacts-v1/R-library${R_LIBS_USER:+:${R_LIBS_USER}}"
+export NEUROATLAS_TRANSFORM_ARTIFACT_ROOT="$PWD"
+export NEUROATLAS_TRANSFORM_WORK_ROOT="$PWD"
+export APPTAINER_CACHEDIR="${SCRATCH:?SCRATCH must be set}/neuroatlas-transform-artifacts-v1/apptainer-cache"
+mkdir -p "$APPTAINER_CACHEDIR"
+'''
+
+[stages.smoke]
+foreach = "routes"
+script = "scripts/run-smoke.sh"
+environment = "nibi_ants"
+
+[stages.smoke.execution]
+mode = "array"
+max_array_size = 1
+max_concurrent = 1
+
+[stages.smoke.resources]
+time = "00:30:00"
+cpus_per_task = 1
+mem = "4G"
+
+[[stages.smoke.outputs]]
+name = "forward"
+kind = "file"
+path = "{route_id}/tpl-synthetic_from-shifted_to-fixed_mode-image_xfm.h5"
+cardinality = "exactly_one"
+min_bytes = 1024
+sha256 = true
+stable_for = 2
+settle_timeout = 60
+settle_interval = 1
+stable_dimensions = ["existence", "size", "mtime", "sha256"]
+
+[[stages.smoke.outputs]]
+name = "inverse"
+kind = "file"
+path = "{route_id}/tpl-synthetic_from-fixed_to-shifted_mode-image_xfm.h5"
+cardinality = "exactly_one"
+min_bytes = 1024
+sha256 = true
+stable_for = 2
+settle_timeout = 60
+settle_interval = 1
+stable_dimensions = ["existence", "size", "mtime", "sha256"]
+
+[[stages.smoke.outputs]]
+name = "warped_image"
+kind = "file"
+path = "{route_id}/tpl-synthetic_from-shifted_to-fixed_desc-warped_T1w.nii.gz"
+cardinality = "exactly_one"
+min_bytes = 1024
+stable_for = 2
+settle_timeout = 60
+settle_interval = 1
+
+[[stages.smoke.outputs]]
+name = "provenance"
+kind = "file"
+path = "{route_id}/smoke-provenance.json"
+cardinality = "exactly_one"
+min_bytes = 1
+sha256 = true
+stable_for = 2
+settle_timeout = 60
+settle_interval = 1
+
+[[stages.smoke.outputs]]
+name = "receipt"
+kind = "file"
+path = "{route_id}/smoke-receipt.json"
+cardinality = "exactly_one"
+min_bytes = 1
+sha256 = true
+stable_for = 2
+settle_timeout = 60
+settle_interval = 1
+stable_dimensions = ["existence", "size", "mtime", "sha256"]
+
+[[stages.smoke.validators]]
+kind = "command"
+argv = ["Rscript", "scripts/validate-smoke-output.R", "{output:forward}", "{output:inverse}", "{output:warped_image}", "{output:provenance}", "{output:receipt}"]
+timeout = 300
+files = ["scripts/validate-smoke-output.R"]
+env = { R_LIBS_USER = "__NIBI_REMOTE_ROOT__/R-library" }

@@ -10,6 +10,11 @@ get_julich_brain_atlas(fsl_dir = Sys.getenv("FSLDIR"), download = TRUE, ...)
 \item{fsl_dir}{FSL installation directory. Defaults to `Sys.getenv("FSLDIR")`.
 `get_julich_brain_atlas()` downloads an FSL-style Julich-Brain cache when
 this is empty and `download = TRUE`.}
+
+\item{download}{Download the Julich-Brain atlas archive into the neuroatlas
+cache when `fsl_dir` is unset.}
+
+\item{...}{Additional arguments passed to `get_fsl_atlas()`.}
 }
 \value{
 An `atlas` object, or path metadata when `path_only = TRUE`.

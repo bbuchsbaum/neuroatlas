@@ -58,3 +58,10 @@ prob4/
 # Local working dirs (rendered-vignette backups, planning scratch)
 .albersdown.bak/
 plans/
+
+# Generated template-transform inputs, attempts, and release staging
+data-raw/transform-artifacts-v1-work/
+data-raw/transform-artifacts-v1/niflowr.nibi.yml
+data-raw/transform-artifacts-v1/niflowr.lock.yml
+data-raw/transform-artifacts-v1/campaign.nibi-smoke.generated.toml
+data-raw/transform-artifacts-v1/campaign.*.generated.toml

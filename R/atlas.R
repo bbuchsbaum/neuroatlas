@@ -313,7 +313,6 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
 #' @return A named list of \code{\link[neurosurf]{ROISurface}} objects.
 #' @seealso \code{\link{get_roi}}
 #' @rdname get_roi-surfatlas
-#' @importFrom neurosurf ROISurface
 #' @export
 #' @method get_roi surfatlas
 get_roi.surfatlas <- function(x, label = NULL, id = NULL, hemi = NULL) {

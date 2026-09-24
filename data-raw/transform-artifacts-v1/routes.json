@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "artifact_release": "transform-artifacts-v1",
+  "status": "inputs_frozen",
+  "input_inventory": {
+    "observed_utc": "2026-09-19",
+    "templateflow_package_version": "0.1.0",
+    "templateflow_cache_origin": "https://github.com/templateflow/templateflow.git",
+    "inventory_rows": 2515,
+    "xfm_rows": 26,
+    "note": "Counts are an observed inventory snapshot, not a release identifier. Every consumed file is pinned below by relpath, byte count, and SHA-256."
+  },
+  "routes": [
+    {
+      "route_id": "mni152nlin6asym-to-mni152nlin2009casym",
+      "source_space": "MNI152NLin6Asym",
+      "target_space": "MNI152NLin2009cAsym",
+      "source": {
+        "template": "MNI152NLin6Asym",
+        "license": "See TemplateFlow template LICENSE file",
+        "references": [
+          "https://doi.org/10.1016/j.neuroimage.2012.01.024",
+          "https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Atlases"
+        ],
+        "image": {
+          "query": {
+            "resolution": 1,
+            "desc": "brain",
+            "suffix": "T1w"
+          },
+          "relpath": "tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_desc-brain_T1w.nii.gz",
+          "bytes": 3293998,
+          "sha256": "72f8edc99d7e696da7717db20b73897d8da5909d7f30b1c9a7e2a79e9f64ff2f",
+          "geometry": {
+            "dim": [
+              182,
+              218,
+              182
+            ],
+            "voxel_size_mm": [
+              1,
+              1,
+              1
+            ],
+            "affine": [
+              [
+                1,
+                0,
+                0,
+                -91
+              ],
+              [
+                0,
+                1,
+                0,
+                -126
+              ],
+              [
+                0,
+                0,
+                1,
+                -72
+              ],
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "mask": {
+          "query": {
+            "resolution": 1,
+            "desc": "brain",
+            "suffix": "mask"
+          },
+          "relpath": "tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_desc-brain_mask.nii.gz",
+          "bytes": 149930,
+          "sha256": "6d540075dac093fa5070a929dc5ea52795d54cc9ab57fe1272086dc70314b428"
+        },
+        "qa_labels": {
+          "query": {
+            "resolution": 1,
+            "atlas": "HOCPA",
+            "desc": "th25",
+            "suffix": "dseg"
+          },
+          "relpath": "tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+          "bytes": 266805,
+          "sha256": "1b4d9cb8b7ae0c9734d01af39a6977aa27c88d6c645d85bcef2fb803734d67c5"
+        }
+      },
+      "target": {
+        "template": "MNI152NLin2009cAsym",
+        "license": "See TemplateFlow template LICENSE file",
+        "references": [
+          "https://doi.org/10.1016/j.neuroimage.2010.07.033",
+          "https://doi.org/10.1016/S1053-8119(09)70884-5",
+          "http://nist.mni.mcgill.ca/?p=904"
+        ],
+        "image": {
+          "query": {
+            "resolution": 1,
+            "desc": "brain",
+            "suffix": "T1w"
+          },
+          "relpath": "tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_T1w.nii.gz",
+          "bytes": 3472309,
+          "sha256": "97cee2cf7f51388d76d7b3632c8375d688d0fa171e1bede81fcef23726bb3d73",
+          "geometry": {
+            "dim": [
+              193,
+              229,
+              193
+            ],
+            "voxel_size_mm": [
+              1,
+              1,
+              1
+            ],
+            "affine": [
+              [
+                1,
+                0,
+                0,
+                -96
+              ],
+              [
+                0,
+                1,
+                0,
+                -132
+              ],
+              [
+                0,
+                0,
+                1,
+                -78
+              ],
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "mask": {
+          "query": {
+            "resolution": 1,
+            "desc": "brain",
+            "suffix": "mask"
+          },
+          "relpath": "tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz",
+          "bytes": 159538,
+          "sha256": "e40bb1816736504d4c25abc243c1c8503df1d308f64c048318aa4b829e09a7ae"
+        },
+        "qa_labels": {
+          "query": {
+            "resolution": 1,
+            "atlas": "HOCPA",
+            "desc": "th25",
+            "suffix": "dseg"
+          },
+          "relpath": "tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+          "bytes": 278168,
+          "sha256": "ace9462a9a132851b73b92882d040ffee968ba5399b5154345571ad4c1a6da2d"
+        }
+      },
+      "registration": {
+        "builder": "niflowr::ni_ants_register_to_template",
+        "software_commits": {
+          "niflowr": "3fe349389c659595c4ed21af7d48641486604c5d",
+          "neurotransform": "9e7550d45d6d6b06155b27717057f4137aaf666e",
+          "neuroim2": "e3f0d64b91a5a92962acd653369d5f9a7df885ea"
+        },
+        "niflowr_development_ref": "github:bbuchsbaum/niflowr@main",
+        "niflowr_last_observed_commit": "3fe3493",
+        "preset": "precise",
+        "random_seed": 1,
+        "threads": 1,
+        "engine": "apptainer",
+        "profile": "ants",
+        "timeout_seconds": 14400,
+        "container": "docker://antsx/ants@sha256:59c45f54a1f1dc69134f63bec91a726e41c71c64a16cc21cda0b54526910a3c3"
+      },
+      "outputs": {
+        "forward": "tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5",
+        "inverse": "tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5",
+        "warped_image": "tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_desc-warped_T1w.nii.gz"
+      }
+    }
+  ]
+}

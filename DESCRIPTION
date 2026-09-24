@@ -1,6 +1,6 @@
 Package: neuroatlas
 Title: Neuroimaging Atlases and Parcellations
-Version: 0.1.0.9000
+Version: 0.1.0.9003
 Authors@R: 
     person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1108-4866"))
@@ -20,6 +20,7 @@ Imports:
     cli,
     crayon,
     downloader,
+    digest,
     dplyr,
     ggiraph,
     ggplot2,
@@ -28,7 +29,6 @@ Imports:
     memoise,
     methods,
     neuroim2,
-    neurosurf,
     rlang,
     Rnanoflann,
     scales,
@@ -50,23 +50,31 @@ Suggests:
     ggseg,
     ggsegSchaefer,
     gifti,
+    hdf5r,
     htmltools,
     igraph,
     jsonlite,
     knitr,
     mockery,
+    neurosurf (>= 0.1.0.9001),
+    neurotransform,
     patchwork,
+    ragg,
     reticulate,
+    RNifti,
     rmarkdown,
     shiny,
     sf,
+    systemfonts,
     testthat (>= 3.0.0),
     tidyr,
-    uwot
+    uwot,
+    withr
 VignetteBuilder:
     knitr
 Remotes:
     bbuchsbaum/neurosurf,
+    bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e,
     bbuchsbaum/albersdown,
     bbuchsbaum/templateflow,
     ggsegverse/ggsegSchaefer
@@ -133,6 +141,8 @@ Collate:
     'subcortical_atlases.R'
     'template_flow.R'
     'template_metadata.R'
+    'template_transform.R'
+    'transform_cache.R'
     'transform_registry.R'
     'visfatlas.R'
     'visual_atlas.R'
