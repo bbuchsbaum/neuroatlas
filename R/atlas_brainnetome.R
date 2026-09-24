@@ -4,7 +4,7 @@
 #' @noRd
 .brainnetome_sources <- function() {
   base <- "https://pan.cstcloud.cn/s/api/shareDownload"
-  data.frame(
+  sources <- data.frame(
     key = c("volume", "lut", "subregions", "networks"),
     file_name = c(
       "BN_Atlas_246_1mm.nii.gz",
@@ -17,11 +17,11 @@
             "86217173499917", "86217173500082"),
     min_size = c(100000L, 1000L, 10000L, 1000L),
     stringsAsFactors = FALSE
-  ) |>
-    transform(
-      url = paste0(base, "?shareId=", share_id, "&fid=", fid),
-      page_url = paste0("https://pan.cstcloud.cn/s/", share_id)
-    )
+  )
+  sources$url <- paste0(base, "?shareId=", sources$share_id,
+                        "&fid=", sources$fid)
+  sources$page_url <- paste0("https://pan.cstcloud.cn/s/", sources$share_id)
+  sources
 }
 
 #' Download or Locate Cached Brainnetome Atlas Assets

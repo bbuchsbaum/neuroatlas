@@ -1,0 +1,16 @@
+{
+  "scope": "prospective qualification policy and numerical landmark coverage",
+  "passed": true,
+  "reviewer": "independent lean_expert policy_review; parent reproduction check",
+  "reviewed_at_utc": "2026-09-24T14:08:17.597886+00:00",
+  "policy_sha256": "b53ccca3dd5db77016150cdcc9458385f390821e85641918df0d9976dbdc912b",
+  "generator_sha256": "9aa77f3d3e192838eb6016bc57a839f601e204b3f2ec532053b2e2ae6d69c526",
+  "landmark_manifest_sha256": "85f62ab5dbd8a396f317cc9129f09de9ec0a5ef0bbf8ce10cf7fd1bdf79c9ef0",
+  "evidence": [
+    "Independent review verified all input affines, exact RAS coordinates, mask inclusion, 320 unique points per grid and 32 per hemisphere in each of five strata.",
+    "Four CSVs reproduced byte identically in a second output directory.",
+    "Prospective engineering thresholds frozen before any own candidate quality measurement. Synthetic pilot exercises mechanics, not anatomical accuracy.",
+    "Official calibration failures retained; HOCPA concordance and differences to official are diagnostic.",
+    "Nonfinite point summaries remain unavailable with explicit counts; no silent omission."
+  ]
+}

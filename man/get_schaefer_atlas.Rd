@@ -33,7 +33,8 @@ get_schaefer_atlas(
   resolution = c("1", "2"),
   outspace = NULL,
   smooth = FALSE,
-  use_cache = TRUE
+  use_cache = TRUE,
+  cache_dir = NULL
 )
 
 sy_100_7(
@@ -41,6 +42,7 @@ sy_100_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -49,6 +51,7 @@ sy_100_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -57,6 +60,7 @@ sy_200_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -65,6 +69,7 @@ sy_200_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -73,6 +78,7 @@ sy_300_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -81,6 +87,7 @@ sy_300_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -89,6 +96,7 @@ sy_400_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -97,6 +105,7 @@ sy_400_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -105,6 +114,7 @@ sy_500_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -113,6 +123,7 @@ sy_500_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -121,6 +132,7 @@ sy_600_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -129,6 +141,7 @@ sy_600_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -137,6 +150,7 @@ sy_700_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -145,6 +159,7 @@ sy_700_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -153,6 +168,7 @@ sy_800_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -161,6 +177,7 @@ sy_800_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -169,6 +186,7 @@ sy_900_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -177,6 +195,7 @@ sy_900_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -185,6 +204,7 @@ sy_1000_7(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 
@@ -193,6 +213,7 @@ sy_1000_17(
   outspace = NULL,
   smooth = FALSE,
   use_cache = TRUE,
+  cache_dir = NULL,
   ...
 )
 }
@@ -212,6 +233,11 @@ Options: "1", "2"}
 Default: FALSE}
 
 \item{use_cache}{Logical. Whether to cache downloaded files. Default: TRUE}
+
+\item{cache_dir}{Optional directory for Schaefer volume and label assets.
+When `NULL`, uses the `neuroatlas.schaefer.cache_dir` option, then the
+`neuroatlas.cache_dir` option, and finally the platform cache directory.
+Ignored when `use_cache = FALSE`, which uses transient files only.}
 
 \item{...}{Additional arguments (currently unused, included for consistency
 with convenience functions)}
@@ -248,7 +274,7 @@ Features include:
 }
 \section{Convenience Functions}{
 
-Shorthand functions are provided for common Schaefer atlas configurations. These functions call \code{get_schaefer_atlas} with the \code{parcels} and \code{networks} arguments pre-set. They all accept \code{resolution} (default "2"), \code{outspace}, \code{smooth}, \code{use_cache}, and \code{...} arguments.
+Shorthand functions are provided for common Schaefer atlas configurations. These functions call \code{get_schaefer_atlas} with the \code{parcels} and \code{networks} arguments pre-set. They all accept \code{resolution} (default "2"), \code{outspace}, \code{smooth}, \code{use_cache}, \code{cache_dir}, and \code{...} arguments.
 \itemize{
   \item \code{sy_100_7()}: 100 parcels, 7 networks.
   \item \code{sy_100_17()}: 100 parcels, 17 networks.

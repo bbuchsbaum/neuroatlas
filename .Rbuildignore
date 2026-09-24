@@ -36,3 +36,5 @@
 ^Rplots\.pdf$
 ^plans$
 ^tmp$
+^prob4$
+^\.git$

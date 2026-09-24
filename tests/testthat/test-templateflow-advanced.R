@@ -187,6 +187,14 @@ test_that("TemplateFlow integration handles edge cases and vectorized operations
   cache_path <- show_templateflow_cache_path()
   expect_true(is.character(cache_path))
   expect_true(nchar(cache_path) > 0)
+  client_cache_path <- tryCatch(
+    templateflow::tf_client()$cache$config$root,
+    error = function(e) NULL
+  )
+  if (is.character(client_cache_path) && length(client_cache_path) == 1L &&
+      !is.na(client_cache_path) && nzchar(client_cache_path)) {
+    expect_equal(cache_path, client_cache_path)
+  }
 
   # Test 2: Vectorized template fetching
   # Get multiple resolutions at once

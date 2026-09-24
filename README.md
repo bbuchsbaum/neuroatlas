@@ -35,6 +35,9 @@ consistent, user-friendly functions.
 - **Atlas operations**: Combine and reshape parcellations with
   `merge_atlases()`, `filter_atlas()`, `dilate_atlas()`,
   `atlas_overlap()`, and resampling across spaces/resolutions
+- **Template transforms**: Resolve verified image-space transforms,
+  resample labels or continuous/probability volumes, and keep artifact
+  and interpolation receipts
 - **Spatial queries**: Look up parcels by world, voxel, or MNI
   coordinate with `query_point()`, `query_coord()`, and `query_vox()`
 - **Network & graph tools**: `atlas_connectivity()`, `atlas_graph()` /
@@ -133,6 +136,39 @@ current object geometry are recorded separately, and unknown provenance
 is explicit. See [Identify, cite, and trace an
 atlas](vignettes/resource-metadata.Rmd).
 
+### Move an atlas to another template
+
+`transform_atlas()` preserves region IDs and samples labels on the
+target grid. Check `space_transform_manifest()` for available routes.
+The transform engine is an optional dependency; install the pinned
+revision used for qualification:
+
+``` r
+pak::pak(c("hdf5r",
+  "bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e"))
+```
+
+``` r
+schaefer <- get_schaefer_atlas(parcels = 200, networks = 7, resolution = 2)
+aligned <- transform_atlas(
+  schaefer, "MNI152NLin2009cAsym", resolution = 2, provider = "neuroatlas"
+)
+attr(aligned, "neuroatlas_transform")$lost_label_ids
+```
+
+This nonlinear example requires the qualified transform release.
+Available artifacts are downloaded once and checked against pinned
+SHA-256 digests. Subsequent calls can use `offline = TRUE` with a cached
+transform and an explicit target grid. For scalar or probability
+volumes, use `get_template_transform()` and `apply_template_transform()`
+with explicit sampling semantics. Probability channels are interpolated
+independently without renormalization.
+
+An image-space transform does not establish correspondence between
+different parcellations. Use `atlas_overlap()` after alignment to
+compare their regions. See [Verified template
+transforms](vignettes/template-transforms.Rmd).
+
 ## Palette demos
 
 `neuroatlas` includes perceptually-optimised palettes for atlas ROIs.
@@ -196,6 +232,9 @@ plot_brain(
 - [Surface
   Parcellations](https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html) -
   Surface-based atlas operations
+- [Verified Template
+  Transforms](https://bbuchsbaum.github.io/neuroatlas/articles/template-transforms.html) -
+  Align volumes and atlases on explicit grids
 - [Working with
   TemplateFlow](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html) -
   Template access and management

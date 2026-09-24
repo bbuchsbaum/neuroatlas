@@ -96,6 +96,8 @@ map_atlas <- function(x, vals, thresh, ...) {
 #' \code{\link{get_roi}} for extracting specific regions
 #'
 #' @importFrom stats setNames
+#' @param level Optional grouping level used by methods.
+#' @param by Optional grouping variable used by methods.
 #'
 #' @export
 reduce_atlas <- function(atlas, data_vol, stat_func, ..., format = NULL) {
@@ -143,6 +145,7 @@ reduce_atlas_vec <- function(atlas, data_vol, mask, ...) {
 #' @param hemi Character vector of hemispheres to retain
 #'   (\code{"left"} and/or \code{"right"}).
 #' @param ... Additional arguments passed to methods.
+#' @param network Optional network labels to retain, where supported.
 #'
 #' @return An atlas object of the same class as \code{x} containing only the
 #'   selected regions. Voxels (or vertices) not belonging to the selected

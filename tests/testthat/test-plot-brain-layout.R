@@ -46,8 +46,8 @@
       n_vert <- ncol(geom@mesh$vb)
       methods::new(
         "LabeledNeuroSurface",
-        labels = character(),
-        cols = character(),
+        labels = "cortex",
+        cols = "#888888",
         geometry = geom,
         indices = seq_len(n_vert),
         data = rep(as.numeric(parcel_id), n_vert)

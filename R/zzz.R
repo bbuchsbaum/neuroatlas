@@ -93,7 +93,7 @@ check_templateflow <- function() {
 
     # Check cache
     tryCatch({
-      cache_path <- templateflow::tf_home()
+      cache_path <- getOption("templateflow.home", NA_character_)
       cat("  Cache path:", cache_path, "\n")
       if (dir.exists(cache_path)) {
         stats <- templateflow::tf_cache_stats()

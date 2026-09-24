@@ -25,6 +25,8 @@ against \code{x$ids}).}
 (\code{"left"} and/or \code{"right"}).}
 
 \item{...}{Additional arguments passed to methods.}
+
+\item{network}{Optional network labels to retain, where supported.}
 }
 \value{
 An atlas object of the same class as \code{x} containing only the
