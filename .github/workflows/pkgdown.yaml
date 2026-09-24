@@ -14,6 +14,8 @@ permissions: read-all
 
 jobs:
   pkgdown:
+    # Data-only transform artifacts do not publish package documentation.
+    if: github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:
