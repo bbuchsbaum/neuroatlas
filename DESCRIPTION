@@ -1,6 +1,6 @@
 Package: neuroatlas
 Title: Neuroimaging Atlases and Parcellations
-Version: 0.1.0.9003
+Version: 0.1.0.9004
 Authors@R: 
     person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1108-4866"))
@@ -24,6 +24,7 @@ Imports:
     dplyr,
     ggiraph,
     ggplot2,
+    grid,
     lifecycle,
     magrittr,
     memoise,
@@ -56,7 +57,7 @@ Suggests:
     jsonlite,
     knitr,
     mockery,
-    neurosurf (>= 0.1.0.9001),
+    neurosurf (>= 0.1.0.9002),
     neurotransform,
     patchwork,
     ragg,
@@ -133,6 +134,7 @@ Collate:
     'print-plot-methods.R'
     'query_point.R'
     'reduce_atlas_vec.R'
+    'render_parcel_surface.R'
     'render_stat_surface.R'
     'roi_colors.R'
     'roi_metadata.R'

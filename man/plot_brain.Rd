@@ -86,6 +86,8 @@ plot_brain(
   value = NULL,
   by = NULL,
   allow_partial = FALSE,
+  vals_threshold = NULL,
+  parcel_style = NULL,
   ...
 )
 }
@@ -130,9 +132,12 @@ mode). Defaults to range of \code{vals}.}
 returns a static \code{ggplot2} object.}
 
 \item{static_backend}{Static renderer: the existing \code{"ggplot"} polygon
-path or deterministic \code{"cpu"} barycentric rasterization. The CPU
-path is intended for continuous publication overlays and requires no
-OpenGL or browser.}
+path or deterministic \code{"cpu"} rasterization. With a vertex
+\code{overlay} the CPU path renders continuous publication overlays; with
+parcel \code{vals} (and no overlay) it renders a publication parcel map
+through [neurosurf::render_surface_parcels()]: smooth antialiased parcel
+edges, a sulcal-depth underlay, soft lighting, a light medial wall, and an
+automatically arranged figure. Neither needs OpenGL or a browser.}
 
 \item{data_id_mode}{Interactive data-id granularity (when
 \code{interactive = TRUE}): \code{"parcel"} (default) uses parcel ids;
@@ -384,6 +389,14 @@ When \code{NULL}, a safe unique key is inferred.}
 \item{allow_partial}{Logical. If \code{FALSE} (default), \code{data} must
 contain every atlas parcel. If \code{TRUE}, missing parcels are rendered
 with \code{NA} values. Unknown and duplicate keys always error.}
+
+\item{vals_threshold}{Optional non-negative magnitude for the CPU parcel
+renderer (\code{static_backend = "cpu"} with \code{vals}): parcels with
+\code{abs(vals)} below it stay unfilled, and the colorbar greys out the
+sub-threshold band.}
+
+\item{parcel_style}{Optional [neurosurf::surface_parcel_style()] object or
+named list of its settings for the CPU parcel renderer.}
 
 \item{...}{Additional arguments (currently unused).}
 }
