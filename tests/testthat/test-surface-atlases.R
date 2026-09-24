@@ -56,12 +56,20 @@ test_that("Schaefer surface annotations are cached by CBIG surface space", {
   expect_equal(download_calls$n, 2L)
   expect_equal(fsaverage_cached, fsaverage_path)
   expect_equal(
-    dirname(fsaverage_path),
-    file.path(cache_root, "schaefer", "fsaverage", "label")
+    normalizePath(dirname(fsaverage_path), winslash = "/", mustWork = FALSE),
+    normalizePath(
+      file.path(cache_root, "schaefer", "fsaverage", "label"),
+      winslash = "/",
+      mustWork = FALSE
+    )
   )
   expect_equal(
-    dirname(fsaverage6_path),
-    file.path(cache_root, "schaefer", "fsaverage6", "label")
+    normalizePath(dirname(fsaverage6_path), winslash = "/", mustWork = FALSE),
+    normalizePath(
+      file.path(cache_root, "schaefer", "fsaverage6", "label"),
+      winslash = "/",
+      mustWork = FALSE
+    )
   )
   expect_false(identical(fsaverage_path, fsaverage6_path))
 })

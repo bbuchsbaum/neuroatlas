@@ -168,6 +168,7 @@ merge_atlases <- function(atlas1, atlas2) {
   if (nrow(cmap) == length(c(atlas1$ids, shifted_ids))) {
     rownames(cmap) <- c(atlas1$ids, shifted_ids)
   }
+  cmap <- .normalize_cmap(cmap)
 
   ret <- list(
     name=paste0(atlas1$name,"::", atlas2$name),
