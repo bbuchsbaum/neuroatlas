@@ -1,5 +1,14 @@
 # Changelog
 
+## neuroatlas 0.1.0.9005
+
+- The CPU parcel renderer again uses the sulcal-depth underlay on
+  inflated fsaverage6 atlases (e.g. Schaefer): a declared atlas density
+  no longer diverts the white-mesh lookup away from the packaged meshes,
+  which had fallen back to raw curvature.
+- Parcel-map colorbars label the limits, threshold, and zero without
+  crowding, set the threshold ticks in bold, and are wider.
+
 ## neuroatlas 0.1.0.9004
 
 - `plot_brain(static_backend = "cpu", vals = ...)` now renders
