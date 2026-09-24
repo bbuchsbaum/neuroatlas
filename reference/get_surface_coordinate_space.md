@@ -37,8 +37,8 @@ transform is needed when working with MNI152 volumetric data.
 
 ## See also
 
-[`transform_coords`](transform_coords.md),
-[`get_space_transform`](get_space_transform.md)
+[`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md),
+[`get_space_transform`](https://bbuchsbaum.github.io/neuroatlas/reference/get_space_transform.md)
 
 ## Examples
 

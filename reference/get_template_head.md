@@ -1,7 +1,8 @@
 # Get Template Head Image (DEPRECATED)
 
 **DEPRECATED:** Please use
-[`get_template`](get_template.md)`(variant = "head", ...)` instead.
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)`(variant = "head", ...)`
+instead.
 
 Convenience function to get the full head (non-brain-extracted)
 template.
@@ -37,7 +38,8 @@ A NeuroVol object containing the head template
 
 ## See also
 
-The new [`get_template`](get_template.md)
+The new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 
 ## Examples
 

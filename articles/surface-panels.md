@@ -15,11 +15,12 @@ maps may show atlas boundaries, whereas a continuous field should appear
 on a quiet anatomical substrate with no parcel or occlusion lines drawn
 over it.
 
-[`plot_brain()`](../reference/plot_brain.md) and
-[`plot_brain_grid()`](../reference/plot_brain_grid.md) are the
-high-level entry points for that job. They let you compose static
-surface figures directly from parcel values instead of building the
-figure by hand after plotting.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+and
+[`plot_brain_grid()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain_grid.md)
+are the high-level entry points for that job. They let you compose
+static surface figures directly from parcel values instead of building
+the figure by hand after plotting.
 
 ## What do you need before you start?
 
@@ -56,8 +57,8 @@ committed so the article remains useful during an offline build.
 
 The deliberately reversed rows demonstrate that plotting uses
 `roi_index`, not table position.
-[`plot_brain_grid()`](../reference/plot_brain_grid.md) can select
-several numeric columns from the same table.
+[`plot_brain_grid()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain_grid.md)
+can select several numeric columns from the same table.
 
 ``` r
 
@@ -71,8 +72,9 @@ plot_brain_grid(
 
 ## How do you build one polished panel figure?
 
-Use [`plot_brain()`](../reference/plot_brain.md) when you want one
-figure with a few surface panels and a single legend.
+Use
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+when you want one figure with a few surface panels and a single legend.
 
 ``` r
 
@@ -155,24 +157,25 @@ that mesh and the displayed mesh have identical vertex dimensions and
 face connectivity. An explicit anatomy vector cannot establish that
 topology by itself.
 
-[`plot_brain()`](../reference/plot_brain.md) can accept a `NeuroVol` as
-`overlay`, but the current projection path cannot read a template-space
-identity from that object and does not enforce or apply a
-cross-coordinate transform. Treat this as unchecked caller
-responsibility: use only a volume already expressed in the coordinates
-of the resolved white and pial surfaces. `fsaverage` surfaces use MNI305
-coordinates, whereas most modern MNI volumes use MNI152 coordinates; do
-not pass such a volume directly. The sampling itself uses five fractions
-from 0.1 through 0.9 of the white-to-pial ribbon, averages those depth
-samples, and applies no tangential smoothing unless requested.
-Projection, mask, anatomy, camera, and legend choices are retained as
-attributes on the returned figure.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+can accept a `NeuroVol` as `overlay`, but the current projection path
+cannot read a template-space identity from that object and does not
+enforce or apply a cross-coordinate transform. Treat this as unchecked
+caller responsibility: use only a volume already expressed in the
+coordinates of the resolved white and pial surfaces. `fsaverage`
+surfaces use MNI305 coordinates, whereas most modern MNI volumes use
+MNI152 coordinates; do not pass such a volume directly. The sampling
+itself uses five fractions from 0.1 through 0.9 of the white-to-pial
+ribbon, averages those depth samples, and applies no tangential
+smoothing unless requested. Projection, mask, anatomy, camera, and
+legend choices are retained as attributes on the returned figure.
 
 ## How do you compare several maps with one legend?
 
-Use [`plot_brain_grid()`](../reference/plot_brain_grid.md) when each
-panel is a different map but the colour scale should mean the same thing
-everywhere.
+Use
+[`plot_brain_grid()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain_grid.md)
+when each panel is a different map but the colour scale should mean the
+same thing everywhere.
 
 ``` r
 
@@ -223,9 +226,9 @@ Panel labels name the surface being shown: hemisphere plus view, such as
 sits in the final grid.
 
 In lateral and medial views,
-[`plot_brain()`](../reference/plot_brain.md) uses a fixed anatomical
-orientation: left hemispheres have anterior on the left, and right
-hemispheres have anterior on the right.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+uses a fixed anatomical orientation: left hemispheres have anterior on
+the left, and right hemispheres have anterior on the right.
 
 Use `panel_labels` when the default labels are too long. Keep both the
 hemisphere and the view when a figure mixes lateral and medial views;
@@ -263,11 +266,11 @@ coordinates for a custom workflow.
 Use this vignette as the reference for figure composition, then branch
 out depending on what you need next:
 
-- [`vignette("surface-parcellations", package = "neuroatlas")`](../articles/surface-parcellations.md)
+- [`vignette("surface-parcellations", package = "neuroatlas")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.md)
   for loading surface atlases and overlays
-- [`vignette("atlas-visualization", package = "neuroatlas")`](../articles/atlas-visualization.md)
+- [`vignette("atlas-visualization", package = "neuroatlas")`](https://bbuchsbaum.github.io/neuroatlas/articles/atlas-visualization.md)
   for volumetric plotting and palette workflows
-- [`?plot_brain`](../reference/plot_brain.md) for the full single-figure
-  API
-- [`?plot_brain_grid`](../reference/plot_brain_grid.md) for the
-  shared-scale multi-panel API
+- [`?plot_brain`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+  for the full single-figure API
+- [`?plot_brain_grid`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain_grid.md)
+  for the shared-scale multi-panel API

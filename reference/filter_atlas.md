@@ -41,14 +41,18 @@ The filter operation creates a new atlas containing only the specified
 ROIs. For volume atlases, voxels belonging to excluded ROIs are set to
 zero. ROI IDs are preserved (not renumbered) to maintain consistency
 with the original atlas labeling. Surface-atlas subsetting is not
-implemented; use [`get_roi()`](get_roi.md) to extract labelled surface
-regions.
+implemented; use
+[`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+to extract labelled surface regions.
 
 ## See also
 
-[`roi_metadata`](roi_metadata.md) for viewing available filter columns,
-[`roi_attributes`](roi_attributes.md) for listing available attributes,
-[`get_roi`](get_roi.md) for extracting ROI data
+[`roi_metadata`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+for viewing available filter columns,
+[`roi_attributes`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_attributes.md)
+for listing available attributes,
+[`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+for extracting ROI data
 
 ## Examples
 

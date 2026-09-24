@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,7 @@ location without downloading an image:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"templateflow"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/show_templateflow_cache_path.html">show_templateflow_cache_path</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/home/runner/.cache/R/neuroatlas/templateflow"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/home/runner/.cache/templateflow"</span></span></code></pre></div>
 <p><code><a href="../reference/create_templateflow.html">create_templateflow()</a></code> and
 <code><a href="../reference/install_templateflow.html">install_templateflow()</a></code> are deprecated migration stubs. New
 code should call <code><a href="../reference/get_template.html">get_template()</a></code>,
@@ -301,9 +301,8 @@ resampling:</p>
 <span><span class="co">#&gt;   from_space: MNI152NLin6Asym </span></span>
 <span><span class="co">#&gt;   to_space: MNI152NLin2009cAsym </span></span>
 <span><span class="co">#&gt;   n_steps: 1 </span></span>
-<span><span class="co">#&gt;   status: planned </span></span>
-<span><span class="co">#&gt;   confidence: high </span></span>
-<span><span class="co">#&gt;   warnings: Plan includes unimplemented/planned transform step(s).</span></span></code></pre></div>
+<span><span class="co">#&gt;   status: available </span></span>
+<span><span class="co">#&gt;   confidence: high</span></span></code></pre></div>
 <p>A plan marked <code>planned</code> is not an executable transform. Do
 not use ordinary grid resampling to imply nonlinear registration between
 templates.</p>
@@ -316,7 +315,7 @@ on disk. Within an R session, <code>neuroatlas</code> also memoises
 loading a resolved NIfTI path into a <code>NeuroVol</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/show_templateflow_cache_path.html">show_templateflow_cache_path</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/home/runner/.cache/R/neuroatlas/templateflow"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/home/runner/.cache/templateflow"</span></span></code></pre></div>
 <p><code><a href="../reference/clear_templateflow_cache.html">clear_templateflow_cache()</a></code> removes cached assets and
 in-memory loading state; because that is destructive and may trigger
 large downloads later, call it only when you deliberately want to

@@ -62,10 +62,10 @@ get_harvard_oxford_cortical_subcortical_atlas(...)
 
   Return resolved paths and metadata without loading image data.
 
-- download:
+- ...:
 
-  Logical; for \`get_julich_brain_atlas()\`, download the Julich-Brain
-  atlas archive into the neuroatlas cache when \`fsl_dir\` is unset.
+  Arguments passed by the convenience wrappers to
+  \`get_harvard_oxford_atlas()\`.
 
 ## Value
 

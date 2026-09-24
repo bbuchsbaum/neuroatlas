@@ -1,7 +1,8 @@
 # Brainnetome Atlas Label Table
 
 Downloads (if needed) and returns the Brainnetome 246-region label table
-used by [`get_brainnetome_atlas()`](get_brainnetome_atlas.md).
+used by
+[`get_brainnetome_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_brainnetome_atlas.md).
 
 ## Usage
 

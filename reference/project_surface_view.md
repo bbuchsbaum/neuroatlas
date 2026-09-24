@@ -1,7 +1,7 @@
 # Project Surface Vertices to a Canonical 2D View
 
 Public wrapper for the core surface-view projection used by
-[`plot_brain()`](plot_brain.md).
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
 
 ## Usage
 

@@ -30,7 +30,8 @@ values. Excludes internal fields like color values and the id column.
 
 ## See also
 
-[`roi_metadata`](roi_metadata.md) for getting the full metadata tibble
+[`roi_metadata`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+for getting the full metadata tibble
 
 ## Examples
 

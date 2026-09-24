@@ -51,8 +51,10 @@ The volume is a single-subject MNI-space grid (182 x 218 x 182, 1 mm);
 the publication aligns it to the MNI colin27 brain.
 
 Note that the visfAtlas defines V1-V3 (dorsal and ventral) but not hV4;
-for V4 see [`get_wang_atlas`](get_wang_atlas.md) or
-[`get_visual_atlas`](get_visual_atlas.md).
+for V4 see
+[`get_wang_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md)
+or
+[`get_visual_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visual_atlas.md).
 
 ## References
 
@@ -63,8 +65,8 @@ Occipito-Temporal Visual Cortex. Cerebral Cortex, 31(1), 603-619.
 
 ## See also
 
-[`get_wang_atlas`](get_wang_atlas.md),
-[`get_visual_atlas`](get_visual_atlas.md).
+[`get_wang_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md),
+[`get_visual_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visual_atlas.md).
 
 ## Examples
 

@@ -67,7 +67,8 @@ The merging process:
 
 ## See also
 
-[`get_aseg_atlas`](get_aseg_atlas.md), [`get_roi`](get_roi.md)
+[`get_aseg_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_aseg_atlas.md),
+[`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
 
 ## Examples
 

@@ -37,13 +37,14 @@ unchanged if no transform is needed.
 ## Details
 
 This is a convenience wrapper around
-[`transform_coords`](transform_coords.md) that automatically determines
-the source space from the surface template.
+[`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md)
+that automatically determines the source space from the surface
+template.
 
 ## See also
 
-[`transform_coords`](transform_coords.md),
-[`get_surface_coordinate_space`](get_surface_coordinate_space.md)
+[`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md),
+[`get_surface_coordinate_space`](https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_coordinate_space.md)
 
 ## Examples
 

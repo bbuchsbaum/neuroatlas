@@ -69,8 +69,8 @@ for spatial queries in 3D voxel space.
 
 ## See also
 
-[`get_template_brainmask`](get_template_brainmask.md) for creating
-appropriate masks from TemplateFlow
+[`get_template_brainmask`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_brainmask.md)
+for creating appropriate masks from TemplateFlow
 
 ## Examples
 

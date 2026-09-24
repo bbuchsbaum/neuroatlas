@@ -1,7 +1,7 @@
 # Get Tissue Probability Map from Template (DEPRECATED)
 
 **DEPRECATED:** Please use
-[`get_template`](get_template.md)`(variant = "probseg", label = ..., ...)`
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)`(variant = "probseg", label = ..., ...)`
 instead.
 
 Retrieves probability maps for different tissue types (GM, WM, CSF).
@@ -43,7 +43,8 @@ A NeuroVol object containing the probability map
 
 ## See also
 
-The new [`get_template`](get_template.md)
+The new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 
 ## Examples
 

@@ -91,9 +91,10 @@ Schaefer atlases).
 
 ## See also
 
-[`roi_attributes`](roi_attributes.md) for listing available attributes,
-[`filter_atlas`](filter_atlas.md) for filtering atlas objects by
-attributes
+[`roi_attributes`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_attributes.md)
+for listing available attributes,
+[`filter_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md)
+for filtering atlas objects by attributes
 
 ## Examples
 

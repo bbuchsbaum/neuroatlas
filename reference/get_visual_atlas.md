@@ -31,7 +31,7 @@ get_visual_atlas(
 - resolution:
 
   Optional Julich-Brain resolution (e.g. `"1mm"` or `"2mm"`); passed to
-  [`get_julich_brain_atlas()`](get_julich_brain_atlas.md).
+  [`get_julich_brain_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_julich_brain_atlas.md).
 
 - fsl_dir:
 
@@ -52,13 +52,15 @@ V1-V5 regions per hemisphere.
 The source regions are the Julich-Brain maximum-probability labels
 `GM Visual cortex V1 BA17`, `V2 BA18`, `V3V`, `V4`, and `V5`
 (left/right), loaded via
-[`get_julich_brain_atlas()`](get_julich_brain_atlas.md). Note that the
-Julich atlas defines only the ventral subdivision of V3 (`V3V`) and a
-single `V4`/`V5` region per hemisphere.
+[`get_julich_brain_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_julich_brain_atlas.md).
+Note that the Julich atlas defines only the ventral subdivision of V3
+(`V3V`) and a single `V4`/`V5` region per hemisphere.
 
 For the topographic surface atlas with dorsal/ventral subdivisions and
-`hV4`, see [`get_wang_atlas`](get_wang_atlas.md); for a volumetric
-functional atlas, see [`get_visfatlas`](get_visfatlas.md).
+`hV4`, see
+[`get_wang_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md);
+for a volumetric functional atlas, see
+[`get_visfatlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visfatlas.md).
 
 ## References
 
@@ -69,9 +71,9 @@ A 3D probabilistic atlas of the human brain's cytoarchitecture. Science,
 
 ## See also
 
-[`get_wang_atlas`](get_wang_atlas.md),
-[`get_visfatlas`](get_visfatlas.md),
-[`get_julich_brain_atlas`](get_julich_brain_atlas.md).
+[`get_wang_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md),
+[`get_visfatlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visfatlas.md),
+[`get_julich_brain_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_julich_brain_atlas.md).
 
 ## Examples
 

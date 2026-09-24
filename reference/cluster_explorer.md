@@ -61,8 +61,9 @@ cluster_explorer(
 
 - surfatlas:
 
-  A surface atlas object used by [`plot_brain()`](plot_brain.md). If
-  `NULL`, the function attempts to infer a surface atlas from a
+  A surface atlas object used by
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
+  If `NULL`, the function attempts to infer a surface atlas from a
   compatible \`atlas\` input (for example Schaefer or Glasser). If
   inference is not possible, and non-demo inputs are otherwise present,
   input validation fails.
@@ -137,7 +138,8 @@ cluster_explorer(
 
 - palette:
 
-  Continuous palette passed to [`plot_brain()`](plot_brain.md).
+  Continuous palette passed to
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
 
 - selection_engine:
 
@@ -172,7 +174,7 @@ cluster_explorer(
 
   Optional function used when `selection_engine = "custom"`. Must return
   a list compatible with
-  [`build_cluster_explorer_data()`](build_cluster_explorer_data.md)
+  [`build_cluster_explorer_data()`](https://bbuchsbaum.github.io/neuroatlas/reference/build_cluster_explorer_data.md)
   output.
 
 - analysis_plugins:

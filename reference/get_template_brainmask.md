@@ -1,7 +1,8 @@
 # Get Brain Mask from Template (DEPRECATED)
 
 **DEPRECATED:** Please use
-[`get_template`](get_template.md)`(variant = "mask", ...)` instead.
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)`(variant = "mask", ...)`
+instead.
 
 Convenience function to retrieve a binary brain mask for a specified
 template.
@@ -37,7 +38,8 @@ A NeuroVol object containing the binary brain mask
 
 ## See also
 
-The new [`get_template`](get_template.md)
+The new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 
 ## Examples
 

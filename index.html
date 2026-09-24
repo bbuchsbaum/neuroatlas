@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,8 @@
 </li>
 <li>
 <strong>Atlas operations</strong>: Combine and reshape parcellations with <code><a href="reference/merge_atlases.html">merge_atlases()</a></code>, <code><a href="reference/filter_atlas.html">filter_atlas()</a></code>, <code><a href="reference/dilate_atlas.html">dilate_atlas()</a></code>, <code><a href="reference/atlas_overlap.html">atlas_overlap()</a></code>, and resampling across spaces/resolutions</li>
+<li>
+<strong>Template transforms</strong>: Resolve verified image-space transforms, resample labels or continuous/probability volumes, and keep artifact and interpolation receipts</li>
 <li>
 <strong>Spatial queries</strong>: Look up parcels by world, voxel, or MNI coordinate with <code><a href="reference/query_point.html">query_point()</a></code>, <code><a href="reference/query_coord.html">query_coord()</a></code>, and <code><a href="reference/query_coord.html">query_vox()</a></code>
 </li>
@@ -157,12 +159,28 @@
 <span><span class="fu"><a href="reference/atlas_history.html">atlas_history</a></span><span class="op">(</span><span class="va">aseg</span><span class="op">)</span>        <span class="co"># Recorded operations and their parameters</span></span></code></pre></div>
 <p>Metadata stay attached when objects are saved. Source-file geometry and current object geometry are recorded separately, and unknown provenance is explicit. See <a href="vignettes/resource-metadata.Rmd">Identify, cite, and trace an atlas</a>.</p>
 </div>
+<div class="section level3">
+<h3 id="move-an-atlas-to-another-template">Move an atlas to another template<a class="anchor" aria-label="anchor" href="#move-an-atlas-to-another-template"></a>
+</h3>
+<p><code><a href="reference/transform_atlas.html">transform_atlas()</a></code> preserves region IDs and samples labels on the target grid. Check <code><a href="reference/space_transform_manifest.html">space_transform_manifest()</a></code> for available routes. The transform engine is an optional dependency; install the pinned revision used for qualification:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hdf5r"</span>,</span>
+<span>  <span class="st">"bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">aligned</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/transform_atlas.html">transform_atlas</a></span><span class="op">(</span></span>
+<span>  <span class="va">schaefer</span>, <span class="st">"MNI152NLin2009cAsym"</span>, resolution <span class="op">=</span> <span class="fl">2</span>, provider <span class="op">=</span> <span class="st">"neuroatlas"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">aligned</span>, <span class="st">"neuroatlas_transform"</span><span class="op">)</span><span class="op">$</span><span class="va">lost_label_ids</span></span></code></pre></div>
+<p>Both MNI152NLin6Asym / MNI152NLin2009cAsym directions are available from the <a href="https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1" class="external-link">qualified artifact release</a>. Qualification covers 1 mm and 2 mm target grids. Each transform is about 86 MiB, downloaded once and checked against its pinned SHA-256 digest. Subsequent calls can use <code>offline = TRUE</code> with a cached transform and an explicit target grid. For scalar or probability volumes, use <code><a href="reference/get_template_transform.html">get_template_transform()</a></code> and <code><a href="reference/apply_template_transform.html">apply_template_transform()</a></code> with explicit sampling semantics. Probability channels are interpolated independently without renormalization. Template-derived artifacts have separate <a href="https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/LICENSES.md" class="external-link">distribution conditions</a>.</p>
+<p>An image-space transform does not establish correspondence between different parcellations. Use <code><a href="reference/atlas_overlap.html">atlas_overlap()</a></code> after alignment to compare their regions. See <a href="vignettes/template-transforms.Rmd">Verified template transforms</a>.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="palette-demos">Palette demos<a class="anchor" aria-label="anchor" href="#palette-demos"></a>
 </h2>
 <p><code>neuroatlas</code> includes perceptually-optimised palettes for atlas ROIs. For instance, you can generate a slice-aware palette for the Schaefer 200×7 atlas and feed it directly into <code><a href="reference/plot_brain.html">plot_brain()</a></code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/neuroatlas" class="external-link">neuroatlas</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
@@ -268,20 +286,22 @@
 </h2>
 <ul>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.html" class="external-link">Getting Started</a> - Introduction and basic usage</li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.html">Getting Started</a> - Introduction and basic usage</li>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/articles/atlas-visualization.html" class="external-link">Atlas Visualization with Optimal Colours</a> - Perceptually-optimised ROI palettes</li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/atlas-visualization.html">Atlas Visualization with Optimal Colours</a> - Perceptually-optimised ROI palettes</li>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.html" class="external-link">Surface Panel Figures</a> - Static panel composition with <code><a href="reference/plot_brain.html">plot_brain()</a></code> and <code><a href="reference/plot_brain_grid.html">plot_brain_grid()</a></code>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.html">Surface Panel Figures</a> - Static panel composition with <code><a href="reference/plot_brain.html">plot_brain()</a></code> and <code><a href="reference/plot_brain_grid.html">plot_brain_grid()</a></code>
 </li>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.html" class="external-link">Surface Templates</a> - Geometry vs. data on surface meshes</li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.html">Surface Templates</a> - Geometry vs. data on surface meshes</li>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html" class="external-link">Surface Parcellations</a> - Surface-based atlas operations</li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html">Surface Parcellations</a> - Surface-based atlas operations</li>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html" class="external-link">Working with TemplateFlow</a> - Template access and management</li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/template-transforms.html">Verified Template Transforms</a> - Align volumes and atlases on explicit grids</li>
 <li>
-<a href="https://bbuchsbaum.github.io/neuroatlas/reference/index.html" class="external-link">Function Reference</a> - Complete API documentation</li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html">Working with TemplateFlow</a> - Template access and management</li>
+<li>
+<a href="https://bbuchsbaum.github.io/neuroatlas/reference/index.html">Function Reference</a> - Complete API documentation</li>
 </ul>
 </div>
 <div class="section level2">

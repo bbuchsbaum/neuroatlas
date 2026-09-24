@@ -58,8 +58,8 @@ The transformation is applied as: `p_new = M %*% [p; 1]` where M is the
 
 ## See also
 
-[`get_space_transform`](get_space_transform.md),
-[`MNI305_to_MNI152`](MNI305_to_MNI152.md)
+[`get_space_transform`](https://bbuchsbaum.github.io/neuroatlas/reference/get_space_transform.md),
+[`MNI305_to_MNI152`](https://bbuchsbaum.github.io/neuroatlas/reference/MNI305_to_MNI152.md)
 
 ## Examples
 

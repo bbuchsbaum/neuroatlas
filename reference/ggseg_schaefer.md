@@ -3,8 +3,9 @@
 \`r lifecycle::badge("deprecated")\`
 
 This function has been deprecated in favour of
-[`plot_brain()`](plot_brain.md). Use `plot_brain(schaefer_surf(...))`
-for interactive cortical surface visualisation.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
+Use `plot_brain(schaefer_surf(...))` for interactive cortical surface
+visualisation.
 
 ## Usage
 

@@ -1,8 +1,10 @@
 # Extract regions of interest from a surface atlas
 
-[`get_roi()`](get_roi.md) method for surface atlases (class `surfatlas`,
-e.g. from [`get_wang_atlas`](get_wang_atlas.md),
-[`glasser_surf`](glasser_surf.md), or `schaefer_surf`). It returns one
+[`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+method for surface atlases (class `surfatlas`, e.g. from
+[`get_wang_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md),
+[`glasser_surf`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md),
+or `schaefer_surf`). It returns one
 [`ROISurface`](https://bbuchsbaum.github.io/neurosurf/reference/ROISurface.html)
 per matched region, carrying the mesh vertices of that area on the
 appropriate hemisphere.
@@ -43,4 +45,4 @@ objects.
 
 ## See also
 
-[`get_roi`](get_roi.md)
+[`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)

@@ -1,8 +1,9 @@
 # Filter Atlas with Infix Operator
 
 A concise infix operator for filtering atlas regions by metadata
-attributes. Equivalent to calling [`filter_atlas`](filter_atlas.md) but
-allows a more fluent pipe-friendly syntax.
+attributes. Equivalent to calling
+[`filter_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md)
+but allows a more fluent pipe-friendly syntax.
 
 ## Usage
 
@@ -19,8 +20,8 @@ atlas %where% expr
 - expr:
 
   An unquoted filter expression using column names from
-  [`roi_metadata`](roi_metadata.md). Multiple conditions can be combined
-  with `&` and `|`.
+  [`roi_metadata`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md).
+  Multiple conditions can be combined with `&` and `|`.
 
 ## Value
 
@@ -28,8 +29,10 @@ A new atlas object containing only the matching ROIs.
 
 ## See also
 
-[`filter_atlas`](filter_atlas.md) for the underlying function,
-[`roi_metadata`](roi_metadata.md) for available filter columns
+[`filter_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md)
+for the underlying function,
+[`roi_metadata`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+for available filter columns
 
 ## Examples
 

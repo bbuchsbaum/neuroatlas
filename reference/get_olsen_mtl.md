@@ -22,8 +22,8 @@ A list with class 'atlas' containing the MTL parcellation
 
 ## See also
 
-[`get_hipp_atlas`](get_hipp_atlas.md) for hippocampus-specific
-parcellation
+[`get_hipp_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_hipp_atlas.md)
+for hippocampus-specific parcellation
 
 ## Examples
 

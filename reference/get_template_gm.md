@@ -1,7 +1,7 @@
 # Get Gray Matter Probability Map (DEPRECATED)
 
 **DEPRECATED:** Please use
-[`get_template`](get_template.md)`(variant = "probseg", label = "GM", ...)`
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)`(variant = "probseg", label = "GM", ...)`
 instead.
 
 Convenience function to get gray matter probability map.
@@ -37,7 +37,8 @@ A NeuroVol object containing the gray matter probability map
 
 ## See also
 
-The new [`get_template`](get_template.md)
+The new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 
 ## Examples
 

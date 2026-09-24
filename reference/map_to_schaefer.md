@@ -2,8 +2,11 @@
 
 \`r lifecycle::badge("deprecated")\`
 
-This function has been deprecated. Use [`map_atlas()`](map_atlas.md)
-directly or [`plot_brain()`](plot_brain.md) for visualisation.
+This function has been deprecated. Use
+[`map_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md)
+directly or
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+for visualisation.
 
 ## Usage
 

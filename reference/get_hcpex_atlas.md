@@ -47,11 +47,11 @@ ordering must be reordered before use with this atlas.
 
 Labels combine upstream abbreviations with hemisphere suffixes (e.g.,
 `V1_L`, `V1_R`). `orig_labels` preserves the full lookup-table names.
-[`roi_metadata()`](roi_metadata.md) also includes `region` (the
-unsuffixed abbreviation) and `division` (`"cortical"` for IDs 1:360,
-`"subcortical"` for 361:426). The complete region catalogue is retained
-after resampling, even when some regions no longer have voxels. No
-surface representation is supplied.
+[`roi_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+also includes `region` (the unsuffixed abbreviation) and `division`
+(`"cortical"` for IDs 1:360, `"subcortical"` for 361:426). The complete
+region catalogue is retained after resampling, even when some regions no
+longer have voxels. No surface representation is supplied.
 
 The upstream data are distributed under GPL-3.0; their license, source
 revision, file receipts, and publication references are attached to the
@@ -71,9 +71,9 @@ and "Where" Dual Stream Model. Cerebral Cortex.
 
 ## See also
 
-[`get_atlas()`](get_atlas.md),
-[`get_glasser_atlas()`](get_glasser_atlas.md),
-[`atlas_citations()`](atlas_citations.md)
+[`get_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_atlas.md),
+[`get_glasser_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_glasser_atlas.md),
+[`atlas_citations()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_citations.md)
 
 ## Examples
 

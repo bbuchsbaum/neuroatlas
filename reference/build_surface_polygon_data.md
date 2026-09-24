@@ -2,7 +2,8 @@
 
 Build 2D projected polygon/boundary data from a `surfatlas` for custom
 rendering workflows. This exposes the mesh-projection data pipeline used
-internally by [`plot_brain()`](plot_brain.md).
+internally by
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
 
 ## Usage
 

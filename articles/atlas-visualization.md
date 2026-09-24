@@ -2,10 +2,11 @@
 
 Every atlas in neuroatlas can be visualised with a single call to
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html). Behind the
-scenes, [`plot.atlas()`](../reference/plot-methods.md) renders coloured
-parcels as volumetric slices using **neuroim2**’s `plot_montage()` and
-`plot_ortho()`, with colours assigned automatically by the
-**roi_colors** system.
+scenes,
+[`plot.atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot-methods.md)
+renders coloured parcels as volumetric slices using **neuroim2**’s
+`plot_montage()` and `plot_ortho()`, with colours assigned automatically
+by the **roi_colors** system.
 
 ``` r
 
@@ -131,7 +132,7 @@ features.](atlas-visualization_files/figure-html/embedding-1.png)
 
 You can supply your own colours as a named character vector (names are
 region IDs) or as a tibble from
-[`atlas_roi_colors()`](../reference/atlas_roi_colors.md).
+[`atlas_roi_colors()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md).
 
 ### Named vector
 
@@ -168,10 +169,11 @@ colours.](atlas-visualization_files/figure-html/custom-tibble-1.png)
 
 ## Programmatic Colour Access
 
-The [`atlas_roi_colors()`](../reference/atlas_roi_colors.md) function is
-the bridge between atlas objects and the `roi_colors_*()` family. It
-extracts ROI centroids, builds a metadata tibble, and dispatches to the
-requested algorithm.
+The
+[`atlas_roi_colors()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md)
+function is the bridge between atlas objects and the `roi_colors_*()`
+family. It extracts ROI centroids, builds a metadata tibble, and
+dispatches to the requested algorithm.
 
 ``` r
 
@@ -218,10 +220,10 @@ sections.](atlas-visualization_files/figure-html/nslices-1.png)
 ## Surface Figures with Layout Control
 
 For cortical surface atlases,
-[`plot_brain()`](../reference/plot_brain.md) gives you direct control
-over the static figure layout. You can move the colorbar, add figure
-titles, and replace the default facet labels without assembling the
-figure by hand afterward.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+gives you direct control over the static figure layout. You can move the
+colorbar, add figure titles, and replace the default facet labels
+without assembling the figure by hand afterward.
 
 ``` r
 
@@ -261,16 +263,21 @@ Because this example mixes lateral and medial views, each short label
 retains both hemisphere and view. For a dedicated guide to multi-panel
 layout, shared legends, and the default hemisphere-orientation
 convention, see
-[`vignette("surface-panels", package = "neuroatlas")`](../articles/surface-panels.md).
+[`vignette("surface-panels", package = "neuroatlas")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.md).
 
 ## Which entry point should you use?
 
 Use [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for volume
-atlases and [`plot_brain()`](../reference/plot_brain.md) for surface
-atlases. The older ggseg helpers are migration paths:
-[`ggseg_schaefer()`](../reference/ggseg_schaefer.md) is deprecated and
-[`plot_glasser()`](../reference/plot_glasser.md) has been removed with a
-stop-level deprecation. New code should load a surface atlas with
-[`schaefer_surf()`](../reference/schaefer_surf.md) or
-[`glasser_surf()`](../reference/glasser_surf.md) and pass it to
-[`plot_brain()`](../reference/plot_brain.md).
+atlases and
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+for surface atlases. The older ggseg helpers are migration paths:
+[`ggseg_schaefer()`](https://bbuchsbaum.github.io/neuroatlas/reference/ggseg_schaefer.md)
+is deprecated and
+[`plot_glasser()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_glasser.md)
+has been removed with a stop-level deprecation. New code should load a
+surface atlas with
+[`schaefer_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/schaefer_surf.md)
+or
+[`glasser_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md)
+and pass it to
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).

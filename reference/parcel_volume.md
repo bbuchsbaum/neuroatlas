@@ -36,7 +36,7 @@ parcel_volume(
 - by:
 
   Parcel-key specification passed to
-  [`align_parcel_values()`](align_parcel_values.md).
+  [`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md).
 
 - allow_partial:
 
@@ -59,11 +59,11 @@ parcel. Atlas space and geometry are preserved.
 ## Details
 
 `parcel_volume()` uses the same strict key matching as
-[`align_parcel_values()`](align_parcel_values.md). The input table
-remains the authoritative result; the returned volume is a deterministic
-rendering representation. Atlas voxels whose non-zero labels are absent
-from `atlas$ids` cause an error rather than being silently treated as
-background.
+[`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md).
+The input table remains the authoritative result; the returned volume is
+a deterministic rendering representation. Atlas voxels whose non-zero
+labels are absent from `atlas$ids` cause an error rather than being
+silently treated as background.
 
 ## Examples
 

@@ -55,11 +55,12 @@ library. Files are downloaded on demand from the neuropythy GitHub
 repository and cached under the neuroatlas user cache directory.
 
 Surface geometry is obtained from TemplateFlow via
-[`get_surface_template`](get_template.md), so a working TemplateFlow
-setup is required (mirroring [`glasser_surf`](glasser_surf.md)). The
-volumetric counterparts (maximum-probability and per-area probability
-maps in MNI space) are served by
-[`get_wang_prob_atlas`](get_wang_prob_atlas.md).
+[`get_surface_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md),
+so a working TemplateFlow setup is required (mirroring
+[`glasser_surf`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md)).
+The volumetric counterparts (maximum-probability and per-area
+probability maps in MNI space) are served by
+[`get_wang_prob_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_prob_atlas.md).
 
 TemplateFlow does not currently distribute an *inflated* `fsaverage`
 mesh, so the available surfaces are `"midthickness"` (default),
@@ -74,10 +75,12 @@ Cortex, 25(10), 3911-3931.
 
 ## See also
 
-[`get_wang_prob_atlas`](get_wang_prob_atlas.md) for the full per-area
-probability volumes, [`get_visfatlas`](get_visfatlas.md) for a
-volumetric visual-cortex atlas,
-[`get_visual_atlas`](get_visual_atlas.md) for cytoarchitectonic V1-V5.
+[`get_wang_prob_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_prob_atlas.md)
+for the full per-area probability volumes,
+[`get_visfatlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visfatlas.md)
+for a volumetric visual-cortex atlas,
+[`get_visual_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visual_atlas.md)
+for cytoarchitectonic V1-V5.
 
 ## Examples
 

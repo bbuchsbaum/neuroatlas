@@ -22,7 +22,7 @@ check_templateflow()
 #> 
 #> templateflow R package: INSTALLED
 #>   Version: 0.1.0 
-#>   Cache info: unavailable ( 'tf_home' is not an exported object from 'namespace:templateflow' )
+#>   Cache path: NA 
 #> [templateflow] Updating TEMPLATEFLOW_HOME at /home/runner/.cache/templateflow
 #> 
 #>   Templates available: 30 

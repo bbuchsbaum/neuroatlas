@@ -3,9 +3,12 @@
 \`r lifecycle::badge("deprecated")\`
 
 This function has been deprecated in favour of the native
-[`plot_brain()`](plot_brain.md) renderer. Use
-[`schaefer_surf()`](schaefer_surf.md) to obtain a surface atlas and
-[`plot_brain()`](plot_brain.md) for visualisation.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+renderer. Use
+[`schaefer_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/schaefer_surf.md)
+to obtain a surface atlas and
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+for visualisation.
 
 ## Usage
 

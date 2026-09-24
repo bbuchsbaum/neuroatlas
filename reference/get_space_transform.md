@@ -29,8 +29,8 @@ transform is not available.
 
 ## See also
 
-[`transform_coords`](transform_coords.md),
-[`MNI305_to_MNI152`](MNI305_to_MNI152.md)
+[`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md),
+[`MNI305_to_MNI152`](https://bbuchsbaum.github.io/neuroatlas/reference/MNI305_to_MNI152.md)
 
 ## Examples
 

@@ -58,8 +58,8 @@ unambiguous match.
 
 ## How do you get a file path?
 
-[`get_surface_template()`](../reference/get_template.md) resolves one
-mesh and returns its cached path:
+[`get_surface_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+resolves one mesh and returns its cached path:
 
 ``` r
 
@@ -81,8 +81,8 @@ currently produces no match.
 
 ## How do you load geometry?
 
-[`load_surface_template()`](../reference/load_surface_template.md) reads
-the asset into a
+[`load_surface_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/load_surface_template.md)
+reads the asset into a
 [`neurosurf::SurfaceGeometry`](https://bbuchsbaum.github.io/neurosurf/reference/SurfaceGeometry.html):
 
 ``` r
@@ -176,10 +176,11 @@ Mesh identity is not only vertex count. `fsaverage` variants use MNI305
 coordinates; `fsLR` is an MNI152-family surface space. Before combining
 a surface with a volume, inspect the surface template and the volume’s
 declared space. Use
-[`needs_coord_transform()`](../reference/needs_coord_transform.md) or
-[`needs_transform()`](../reference/needs_transform.md) to detect a
-coordinate-system mismatch, and use a validated transform before
-sampling.
+[`needs_coord_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/needs_coord_transform.md)
+or
+[`needs_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/needs_transform.md)
+to detect a coordinate-system mismatch, and use a validated transform
+before sampling.
 
 Two meshes with the same number of vertices are not thereby aligned, and
 a volume reslice is not a surface registration.
@@ -187,12 +188,13 @@ a volume reslice is not a surface registration.
 ## What should you use next?
 
 - Use
-  [`vignette("surface-parcellations")`](../articles/surface-parcellations.md)
+  [`vignette("surface-parcellations")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.md)
   when region identity matters.
-- Use [`vignette("surface-panels")`](../articles/surface-panels.md) to
-  display parcel or per-vertex values.
 - Use
-  [`vignette("working-with-templateflow")`](../articles/working-with-templateflow.md)
+  [`vignette("surface-panels")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.md)
+  to display parcel or per-vertex values.
+- Use
+  [`vignette("working-with-templateflow")`](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.md)
   for cache and volume queries.
 
 The durable rule is simple: verify file identity, topology, value

@@ -17,41 +17,53 @@ consistent, user-friendly functions.
 - **Surface & volume**: Work with both volumetric and surface-based
   parcellations through one consistent interface
 - **Atlas discovery**: Enumerate built-ins with
-  [`list_atlases()`](reference/list_atlases.md) and load any of them by
-  name with [`get_atlas()`](reference/get_atlas.md)
+  [`list_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/list_atlases.md)
+  and load any of them by name with
+  [`get_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_atlas.md)
 - **ROI analysis**: Extract and summarise regions with
-  [`get_roi()`](reference/get_roi.md),
-  [`map_atlas()`](reference/map_atlas.md),
-  [`reduce_atlas()`](reference/reduce_atlas.md), and
-  [`batch_reduce()`](reference/batch_reduce.md)
+  [`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md),
+  [`map_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md),
+  [`reduce_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md),
+  and
+  [`batch_reduce()`](https://bbuchsbaum.github.io/neuroatlas/reference/batch_reduce.md)
 - **Atlas operations**: Combine and reshape parcellations with
-  [`merge_atlases()`](reference/merge_atlases.md),
-  [`filter_atlas()`](reference/filter_atlas.md),
-  [`dilate_atlas()`](reference/dilate_atlas.md),
-  [`atlas_overlap()`](reference/atlas_overlap.md), and resampling across
-  spaces/resolutions
+  [`merge_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/merge_atlases.md),
+  [`filter_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md),
+  [`dilate_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md),
+  [`atlas_overlap()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_overlap.md),
+  and resampling across spaces/resolutions
+- **Template transforms**: Resolve verified image-space transforms,
+  resample labels or continuous/probability volumes, and keep artifact
+  and interpolation receipts
 - **Spatial queries**: Look up parcels by world, voxel, or MNI
-  coordinate with [`query_point()`](reference/query_point.md),
-  [`query_coord()`](reference/query_coord.md), and
-  [`query_vox()`](reference/query_coord.md)
+  coordinate with
+  [`query_point()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_point.md),
+  [`query_coord()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.md),
+  and
+  [`query_vox()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.md)
 - **Network & graph tools**:
-  [`atlas_connectivity()`](reference/atlas_connectivity.md),
-  [`atlas_graph()`](reference/atlas_graph.md) /
-  [`as_igraph()`](reference/as_igraph.md),
-  [`atlas_hierarchy()`](reference/atlas_hierarchy.md), and
-  [`spin_test()`](reference/spin_test.md) spatial null models
+  [`atlas_connectivity()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_connectivity.md),
+  [`atlas_graph()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_graph.md)
+  /
+  [`as_igraph()`](https://bbuchsbaum.github.io/neuroatlas/reference/as_igraph.md),
+  [`atlas_hierarchy()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_hierarchy.md),
+  and
+  [`spin_test()`](https://bbuchsbaum.github.io/neuroatlas/reference/spin_test.md)
+  spatial null models
 - **TemplateFlow integration**: Access standardized templates through
   the pure-R `templateflow` backend
 - **Visualization**: Publication-quality surface figures with
-  [`plot_brain()`](reference/plot_brain.md) /
-  [`plot_brain_grid()`](reference/plot_brain_grid.md),
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+  /
+  [`plot_brain_grid()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain_grid.md),
   perceptually-optimised ROI palettes, the ggseg ecosystem, and an
-  interactive [`cluster_explorer()`](reference/cluster_explorer.md)
+  interactive
+  [`cluster_explorer()`](https://bbuchsbaum.github.io/neuroatlas/reference/cluster_explorer.md)
   Shiny app
 - **Metadata**: Atlases and loaded templates carry identity, spatial
   geometry, citations, source artifacts, and processing history
-  ([`atlas_metadata()`](reference/atlas_metadata.md),
-  [`template_metadata()`](reference/atlas_metadata.md)).
+  ([`atlas_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_metadata.md),
+  [`template_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_metadata.md)).
 
 ## Installation
 
@@ -140,14 +152,58 @@ atlas_history(aseg)        # Recorded operations and their parameters
 Metadata stay attached when objects are saved. Source-file geometry and
 current object geometry are recorded separately, and unknown provenance
 is explicit. See [Identify, cite, and trace an
-atlas](vignettes/resource-metadata.Rmd).
+atlas](https://bbuchsbaum.github.io/neuroatlas/vignettes/resource-metadata.Rmd).
+
+### Move an atlas to another template
+
+[`transform_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_atlas.md)
+preserves region IDs and samples labels on the target grid. Check
+[`space_transform_manifest()`](https://bbuchsbaum.github.io/neuroatlas/reference/space_transform_manifest.md)
+for available routes. The transform engine is an optional dependency;
+install the pinned revision used for qualification:
+
+``` r
+
+pak::pak(c("hdf5r",
+  "bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e"))
+```
+
+``` r
+
+schaefer <- get_schaefer_atlas(parcels = 200, networks = 7, resolution = 2)
+aligned <- transform_atlas(
+  schaefer, "MNI152NLin2009cAsym", resolution = 2, provider = "neuroatlas"
+)
+attr(aligned, "neuroatlas_transform")$lost_label_ids
+```
+
+Both MNI152NLin6Asym / MNI152NLin2009cAsym directions are available from
+the [qualified artifact
+release](https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1).
+Qualification covers 1 mm and 2 mm target grids. Each transform is about
+86 MiB, downloaded once and checked against its pinned SHA-256 digest.
+Subsequent calls can use `offline = TRUE` with a cached transform and an
+explicit target grid. For scalar or probability volumes, use
+[`get_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_transform.md)
+and
+[`apply_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_template_transform.md)
+with explicit sampling semantics. Probability channels are interpolated
+independently without renormalization. Template-derived artifacts have
+separate [distribution
+conditions](https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/LICENSES.md).
+
+An image-space transform does not establish correspondence between
+different parcellations. Use
+[`atlas_overlap()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_overlap.md)
+after alignment to compare their regions. See [Verified template
+transforms](https://bbuchsbaum.github.io/neuroatlas/vignettes/template-transforms.Rmd).
 
 ## Palette demos
 
 `neuroatlas` includes perceptually-optimised palettes for atlas ROIs.
 For instance, you can generate a slice-aware palette for the Schaefer
 200×7 atlas and feed it directly into
-[`plot_brain()`](reference/plot_brain.md):
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md):
 
 ``` r
 
@@ -179,18 +235,18 @@ of both hemispheres.](reference/figures/README-roi-palette.png)
 
 | Atlas | Function | Description |
 |----|----|----|
-| Schaefer | [`get_schaefer_atlas()`](reference/get_schaefer_atlas.md) | Cortical parcellations (100-1000 regions, 7 or 17 networks); surface via [`get_schaefer_surfatlas()`](reference/get_schaefer_surfatlas.md) |
-| Brainnetome | [`get_brainnetome_atlas()`](reference/get_brainnetome_atlas.md) | 246-region connectional atlas with Yeo network and cytoarchitectonic metadata |
-| Glasser | [`get_glasser_atlas()`](reference/get_glasser_atlas.md) | 360-region multi-modal cortical parcellation (surface via [`glasser_surf()`](reference/glasser_surf.md)) |
-| HCPex | [`get_hcpex_atlas()`](reference/get_hcpex_atlas.md) | 360 cortical and 66 subcortical regions, native 1/2 mm volumes in MNI152NLin2009cAsym |
-| Harvard-Oxford | [`get_harvard_oxford_atlas()`](reference/get_harvard_oxford_atlas.md) | Cortical/subcortical structural atlases via TemplateFlow or FSL |
-| Julich-Brain | [`get_julich_brain_atlas()`](reference/get_julich_brain_atlas.md) | FSL Julich-Brain cytoarchitectonic atlas |
-| ASEG | [`get_aseg_atlas()`](reference/get_aseg_atlas.md) | FreeSurfer subcortical segmentation |
-| Subcortical | [`get_subcortical_atlas()`](reference/get_subcortical_atlas.md) | Harmonized thalamus, cerebellum, and subcortex atlases (AtlasPack/TemplateFlow) |
-| Olsen MTL | [`get_olsen_mtl()`](reference/get_olsen_mtl.md) | Medial temporal lobe atlas with hippocampal subfields |
-| Wang (2015) | [`get_wang_atlas()`](reference/get_wang_atlas.md) | Probabilistic visual topography on `fsaverage` (25 areas/hemi); probability volumes via [`get_wang_prob_atlas()`](reference/get_wang_prob_atlas.md) |
-| visfAtlas | [`get_visfatlas()`](reference/get_visfatlas.md) | Probabilistic functional atlas of occipito-temporal visual cortex (33 regions) |
-| Visual V1-V5 | [`get_visual_atlas()`](reference/get_visual_atlas.md) | Cytoarchitectonic early visual areas extracted from Julich-Brain |
+| Schaefer | [`get_schaefer_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_schaefer_atlas.md) | Cortical parcellations (100-1000 regions, 7 or 17 networks); surface via [`get_schaefer_surfatlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_schaefer_surfatlas.md) |
+| Brainnetome | [`get_brainnetome_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_brainnetome_atlas.md) | 246-region connectional atlas with Yeo network and cytoarchitectonic metadata |
+| Glasser | [`get_glasser_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_glasser_atlas.md) | 360-region multi-modal cortical parcellation (surface via [`glasser_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md)) |
+| HCPex | [`get_hcpex_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_hcpex_atlas.md) | 360 cortical and 66 subcortical regions, native 1/2 mm volumes in MNI152NLin2009cAsym |
+| Harvard-Oxford | [`get_harvard_oxford_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_harvard_oxford_atlas.md) | Cortical/subcortical structural atlases via TemplateFlow or FSL |
+| Julich-Brain | [`get_julich_brain_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_julich_brain_atlas.md) | FSL Julich-Brain cytoarchitectonic atlas |
+| ASEG | [`get_aseg_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_aseg_atlas.md) | FreeSurfer subcortical segmentation |
+| Subcortical | [`get_subcortical_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_subcortical_atlas.md) | Harmonized thalamus, cerebellum, and subcortex atlases (AtlasPack/TemplateFlow) |
+| Olsen MTL | [`get_olsen_mtl()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_olsen_mtl.md) | Medial temporal lobe atlas with hippocampal subfields |
+| Wang (2015) | [`get_wang_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md) | Probabilistic visual topography on `fsaverage` (25 areas/hemi); probability volumes via [`get_wang_prob_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_prob_atlas.md) |
+| visfAtlas | [`get_visfatlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visfatlas.md) | Probabilistic functional atlas of occipito-temporal visual cortex (33 regions) |
+| Visual V1-V5 | [`get_visual_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visual_atlas.md) | Cytoarchitectonic early visual areas extracted from Julich-Brain |
 
 ## Documentation
 
@@ -203,14 +259,18 @@ of both hemispheres.](reference/figures/README-roi-palette.png)
 - [Surface Panel
   Figures](https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.html) -
   Static panel composition with
-  [`plot_brain()`](reference/plot_brain.md) and
-  [`plot_brain_grid()`](reference/plot_brain_grid.md)
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+  and
+  [`plot_brain_grid()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain_grid.md)
 - [Surface
   Templates](https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.html) -
   Geometry vs. data on surface meshes
 - [Surface
   Parcellations](https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.html) -
   Surface-based atlas operations
+- [Verified Template
+  Transforms](https://bbuchsbaum.github.io/neuroatlas/articles/template-transforms.html) -
+  Align volumes and atlases on explicit grids
 - [Working with
   TemplateFlow](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.html) -
   Template access and management

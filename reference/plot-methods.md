@@ -1,13 +1,15 @@
 # Plot Glasser Atlas
 
 Visualise a Glasser atlas object. For surface atlases (`glasser_surf`),
-renders via [`plot_brain()`](plot_brain.md). For volumetric Glasser
-atlases, falls back to the base `plot.atlas()` method.
+renders via
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
+For volumetric Glasser atlases, falls back to the base `plot.atlas()`
+method.
 
 Volumetric slice visualisation for any atlas object. By default renders
 a multi-slice montage with each parcel coloured by the
-[`atlas_roi_colors()`](atlas_roi_colors.md) system. An orthogonal
-three-plane view is also available.
+[`atlas_roi_colors()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md)
+system. An orthogonal three-plane view is also available.
 
 ## Usage
 
@@ -59,14 +61,15 @@ plot(x, y, vals = NULL, views = c("lateral", "medial"), ...)
 - method:
 
   Colour algorithm passed to
-  [`atlas_roi_colors()`](atlas_roi_colors.md). One of `"rule_hcl"`
-  (default), `"network_harmony"`, `"maximin_view"`, or `"embedding"`.
+  [`atlas_roi_colors()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md).
+  One of `"rule_hcl"` (default), `"network_harmony"`, `"maximin_view"`,
+  or `"embedding"`.
 
 - colors:
 
   Optional pre-computed colour specification: a tibble from
-  [`atlas_roi_colors()`](atlas_roi_colors.md), or a named character
-  vector of hex colours keyed by region ID.
+  [`atlas_roi_colors()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md),
+  or a named character vector of hex colours keyed by region ID.
 
 - nslices:
 
@@ -133,12 +136,12 @@ three `ggplot2` objects.
 ## Details
 
 `plot.surfatlas` renders a cortical surface projection via
-[`plot_brain()`](plot_brain.md).
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
 
 ## See also
 
-[`atlas_roi_colors`](atlas_roi_colors.md),
-[`ggseg_schaefer`](ggseg_schaefer.md)
+[`atlas_roi_colors`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md),
+[`ggseg_schaefer`](https://bbuchsbaum.github.io/neuroatlas/reference/ggseg_schaefer.md)
 
 ## Examples
 

@@ -13,7 +13,7 @@ discoverability, and integration within `neuroatlas`.
 **T1.1.1**: Define S3 class `templateflow`.
 
 **T1.1.2**: Implement constructor
-[`create_templateflow()`](reference/create_templateflow.md):
+[`create_templateflow()`](https://bbuchsbaum.github.io/neuroatlas/reference/create_templateflow.md):
 
 Initializes and stores the `reticulate` Python `templateflow.api` handle
 (e.g., `tf_api`).
@@ -63,8 +63,8 @@ into the file fetching part of `get_template`.
 ### 2.1. Unified `get_template()` Function
 
 **T2.1.1**: Design and implement the primary
-[`get_template()`](reference/get_template.md) function with a signature
-like:
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+function with a signature like:
 `get_template(space = "MNI152NLin2009cAsym", variant = "brain", modality = "T1w", resolution = 1, cohort = NULL, desc = NULL, label = NULL, atlas = NULL, suffix = NULL, extension = ".nii.gz", path_only = FALSE, use_cache = TRUE, api_handle = NULL, ...)`
 
 - `space`: Template identifier (e.g., “MNI152NLin2009cAsym”).
@@ -79,11 +79,13 @@ like:
 - `path_only`: If `TRUE`, return file path string instead of `NeuroVol`.
 - `use_cache`: Boolean, to enable/disable caching for this call.
 - `api_handle`: Optionally pass an existing `templateflow` S3 object
-  (from [`create_templateflow()`](reference/create_templateflow.md)) or
-  let it use a default/global one.
+  (from
+  [`create_templateflow()`](https://bbuchsbaum.github.io/neuroatlas/reference/create_templateflow.md))
+  or let it use a default/global one.
 - `...`: Additional arguments to pass to `tflow$api$get()`.
 
-**T2.1.2**: Internally, [`get_template()`](reference/get_template.md)
+**T2.1.2**: Internally,
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 should construct the correct query dictionary for `tf_api$get()`.
 
 **T2.1.3**: Implement robust validation for common parameter
@@ -94,8 +96,9 @@ combinations:
 - E.g., `variant = "mask"` typically implies `modality = "mask"` (or
   `suffix="mask"`).
 
-**T2.1.4**: Ensure [`get_template()`](reference/get_template.md) returns
-a `NeuroVol` (via `as_neurovol`) or a file path string.
+**T2.1.4**: Ensure
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+returns a `NeuroVol` (via `as_neurovol`) or a file path string.
 
 ### 2.2. Typed Helper Functions (as thin wrappers)
 
@@ -118,21 +121,22 @@ around `get_template(..., variant = "mask", modality = "mask")`.
 `get_template(..., variant = "head", modality = "T1w")`.
 
 **T2.2.7**: Refactor `get_template_schaefer(...)` (the TemplateFlow one)
-to use the new [`get_template()`](reference/get_template.md) with
-appropriate `atlas`, `desc`, `suffix` args.
+to use the new
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+with appropriate `atlas`, `desc`, `suffix` args.
 
 **T2.2.8**: Review if original
-[`get_template()`](reference/get_template.md) needs to be kept or if its
-functionality is fully superseded by the new
-[`get_template()`](reference/get_template.md). If kept for backward
-compatibility, mark as deprecated.
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+needs to be kept or if its functionality is fully superseded by the new
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md).
+If kept for backward compatibility, mark as deprecated.
 
 ### 2.3. Vectorized Retrieval (Optional Enhancement)
 
 **T2.3.1**: (Optional) Consider allowing vectorized arguments for
 `space`, `resolution`, `variant` in
-[`get_template()`](reference/get_template.md), returning a named list of
-`NeuroVol` objects or paths.
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md),
+returning a named list of `NeuroVol` objects or paths.
 
 ### 2.4 Typed Helper Functions for Volumes and Surfaces
 
@@ -162,8 +166,8 @@ complementary.
 **T3.2.1**: Apply
 [`memoise::memoise()`](https://memoise.r-lib.org/reference/memoise.html)
 to the core TemplateFlow fetching operation within
-[`get_template()`](reference/get_template.md) (or the part that calls
-`tf_api$get()`).
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+(or the part that calls `tf_api$get()`).
 
 - The memoisation key should be a unique, reproducible string derived
   from all query parameters (name, resolution, desc, label, etc.).
@@ -175,20 +179,21 @@ file) can then use the memoised path.
 ### 3.3. Cache Control Functions
 
 **T3.3.1**: Implement
-[`clear_templateflow_cache()`](reference/clear_templateflow_cache.md) to
-remove all files from the `neuroatlas_cache_dir("templateflow")`.
+[`clear_templateflow_cache()`](https://bbuchsbaum.github.io/neuroatlas/reference/clear_templateflow_cache.md)
+to remove all files from the `neuroatlas_cache_dir("templateflow")`.
 
 **T3.3.2**: (Optional) Add
-[`show_templateflow_cache_path()`](reference/show_templateflow_cache_path.md)
+[`show_templateflow_cache_path()`](https://bbuchsbaum.github.io/neuroatlas/reference/show_templateflow_cache_path.md)
 function.
 
 ## 4. Error Handling & Validation
 
 ### 4.1. Pre-emptive Checks and Graceful Errors
 
-**T4.1.1**: In [`get_template()`](reference/get_template.md), before
-calling `tf_api$get()`, use `tf_api$template_exists(space)` or similar
-to check if the base template exists.
+**T4.1.1**: In
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md),
+before calling `tf_api$get()`, use `tf_api$template_exists(space)` or
+similar to check if the base template exists.
 
 **T4.1.2**: Validate `resolution` against available resolutions for a
 template (e.g., using `tf_api$resolutions(space)` if such a method
@@ -212,8 +217,8 @@ due to network issues).
   failure.*
 
 **T4.2.2**: If offline and `use_cache = TRUE`,
-[`get_template()`](reference/get_template.md) should attempt to find the
-requested template in the local cache first.
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+should attempt to find the requested template in the local cache first.
 
 - *Note: Handled by `memoise` (R-level path cache) and TemplateFlow
   Python’s own disk cache (`TEMPLATEFLOW_HOME`). If a path/file was
@@ -263,7 +268,8 @@ new argument to also accept:
 
 - Checks if `input` is already a `NeuroVol`.
 - If `input` is a string or list, parses it and calls the new
-  [`get_template()`](reference/get_template.md) to fetch the `NeuroVol`.
+  [`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+  to fetch the `NeuroVol`.
 
 **T6.1.4**: Update `get_schaefer_atlas(..., outspace)` so `outspace` can
 be a TemplateFlow query string/list, resolved via
@@ -275,14 +281,15 @@ TemplateFlow query string/list (primarily achieved by
 
 **T6.1.6**: Update `dilate_atlas(atlas, mask, ...)` so `mask` can be a
 TemplateFlow query string/list, resolved via
-[`.resolve_template_input()`](reference/dot-resolve_template_input.md)
+[`.resolve_template_input()`](https://bbuchsbaum.github.io/neuroatlas/reference/dot-resolve_template_input.md)
 to fetch a brain mask.
 
 ## 7. Documentation & Vignettes
 
 **T7.1.1**: Write comprehensive `roxygen2` documentation for the new
-unified [`get_template()`](reference/get_template.md) function,
-explaining all parameters and common use cases.
+unified
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+function, explaining all parameters and common use cases.
 
 **T7.1.2**: Document all other new/refactored public functions
 (`create_templateflow`, `tflow_spaces`, `tflow_files`,
@@ -295,11 +302,12 @@ explaining all parameters and common use cases.
 
 - Introduction to TemplateFlow concept.
 - Setting up (e.g.,
-  [`create_templateflow()`](reference/create_templateflow.md)).
+  [`create_templateflow()`](https://bbuchsbaum.github.io/neuroatlas/reference/create_templateflow.md)).
 - Discovering available templates/metadata (`tflow_spaces`,
   `tflow_files`).
 - Retrieving various template types (T1w, masks, probsegs) using
-  [`get_template()`](reference/get_template.md) and typed helpers.
+  [`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+  and typed helpers.
 - Understanding caching behavior and management.
 - Examples of integrating TemplateFlow templates with other `neuroatlas`
   functions (e.g., `reduce_atlas`, plotting functions if applicable).
@@ -308,7 +316,8 @@ explaining all parameters and common use cases.
 
 **T8.1.1**: For all existing `get_template_*` functions in
 `R/template_flow.R` that are being replaced by the new
-[`get_template()`](reference/get_template.md) or its wrappers:
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+or its wrappers:
 
 - Mark them with `@deprecate new="get_template"` (or the relevant new
   helper).
@@ -316,8 +325,9 @@ explaining all parameters and common use cases.
   user invocation once deprecated.
 
 **T8.1.2**: Modify the body of these old functions to call the new
-unified [`get_template()`](reference/get_template.md) or relevant new
-helper, ensuring parameters are correctly mapped.
+unified
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+or relevant new helper, ensuring parameters are correctly mapped.
 
 **T8.1.3**: Ensure they issue a deprecation warning when called (e.g.,
 using
@@ -330,15 +340,17 @@ using
 - Target Tickets: T1.1.1, T1.1.2, T1.1.3, T1.2.1, T2.1.1 (basic
   implementation), T2.1.2, T2.1.4, T3.1.1, T4.1.3.
 - Goal: Establish the `templateflow` S3 object and a working, albeit
-  basic, [`get_template()`](reference/get_template.md) that can fetch a
-  T1w image.
+  basic,
+  [`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+  that can fetch a T1w image.
 
 ### M2: Full Retrieval API & Typed Helpers
 
 - Target Tickets: T2.1.1 (full signature), T2.1.3, T2.2.1-T2.2.8,
   T8.1.1-T8.1.3 (for functions being wrapped).
-- Goal: Complete the [`get_template()`](reference/get_template.md) API
-  and refactor all existing typed helpers. Implement deprecation
+- Goal: Complete the
+  [`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+  API and refactor all existing typed helpers. Implement deprecation
   strategy.
 
 ### M3: Caching, Memoisation & Discoverability

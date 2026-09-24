@@ -88,8 +88,10 @@ subsetting, and visualization.
 - Cluster IDs must be contiguous 1:K when constructing
   `ClusteredNeuroVec` objects
 - `.subset_atlas()` is the internal workhorse for subsetting;
-  [`sub_atlas()`](reference/sub_atlas.md) and
-  [`filter_atlas()`](reference/filter_atlas.md) are public wrappers
+  [`sub_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/sub_atlas.md)
+  and
+  [`filter_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md)
+  are public wrappers
 
 ## Dependencies
 

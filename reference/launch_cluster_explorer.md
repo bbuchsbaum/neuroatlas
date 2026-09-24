@@ -1,6 +1,7 @@
 # Launch Cluster Explorer in Interactive Session
 
-Convenience wrapper around [`cluster_explorer()`](cluster_explorer.md)
+Convenience wrapper around
+[`cluster_explorer()`](https://bbuchsbaum.github.io/neuroatlas/reference/cluster_explorer.md)
 that launches the app in an interactive session.
 
 ## Usage
@@ -13,7 +14,8 @@ launch_cluster_explorer(...)
 
 - ...:
 
-  Passed to [`cluster_explorer()`](cluster_explorer.md).
+  Passed to
+  [`cluster_explorer()`](https://bbuchsbaum.github.io/neuroatlas/reference/cluster_explorer.md).
 
 ## Value
 

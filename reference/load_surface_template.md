@@ -1,6 +1,7 @@
 # Load a surface template as a neurosurf geometry
 
-Convenience wrapper around [`get_surface_template`](get_template.md)
+Convenience wrapper around
+[`get_surface_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 that downloads (via TemplateFlow) the requested surface geometry and
 returns it as a
 [`neurosurf::SurfaceGeometry`](https://bbuchsbaum.github.io/neurosurf/reference/SurfaceGeometry.html)
@@ -47,7 +48,7 @@ load_surface_template(
 - ...:
 
   Additional arguments forwarded to
-  [`get_surface_template`](get_template.md).
+  [`get_surface_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md).
 
 ## Value
 

@@ -43,7 +43,9 @@ A list of class \`"atlas_provenance"\` with fields:
 
 - ref:
 
-  Canonical [`atlas_ref()`](atlas_ref.md) identity metadata.
+  Canonical
+  [`atlas_ref()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_ref.md)
+  identity metadata.
 
 - artifacts:
 

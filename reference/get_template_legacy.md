@@ -1,8 +1,9 @@
 # Access Templateflow Brain Templates (DEPRECATED - Legacy Signature)
 
 **DEPRECATED:** This function signature is deprecated. Please use the
-new [`get_template`](get_template.md) function which offers a more
-comprehensive and R-native interface.
+new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+function which offers a more comprehensive and R-native interface.
 
 ## Usage
 
@@ -55,7 +56,9 @@ A NeuroVol object containing the requested template
 
 ## See also
 
-The new [`get_template`](get_template.md) with updated signature.
+The new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+with updated signature.
 
 ## Examples
 

@@ -41,6 +41,10 @@ sub_atlas(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...)
 
   Additional arguments passed to methods.
 
+- network:
+
+  Optional network labels to retain, where supported.
+
 ## Value
 
 An atlas object of the same class as `x` containing only the selected
@@ -57,8 +61,10 @@ objects.
 
 ## See also
 
-[`filter_atlas`](filter_atlas.md) for tidy-eval filtering by metadata
-columns, [`get_roi`](get_roi.md) for extracting ROI volumes
+[`filter_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md)
+for tidy-eval filtering by metadata columns,
+[`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+for extracting ROI volumes
 
 ## Examples
 

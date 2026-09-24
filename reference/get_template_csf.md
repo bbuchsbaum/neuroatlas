@@ -1,7 +1,7 @@
 # Get CSF Probability Map (DEPRECATED)
 
 **DEPRECATED:** Please use
-[`get_template`](get_template.md)`(variant = "probseg", label = "CSF", ...)`
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)`(variant = "probseg", label = "CSF", ...)`
 instead.
 
 Convenience function to get CSF probability map.
@@ -37,7 +37,8 @@ A NeuroVol object containing the CSF probability map
 
 ## See also
 
-The new [`get_template`](get_template.md)
+The new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 
 ## Examples
 

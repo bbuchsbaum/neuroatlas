@@ -79,7 +79,7 @@ coordinates to find all labelled atlas voxels within \`radius\` mm.
 If the atlas carries a coordinate-space annotation
 (\`atlas\$atlas_ref\$coord_space\`) that differs from \`from_space\`,
 the input coordinates are transformed automatically via
-[`transform_coords`](transform_coords.md).
+[`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md).
 
 ## Examples
 

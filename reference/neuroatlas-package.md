@@ -18,67 +18,67 @@ rendering.
 
 ## Main Functions
 
-- [`get_schaefer_atlas`](get_schaefer_atlas.md):
+- [`get_schaefer_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_schaefer_atlas.md):
 
   Access Schaefer cortical parcellations
 
-- [`get_glasser_atlas`](get_glasser_atlas.md):
+- [`get_glasser_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_glasser_atlas.md):
 
   Access Glasser multi-modal parcellation
 
-- [`get_aseg_atlas`](get_aseg_atlas.md):
+- [`get_aseg_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_aseg_atlas.md):
 
   Access FreeSurfer subcortical segmentation
 
-- [`get_harvard_oxford_atlas`](get_harvard_oxford_atlas.md):
+- [`get_harvard_oxford_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_harvard_oxford_atlas.md):
 
   Access Harvard-Oxford structural atlases
 
-- [`get_fsl_atlas`](get_fsl_atlas.md):
+- [`get_fsl_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_fsl_atlas.md):
 
   Access FSL XML-described atlases
 
-- [`get_olsen_mtl`](get_olsen_mtl.md):
+- [`get_olsen_mtl`](https://bbuchsbaum.github.io/neuroatlas/reference/get_olsen_mtl.md):
 
   Access Olsen medial temporal lobe atlas
 
-- [`get_template`](get_template.md):
+- [`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md):
 
   Fetch templates from TemplateFlow
 
 ## Atlas Operations
 
-- [`get_roi`](get_roi.md):
+- [`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md):
 
   Extract specific regions from an atlas
 
-- [`map_atlas`](map_atlas.md):
+- [`map_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md):
 
   Map values to atlas regions
 
-- [`reduce_atlas`](reduce_atlas.md):
+- [`reduce_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md):
 
   Combine regions within an atlas
 
-- [`merge_atlases`](merge_atlases.md):
+- [`merge_atlases`](https://bbuchsbaum.github.io/neuroatlas/reference/merge_atlases.md):
 
   Combine multiple atlases
 
-- [`dilate_atlas`](dilate_atlas.md):
+- [`dilate_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md):
 
   Expand atlas regions into unassigned voxels
 
 ## Visualization
 
-- [`plot_brain`](plot_brain.md):
+- [`plot_brain`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md):
 
   Interactive cortical surface rendering
 
-- [`plot.atlas`](plot-methods.md):
+- [`plot.atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/plot-methods.md):
 
   Plot volumetric atlas objects
 
-- [`atlas_roi_colors`](atlas_roi_colors.md):
+- [`atlas_roi_colors`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md):
 
   Optimal ROI colour assignment
 
@@ -87,15 +87,15 @@ rendering.
 Access standardized neuroimaging templates through the pure-R
 \`templateflow\` backend:
 
-- [`get_template`](get_template.md):
+- [`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md):
 
   Fetch a template asset
 
-- [`tflow_spaces`](tflow_spaces.md):
+- [`tflow_spaces`](https://bbuchsbaum.github.io/neuroatlas/reference/tflow_spaces.md):
 
   List available template spaces
 
-- [`tflow_files`](tflow_files.md):
+- [`tflow_files`](https://bbuchsbaum.github.io/neuroatlas/reference/tflow_files.md):
 
   Query template assets
 

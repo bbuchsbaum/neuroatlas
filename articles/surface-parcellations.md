@@ -14,8 +14,9 @@ code shown here.
 
 ## What is a surface atlas?
 
-[`schaefer_surf()`](../reference/schaefer_surf.md) returns a
-`surfatlas`. Its two labelled surfaces share one region catalogue:
+[`schaefer_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/schaefer_surf.md)
+returns a `surfatlas`. Its two labelled surfaces share one region
+catalogue:
 
 | Object | Contents | Cardinality |
 |----|----|----|
@@ -160,8 +161,9 @@ Passing `vals = parcel_values` remains useful for code that already
 maintains atlas order, but a keyed table is safer at analysis
 boundaries.
 
-[`map_atlas()`](../reference/map_atlas.md) is the tabular companion to
-this plot. It does **not** mutate the surface or return a labelled mesh:
+[`map_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md)
+is the tabular companion to this plot. It does **not** mutate the
+surface or return a labelled mesh:
 
 ``` r
 
@@ -177,12 +179,13 @@ stopifnot(
 ```
 
 Use the tibble for modelling and reporting; pass it directly to
-[`plot_brain()`](../reference/plot_brain.md) for a surface figure.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+for a surface figure.
 
 ## How do you extract one surface ROI?
 
-[`get_roi()`](../reference/get_roi.md) selects vertices for one or more
-named regions and returns
+[`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+selects vertices for one or more named regions and returns
 [`neurosurf::ROISurface`](https://bbuchsbaum.github.io/neurosurf/reference/ROISurface.html)
 objects. Labels may occur in both hemispheres, so make the side explicit
 when the question is unilateral:
@@ -201,8 +204,9 @@ stopifnot(
 
 Atlas-level subsetting is currently volume-only.
 `filter_atlas(atl, ...)` and `sub_atlas(atl, ...)` fail clearly for a
-surface atlas; use [`get_roi()`](../reference/get_roi.md) for surface
-regions rather than expecting a smaller `surfatlas`.
+surface atlas; use
+[`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+for surface regions rather than expecting a smaller `surfatlas`.
 
 ## How do you use per-vertex data?
 
@@ -232,32 +236,36 @@ plot_brain(
 ```
 
 A `NeuroVol` is not automatically aligned merely because it can be
-sampled. The current [`plot_brain()`](../reference/plot_brain.md) volume
-projection cannot infer template identity from a raw `NeuroVol`, check
-compatibility, or consume a transformed white/pial pair. Passing a
+sampled. The current
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+volume projection cannot infer template identity from a raw `NeuroVol`,
+check compatibility, or consume a transformed white/pial pair. Passing a
 volume is therefore unchecked caller responsibility and is appropriate
 only when the volume already uses the resolved surface coordinates.
 `fsaverage`, `fsaverage5`, and `fsaverage6` use MNI305 coordinates,
 whereas most modern MNI volumes use MNI152 coordinates; do not project
 the latter directly.
-[`transform_vertices_to_volume()`](../reference/transform_vertices_to_volume.md)
+[`transform_vertices_to_volume()`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_vertices_to_volume.md)
 is useful for coordinate-level calculations, but it does not by itself
-create a [`plot_brain()`](../reference/plot_brain.md) projection
-geometry. A grid reslice does not establish correspondence.
+create a
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+projection geometry. A grid reslice does not establish correspondence.
 
 ## What about other atlases and templates?
 
-[`glasser_surf()`](../reference/glasser_surf.md) has the same
-`surfatlas` contract, but uses 164k `fsaverage` geometry and downloads
-both geometry and annotations on first use. Raw geometry from
-[`load_surface_template()`](../reference/load_surface_template.md) has
-no atlas labels; the next article explains that distinction in detail.
+[`glasser_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md)
+has the same `surfatlas` contract, but uses 164k `fsaverage` geometry
+and downloads both geometry and annotations on first use. Raw geometry
+from
+[`load_surface_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/load_surface_template.md)
+has no atlas labels; the next article explains that distinction in
+detail.
 
 Continue with:
 
-1.  [`vignette("surface-panels")`](../articles/surface-panels.md) for
-    shared legends and multi-map figures.
-2.  [`vignette("surface-templates")`](../articles/surface-templates.md)
+1.  [`vignette("surface-panels")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.md)
+    for shared legends and multi-map figures.
+2.  [`vignette("surface-templates")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.md)
     for paths, geometry, and per-vertex data.
-3.  [`vignette("working-with-templateflow")`](../articles/working-with-templateflow.md)
+3.  [`vignette("working-with-templateflow")`](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.md)
     for live asset discovery.

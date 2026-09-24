@@ -18,7 +18,7 @@ Three object transitions organise the workflow:
 
 | You have | What it contains | A common next step |
 |----|----|----|
-| an `atlas` | a labelled volume plus one row of metadata per region | [`roi_metadata()`](../reference/roi_metadata.md), [`get_roi()`](../reference/get_roi.md), or [`reduce_atlas()`](../reference/reduce_atlas.md) |
+| an `atlas` | a labelled volume plus one row of metadata per region | [`roi_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md), [`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md), or [`reduce_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md) |
 | a `NeuroVol` | one numeric value at every voxel on a declared grid | summarise it with a compatible volume atlas |
 | a regional tibble | one value per parcel or anatomical region | analyse it or pair it with a matching plot |
 
@@ -29,9 +29,9 @@ interchangeable containers.
 
 ## How do you load and inspect an atlas?
 
-[`get_atlas()`](../reference/get_atlas.md) is the general
-discovery-and-loading entry point. Atlas-specific loaders remain useful
-when you want their specialised arguments.
+[`get_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_atlas.md)
+is the general discovery-and-loading entry point. Atlas-specific loaders
+remain useful when you want their specialised arguments.
 
 ``` r
 
@@ -84,8 +84,9 @@ meta[c("id", "label", "hemi")]
 #> 17    60 VentralDC   right
 ```
 
-Use [`list_atlases()`](../reference/list_atlases.md) to discover the
-other registered families without loading them:
+Use
+[`list_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/list_atlases.md)
+to discover the other registered families without loading them:
 
 ``` r
 
@@ -114,9 +115,10 @@ list_atlases()[c("id", "label", "representation", "default_space")]
 
 ## How do you select regions?
 
-Use [`filter_atlas()`](../reference/filter_atlas.md) when the selection
-is naturally expressed through metadata. Multiple expressions are
-intersected.
+Use
+[`filter_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md)
+when the selection is naturally expressed through metadata. Multiple
+expressions are intersected.
 
 ``` r
 
@@ -139,14 +141,18 @@ The result is still an atlas, now containing only the seven selected
 regions. Excluded voxels are unlabelled; region IDs are preserved.
 
 Atlas-level subsetting currently applies to volume atlases. For a
-`surfatlas`, both [`filter_atlas()`](../reference/filter_atlas.md) and
-[`sub_atlas()`](../reference/sub_atlas.md) fail with a typed
-unsupported-operation error. Use [`get_roi()`](../reference/get_roi.md)
+`surfatlas`, both
+[`filter_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/filter_atlas.md)
+and
+[`sub_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/sub_atlas.md)
+fail with a typed unsupported-operation error. Use
+[`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
 to extract labelled surface ROIs instead.
 
-[`get_roi()`](../reference/get_roi.md) answers a different question: it
-extracts the voxel set belonging to a named region. Labels repeat across
-hemispheres, so specify `hemi` when you need one side.
+[`get_roi()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+answers a different question: it extracts the voxel set belonging to a
+named region. Labels repeat across hemispheres, so specify `hemi` when
+you need one side.
 
 ``` r
 
@@ -184,9 +190,9 @@ x_gradient <- array(x_gradient, dim = atlas_dim)
 image <- neuroim2::NeuroVol(x_gradient, atlas_space)
 ```
 
-[`reduce_atlas()`](../reference/reduce_atlas.md) applies a statistic
-within every labelled parcel. A 3D image returns a long tibble by
-default.
+[`reduce_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md)
+applies a statistic within every labelled parcel. A 3D image returns a
+long tibble by default.
 
 ``` r
 
@@ -219,9 +225,10 @@ finite and vary across parcels because the input image varies in space.
 
 ## What does `map_atlas()` return?
 
-[`map_atlas()`](../reference/map_atlas.md) pairs one value per region
-with the atlas’s labels and hemispheres. It returns a tibble; it does
-**not** mutate the atlas or create a new surface object.
+[`map_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md)
+pairs one value per region with the atlas’s labels and hemispheres. It
+returns a tibble; it does **not** mutate the atlas or create a new
+surface object.
 
 ``` r
 
@@ -288,10 +295,10 @@ subcortical and midline regions in distinct colours across six
 slices.](neuroatlas-overview_files/figure-html/plot-atlas-1.png)
 
 For a cortical `surfatlas`, pass one value per region directly to
-[`plot_brain()`](../reference/plot_brain.md). The surface articles
-develop that separate object flow. Verify region IDs rather than
-assuming unrelated volume and surface products align by shape or region
-count.
+[`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
+The surface articles develop that separate object flow. Verify region
+IDs rather than assuming unrelated volume and surface products align by
+shape or region count.
 
 ## When is resampling safe?
 
@@ -318,9 +325,8 @@ atlas_transform_plan(
 #>   from_space: MNI152NLin6Asym 
 #>   to_space: MNI152NLin2009cAsym 
 #>   n_steps: 1 
-#>   status: planned 
-#>   confidence: high 
-#>   warnings: Plan includes unimplemented/planned transform step(s).
+#>   status: available 
+#>   confidence: high
 ```
 
 At the time this article was built, that route is recorded as `planned`,
@@ -337,13 +343,13 @@ volume plot.
 
 Continue with:
 
-1.  [`vignette("atlas-visualization")`](../articles/atlas-visualization.md)
+1.  [`vignette("atlas-visualization")`](https://bbuchsbaum.github.io/neuroatlas/articles/atlas-visualization.md)
     for volume figures and ROI colours.
-2.  [`vignette("surface-parcellations")`](../articles/surface-parcellations.md)
+2.  [`vignette("surface-parcellations")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-parcellations.md)
     for the surface object model and parcel-level values.
-3.  [`vignette("surface-panels")`](../articles/surface-panels.md) for
-    publication-style comparison figures.
-4.  [`vignette("working-with-templateflow")`](../articles/working-with-templateflow.md)
+3.  [`vignette("surface-panels")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-panels.md)
+    for publication-style comparison figures.
+4.  [`vignette("working-with-templateflow")`](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.md)
     when you need external template assets and understand their space
     contract.
 

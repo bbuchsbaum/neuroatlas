@@ -20,7 +20,8 @@ build_brain_polygon_data(
 
 - surfatlas:
 
-  A surfatlas object (e.g. from [`schaefer_surf()`](schaefer_surf.md)).
+  A surfatlas object (e.g. from
+  [`schaefer_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/schaefer_surf.md)).
 
 - views:
 

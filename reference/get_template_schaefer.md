@@ -1,7 +1,7 @@
 # Get Schaefer Parcellation in Template Space (DEPRECATED)
 
 **DEPRECATED:** Please use
-[`get_template`](get_template.md)`(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)`
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)`(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)`
 instead.
 
 Retrieves Schaefer cortical parcellation mapped to a specified template
@@ -48,7 +48,8 @@ A NeuroVol object containing the parcellation
 
 ## See also
 
-The new [`get_template`](get_template.md)
+The new
+[`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
 
 ## Examples
 

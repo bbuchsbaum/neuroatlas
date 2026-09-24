@@ -50,17 +50,20 @@ reduce_atlas_vec(
 - dilate:
 
   Logical. If `TRUE`, atlas parcels are dilated into the mask before
-  averaging (via [`dilate_atlas`](dilate_atlas.md)).
+  averaging (via
+  [`dilate_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md)).
 
 - radius:
 
   Numeric dilation radius in voxels (passed to
-  [`dilate_atlas`](dilate_atlas.md)). Default: 4.
+  [`dilate_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md)).
+  Default: 4.
 
 - maxn:
 
   Integer maximum neighbours for dilation (passed to
-  [`dilate_atlas`](dilate_atlas.md)). Default: 50.
+  [`dilate_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md)).
+  Default: 50.
 
 ## Value
 
@@ -82,8 +85,10 @@ the output.
 
 ## See also
 
-[`reduce_atlas`](reduce_atlas.md) for a tibble-based summary,
-[`dilate_atlas`](dilate_atlas.md) for expanding parcels into a mask.
+[`reduce_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md)
+for a tibble-based summary,
+[`dilate_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md)
+for expanding parcels into a mask.
 
 ## Examples
 

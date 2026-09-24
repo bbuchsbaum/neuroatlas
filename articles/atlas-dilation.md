@@ -11,10 +11,10 @@ whole-brain atlas.
 
 ## What does dilation do?
 
-[`dilate_atlas()`](../reference/dilate_atlas.md) considers voxels that
-are inside a supplied mask but not already labelled. A candidate is
-assigned only when a labelled voxel lies within `radius`, measured in
-**voxel units**. When several parcels are nearby,
+[`dilate_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md)
+considers voxels that are inside a supplied mask but not already
+labelled. A candidate is assigned only when a labelled voxel lies within
+`radius`, measured in **voxel units**. When several parcels are nearby,
 inverse-distance-weighted voting over at most `maxn` neighbours chooses
 the label.
 
@@ -183,9 +183,8 @@ atlas_transform_plan(
 #>   from_space: MNI152NLin6Asym 
 #>   to_space: MNI152NLin2009cAsym 
 #>   n_steps: 1 
-#>   status: planned 
-#>   confidence: high 
-#>   warnings: Plan includes unimplemented/planned transform step(s).
+#>   status: available 
+#>   confidence: high
 ```
 
 Do not build a mask in one of those spaces, reslice it onto the other’s
@@ -213,7 +212,7 @@ reduce_atlas(radius_three, image, mean)
 ```
 
 Return to
-[`vignette("neuroatlas-overview")`](../articles/neuroatlas-overview.md)
+[`vignette("neuroatlas-overview")`](https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.md)
 for the general reduction workflow, or read
-[`vignette("working-with-templateflow")`](../articles/working-with-templateflow.md)
+[`vignette("working-with-templateflow")`](https://bbuchsbaum.github.io/neuroatlas/articles/working-with-templateflow.md)
 before combining external templates and masks.

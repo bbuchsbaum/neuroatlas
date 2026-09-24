@@ -1,24 +1,59 @@
 # Changelog
 
+## neuroatlas 0.1.0.9004
+
+- `plot_brain(static_backend = "cpu", vals = ...)` now renders
+  publication parcel maps with
+  [`neurosurf::render_surface_parcels()`](https://bbuchsbaum.github.io/neurosurf/reference/render_surface_parcels.html):
+  smooth antialiased parcel edges, a sulcal-depth underlay with soft
+  lighting, a flat medial wall drawn only in medial views, and a figure
+  whose layout (2x2 grid or single row, colorbar below or beside) adapts
+  to the device. New arguments `vals_threshold` (unfills sub-threshold
+  parcels and greys that band of the colorbar) and `parcel_style`. The
+  CPU backend previously rejected `vals`.
+
+## neuroatlas 0.1.0.9003
+
+- Enabled the qualified `MNI152NLin6Asym` / `MNI152NLin2009cAsym` ANTs
+  transform pair in both directions, with published artifact hashes,
+  input and software provenance, and qualification on 1 mm and 2 mm
+  target grids.
+- Added
+  [`get_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_transform.md),
+  [`apply_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_template_transform.md),
+  and
+  [`transform_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_atlas.md)
+  for explicit template-space routes and target grids. Routes compose
+  before a single resampling pass. Label IDs and metadata are retained,
+  probability channels are never renormalized, and provenance records
+  the artifact hashes, grids, and interpolation.
+- Added verified transform caching with atomic downloads, offline
+  operation, and cache cleanup restricted to neuroatlas-owned files. The
+  route planner handles longer paths and can restrict resolution to
+  executable releases.
+
 ## neuroatlas 0.1.0.9000
 
-- Added [`get_hcpex_atlas()`](../reference/get_hcpex_atlas.md) and
-  `get_atlas("hcpex")` for HCPex v1.1: 360 cortical and 66 subcortical
-  regions at 1 or 2 mm in the source-declared MNI152NLin2009cAsym space.
-  Downloads use a pinned upstream revision and checksum-verified
-  caching. Native IDs, abbreviations, full names, colors, hemisphere,
-  and cortical/subcortical membership are available for ROI work;
-  metadata includes citations, license, file receipts, and resampling
-  history.
+- Added
+  [`get_hcpex_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_hcpex_atlas.md)
+  and `get_atlas("hcpex")` for HCPex v1.1: 360 cortical and 66
+  subcortical regions at 1 or 2 mm in the source-declared
+  MNI152NLin2009cAsym space. Downloads use a pinned upstream revision
+  and checksum-verified caching. Native IDs, abbreviations, full names,
+  colors, hemisphere, and cortical/subcortical membership are available
+  for ROI work; metadata includes citations, license, file receipts, and
+  resampling history.
 
 - Added a shared, versioned metadata record for atlases and loaded
-  templates: [`atlas_metadata()`](../reference/atlas_metadata.md),
-  [`template_metadata()`](../reference/atlas_metadata.md),
-  [`atlas_citations()`](../reference/atlas_citations.md), and
-  [`template_citations()`](../reference/atlas_citations.md). Records
-  contain resource identity, actual geometry, role-specific references,
-  file receipts, and structured processing history. Citation access and
-  inspection work offline and survive R serialization.
+  templates:
+  [`atlas_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_metadata.md),
+  [`template_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_metadata.md),
+  [`atlas_citations()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_citations.md),
+  and
+  [`template_citations()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_citations.md).
+  Records contain resource identity, actual geometry, role-specific
+  references, file receipts, and structured processing history. Citation
+  access and inspection work offline and survive R serialization.
 
 - Atlas summaries now consistently display spatial metadata and citation
   information. Resampled atlases report their actual voxel spacing;
@@ -37,9 +72,10 @@
   remains explicitly unverified. See the new “Identify, cite, and trace
   an atlas” vignette.
 
-- [`dilate_atlas()`](../reference/dilate_atlas.md) now genuinely honours
-  its `radius` argument. The previous implementation passed a fixed `k`
-  to `Rnanoflann::nn(search = "radius")`, which returns the `k` nearest
+- [`dilate_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md)
+  now genuinely honours its `radius` argument. The previous
+  implementation passed a fixed `k` to
+  `Rnanoflann::nn(search = "radius")`, which returns the `k` nearest
   neighbours regardless of distance, so `radius` had no effect and
   dilation filled the entire mask (absorbing, for a cortical atlas,
   distant cerebellar and deep subcortical grey matter). Dilation now
@@ -50,18 +86,19 @@
   “Dilating an Atlas to Cover Grey Matter” vignette.
 
 - Added
-  [`get_harvard_oxford_atlas()`](../reference/get_harvard_oxford_atlas.md)
+  [`get_harvard_oxford_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_harvard_oxford_atlas.md)
   and registry entries for Harvard-Oxford cortical, subcortical, and
   combined structural parcellations. The default source is TemplateFlow,
   with threshold and resolution options for maximum-probability `dseg`
   images.
 
-- Added [`get_fsl_atlas()`](../reference/get_fsl_atlas.md) for FSL
-  XML-described atlases, including the documented offset between
+- Added
+  [`get_fsl_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_fsl_atlas.md)
+  for FSL XML-described atlases, including the documented offset between
   probabilistic XML label indices and max-probability summary image
   label values. Added a thin FSL-backed wrapper for Julich-Brain /
   Brodmann-style cytoarchitectonic labels
-  ([`get_julich_brain_atlas()`](../reference/get_julich_brain_atlas.md)),
+  ([`get_julich_brain_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_julich_brain_atlas.md)),
   which now downloads the Nilearn/NITRC `Juelich.tgz` archive into a
   local FSL-style cache when `FSLDIR` is unset.
 
@@ -86,26 +123,29 @@
   any geometry that fails `validObject()` via the current constructor
   before passing it to `vol_to_surf()`.
 
-- Added a canonical [`new_atlas()`](../reference/atlas_constructor.md) /
-  [`new_surfatlas()`](../reference/atlas_constructor.md) constructor
-  that assembles every loader’s return value (Schaefer, Glasser, ASEG,
-  Olsen MTL / hippocampus, TemplateFlow subcortical). The constructor
-  validates required fields with a typed
+- Added a canonical
+  [`new_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_constructor.md)
+  /
+  [`new_surfatlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_constructor.md)
+  constructor that assembles every loader’s return value (Schaefer,
+  Glasser, ASEG, Olsen MTL / hippocampus, TemplateFlow subcortical). The
+  constructor validates required fields with a typed
   `neuroatlas_error_invalid_atlas` condition, normalises RGB colour maps
   to a data frame, builds `roi_metadata` uniformly, and attaches
   `atlas_ref` / provenance in one place — removing ~100 lines of
   per-loader boilerplate.
 
 - Added a lightweight atlas registry
-  ([`register_atlas()`](../reference/register_atlas.md)) exposed via two
-  new public helpers: [`list_atlases()`](../reference/list_atlases.md)
+  ([`register_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/register_atlas.md))
+  exposed via two new public helpers:
+  [`list_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/list_atlases.md)
   enumerates the built-in atlases, and `get_atlas(name, ...)` dispatches
   to the registered loader by id or alias
   (e.g. `get_atlas("schaefer2018", parcels="100", networks="7")`).
 
 - Added centralised download helpers
-  ([`.neuroatlas_download()`](../reference/dot-neuroatlas_download.md),
-  [`.neuroatlas_try_download()`](../reference/dot-neuroatlas_try_download.md))
+  ([`.neuroatlas_download()`](https://bbuchsbaum.github.io/neuroatlas/reference/dot-neuroatlas_download.md),
+  [`.neuroatlas_try_download()`](https://bbuchsbaum.github.io/neuroatlas/reference/dot-neuroatlas_try_download.md))
   used by the Schaefer and Glasser loaders. Failures now raise classed
   `neuroatlas_error_download` conditions with the upstream URL instead
   of returning a silent `NULL`; Git LFS pointer stubs are detected and
@@ -120,49 +160,54 @@
   catch loader errors by class.
 
 - Added atlas provenance descriptors via new `atlas_ref` infrastructure:
-  [`new_atlas_ref()`](../reference/new_atlas_ref.md),
-  [`atlas_ref()`](../reference/atlas_ref.md),
-  [`atlas_family()`](../reference/atlas_family.md),
-  [`atlas_space()`](../reference/atlas_space.md),
-  [`atlas_coord_space()`](../reference/atlas_coord_space.md), and
-  [`validate_atlas_ref()`](../reference/validate_atlas_ref.md).
+  [`new_atlas_ref()`](https://bbuchsbaum.github.io/neuroatlas/reference/new_atlas_ref.md),
+  [`atlas_ref()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_ref.md),
+  [`atlas_family()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_family.md),
+  [`atlas_space()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_space.md),
+  [`atlas_coord_space()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_coord_space.md),
+  and
+  [`validate_atlas_ref()`](https://bbuchsbaum.github.io/neuroatlas/reference/validate_atlas_ref.md).
 
 - Atlas constructors now attach structured provenance/space metadata and
   compatibility aliases (`space`, `template_space`, `coord_space`,
   `confidence`) for Schaefer, Glasser, ASEG, Olsen MTL/hippocampus, and
   TemplateFlow subcortical atlases.
 
-- [`get_glasser_atlas()`](../reference/get_glasser_atlas.md) now accepts
-  a `source` argument and defaults to `source = "mni2009c"` with
-  fallback to legacy `xcpengine` when unavailable. Fallback paths are
-  tagged with `confidence = "uncertain"`.
+- [`get_glasser_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_glasser_atlas.md)
+  now accepts a `source` argument and defaults to `source = "mni2009c"`
+  with fallback to legacy `xcpengine` when unavailable. Fallback paths
+  are tagged with `confidence = "uncertain"`.
 
 - Added `test-atlas-ref.R` coverage for atlas reference metadata and
   basic cross-representation label concordance checks.
 
 - Added space-level transform planning utilities backed by
   `inst/extdata/transform_registry.csv`:
-  [`space_transform_manifest()`](../reference/space_transform_manifest.md),
-  [`atlas_transform_plan()`](../reference/atlas_transform_plan.md), and
-  scope-aware
-  [`atlas_transform_manifest()`](../reference/atlas_transform_manifest.md).
+  [`space_transform_manifest()`](https://bbuchsbaum.github.io/neuroatlas/reference/space_transform_manifest.md),
+  [`atlas_transform_plan()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_transform_plan.md),
+  and scope-aware
+  [`atlas_transform_manifest()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_transform_manifest.md).
 
-- [`atlas_alignment()`](../reference/atlas_alignment.md) now consults
-  the space transform registry for same-representation cross-template
-  routes (e.g., NLin6Asym to 2009cAsym) and reports route-specific
-  status/confidence.
+- [`atlas_alignment()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_alignment.md)
+  now consults the space transform registry for same-representation
+  cross-template routes (e.g., NLin6Asym to 2009cAsym) and reports
+  route-specific status/confidence.
 
 - Fixed white gaps (“shards”) in
-  [`plot_brain()`](../reference/plot_brain.md) surface rendering caused
-  by inconsistent triangle winding in some meshes.
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+  surface rendering caused by inconsistent triangle winding in some
+  meshes.
 
 - Added `silhouette*` and `network_border*` options to
-  [`plot_brain()`](../reference/plot_brain.md) for improved boundary
-  styling (silhouette outline and between-network borders).
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+  for improved boundary styling (silhouette outline and between-network
+  borders).
 
-- Improved [`plot_brain()`](../reference/plot_brain.md) aesthetics with
-  smoother boundary rendering (`border_geom = "path"`) and an optional
-  normal-based shading overlay (`shading*`, `fill_alpha`).
+- Improved
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+  aesthetics with smoother boundary rendering (`border_geom = "path"`)
+  and an optional normal-based shading overlay (`shading*`,
+  `fill_alpha`).
 
 ## neuroatlas 0.1.0
 

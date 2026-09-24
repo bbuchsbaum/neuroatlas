@@ -46,6 +46,14 @@ reduce_atlas(
   Character string specifying output format: "wide" or "long". If NULL
   (default), uses "long" for NeuroVol and "wide" for NeuroVec.
 
+- level:
+
+  Optional grouping level used by methods.
+
+- by:
+
+  Optional grouping variable used by methods.
+
 ## Value
 
 A `tibble` with format depending on the `format` parameter:
@@ -64,8 +72,10 @@ tibble.
 
 ## See also
 
-[`map_atlas`](map_atlas.md) for mapping values to atlas regions,
-[`get_roi`](get_roi.md) for extracting specific regions
+[`map_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md)
+for mapping values to atlas regions,
+[`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+for extracting specific regions
 
 ## Examples
 

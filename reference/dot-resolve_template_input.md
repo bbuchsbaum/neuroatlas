@@ -16,7 +16,8 @@ neuroimaging template and resolves it to either a `NeuroVol` or
 
   The input to resolve. Can be a `NeuroVol`, `NeuroSpace`, a
   TemplateFlow space string, or a named list of
-  [`get_template()`](get_template.md) arguments.
+  [`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+  arguments.
 
 - target_type:
 

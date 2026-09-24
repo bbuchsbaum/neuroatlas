@@ -87,7 +87,8 @@ the volumetric version.
 
 ## See also
 
-[`get_schaefer_atlas`](get_schaefer_atlas.md) for volumetric version
+[`get_schaefer_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_schaefer_atlas.md)
+for volumetric version
 
 ## Examples
 

@@ -13,7 +13,7 @@ builds. The figures are committed outputs generated from the code shown.
 
 | Scientific question | Loader | Representation |
 |----|----|----|
-| where do areas lie on cortex? | [`get_wang_atlas()`](../reference/get_wang_atlas.md) | `surfatlas` in `fsaverage` / MNI305 coordinates |
+| where do areas lie on cortex? | [`get_wang_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md) | `surfatlas` in `fsaverage` / MNI305 coordinates |
 | what is the maximum-probability voxel label? | `get_wang_prob_atlas(image = "maxprob")` | raw `NeuroVol` pair on the native ProbAtlas grid |
 | what probability does one area have at each voxel? | `get_wang_prob_atlas(image = "probability")` | raw continuous `NeuroVol` objects |
 
@@ -22,9 +22,10 @@ easier to make.
 
 ## How do you load the native surface atlas?
 
-[`get_wang_atlas()`](../reference/get_wang_atlas.md) returns 50 regions:
-the same 25 area names in each hemisphere. The default midthickness
-geometry and label overlays may be downloaded and cached on first use.
+[`get_wang_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md)
+returns 50 regions: the same 25 area names in each hemisphere. The
+default midthickness geometry and label overlays may be downloaded and
+cached on first use.
 
 ``` r
 
@@ -264,10 +265,11 @@ anatomically registered.
 
 ## What about the other visual-cortex atlases?
 
-[`get_visfatlas()`](../reference/get_visfatlas.md) loads the 33-region
-Rosenke et al. functional visual atlas on its distributed 1 mm
-single-subject MNI grid. Its provenance records alignment to MNI
-colin27. [`get_visual_atlas()`](../reference/get_visual_atlas.md)
+[`get_visfatlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visfatlas.md)
+loads the 33-region Rosenke et al. functional visual atlas on its
+distributed 1 mm single-subject MNI grid. Its provenance records
+alignment to MNI colin27.
+[`get_visual_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_visual_atlas.md)
 derives V1-V5 regions from Julich-Brain. Both return ordinary volume
 `atlas` objects and can be rendered directly:
 
@@ -282,7 +284,8 @@ plot(julich_visual, nslices = 8, title = "Julich-derived V1-V5")
 
 Do not resample `visfAtlas` onto `MNI152NLin2009cAsym` and call the
 result aligned: regridding is not a validated colin27-to-MNI2009
-nonlinear transform. Inspect [`atlas_ref()`](../reference/atlas_ref.md)
+nonlinear transform. Inspect
+[`atlas_ref()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_ref.md)
 and the transform plan before any cross-template overlay.
 
 ## A representation checklist

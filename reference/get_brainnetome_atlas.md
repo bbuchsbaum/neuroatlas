@@ -38,7 +38,7 @@ A list with classes `c("brainnetome", "volatlas", "atlas")`.
 The Brainnetome download page describes non-commercial use and
 attribution terms. This loader keeps the data outside the package source
 and records the upstream assets in
-[`atlas_artifacts()`](atlas_artifacts.md).
+[`atlas_artifacts()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_artifacts.md).
 
 ## References
 

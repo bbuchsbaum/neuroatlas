@@ -1,7 +1,9 @@
 # MNI152 to MNI305 Affine Transform Matrix
 
-The inverse of [`MNI305_to_MNI152`](MNI305_to_MNI152.md), for converting
-RAS coordinates from MNI152 space back to MNI305 (fsaverage) space.
+The inverse of
+[`MNI305_to_MNI152`](https://bbuchsbaum.github.io/neuroatlas/reference/MNI305_to_MNI152.md),
+for converting RAS coordinates from MNI152 space back to MNI305
+(fsaverage) space.
 
 ## Usage
 
@@ -27,8 +29,8 @@ To apply: for a point `p = c(R, A, S)`, compute
 
 ## See also
 
-[`MNI305_to_MNI152`](MNI305_to_MNI152.md),
-[`transform_coords`](transform_coords.md)
+[`MNI305_to_MNI152`](https://bbuchsbaum.github.io/neuroatlas/reference/MNI305_to_MNI152.md),
+[`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md)
 
 ## Examples
 

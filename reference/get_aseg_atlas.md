@@ -69,8 +69,10 @@ of neuroanatomical structures in the human brain. Neuron, 33(3),
 
 ## See also
 
-[`map_atlas`](map_atlas.md) for mapping values onto atlas regions
-[`get_roi`](get_roi.md) for extracting specific regions of interest
+[`map_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md)
+for mapping values onto atlas regions
+[`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+for extracting specific regions of interest
 
 ## Examples
 

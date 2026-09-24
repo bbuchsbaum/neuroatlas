@@ -1,8 +1,9 @@
 # Batch Reduce Multiple Volumes by an Atlas
 
-Applies [`reduce_atlas`](reduce_atlas.md) to multiple input volumes (or
-file paths) and combines the results into a single tibble with a
-`subject` column identifying each input.
+Applies
+[`reduce_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md)
+to multiple input volumes (or file paths) and combines the results into
+a single tibble with a `subject` column identifying each input.
 
 ## Usage
 
@@ -41,7 +42,8 @@ batch_reduce(
 
 - ...:
 
-  Additional arguments passed to [`reduce_atlas`](reduce_atlas.md).
+  Additional arguments passed to
+  [`reduce_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md).
 
 - format:
 
@@ -64,7 +66,8 @@ for each input.
 
 ## See also
 
-[`reduce_atlas`](reduce_atlas.md) for single-volume extraction
+[`reduce_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md)
+for single-volume extraction
 
 ## Examples
 

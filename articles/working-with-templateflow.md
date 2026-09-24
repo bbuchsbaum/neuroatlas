@@ -22,15 +22,18 @@ library(neuroatlas)
 
 requireNamespace("templateflow", quietly = TRUE)
 show_templateflow_cache_path()
-#> [1] "/home/runner/.cache/R/neuroatlas/templateflow"
+#> [1] "/home/runner/.cache/templateflow"
 ```
 
-[`create_templateflow()`](../reference/create_templateflow.md) and
-[`install_templateflow()`](../reference/install_templateflow.md) are
-deprecated migration stubs. New code should call
-[`get_template()`](../reference/get_template.md),
-[`tflow_spaces()`](../reference/tflow_spaces.md), and
-[`tflow_files()`](../reference/tflow_files.md) directly.
+[`create_templateflow()`](https://bbuchsbaum.github.io/neuroatlas/reference/create_templateflow.md)
+and
+[`install_templateflow()`](https://bbuchsbaum.github.io/neuroatlas/reference/install_templateflow.md)
+are deprecated migration stubs. New code should call
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md),
+[`tflow_spaces()`](https://bbuchsbaum.github.io/neuroatlas/reference/tflow_spaces.md),
+and
+[`tflow_files()`](https://bbuchsbaum.github.io/neuroatlas/reference/tflow_files.md)
+directly.
 
 ## How do you fetch one template image?
 
@@ -70,8 +73,8 @@ intentionally shown without fabricated output.
 ## How do the query fields fit together?
 
 TemplateFlow filenames use BIDS-like entities.
-[`get_template()`](../reference/get_template.md) exposes two levels of
-control:
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+exposes two levels of control:
 
 | Argument | Meaning | Example |
 |----|----|----|
@@ -116,7 +119,8 @@ schaefer_path <- get_template(
 ```
 
 If one argument has several values,
-[`get_template()`](../reference/get_template.md) returns a named list:
+[`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+returns a named list:
 
 ``` r
 
@@ -135,17 +139,18 @@ code.
 
 ## How do you discover what exists?
 
-[`tflow_spaces()`](../reference/tflow_spaces.md) lists registered
-template IDs; its optional regular expression filters the result:
+[`tflow_spaces()`](https://bbuchsbaum.github.io/neuroatlas/reference/tflow_spaces.md)
+lists registered template IDs; its optional regular expression filters
+the result:
 
 ``` r
 
 tflow_spaces(pattern = "^MNI")
 ```
 
-[`tflow_files()`](../reference/tflow_files.md) is the lower-level
-inventory query. It returns paths matching the supplied entities and is
-useful before you choose one exact file:
+[`tflow_files()`](https://bbuchsbaum.github.io/neuroatlas/reference/tflow_files.md)
+is the lower-level inventory query. It returns paths matching the
+supplied entities and is useful before you choose one exact file:
 
 ``` r
 
@@ -165,8 +170,9 @@ as a permanent catalogue.
 ## How do you fetch surface geometry?
 
 Surface queries use hemisphere, density or resolution, and a surface
-suffix. [`get_surface_template()`](../reference/get_template.md) returns
-a file path by default:
+suffix.
+[`get_surface_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
+returns a file path by default:
 
 ``` r
 
@@ -179,8 +185,8 @@ left_midthickness <- get_surface_template(
 left_midthickness
 ```
 
-[`load_surface_template()`](../reference/load_surface_template.md) reads
-the geometry for use with `neurosurf`:
+[`load_surface_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/load_surface_template.md)
+reads the geometry for use with `neurosurf`:
 
 ``` r
 
@@ -193,7 +199,8 @@ geometry <- load_surface_template(
 geometry
 ```
 
-Use [`vignette("surface-templates")`](../articles/surface-templates.md)
+Use
+[`vignette("surface-templates")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.md)
 for the distinction between geometry, per-vertex data, and labelled
 surface atlases.
 
@@ -223,9 +230,8 @@ atlas_transform_plan(
 #>   from_space: MNI152NLin6Asym 
 #>   to_space: MNI152NLin2009cAsym 
 #>   n_steps: 1 
-#>   status: planned 
-#>   confidence: high 
-#>   warnings: Plan includes unimplemented/planned transform step(s).
+#>   status: available 
+#>   confidence: high
 ```
 
 A plan marked `planned` is not an executable transform. Do not use
@@ -241,10 +247,10 @@ path into a `NeuroVol`.
 ``` r
 
 show_templateflow_cache_path()
-#> [1] "/home/runner/.cache/R/neuroatlas/templateflow"
+#> [1] "/home/runner/.cache/templateflow"
 ```
 
-[`clear_templateflow_cache()`](../reference/clear_templateflow_cache.md)
+[`clear_templateflow_cache()`](https://bbuchsbaum.github.io/neuroatlas/reference/clear_templateflow_cache.md)
 removes cached assets and in-memory loading state; because that is
 destructive and may trigger large downloads later, call it only when you
 deliberately want to rebuild the cache.
@@ -252,14 +258,15 @@ deliberately want to rebuild the cache.
 ## Where should you go next?
 
 - Return to
-  [`vignette("neuroatlas-overview")`](../articles/neuroatlas-overview.md)
+  [`vignette("neuroatlas-overview")`](https://bbuchsbaum.github.io/neuroatlas/articles/neuroatlas-overview.md)
   for the atlas-to-summary workflow.
 - Read
-  [`vignette("surface-templates")`](../articles/surface-templates.md)
+  [`vignette("surface-templates")`](https://bbuchsbaum.github.io/neuroatlas/articles/surface-templates.md)
   for surface geometry and data.
 - Use
-  [`space_transform_manifest()`](../reference/space_transform_manifest.md)
-  and [`atlas_transform_plan()`](../reference/atlas_transform_plan.md)
+  [`space_transform_manifest()`](https://bbuchsbaum.github.io/neuroatlas/reference/space_transform_manifest.md)
+  and
+  [`atlas_transform_plan()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_transform_plan.md)
   before mixing images from different template spaces.
 
 For archive naming and governance, consult the [TemplateFlow

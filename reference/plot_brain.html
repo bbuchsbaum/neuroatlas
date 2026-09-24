@@ -11,7 +11,7 @@ the legacy ggseg-based visualisation pipeline."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,6 +133,8 @@ the legacy ggseg-based visualisation pipeline.</p>
 <span>  value <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  allow_partial <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  vals_threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  parcel_style <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -202,9 +204,12 @@ returns a static <code>ggplot2</code> object.</p></dd>
 
 <dt id="arg-static-backend">static_backend<a class="anchor" aria-label="anchor" href="#arg-static-backend"></a></dt>
 <dd><p>Static renderer: the existing <code>"ggplot"</code> polygon
-path or deterministic <code>"cpu"</code> barycentric rasterization. The CPU
-path is intended for continuous publication overlays and requires no
-OpenGL or browser.</p></dd>
+path or deterministic <code>"cpu"</code> rasterization. With a vertex
+<code>overlay</code> the CPU path renders continuous publication overlays; with
+parcel <code>vals</code> (and no overlay) it renders a publication parcel map
+through [neurosurf::render_surface_parcels()]: smooth antialiased parcel
+edges, a sulcal-depth underlay, soft lighting, a light medial wall, and an
+automatically arranged figure. Neither needs OpenGL or a browser.</p></dd>
 
 
 <dt id="arg-data-id-mode">data_id_mode<a class="anchor" aria-label="anchor" href="#arg-data-id-mode"></a></dt>
@@ -590,6 +595,18 @@ When <code>NULL</code>, a safe unique key is inferred.</p></dd>
 <dd><p>Logical. If <code>FALSE</code> (default), <code>data</code> must
 contain every atlas parcel. If <code>TRUE</code>, missing parcels are rendered
 with <code>NA</code> values. Unknown and duplicate keys always error.</p></dd>
+
+
+<dt id="arg-vals-threshold">vals_threshold<a class="anchor" aria-label="anchor" href="#arg-vals-threshold"></a></dt>
+<dd><p>Optional non-negative magnitude for the CPU parcel
+renderer (<code>static_backend = "cpu"</code> with <code>vals</code>): parcels with
+<code>abs(vals)</code> below it stay unfilled, and the colorbar greys out the
+sub-threshold band.</p></dd>
+
+
+<dt id="arg-parcel-style">parcel_style<a class="anchor" aria-label="anchor" href="#arg-parcel-style"></a></dt>
+<dd><p>Optional [neurosurf::surface_parcel_style()] object or
+named list of its settings for the CPU parcel renderer.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

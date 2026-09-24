@@ -24,7 +24,8 @@ A data frame with columns:
 - `cbig_space`: CBIG FreeSurfer5.3 subfolder.
 
 - `template_id`, `tf_resolution`, `tf_density`: TemplateFlow identifiers
-  used by [`get_surface_template()`](get_template.md).
+  used by
+  [`get_surface_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md).
 
 ## Examples
 

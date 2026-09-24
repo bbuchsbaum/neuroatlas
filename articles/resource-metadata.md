@@ -159,8 +159,9 @@ separately as `spatial$sampling_reference` and in the resampling
 parameters. Supplying a different TemplateFlow name as `outspace` does
 not prove that a nonlinear warp to that template was applied.
 
-[`dilate_atlas()`](../reference/dilate_atlas.md) records its radius and
-neighbour limit. [`merge_atlases()`](../reference/merge_atlases.md)
+[`dilate_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/dilate_atlas.md)
+records its radius and neighbour limit.
+[`merge_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/merge_atlases.md)
 keeps both parent metadata records and their references, records the
 identifier map and overlap rule, and rejects conflicting grids or known
 template identities. Surface subsetting remains unsupported; its
@@ -193,11 +194,12 @@ provenance; it is not treated as the original template’s published
 version.
 
 `get_wang_prob_atlas(path_only = FALSE)` also provides
-[`atlas_metadata()`](../reference/atlas_metadata.md) and
-[`atlas_citations()`](../reference/atlas_citations.md). Its record
-distinguishes probability maps from maximum-probability labels, and
-retains the individual volume records in `parents`. Path-only requests
-retain their existing path/manifest return types.
+[`atlas_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_metadata.md)
+and
+[`atlas_citations()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_citations.md).
+Its record distinguishes probability maps from maximum-probability
+labels, and retains the individual volume records in `parents`.
+Path-only requests retain their existing path/manifest return types.
 
 ## Save the evidence with your analysis
 
@@ -219,12 +221,13 @@ recorded checksum is a content identity, not an assertion that an
 upstream publisher supplied a matching checksum.
 
 The metadata record is authoritative. Existing
-[`atlas_ref()`](../reference/atlas_ref.md),
-[`atlas_artifacts()`](../reference/atlas_artifacts.md), and
-[`atlas_history()`](../reference/atlas_history.md) calls continue to
-work for atlas objects. Direct edits to legacy compatibility fields do
-not update the record. Old saved objects receive conservative metadata
-views with unknown provenance. Preservation is supported for
-neuroatlas’s loaders and atlas operations; arbitrary data replacement or
-transformations in other packages may require their own provenance
-handling.
+[`atlas_ref()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_ref.md),
+[`atlas_artifacts()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_artifacts.md),
+and
+[`atlas_history()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_history.md)
+calls continue to work for atlas objects. Direct edits to legacy
+compatibility fields do not update the record. Old saved objects receive
+conservative metadata views with unknown provenance. Preservation is
+supported for neuroatlas’s loaders and atlas operations; arbitrary data
+replacement or transformations in other packages may require their own
+provenance handling.

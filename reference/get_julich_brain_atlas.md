@@ -19,6 +19,15 @@ get_julich_brain_atlas(fsl_dir = Sys.getenv("FSLDIR"), download = TRUE, ...)
   \`get_julich_brain_atlas()\` downloads an FSL-style Julich-Brain cache
   when this is empty and \`download = TRUE\`.
 
+- download:
+
+  Download the Julich-Brain atlas archive into the neuroatlas cache when
+  \`fsl_dir\` is unset.
+
+- ...:
+
+  Additional arguments passed to \`get_fsl_atlas()\`.
+
 ## Value
 
 An \`atlas\` object, or path metadata when \`path_only = TRUE\`.

@@ -51,7 +51,7 @@ spin_test(
   Optional list with elements `lh` and `rh`, each an N x 3 matrix of
   sphere vertex coordinates. If `NULL` (default), sphere coordinates are
   fetched via
-  [`load_surface_template`](load_surface_template.md)`(..., "sphere")`.
+  [`load_surface_template`](https://bbuchsbaum.github.io/neuroatlas/reference/load_surface_template.md)`(..., "sphere")`.
 
 - seed:
 

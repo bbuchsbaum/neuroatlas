@@ -1,0 +1,201 @@
+# Verified Template Transforms
+
+A template transform moves samples between explicitly named image grids.
+It does not estimate a registration, infer an atlas correspondence, or
+change a parcellation’s region identities. `neuroatlas` resolves an
+available route and samples the source once on the target grid.
+
+The application API requires the optional `neurotransform` and `hdf5r`
+packages. Install the engine revision pinned in neuroatlas’s `Remotes`
+field; the runtime checks its H5 conventions against independent
+fixtures.
+
+## Transform a volume on an explicit target grid
+
+Use
+[`get_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_transform.md)
+followed by
+[`apply_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_template_transform.md).
+The built-in MNI305-to-MNI152 affine route is available without a
+download. This offline example supplies continuous semantics and both
+image grids.
+
+``` r
+
+library(neuroatlas)
+if (!requireNamespace("neurotransform", quietly = TRUE)) {
+  stop("This vignette requires the optional neurotransform package.")
+}
+
+source_grid <- neuroim2::NeuroSpace(
+  c(5L, 5L, 5L), spacing = c(2, 2, 2), origin = c(-4, -4, -4)
+)
+source <- neuroim2::NeuroVol(array(seq_len(125), c(5, 5, 5)), source_grid)
+target_grid <- neuroim2::NeuroSpace(
+  c(5L, 5L, 5L), spacing = c(2, 2, 2), origin = c(-4, -4, -4)
+)
+
+transform <- get_template_transform(
+  "MNI305", "MNI152", provider = "neuroatlas", offline = TRUE
+)
+transformed <- apply_template_transform(
+  source, transform, target_grid, data_type = "continuous"
+)
+
+c(
+  source_range = range(as.vector(source)),
+  transformed_range = range(as.vector(transformed)),
+  output_dimensions = paste(dim(transformed), collapse = " x ")
+)
+#>      source_range1      source_range2 transformed_range1 transformed_range2 
+#>                "1"              "125"                "0" "107.228130585401" 
+#>  output_dimensions 
+#>        "5 x 5 x 5"
+```
+
+The target grid is part of the analysis definition: dimensions, affine,
+spacing, and origin determine where values are evaluated. A bare grid
+asserts that it belongs to the transform’s target template. Attached
+source or target metadata must agree with the route.
+
+``` r
+
+receipt <- attr(transformed, "neuroatlas_transform")
+receipt[c("from_space", "to_space", "data_type", "interpolation", "renormalized")]
+#> $from_space
+#> [1] "MNI305"
+#> 
+#> $to_space
+#> [1] "MNI152"
+#> 
+#> $data_type
+#> [1] "continuous"
+#> 
+#> $interpolation
+#> [1] "linear"
+#> 
+#> $renormalized
+#> [1] FALSE
+```
+
+## Select sampling semantics
+
+`data_type` is a sampling contract. Labels and masks use
+nearest-neighbour sampling, so output values remain source labels or
+zero outside the source field. Continuous values and probability
+channels use linear interpolation. Probability values are not
+renormalized after resampling.
+
+For an atlas, label semantics are automatic. For a bare `NeuroVol` or
+`NeuroVec`, supply `data_type` unless metadata already declares its
+contents. The package rejects a conflict between metadata and an
+explicit type.
+
+When a target clips a labelled atlas, the atlas retains all semantic
+`ids`, labels, and provenance. The receipt records only IDs absent from
+the output.
+
+``` r
+
+aligned_atlas <- transform_atlas(
+  atlas, to_space = "MNI152", target = target_grid, provider = "neuroatlas"
+)
+attr(aligned_atlas, "neuroatlas_transform")$lost_label_ids
+```
+
+[`transform_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_atlas.md)
+changes image space; it does not make labels from different
+parcellations equivalent. After alignment, use
+[`atlas_overlap()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_overlap.md)
+to inspect spatial relationships.
+[`map_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md)
+retains its original role of mapping supplied regional values onto an
+atlas.
+
+## Route availability and nonlinear artifacts
+
+The manifest distinguishes available and planned routes. Only available
+routes are resolved by
+[`get_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_transform.md).
+
+``` r
+
+space_transform_manifest()[, c("from_space", "to_space", "backend", "status")]
+#>             from_space            to_space         backend    status
+#> 1               MNI305              MNI152 internal_affine available
+#> 2               MNI152              MNI305 internal_affine available
+#> 3      MNI152NLin6Asym MNI152NLin2009cAsym  neurotransform available
+#> 4  MNI152NLin2009cAsym     MNI152NLin6Asym  neurotransform available
+#> 5            fsaverage          fsaverage6       sphere_nn available
+#> 6           fsaverage6           fsaverage       sphere_nn available
+#> 7            fsaverage          fsaverage5       sphere_nn available
+#> 8           fsaverage5           fsaverage       sphere_nn available
+#> 9            fsaverage            fsLR_32k       workbench   planned
+#> 10            fsLR_32k           fsaverage       workbench   planned
+#> 11 MNI152NLin2009cAsym           fsaverage       neurosurf   planned
+#> 12           fsaverage MNI152NLin2009cAsym     ribbon_fill   planned
+```
+
+Both directions between MNI152NLin6Asym and MNI152NLin2009cAsym are
+available from the [immutable artifact
+release](https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1).
+Each ANTs H5 file is about 86 MiB and is verified before use. The
+download example is not run while building this vignette.
+
+``` r
+
+nonlinear <- get_template_transform(
+  "MNI152NLin6Asym", "MNI152NLin2009cAsym", provider = "neuroatlas",
+  cache_dir = transform_cache_path(), download = TRUE, offline = FALSE
+)
+schaefer <- get_schaefer_atlas(parcels = 200, networks = 7, resolution = 2)
+target <- get_template("MNI152NLin2009cAsym", resolution = 2)
+aligned <- apply_template_transform(schaefer, nonlinear, target)
+```
+
+Qualification covers both directions on the native 1 mm and 2 mm target
+grids, with independent ANTs application, repeated builds, numerical
+coverage probes, and review of all 24 visual panels. The maximum point
+round-trip error was 0.0782 mm against the frozen 0.5 mm limit;
+repeated-build point differences were zero. These results describe
+template transforms, not individual-subject accuracy. Jacobian
+positivity was checked within the declared brain masks.
+
+Coarser resampling loses boundary detail: minimum label image-round-trip
+Dice was 0.7966 at 2 mm. Minimum inverse 2 mm Harvard-Oxford concordance
+was 0.5779; these mapped atlas labels are diagnostic rather than
+independent anatomical truth. The release retains the full measurements,
+reviews, and failed earlier attempts. See its [distribution
+conditions](https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/LICENSES.md)
+for template/evidence terms, including FSL commercial-use restrictions.
+
+## Work with the verified cache
+
+Artifacts live in a dedicated cache, separate from TemplateFlow’s cache.
+A download is published atomically only after its byte count and SHA-256
+digest match its immutable release record. Verification cannot be
+disabled; a corrupt cache entry fails rather than being used silently.
+
+Use `offline = TRUE` when an analysis may use only already verified
+artifacts:
+
+``` r
+
+get_template_transform(
+  "MNI152NLin6Asym", "MNI152NLin2009cAsym", provider = "neuroatlas",
+  cache_dir = transform_cache_path(), offline = TRUE
+)
+```
+
+[`clear_transform_cache()`](https://bbuchsbaum.github.io/neuroatlas/reference/clear_transform_cache.md)
+removes only entries neuroatlas recognizes as its own, refuses active
+locks, and does not clear a TemplateFlow cache.
+
+``` r
+
+clear_transform_cache(artifact_version = "released-artifact-version")
+```
+
+Keep the `neuroatlas_transform` receipt with analysis output. It records
+the route, artifact checksums, grids, interpolation, and lost-label
+information.

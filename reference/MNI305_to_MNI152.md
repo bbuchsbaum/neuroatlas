@@ -32,8 +32,8 @@ To apply: for a point `p = c(R, A, S)`, compute
 ## See also
 
 <https://surfer.nmr.mgh.harvard.edu/fswiki/CoordinateSystems>
-[`MNI152_to_MNI305`](MNI152_to_MNI305.md),
-[`transform_coords`](transform_coords.md)
+[`MNI152_to_MNI305`](https://bbuchsbaum.github.io/neuroatlas/reference/MNI152_to_MNI305.md),
+[`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md)
 
 ## Examples
 

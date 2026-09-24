@@ -44,7 +44,8 @@ atlas_connectivity(
 
 - ...:
 
-  Additional arguments passed to [`reduce_atlas`](reduce_atlas.md).
+  Additional arguments passed to
+  [`reduce_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md).
 
 ## Value
 
@@ -53,8 +54,10 @@ region labels as dimnames.
 
 ## See also
 
-[`reduce_atlas`](reduce_atlas.md) for the underlying extraction,
-[`as_igraph.atlas_connectivity`](as_igraph.md) for graph conversion
+[`reduce_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md)
+for the underlying extraction,
+[`as_igraph.atlas_connectivity`](https://bbuchsbaum.github.io/neuroatlas/reference/as_igraph.md)
+for graph conversion
 
 ## Examples
 

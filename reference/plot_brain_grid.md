@@ -2,7 +2,7 @@
 
 Arranges multiple brain surface plots into a grid layout using
 patchwork. Each element of `vals_list` produces one panel rendered by
-[`plot_brain`](plot_brain.md).
+[`plot_brain`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
 
 ## Usage
 
@@ -34,8 +34,10 @@ plot_brain_grid(
 
 - surfatlas:
 
-  A `surfatlas` object (e.g., from [`schaefer_surf`](schaefer_surf.md)
-  or [`glasser_surf`](glasser_surf.md)).
+  A `surfatlas` object (e.g., from
+  [`schaefer_surf`](https://bbuchsbaum.github.io/neuroatlas/reference/schaefer_surf.md)
+  or
+  [`glasser_surf`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md)).
 
 - vals_list:
 
@@ -46,13 +48,15 @@ plot_brain_grid(
 
 - views:
 
-  Character vector of views passed to [`plot_brain`](plot_brain.md).
+  Character vector of views passed to
+  [`plot_brain`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
   Default: `c("lateral", "medial")`.
 
 - hemis:
 
   Character vector of hemispheres passed to
-  [`plot_brain`](plot_brain.md). Default: `c("left", "right")`.
+  [`plot_brain`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
+  Default: `c("left", "right")`.
 
 - ncol:
 
@@ -105,7 +109,7 @@ plot_brain_grid(
 - by:
 
   Parcel-key specification passed to
-  [`align_parcel_values()`](align_parcel_values.md).
+  [`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md).
 
 - allow_partial:
 
@@ -114,7 +118,8 @@ plot_brain_grid(
 
 - ...:
 
-  Additional arguments passed to [`plot_brain`](plot_brain.md).
+  Additional arguments passed to
+  [`plot_brain`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md).
 
 ## Value
 

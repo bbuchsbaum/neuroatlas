@@ -4,9 +4,9 @@ Resolve (and optionally load) the full per-area probability maps and
 maximum-probability volumes from the original Princeton ProbAtlas_v4
 distribution of the Wang et al. (2015) visual topography atlas. These
 are the volumetric counterparts to the surface labels returned by
-[`get_wang_atlas()`](get_wang_atlas.md): for each of the 25 topographic
-areas there is a continuous probability map
-(`perc_VTPM_vol_roi<n>_<hemi>.nii.gz`) in MNI volume space, plus a
+[`get_wang_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md):
+for each of the 25 topographic areas there is a continuous probability
+map (`perc_VTPM_vol_roi<n>_<hemi>.nii.gz`) in MNI volume space, plus a
 maximum-probability summary (`maxprob_vol_<hemi>.nii.gz`).
 
 ## Usage
@@ -108,8 +108,9 @@ the cache.
 
 Note on naming: the volume coding (`ROIfiles_Labeling.txt`) labels areas
 12/13 as `MST`/`hMT`, which correspond to `TO2`/`TO1` in the surface
-(neuropythy) naming used by [`get_wang_atlas()`](get_wang_atlas.md); the
-numeric ids are identical.
+(neuropythy) naming used by
+[`get_wang_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md);
+the numeric ids are identical.
 
 ## References
 
@@ -120,7 +121,8 @@ Cortex, 25(10), 3911-3931.
 
 ## See also
 
-[`get_wang_atlas`](get_wang_atlas.md) for the fsaverage surface atlas.
+[`get_wang_atlas`](https://bbuchsbaum.github.io/neuroatlas/reference/get_wang_atlas.md)
+for the fsaverage surface atlas.
 
 ## Examples
 

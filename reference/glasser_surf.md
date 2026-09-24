@@ -50,7 +50,7 @@ A list with classes `c("glasser_surf","surfatlas","atlas")` containing:
 This function uses:
 
 - fsaverage surface geometry from TemplateFlow via
-  [`load_surface_template`](load_surface_template.md)
+  [`load_surface_template`](https://bbuchsbaum.github.io/neuroatlas/reference/load_surface_template.md)
 
 - fsaverage `.annot` files from the Mills Figshare distribution
   (`lh.HCP-MMP1.annot`, `rh.HCP-MMP1.annot`)

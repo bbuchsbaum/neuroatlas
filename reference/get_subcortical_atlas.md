@@ -26,8 +26,8 @@ get_subcortical_atlas(
 - name:
 
   Atlas identifier; see
-  [`subcortical_atlas_options()`](subcortical_atlas_options.md). Aliases
-  such as "thalamus_hcp" or "cerebellum" are accepted.
+  [`subcortical_atlas_options()`](https://bbuchsbaum.github.io/neuroatlas/reference/subcortical_atlas_options.md).
+  Aliases such as "thalamus_hcp" or "cerebellum" are accepted.
 
 - template_space:
 
@@ -52,7 +52,8 @@ get_subcortical_atlas(
 
 - use_cache:
 
-  Logical; pass through to [`get_template`](get_template.md).
+  Logical; pass through to
+  [`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md).
 
 - path_only:
 
@@ -61,7 +62,8 @@ get_subcortical_atlas(
 
 - ...:
 
-  Additional arguments forwarded to [`get_template`](get_template.md).
+  Additional arguments forwarded to
+  [`get_template`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md).
 
 ## Value
 

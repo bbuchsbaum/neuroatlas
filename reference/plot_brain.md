@@ -89,6 +89,8 @@ plot_brain(
   value = NULL,
   by = NULL,
   allow_partial = FALSE,
+  vals_threshold = NULL,
+  parcel_style = NULL,
   ...
 )
 ```
@@ -98,8 +100,9 @@ plot_brain(
 - surfatlas:
 
   A surface atlas object of class `"surfatlas"` (e.g. from
-  [`schaefer_surf()`](schaefer_surf.md) or
-  [`glasser_surf()`](glasser_surf.md)).
+  [`schaefer_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/schaefer_surf.md)
+  or
+  [`glasser_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md)).
 
 - vals:
 
@@ -128,7 +131,8 @@ plot_brain(
 - color_method:
 
   Colour algorithm for discrete parcel colouring (when `vals` is
-  `NULL`). Passed to [`atlas_roi_colors()`](atlas_roi_colors.md).
+  `NULL`). Passed to
+  [`atlas_roi_colors()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_roi_colors.md).
   Default: `"rule_hcl"`.
 
 - colors:
@@ -157,8 +161,13 @@ plot_brain(
 - static_backend:
 
   Static renderer: the existing `"ggplot"` polygon path or deterministic
-  `"cpu"` barycentric rasterization. The CPU path is intended for
-  continuous publication overlays and requires no OpenGL or browser.
+  `"cpu"` rasterization. With a vertex `overlay` the CPU path renders
+  continuous publication overlays; with parcel `vals` (and no overlay)
+  it renders a publication parcel map through
+  \[neurosurf::render_surface_parcels()\]: smooth antialiased parcel
+  edges, a sulcal-depth underlay, soft lighting, a light medial wall,
+  and an automatically arranged figure. Neither needs OpenGL or a
+  browser.
 
 - data_id_mode:
 
@@ -507,8 +516,8 @@ plot_brain(
 
   Optional data frame, tibble, or `parcel_data` object with one row per
   parcel. When supplied, `value` is aligned to the atlas with
-  [`align_parcel_values()`](align_parcel_values.md) before rendering.
-  Supply either `data` or `vals`, not both.
+  [`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md)
+  before rendering. Supply either `data` or `vals`, not both.
 
 - value:
 
@@ -526,6 +535,17 @@ plot_brain(
   Logical. If `FALSE` (default), `data` must contain every atlas parcel.
   If `TRUE`, missing parcels are rendered with `NA` values. Unknown and
   duplicate keys always error.
+
+- vals_threshold:
+
+  Optional non-negative magnitude for the CPU parcel renderer
+  (`static_backend = "cpu"` with `vals`): parcels with `abs(vals)` below
+  it stay unfilled, and the colorbar greys out the sub-threshold band.
+
+- parcel_style:
+
+  Optional \[neurosurf::surface_parcel_style()\] object or named list of
+  its settings for the CPU parcel renderer.
 
 - ...:
 

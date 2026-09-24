@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,17 @@
       <small>Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9004" id="neuroatlas-0109004">neuroatlas 0.1.0.9004<a class="anchor" aria-label="anchor" href="#neuroatlas-0109004"></a></h2>
+<ul><li>
+<code>plot_brain(static_backend = "cpu", vals = ...)</code> now renders publication parcel maps with <code><a href="https://bbuchsbaum.github.io/neurosurf/reference/render_surface_parcels.html" class="external-link">neurosurf::render_surface_parcels()</a></code>: smooth antialiased parcel edges, a sulcal-depth underlay with soft lighting, a flat medial wall drawn only in medial views, and a figure whose layout (2x2 grid or single row, colorbar below or beside) adapts to the device. New arguments <code>vals_threshold</code> (unfills sub-threshold parcels and greys that band of the colorbar) and <code>parcel_style</code>. The CPU backend previously rejected <code>vals</code>.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9003" id="neuroatlas-0109003">neuroatlas 0.1.0.9003<a class="anchor" aria-label="anchor" href="#neuroatlas-0109003"></a></h2>
+<ul><li>Enabled the qualified <code>MNI152NLin6Asym</code> / <code>MNI152NLin2009cAsym</code> ANTs transform pair in both directions, with published artifact hashes, input and software provenance, and qualification on 1 mm and 2 mm target grids.</li>
+<li>Added <code><a href="../reference/get_template_transform.html">get_template_transform()</a></code>, <code><a href="../reference/apply_template_transform.html">apply_template_transform()</a></code>, and <code><a href="../reference/transform_atlas.html">transform_atlas()</a></code> for explicit template-space routes and target grids. Routes compose before a single resampling pass. Label IDs and metadata are retained, probability channels are never renormalized, and provenance records the artifact hashes, grids, and interpolation.</li>
+<li>Added verified transform caching with atomic downloads, offline operation, and cache cleanup restricted to neuroatlas-owned files. The route planner handles longer paths and can restrict resolution to executable releases.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9000" id="neuroatlas-0109000">neuroatlas 0.1.0.9000<a class="anchor" aria-label="anchor" href="#neuroatlas-0109000"></a></h2>
 <ul><li><p>Added <code><a href="../reference/get_hcpex_atlas.html">get_hcpex_atlas()</a></code> and <code>get_atlas("hcpex")</code> for HCPex v1.1: 360 cortical and 66 subcortical regions at 1 or 2 mm in the source-declared MNI152NLin2009cAsym space. Downloads use a pinned upstream revision and checksum-verified caching. Native IDs, abbreviations, full names, colors, hemisphere, and cortical/subcortical membership are available for ROI work; metadata includes citations, license, file receipts, and resampling history.</p></li>
