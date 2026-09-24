@@ -149,7 +149,8 @@ click-to-surface workflows.}
 \code{"native"} (default) preserves raw projected units;
 \code{"presentation"} recentres each panel, rotates dorsal/ventral views
 to horizontal, and normalises per-panel scale for a cleaner ggseg-like
-grid.}
+grid. Placement, scale, and panel limits use the full cortex silhouette,
+regardless of parcel coverage or whether \code{background} is drawn.}
 
 \item{style}{Visual preset. \code{"default"} keeps existing behaviour.
 \code{"ggseg_like"} enables a cleaner publication style and, unless
@@ -342,8 +343,9 @@ on matched white geometry and verifies vertex correspondence.}
 \item{medial_wall}{Explicit medial-wall policy: neutral shade, mask, or
 independent outline.}
 
-\item{camera}{Strict canonical orthographic or slightly oblique presentation
-camera.}
+\item{camera}{Camera for \code{static_backend = "cpu"}: strict canonical
+orthographic or slightly oblique presentation. The ggplot backend always
+uses canonical projections; use \code{panel_layout} to arrange its panels.}
 
 \item{orientation_labels}{Draw small anterior/posterior marks in CPU panels.}
 
