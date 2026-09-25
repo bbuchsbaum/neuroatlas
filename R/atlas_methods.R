@@ -119,7 +119,12 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
   # Helper to apply discrete colour scale to a ggplot from plot_montage/ortho
   .apply_atlas_scale <- function(p) {
     # Convert the continuous 'value' column to factor for discrete scale
-    p$data$value <- factor(as.character(round(p$data$value)),
+    if (!is.data.frame(p$data) || !"value" %in% names(p$data)) {
+      stop("Cannot recolour the neuroim2 slice plot: its data has no ",
+           "'value' column (unsupported neuroim2 plot structure).",
+           call. = FALSE)
+    }
+    p$data$value <- factor(.atlas_value_ids(p$data$value),
                            levels = names(color_map))
     # Suppress "Scale for fill is already present" message from replacing
     # the continuous scale that plot_montage/plot_ortho sets
@@ -168,14 +173,34 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
     n_use <- min(nslices, length(nonempty))
     idx <- nonempty[round(seq(1, length(nonempty), length.out = n_use))]
 
-    p <- neuroim2::plot_montage(vol, zlevels = idx, ncol = min(6L, n_use), ...)
+    p <- .call_neuroim2_plot(
+      neuroim2::plot_montage, vol,
+      args = list(zlevels = idx, ncol = min(6L, n_use)),
+      optional = list(interpolate = FALSE),
+      dots = list(...)
+    )
     p <- .apply_atlas_scale(p)
     print(p)
     invisible(p)
   } else {
     # ortho: list of 3 ggplots
-    plots <- neuroim2::plot_ortho(vol, ...)
-    plots <- lapply(plots, .apply_atlas_scale)
+    # neuroim2 >= 0.19 returns one assembled patchwork figure by default;
+    # ask for the per-plane ggplots (assemble = FALSE) so each can be
+    # recoloured. Older versions return the list directly.
+    plots <- .call_neuroim2_plot(
+      neuroim2::plot_ortho, vol,
+      optional = list(assemble = FALSE, interpolate = FALSE, crop = FALSE),
+      dots = list(...)
+    )
+    if (inherits(plots, "ggplot")) {
+      stop("neuroim2::plot_ortho() returned a single assembled figure; ",
+           "cannot recolour its panels.", call. = FALSE)
+    }
+    plane_order <- c("sagittal", "coronal", "axial")
+    if (all(plane_order %in% names(plots))) {
+      plots <- plots[plane_order]
+    }
+    plots <- lapply(unname(plots), .apply_atlas_scale)
     if (requireNamespace("patchwork", quietly = TRUE)) {
       # Collect the three identical panel legends into one shared legend.
       combined <- patchwork::wrap_plots(
@@ -189,4 +214,44 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
       invisible(plots)
     }
   }
+}
+
+#' Convert slice-plot values to atlas region-ID strings
+#'
+#' neuroim2's slice plots store voxel values in a `value` column whose type
+#' has varied across versions (numeric, and possibly factor or character).
+#' Returns the rounded integer label as a character vector, `NA` for values
+#' that are not interpretable as numbers.
+#' @param value Vector of slice values.
+#' @return Character vector of region IDs.
+#' @keywords internal
+#' @noRd
+.atlas_value_ids <- function(value) {
+  if (is.list(value)) {
+    value <- vapply(value, function(v) {
+      if (length(v) == 1L) as.character(v) else NA_character_
+    }, character(1))
+  }
+  if (is.factor(value)) value <- as.character(value)
+  if (!is.numeric(value)) {
+    value <- suppressWarnings(as.numeric(as.character(value)))
+  }
+  out <- as.character(round(value))
+  out[is.na(value)] <- NA_character_
+  out
+}
+
+#' Call a neuroim2 slice-plot function with version-tolerant arguments
+#'
+#' `args` are always passed. `optional` arguments are passed only when the
+#' installed neuroim2 function accepts them, so the same call works with
+#' neuroim2 releases before and after the 0.19 plotting redesign. User
+#' arguments in `dots` take precedence over both.
+#' @keywords internal
+#' @noRd
+.call_neuroim2_plot <- function(fun, vol, args = list(), optional = list(),
+                                dots = list()) {
+  optional <- optional[names(optional) %in% names(formals(fun))]
+  args <- utils::modifyList(utils::modifyList(args, optional), dots)
+  do.call(fun, c(list(vol), args))
 }
