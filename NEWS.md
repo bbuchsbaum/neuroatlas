@@ -1,3 +1,10 @@
+# neuroatlas 0.1.0.9006
+
+* `surface_anatomy()` gains `type = "sulcal_depth"`, a FreeSurfer-style
+  sulcal-depth proxy from the white and displayed (inflated) surfaces. It gives
+  the broad two-tone gyral/sulcal underlay used by Workbench and pycortex; the
+  default (`"curvature"`) is unchanged, and explicit or atlas metrics still win.
+
 # neuroatlas 0.1.0.9005
 
 * The CPU parcel renderer again uses the sulcal-depth underlay on inflated

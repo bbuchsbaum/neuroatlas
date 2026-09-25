@@ -359,21 +359,72 @@
 
 #' Resolve an anatomical underlay for a surface atlas
 #'
-#' Uses an explicit metric, then the atlas anatomy metric, otherwise curvature
-#' computed on matching white geometry with five adjacency averaging steps.
-#' Supplied metrics are used unchanged. The result can be shared by static and
-#' interactive renderers. No curvature is inferred from an inflated surface.
+#' Uses an explicit metric, then the atlas anatomy metric, otherwise a metric
+#' computed from matching white geometry. Supplied metrics are used unchanged.
+#' The result can be shared by static and interactive renderers. No curvature
+#' is inferred from an inflated surface.
+#'
+#' Two computed metrics are available. `"curvature"` is mean curvature of the
+#' white surface with five adjacency averaging steps; it resolves individual
+#' folds but looks mottled on inflated displays. `"sulcal_depth"` is a
+#' FreeSurfer-style sulcal-depth proxy, the signed displacement between the
+#' white and the displayed (inflated) surface from
+#' [neurosurf::surface_sulcal_proxy()]; it gives the broad two-tone gyral/sulcal
+#' pattern used by Workbench and pycortex. When the proxy cannot be computed
+#' (for example on a white display surface) curvature is used instead and the
+#' provenance records that.
 #' @param surfatlas A surface atlas.
 #' @param hemi Hemisphere, lh or rh (left and right are also accepted).
 #' @param metric Optional finite per-vertex metric overriding the atlas.
 #' @param source Optional provenance label for the supplied metric.
+#' @param type Computed metric used when neither `metric` nor the atlas supplies
+#'   one: `"curvature"` (default) or `"sulcal_depth"`.
 #' @return A list with metric and provenance. Unavailable computed anatomy is
 #'   neutral, with source recorded as neutral_fallback.
 #' @export
 surface_anatomy <- function(surfatlas, hemi = "lh",
-                            metric = NULL, source = NULL) {
+                            metric = NULL, source = NULL,
+                            type = c("curvature", "sulcal_depth")) {
   hemi <- match.arg(hemi, c("lh", "rh", "left", "right"))
   hemi <- switch(hemi, left = "lh", right = "rh", hemi)
+  type <- match.arg(type)
   if (!inherits(surfatlas, "surfatlas")) stop("Expected a surface atlas.")
+  if (identical(type, "sulcal_depth") && is.null(metric) &&
+      is.null(.surface_hemi_value(surfatlas$anatomy_metric, hemi))) {
+    depth <- .resolve_sulcal_depth_anatomy(surfatlas, hemi)
+    if (!is.null(depth)) return(depth)
+  }
   .resolve_surface_anatomy(surfatlas, hemi, override = metric, source = source)
+}
+
+.resolve_sulcal_depth_anatomy <- function(surfatlas, hemi) {
+  if (identical(surfatlas$surf_type %||% "inflated", "white")) return(NULL)
+  display <- surfatlas[[paste0(hemi, "_atlas")]]@geometry
+  white <- tryCatch(
+    .resolve_overlay_surface_pair(surfatlas, hemi = hemi)$white,
+    error = function(e) NULL
+  )
+  if (is.null(white) || !.surface_geometry_topology_equal(white, display)) {
+    return(NULL)
+  }
+  metric <- tryCatch(neurosurf::surface_sulcal_proxy(white, display),
+                     error = function(e) NULL)
+  if (is.null(metric) || length(metric) != length(surfatlas[[paste0(hemi, "_atlas")]]@data) ||
+      any(!is.finite(metric))) {
+    return(NULL)
+  }
+  list(metric = as.numeric(metric), provenance = list(
+    source = "computed_sulcal_depth_proxy",
+    source_surface = "white",
+    smoothing_iterations = 4L,
+    display_surface = surfatlas$surf_type %||% NA_character_,
+    topology_verified = TRUE,
+    surface_space = surfatlas$surface_space %||% NA_character_,
+    density = surfatlas$density %||% NA_character_,
+    hemi = hemi,
+    mesh_identity = rlang::hash(list(
+      display@mesh$vb[1:3, , drop = FALSE],
+      display@mesh$it
+    ))
+  ))
 }
