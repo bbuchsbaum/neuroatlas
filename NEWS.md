@@ -1,5 +1,12 @@
 # neuroatlas 0.1.0.9006
 
+* `plot(<atlas>, view = "ortho")` works again with neuroim2 >= 0.19, whose
+  redesigned `plot_ortho()` returns one assembled figure by default. The
+  per-plane panels are now requested with `assemble = FALSE`, drawn without
+  raster interpolation (which blended neighbouring region colours) or head
+  cropping, and region-ID mapping tolerates non-numeric slice values. Older
+  neuroim2 releases are handled unchanged.
+
 * `surface_anatomy()` gains `type = "sulcal_depth"`, a FreeSurfer-style
   sulcal-depth proxy from the white and displayed (inflated) surfaces. It gives
   the broad two-tone gyral/sulcal underlay used by Workbench and pycortex; the
