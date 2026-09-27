@@ -20,7 +20,10 @@ NULL
 #'   \describe{
 #'     \item{id}{Numeric ROI identifier}
 #'     \item{label}{Simplified region name}
-#'     \item{label_full}{Original/full region label}
+#'     \item{label_full}{Full region label. Glasser uses a shared
+#'       hemisphere-qualified key such as \code{"L_V1_ROI"} in both representations.}
+#'     \item{area}{Glasser area name without hemisphere, e.g. \code{"V1"}.}
+#'     \item{id_convention}{Parcel ID convention, when recorded by the loader.}
 #'     \item{hemi}{Hemisphere ("left", "right", or NA for bilateral/midline)}
 #'     \item{color_r, color_g, color_b}{RGB color values (0-255)}
 #'     \item{template_space}{Template space identifier (e.g., "MNI152NLin6Asym"), when atlas_ref is available}
@@ -59,6 +62,9 @@ roi_metadata.atlas <- function(x, ...) {
   if (!is.null(x$roi_metadata)) {
     meta <- x$roi_metadata
     if (!is.null(x$atlas_ref)) {
+      if (!is.null(x$atlas_ref$id_convention)) {
+        meta$id_convention <- x$atlas_ref$id_convention
+      }
       if (!("template_space" %in% names(meta))) {
         meta$template_space <- x$atlas_ref$template_space
       }
@@ -122,6 +128,9 @@ roi_metadata.atlas <- function(x, ...) {
 
   # Add atlas_ref provenance if available
   if (!is.null(x$atlas_ref)) {
+    if (!is.null(x$atlas_ref$id_convention)) {
+      meta$id_convention <- x$atlas_ref$id_convention
+    }
     meta$template_space <- x$atlas_ref$template_space
     meta$coord_space <- x$atlas_ref$coord_space
     meta$atlas_family <- x$atlas_ref$family
@@ -468,6 +477,9 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
 
   # Add atlas_ref provenance if available
   if (!is.null(x$atlas_ref)) {
+    if (!is.null(x$atlas_ref$id_convention)) {
+      meta$id_convention <- x$atlas_ref$id_convention
+    }
     meta$template_space <- x$atlas_ref$template_space
     meta$coord_space <- x$atlas_ref$coord_space
     meta$atlas_family <- x$atlas_ref$family

@@ -18,6 +18,8 @@
 #' @param confidence Confidence tier: `"exact"`, `"high"`, `"approximate"`, or
 #'   `"uncertain"`.
 #' @param notes Optional free-text notes.
+#' @param id_convention Optional parcel ID convention. Glasser uses
+#'   \code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.
 #'
 #' @return An object of class `"atlas_ref"`.
 #' @export
@@ -32,7 +34,8 @@ new_atlas_ref <- function(family,
                           source = NA_character_,
                           lineage = NA_character_,
                           confidence = c("uncertain", "exact", "high", "approximate"),
-                          notes = NA_character_) {
+                          notes = NA_character_,
+                          id_convention = NA_character_) {
   representation <- match.arg(representation)
   confidence <- match.arg(confidence)
 
@@ -48,7 +51,8 @@ new_atlas_ref <- function(family,
     source = as.character(source),
     lineage = as.character(lineage),
     confidence = confidence,
-    notes = as.character(notes)
+    notes = as.character(notes),
+    id_convention = as.character(id_convention)
   )
 
   class(ref) <- c("atlas_ref", "list")
@@ -89,6 +93,12 @@ validate_atlas_ref <- function(x) {
   }
   if (!x$confidence %in% c("exact", "high", "approximate", "uncertain")) {
     stop("'confidence' must be one of: exact, high, approximate, uncertain")
+  }
+  if (!is.null(x$id_convention)) {
+    assertthat::assert_that(
+      is.character(x$id_convention), length(x$id_convention) == 1L,
+      is.na(x$id_convention) || nzchar(x$id_convention)
+    )
   }
 
   invisible(x)

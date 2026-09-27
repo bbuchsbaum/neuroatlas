@@ -26,6 +26,15 @@
 #' Region labels are read from the xcpEngine node-name table to provide stable
 #' parcel naming across sources.
 #'
+#' Parcel IDs are representation-specific: volume IDs 1--180 refer to the
+#' right hemisphere (\code{"hcp_R_first"}), whereas \code{\link{glasser_surf}()}
+#' uses left-first IDs (\code{"surfatlas_L_first"}). For cross-representation
+#' tables, join on \code{roi_metadata(atlas)$label_full} (\code{"L_V1_ROI"},
+#' \code{"R_V1_ROI"}, etc.), or on \code{c("area", "hemi")}. Both loaders expose
+#' these shared keys. Original source labels remain in \code{orig_labels}.
+#' ID-keyed tables must declare a matching \code{id_convention} column; see
+#' \code{\link{align_parcel_values}()}.
+#'
 #' @param outspace Optional \code{NeuroSpace} object specifying desired output space.
 #'   If provided, the atlas will be resampled to this space. Default: NULL
 #' @param source Volume source to use. One of \code{"xcpengine"} (default) or
@@ -172,7 +181,8 @@ get_glasser_atlas <- function(outspace=NULL,
     } else {
       "uncertain"
     },
-    notes = source_info$notes
+    notes = source_info$notes,
+    id_convention = "hcp_R_first"
   )
 
   native_space <- if (source == "mni2009c") {
@@ -256,6 +266,10 @@ get_glasser_atlas <- function(outspace=NULL,
     orig_labels = orig_labels,
     hemi = hemi,
     cmap = cols,
+    extra = list(
+      area = region,
+      label_full = paste0(ifelse(hemi == "left", "L_", "R_"), region, "_ROI")
+    ),
     subclass = "glasser",
     ref = ref,
     artifacts = artifacts,
@@ -345,6 +359,13 @@ print.glasser <- function(x, ...) {
 #' at the required 164k density; it does not provide an \code{"inflated"}
 #' fsaverage surface.
 #'
+#' Surface IDs 1--180 are left hemisphere and 181--360 are right hemisphere
+#' (\code{"surfatlas_L_first"}), opposite to \code{\link{get_glasser_atlas}()}.
+#' Use the shared \code{label_full} or \code{c("area", "hemi")} keys from
+#' \code{\link{roi_metadata}()} when moving
+#' parcel values between representations. ID-keyed tables must declare a
+#' matching \code{id_convention} column; see \code{\link{align_parcel_values}()}.
+#'
 #' @param space Surface space / mesh template. Only \code{"fsaverage"} is
 #'   supported at present.
 #' @param surf Surface type. One of \code{"pial"}, \code{"white"}, or
@@ -427,7 +448,8 @@ glasser_surf <- function(space = "fsaverage",
     provenance = "https://doi.org/10.6084/m9.figshare.3498446",
     source = "mills_figshare_fsaverage",
     lineage = "Projected from HCP fsLR32k labels to fsaverage surface.",
-    confidence = "high"
+    confidence = "high",
+    id_convention = "surfatlas_L_first"
   )
 
   artifacts <- dplyr::bind_rows(
@@ -513,6 +535,7 @@ glasser_surf <- function(space = "fsaverage",
     surf_type = surf,
     surface_space = "fsaverage",
     extra = list(
+      area = sub("_ROI$", "", sub("^[LR]_", "", labels)),
       cortex_mask = list(
         lh = as.integer(lh@data) != 0L,
         rh = as.integer(rh@data) != 0L

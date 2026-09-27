@@ -52,6 +52,15 @@ serve a small git-annex pointer stub rather than the real NIfTI payload.
 
 Region labels are read from the xcpEngine node-name table to provide stable
 parcel naming across sources.
+
+Parcel IDs are representation-specific: volume IDs 1--180 refer to the
+right hemisphere (\code{"hcp_R_first"}), whereas \code{\link{glasser_surf}()}
+uses left-first IDs (\code{"surfatlas_L_first"}). For cross-representation
+tables, join on \code{roi_metadata(atlas)$label_full} (\code{"L_V1_ROI"},
+\code{"R_V1_ROI"}, etc.), or on \code{c("area", "hemi")}. Both loaders expose
+these shared keys. Original source labels remain in \code{orig_labels}.
+ID-keyed tables must declare a matching \code{id_convention} column; see
+\code{\link{align_parcel_values}()}.
 }
 \examples{
 \dontrun{

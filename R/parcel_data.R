@@ -180,6 +180,11 @@ as_parcel_data.parcel_data <- function(x, ...) {
 #' @param atlas_version Optional atlas version.
 #' @param atlas_space Optional atlas space/template identifier.
 #' @param schema_version Schema version for the returned object.
+#' @details
+#' Glasser ID joins require a matching \code{id_convention} in the input table or
+#' \code{parcel_data} atlas metadata. See \code{\link{align_parcel_values}()} for safe joins
+#' between Glasser volume and surface representations. Numeric vectors are
+#' positional: they must already follow the target atlas's parcel order.
 #' @export
 as_parcel_data.atlas <- function(x,
                                  values = NULL,
@@ -259,6 +264,7 @@ as_parcel_data.atlas <- function(x,
     family = ref$family,
     model = ref$model,
     representation = ref$representation,
+    id_convention = ref$id_convention,
     coord_space = ref$coord_space,
     confidence = ref$confidence,
     n_parcels = nrow(parcels)
@@ -305,6 +311,23 @@ as_parcel_data.atlas <- function(x,
 #'
 #' Atlas metadata columns supplied in `data` are treated as consistency checks.
 #' They are never allowed to overwrite canonical metadata.
+#'
+#' Glasser volume and surface IDs number opposite hemispheres first. Any
+#' Glasser join using \code{id} (including renamed or composite keys) therefore
+#' requires a matching \code{id_convention} column, or a \code{parcel_data} object
+#' with a matching \code{atlas$id_convention}. The convention is
+#' \code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.
+#' Only declare a convention
+#' when the source of the IDs is known; missing or conflicting conventions
+#' cause an error. Reload older Glasser atlas objects that lack this metadata.
+#'
+#' To move Glasser values between representations, supply only the shared
+#' \code{label_full} key and value columns, then use \code{by = "label_full"};
+#' alternatively use \code{by = c("area", "hemi")}. For example, select
+#' \code{source$parcels[c("label_full", "value")]} from a \code{parcel_data} object.
+#' Representation-specific IDs, labels, colours and provenance in a full
+#' source table remain consistency checks and must be omitted for such a join.
+#' A complete \code{parcel_data} object remains bound to its source representation.
 #'
 #' @examples
 #' atlas <- structure(
@@ -537,9 +560,11 @@ parcel_volume <- function(atlas,
     )
   }
 
+  source_id_convention <- NULL
   if (inherits(data, "parcel_data")) {
     validate_parcel_data(data)
     .validate_parcel_atlas_identity(data, atlas)
+    source_id_convention <- data$atlas$id_convention
     data <- data$parcels
   }
   if (!is.data.frame(data)) {
@@ -586,6 +611,7 @@ parcel_volume <- function(atlas,
   }
   meta$id <- meta_ids
   key <- .resolve_parcel_by(meta, data, by = by)
+  .validate_parcel_id_convention(atlas, data, key, source_id_convention)
   atlas_key <- .normalise_parcel_key(meta, key$atlas, key$atlas, "atlas")
   data_key <- .normalise_parcel_key(data, key$data, key$atlas, "data")
   codes <- .parcel_key_codes(atlas_key, data_key)
@@ -675,6 +701,44 @@ parcel_volume <- function(atlas,
     value_cols = value_cols,
     missing_ids = meta$id[missing_atlas]
   )
+}
+
+
+#' Require explicit ID provenance for Glasser table joins
+#' @keywords internal
+#' @noRd
+.validate_parcel_id_convention <- function(atlas, data, key,
+                                           source_id_convention = NULL) {
+  if (!"id" %in% key$atlas) return(invisible(TRUE))
+  ref <- atlas_ref(atlas)
+  is_glasser <- identical(ref$family, "glasser") ||
+    inherits(atlas, "glasser") || inherits(atlas, "glasser_surf")
+  if (!is_glasser) return(invisible(TRUE))
+
+  expected <- ref$id_convention
+  valid_target <- is.character(expected) && length(expected) == 1L &&
+    !is.na(expected) && nzchar(expected)
+  supplied <- c(source_id_convention, data[["id_convention"]])
+  valid_source <- length(supplied) > 0L && !anyNA(supplied) &&
+    all(as.character(supplied) == expected)
+  if (!valid_target || !valid_source) {
+    cli::cli_abort(
+      c(
+        "Glasser ID joins require an explicit matching {.field id_convention}.",
+        "i" = paste0(
+          "Volume IDs use {.val hcp_R_first}; surface IDs use ",
+          "{.val surfatlas_L_first}."
+        ),
+        "i" = paste0(
+          "Use a {.field label_full} and value table for cross-representation ",
+          "joins, or supply the known source {.field id_convention}."
+        ),
+        "i" = "Reload older Glasser atlas objects without ID convention metadata."
+      ),
+      class = c("neuroatlas_error_id_convention", "neuroatlas_error")
+    )
+  }
+  invisible(TRUE)
 }
 
 

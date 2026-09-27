@@ -359,6 +359,7 @@ print.NeuroResourceMetadata <- function(x, ...) {
       id = paste(ref$family, ref$model, sep = ":"),
       name = .metadata_scalar(x$name, ref$model),
       family = ref$family, model = ref$model,
+      id_convention = .metadata_scalar(ref$id_convention),
       version = .metadata_scalar(catalog$version),
       description = .metadata_scalar(catalog$description),
       species = .metadata_scalar(catalog$species),
@@ -387,7 +388,8 @@ print.NeuroResourceMetadata <- function(x, ...) {
     resolution = meta$spatial$resolution, density = meta$spatial$density,
     provenance = meta$provenance$url, source = meta$provenance$source,
     lineage = meta$provenance$lineage, confidence = meta$provenance$confidence,
-    notes = meta$provenance$notes
+    notes = meta$provenance$notes,
+    id_convention = .metadata_scalar(meta$identity$id_convention)
   )
 }
 
