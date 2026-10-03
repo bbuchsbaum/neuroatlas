@@ -2,9 +2,11 @@
 #'
 #' @description
 #' Given one or more 3D coordinates, look up the atlas region(s) at each
-#' location. Supports exact voxel lookup (`radius = 0`) or fuzzy search
+#' location. Supports exact voxel lookup (`radius = 0`), fuzzy search
 #' (`radius > 0`) that returns all regions within a sphere of given radius
-#' in millimetres. Multiple atlases can be queried simultaneously.
+#' in millimetres, and a nearest-label mode (`nearest = TRUE`) that returns
+#' the single closest labelled region within `radius` together with its
+#' distance. Multiple atlases can be queried simultaneously.
 #'
 #' @param coords Numeric vector of length 3 (single point) or an N x 3 matrix
 #'   of world coordinates.
@@ -16,6 +18,10 @@
 #'   the query coordinate.
 #' @param from_space Character string identifying the coordinate space of the
 #'   input coordinates (default `"MNI152"`).
+#' @param nearest Logical. If `TRUE`, return exactly one row per point and
+#'   atlas: the region containing the point if there is one, otherwise the
+#'   nearest labelled voxel within `radius` mm, with its distance in a
+#'   `distance` column. Default `FALSE` keeps the exact/fuzzy behaviour.
 #'
 #' @return A \code{\link[tibble]{tibble}} with columns:
 #' \describe{
@@ -26,7 +32,12 @@
 #'   \item{label}{Region label string (`NA` for background/OOB).}
 #'   \item{hemi}{Hemisphere designation (`NA` if unavailable).}
 #'   \item{network}{Network label (`NA` if unavailable).}
+#'   \item{distance}{Only when `nearest = TRUE`: distance in mm from the
+#'     query coordinate to the centre of the reported region's nearest
+#'     voxel; `0` when the point lies in a labelled voxel, `NA` when no
+#'     labelled voxel is within `radius`.}
 #' }
+#' Any further per-region columns from \code{\link{roi_metadata}} follow.
 #'
 #' @details
 #' World coordinates are converted to voxel grid positions via
@@ -34,6 +45,16 @@
 #' When `radius > 0`, candidate voxel centres in a local grid neighbourhood
 #' are tested in world coordinates to find all labelled atlas voxels within
 #' `radius` mm.
+#'
+#' With `nearest = TRUE`, the voxel containing the point (the voxel whose
+#' grid position is nearest to it) is checked first; if it is labelled, that
+#' region is returned with distance `0`. Otherwise every labelled voxel whose
+#' centre lies within `radius` mm of the point is considered and the closest
+#' one wins. Distances are Euclidean, in the atlas's world coordinates.
+#' Ties (voxel centres equidistant from the point, to within 1e-6 mm) are
+#' broken deterministically in favour of the \strong{smallest region id}, so
+#' the result does not depend on voxel scan order. With `radius = 0` only
+#' the containing voxel is considered.
 #'
 #' If the atlas carries a coordinate-space annotation
 #' (`atlas$atlas_ref$coord_space`) that differs from `from_space`, the input
@@ -52,6 +73,9 @@
 #' # Fuzzy search within 5 mm
 #' query_point(c(24, -10, 5), atlas, radius = 5)
 #'
+#' # Nearest labelled region within 4 mm, with its distance
+#' query_point(c(24, -10, 5), atlas, radius = 4, nearest = TRUE)
+#'
 #' # Query multiple atlases at once
 #' atlases <- list(schaefer = atlas, aseg = get_aseg_atlas())
 #' query_point(c(24, -10, 5), atlases)
@@ -60,10 +84,14 @@
 #' @importFrom neuroim2 space coord_to_grid grid_to_coord
 #' @importFrom tibble tibble
 #' @export
-query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
+query_point <- function(coords, atlas, radius = 0, from_space = "MNI152",
+                        nearest = FALSE) {
   if (!is.numeric(radius) || length(radius) != 1L ||
       is.na(radius) || radius < 0) {
     stop("'radius' must be a non-negative numeric scalar")
+  }
+  if (!is.logical(nearest) || length(nearest) != 1L || is.na(nearest)) {
+    stop("'nearest' must be TRUE or FALSE")
   }
 
   # --- Normalise coords to N x 3 matrix ---
@@ -95,7 +123,7 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
   # --- Query each atlas ---
   result_parts <- lapply(names(atlas_list), function(aname) {
     atlas_obj <- atlas_list[[aname]]
-    .query_one_atlas(coords, atlas_obj, aname, radius, from_space)
+    .query_one_atlas(coords, atlas_obj, aname, radius, from_space, nearest)
   })
 
   do.call(rbind, result_parts)
@@ -115,7 +143,7 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152") {
 #' @param ijk Numeric/integer vector of length 3 or an N x 3 matrix of R-style
 #'   1-based voxel grid indices.
 #' @param ... Additional arguments passed to `query_point()`, such as
-#'   `radius` or `from_space`.
+#'   `radius`, `from_space`, or `nearest`.
 #'
 #' @return A tibble with atlas labels at the requested locations.
 #' @export
@@ -157,7 +185,7 @@ query_vox <- function(x, ijk, ...) {
 # Returns a tibble
 #' @noRd
 .query_one_atlas <- function(coords, atlas_obj, atlas_name, radius,
-                             from_space) {
+                             from_space, nearest = FALSE) {
   n_points <- nrow(coords)
 
 
@@ -176,7 +204,9 @@ query_vox <- function(x, ijk, ...) {
     )
   }
 
-  if (radius == 0) {
+  if (isTRUE(nearest)) {
+    .query_nearest(query_coords, coords, vol, atlas_obj, atlas_name, radius)
+  } else if (radius == 0) {
     .query_exact(query_coords, coords, vol, atlas_obj, atlas_name)
   } else {
     .query_radius(query_coords, coords, vol, atlas_obj, atlas_name, radius)
@@ -285,6 +315,62 @@ query_vox <- function(x, ijk, ...) {
   }
 
   do.call(rbind, rows)
+}
+
+
+# Internal: nearest labelled region within `radius` mm (one row per point).
+# The containing voxel wins at distance 0; otherwise the closest labelled
+# voxel centre within `radius`; ties go to the smallest region id.
+#' @noRd
+.query_nearest <- function(query_coords, output_coords, vol, atlas_obj,
+                           atlas_name, radius) {
+  n_points <- nrow(query_coords)
+  sp <- neuroim2::space(vol)
+  vol_dims <- dim(vol)
+  tol <- 1e-6
+  ids <- rep(NA_integer_, n_points)
+  dist <- rep(NA_real_, n_points)
+  offsets <- if (radius > 0) .radius_grid_offsets(radius, sp) else NULL
+
+  for (i in seq_len(n_points)) {
+    pt <- query_coords[i, ]
+    if (any(!is.finite(pt))) next
+    centre <- round(neuroim2::coord_to_grid(sp, matrix(pt, nrow = 1L)))
+    if (is.null(dim(centre))) centre <- matrix(centre, nrow = 1L)
+
+    here <- .atlas_values_at_grid(vol, centre)
+    if (!is.na(here) && here != 0L) {
+      ids[i] <- here
+      dist[i] <- 0
+      next
+    }
+    if (is.null(offsets)) next
+
+    cand <- sweep(offsets, 2L, centre[1, ], "+")
+    cand <- cand[.grid_in_bounds(cand, vol_dims), , drop = FALSE]
+    if (nrow(cand) == 0L) next
+    vals <- .atlas_values_at_grid(vol, cand)
+    hit <- !is.na(vals) & vals != 0L
+    if (!any(hit)) next
+    cand <- cand[hit, , drop = FALSE]
+    vals <- vals[hit]
+
+    world <- neuroim2::grid_to_coord(sp, cand)
+    if (is.null(dim(world))) world <- matrix(world, nrow = 1L)
+    d <- sqrt(rowSums(
+      (world - matrix(pt, nrow(world), 3L, byrow = TRUE))^2
+    ))
+    within <- d <= radius + tol
+    if (!any(within)) next
+    d_min <- min(d[within])
+    tied <- within & d <= d_min + tol
+    ids[i] <- min(vals[tied])
+    dist[i] <- d_min
+  }
+
+  out <- .ids_to_tibble(ids, output_coords, atlas_obj, atlas_name,
+                        point = seq_len(n_points))
+  tibble::add_column(out, distance = dist, .after = "network")
 }
 
 

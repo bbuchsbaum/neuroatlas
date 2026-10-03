@@ -236,3 +236,115 @@ test_that("query_point validates inputs", {
   expect_error(query_vox(atlas, c(1, 2)), "length-3")
   expect_error(query_vox(atlas, matrix(1:4, ncol = 2)), "3 columns")
 })
+
+# Brute-force oracle for nearest = TRUE: containing voxel first, else the
+# closest labelled voxel centre within radius, ties to the smallest id.
+brute_nearest_qp <- function(atlas, coord, radius) {
+  vol <- neuroatlas:::.get_atlas_volume(atlas)
+  sp <- neuroim2::space(vol)
+  arr <- as.integer(vol[, , ])
+  dim(arr) <- dim(vol)
+  g <- matrix(round(neuroim2::coord_to_grid(sp, matrix(coord, nrow = 1L))),
+              nrow = 1L)
+  if (all(g >= 1 & g <= dim(arr)) && arr[g] != 0L) {
+    return(list(id = arr[g], distance = 0))
+  }
+  nz <- which(arr != 0L, arr.ind = TRUE)
+  world <- neuroim2::grid_to_coord(sp, nz)
+  d <- sqrt(rowSums((world - matrix(coord, nrow(world), 3L, byrow = TRUE))^2))
+  ok <- d <= radius + 1e-6
+  if (!any(ok)) return(list(id = NA_integer_, distance = NA_real_))
+  dmin <- min(d[ok])
+  list(id = min(arr[nz][ok & d <= dmin + 1e-6]), distance = dmin)
+}
+
+test_that("nearest = TRUE returns the containing region at distance 0", {
+  atlas <- make_toy_atlas_qp()
+  res <- query_point(c(4, 4, 4), atlas, radius = 5, nearest = TRUE)
+  expect_equal(nrow(res), 1L)
+  expect_identical(res$id, 1L)
+  expect_identical(res$label, "RegionA")
+  expect_identical(res$network, "NetA")
+  expect_identical(res$distance, 0)
+  expect_identical(names(res)[1:10],
+                   c("point", "x", "y", "z", "atlas_name", "id", "label",
+                     "hemi", "network", "distance"))
+})
+
+test_that("nearest = TRUE finds the closest region within radius", {
+  atlas <- make_toy_atlas_qp()
+  # World (4, 4, 9) falls in background grid voxel (3, 3, 6); region 1's
+  # closest voxel (3, 3, 4), at world (4, 4, 6), is 3 mm away.
+  res <- query_point(c(4, 4, 9), atlas, radius = 4, nearest = TRUE)
+  expect_identical(res$id, 1L)
+  expect_equal(res$distance, 3)
+
+  # Nothing within a 2 mm radius: one NA row, distance NA.
+  none <- query_point(c(4, 4, 9), atlas, radius = 2, nearest = TRUE)
+  expect_equal(nrow(none), 1L)
+  expect_true(is.na(none$id))
+  expect_true(is.na(none$label))
+  expect_true(is.na(none$distance))
+
+  # radius = 0 only checks the containing voxel.
+  exact <- query_point(c(4, 4, 9), atlas, radius = 0, nearest = TRUE)
+  expect_true(is.na(exact$id))
+})
+
+test_that("nearest = TRUE breaks distance ties toward the smallest id", {
+  atlas <- make_toy_atlas_qp()
+  # World (4, 8, 4) is background exactly 2 mm from region 1 (grid y = 4)
+  # and region 3 (grid y = 6).
+  res <- query_point(c(4, 8, 4), atlas, radius = 3, nearest = TRUE)
+  expect_equal(nrow(res), 1L)
+  expect_identical(res$id, 1L)
+  expect_equal(res$distance, 2)
+
+  # Swap the ids so the smaller id is the one scanned later: still id 1.
+  swapped <- atlas
+  arr <- as.integer(atlas$atlas[, , ])
+  dim(arr) <- dim(atlas$atlas)
+  arr2 <- arr
+  arr2[arr == 1L] <- 3L
+  arr2[arr == 3L] <- 1L
+  swapped$atlas <- neuroim2::NeuroVol(arr2, neuroim2::space(atlas$atlas))
+  res2 <- query_point(c(4, 8, 4), swapped, radius = 3, nearest = TRUE)
+  expect_identical(res2$id, 1L)
+  expect_equal(res2$distance, 2)
+})
+
+test_that("nearest = TRUE matches a brute-force oracle", {
+  set.seed(11)
+  pts <- rbind(
+    c(4, 8, 4), c(4, 4, 9), c(12, 12, 12), c(0, 0, 0), c(-6, 3, 1),
+    matrix(round(stats::runif(60, -4, 22), 1), ncol = 3)
+  )
+  dense <- make_toy_atlas_qp()
+  # The clustered atlas holds the same labels, so the dense oracle serves both.
+  for (atlas in list(dense, make_toy_clustered_atlas_qp())) {
+    res <- query_coord(atlas, pts, radius = 4.5, nearest = TRUE)
+    expect_equal(nrow(res), nrow(pts))
+    expect_identical(res$point, seq_len(nrow(pts)))
+    for (i in seq_len(nrow(pts))) {
+      want <- brute_nearest_qp(dense, pts[i, ], 4.5)
+      expect_identical(res$id[i], want$id, info = paste(pts[i, ], collapse = ","))
+      expect_equal(res$distance[i], want$distance,
+                   info = paste(pts[i, ], collapse = ","))
+    }
+  }
+})
+
+test_that("nearest = TRUE handles several atlases and bad input", {
+  atlas <- make_toy_atlas_qp()
+  res <- query_point(rbind(c(4, 8, 4), c(NA, 0, 0)),
+                     list(a = atlas, b = atlas), radius = 3, nearest = TRUE)
+  expect_equal(nrow(res), 4L)
+  expect_identical(res$atlas_name, c("a", "a", "b", "b"))
+  expect_identical(res$id, c(1L, NA, 1L, NA))
+  expect_error(query_point(c(1, 2, 3), atlas, nearest = NA), "TRUE or FALSE")
+  expect_error(query_point(c(1, 2, 3), atlas, nearest = "yes"),
+               "TRUE or FALSE")
+  # Default behaviour is unchanged: no distance column.
+  expect_false("distance" %in% names(query_point(c(4, 8, 4), atlas,
+                                                 radius = 3)))
+})

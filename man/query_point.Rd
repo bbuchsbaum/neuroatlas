@@ -4,7 +4,7 @@
 \alias{query_point}
 \title{Look Up Atlas Regions at MNI Coordinates}
 \usage{
-query_point(coords, atlas, radius = 0, from_space = "MNI152")
+query_point(coords, atlas, radius = 0, from_space = "MNI152", nearest = FALSE)
 }
 \arguments{
 \item{coords}{Numeric vector of length 3 (single point) or an N x 3 matrix
@@ -20,6 +20,11 @@ the query coordinate.}
 
 \item{from_space}{Character string identifying the coordinate space of the
 input coordinates (default `"MNI152"`).}
+
+\item{nearest}{Logical. If `TRUE`, return exactly one row per point and
+atlas: the region containing the point if there is one, otherwise the
+nearest labelled voxel within `radius` mm, with its distance in a
+`distance` column. Default `FALSE` keeps the exact/fuzzy behaviour.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with columns:
@@ -31,13 +36,20 @@ A \code{\link[tibble]{tibble}} with columns:
   \item{label}{Region label string (`NA` for background/OOB).}
   \item{hemi}{Hemisphere designation (`NA` if unavailable).}
   \item{network}{Network label (`NA` if unavailable).}
+  \item{distance}{Only when `nearest = TRUE`: distance in mm from the
+    query coordinate to the centre of the reported region's nearest
+    voxel; `0` when the point lies in a labelled voxel, `NA` when no
+    labelled voxel is within `radius`.}
 }
+Any further per-region columns from \code{\link{roi_metadata}} follow.
 }
 \description{
 Given one or more 3D coordinates, look up the atlas region(s) at each
-location. Supports exact voxel lookup (`radius = 0`) or fuzzy search
+location. Supports exact voxel lookup (`radius = 0`), fuzzy search
 (`radius > 0`) that returns all regions within a sphere of given radius
-in millimetres. Multiple atlases can be queried simultaneously.
+in millimetres, and a nearest-label mode (`nearest = TRUE`) that returns
+the single closest labelled region within `radius` together with its
+distance. Multiple atlases can be queried simultaneously.
 }
 \details{
 World coordinates are converted to voxel grid positions via
@@ -45,6 +57,16 @@ World coordinates are converted to voxel grid positions via
 When `radius > 0`, candidate voxel centres in a local grid neighbourhood
 are tested in world coordinates to find all labelled atlas voxels within
 `radius` mm.
+
+With `nearest = TRUE`, the voxel containing the point (the voxel whose
+grid position is nearest to it) is checked first; if it is labelled, that
+region is returned with distance `0`. Otherwise every labelled voxel whose
+centre lies within `radius` mm of the point is considered and the closest
+one wins. Distances are Euclidean, in the atlas's world coordinates.
+Ties (voxel centres equidistant from the point, to within 1e-6 mm) are
+broken deterministically in favour of the \strong{smallest region id}, so
+the result does not depend on voxel scan order. With `radius = 0` only
+the containing voxel is considered.
 
 If the atlas carries a coordinate-space annotation
 (`atlas$atlas_ref$coord_space`) that differs from `from_space`, the input
@@ -62,6 +84,9 @@ query_point(pts, atlas)
 
 # Fuzzy search within 5 mm
 query_point(c(24, -10, 5), atlas, radius = 5)
+
+# Nearest labelled region within 4 mm, with its distance
+query_point(c(24, -10, 5), atlas, radius = 4, nearest = TRUE)
 
 # Query multiple atlases at once
 atlases <- list(schaefer = atlas, aseg = get_aseg_atlas())
