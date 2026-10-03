@@ -30,6 +30,24 @@
   default (`"curvature"`) is unchanged, and explicit or atlas metrics
   still win.
 
+- [`merge_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/merge_atlases.md)
+  keeps every per-region column of both parents (e.g. Schaefer
+  `network`), filling `NA` for regions from a parent that lacks it, so
+  [`roi_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+  and
+  [`query_point()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_point.md)
+  on a composite report them. It also remaps the second atlas’s ids in a
+  single lookup: previously a voxel could be remapped twice (with ASEG
+  first, Schaefer parcel 38 was reported as another parcel).
+
+- [`query_point()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_point.md)
+  no longer errors on atlases whose `coord_space` is `NA`, empty or
+  `"Unknown"`, such as
+  [`merge_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/merge_atlases.md)
+  composites of parents in different spaces. They are queried in their
+  own world coordinates without a transform, with a warning of class
+  `"neuroatlas_unknown_coord_space"`.
+
 ## neuroatlas 0.1.0.9005
 
 - The CPU parcel renderer again uses the sulcal-depth underlay on

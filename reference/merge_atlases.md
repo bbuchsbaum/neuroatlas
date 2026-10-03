@@ -53,6 +53,19 @@ A new atlas object containing:
 
   Combined hemisphere designations
 
+- network:
+
+  Combined network assignments, when either parent has them (e.g.
+  Schaefer); regions from a parent without networks are `NA`
+
+Other per-region attributes reported by
+[`roi_metadata`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+for either parent are carried over in the same way, so
+[`roi_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+and
+[`query_point`](https://bbuchsbaum.github.io/neuroatlas/reference/query_point.md)
+on the merged atlas report them for the regions that had them.
+
 ## Details
 
 The merging process:
@@ -61,7 +74,8 @@ The merging process:
 
 - Adjusts region IDs in the second atlas to avoid overlap
 
-- Combines color maps, labels, and hemisphere information
+- Combines color maps, labels, hemisphere information, and other
+  per-region metadata such as Schaefer network assignments
 
 - Creates a new ClusteredNeuroVol object for the merged atlas
 

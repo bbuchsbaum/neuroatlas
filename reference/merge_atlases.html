@@ -89,13 +89,23 @@ for creating composite atlases that combine different parcellation schemes.</p>
   <dt>hemi</dt>
 <dd><p>Combined hemisphere designations</p></dd>
 
+  <dt>network</dt>
+<dd><p>Combined network assignments, when either parent has
+    them (e.g. Schaefer); regions from a parent without networks are
+    <code>NA</code></p></dd>
 
-</dl></div>
+
+</dl><p>Other per-region attributes reported by <code><a href="roi_metadata.html">roi_metadata</a></code> for
+either parent are carried over in the same way, so
+<code><a href="roi_metadata.html">roi_metadata()</a></code> and <code><a href="query_point.html">query_point</a></code> on the merged atlas
+report them for the regions that had them.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The merging process:</p><ul><li><p>Verifies that both atlases have the same dimensions</p></li>
 <li><p>Adjusts region IDs in the second atlas to avoid overlap</p></li>
-<li><p>Combines color maps, labels, and hemisphere information</p></li>
+<li><p>Combines color maps, labels, hemisphere information, and other
+    per-region metadata such as Schaefer network assignments</p></li>
 <li><p>Creates a new ClusteredNeuroVol object for the merged atlas</p></li>
 </ul></div>
     <div class="section level2">

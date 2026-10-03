@@ -81,6 +81,16 @@ If the atlas carries a coordinate-space annotation
 the input coordinates are transformed automatically via
 [`transform_coords`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_coords.md).
 
+An atlas whose \`coord_space\` is \`NA\`, empty or \`"Unknown"\` has no
+single coordinate space to transform into. This is the case for
+[`merge_atlases`](https://bbuchsbaum.github.io/neuroatlas/reference/merge_atlases.md)
+composites whose parents declare different spaces, and for atlases built
+without a space annotation. Such atlases are queried directly in their
+own world coordinates: the input coordinates are assumed to be in the
+atlas's space, no transform is applied, and a warning of class
+\`"neuroatlas_unknown_coord_space"\` says so. Check that the input
+coordinates match the atlas grid before relying on the result.
+
 ## Examples
 
 ``` r
