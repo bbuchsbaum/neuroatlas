@@ -1,5 +1,12 @@
 # neuroatlas 0.1.0.9006
 
+* New exported `project_cluster_overlay()` projects a `NeuroVol` overlay onto
+  a surface atlas's vertices and returns the per-vertex values `plot_brain()`
+  draws (`list(overlay = list(lh, rh), meta)`), so callers no longer need the
+  internal `.project_cluster_overlay()`. A hemisphere that cannot be projected
+  now raises a warning and records the reason in `meta$hemis[[hemi]]$error`
+  instead of silently becoming all `NA`.
+
 * Glasser volume and surface atlases now share hemisphere-qualified
   `label_full` and `area` metadata. Their existing, opposite ID conventions
   are recorded in atlas and parcel metadata. Glasser table joins on `id`
