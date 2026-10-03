@@ -40,6 +40,15 @@
 #' coordinates are transformed automatically via
 #' \code{\link{transform_coords}}.
 #'
+#' An atlas whose `coord_space` is `NA`, empty or `"Unknown"` has no single
+#' coordinate space to transform into. This is the case for
+#' \code{\link{merge_atlases}} composites whose parents declare different
+#' spaces, and for atlases built without a space annotation. Such atlases are
+#' queried directly in their own world coordinates: the input coordinates are
+#' assumed to be in the atlas's space, no transform is applied, and a warning
+#' of class `"neuroatlas_unknown_coord_space"` says so. Check that the input
+#' coordinates match the atlas grid before relying on the result.
+#'
 #' @examples
 #' \dontrun{
 #' atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
@@ -166,9 +175,7 @@ query_vox <- function(x, ijk, ...) {
 
   # --- Coordinate-space transform if needed ---
   query_coords <- coords
-  if (!is.null(atlas_obj$atlas_ref$coord_space) &&
-      !identical(toupper(atlas_obj$atlas_ref$coord_space),
-                 toupper(from_space))) {
+  if (.query_needs_transform(atlas_obj, atlas_name, from_space)) {
     query_coords <- transform_coords(
       coords,
       from = from_space,
@@ -181,6 +188,42 @@ query_vox <- function(x, ijk, ...) {
   } else {
     .query_radius(query_coords, coords, vol, atlas_obj, atlas_name, radius)
   }
+}
+
+
+# Internal: does querying `atlas_obj` need a transform from `from_space`?
+# A missing atlas_ref keeps the legacy behaviour (no transform). An atlas_ref
+# whose coord_space is NA, empty or "Unknown" (e.g. a merge_atlases()
+# composite of parents in different spaces) has no target space: the query
+# proceeds in the atlas's own world coordinates, with a warning.
+#' @noRd
+.query_needs_transform <- function(atlas_obj, atlas_name, from_space) {
+  target <- atlas_obj$atlas_ref$coord_space
+  if (is.null(target)) {
+    return(FALSE)
+  }
+  if (.coord_space_is_unknown(target)) {
+    shown <- if (length(target)) dQuote(target[1], FALSE) else "empty"
+    warning(warningCondition(
+      paste0(
+        "Atlas '", atlas_name, "' has no single coordinate space ",
+        "(coord_space is ", shown, "); assuming the coordinates are ",
+        "already in its world space and applying no transform from '",
+        from_space, "'."
+      ),
+      class = "neuroatlas_unknown_coord_space"
+    ))
+    return(FALSE)
+  }
+  !identical(toupper(target), toupper(from_space))
+}
+
+
+# Internal: TRUE for a missing/unknown coordinate-space annotation.
+#' @noRd
+.coord_space_is_unknown <- function(space) {
+  length(space) != 1L || is.na(space) || !nzchar(trimws(space)) ||
+    identical(toupper(space), toupper(coord_spaces$UNKNOWN))
 }
 
 
