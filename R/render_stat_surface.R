@@ -149,16 +149,50 @@
   grDevices::as.raster(array(as.numeric(x$rgba) / 255, dim = dim(x$rgba)))
 }
 
+# Screen direction of the anterior (+y RAS) axis for a canonical CPU camera.
+#
+# Mirrors the camera of neurosurf's CPU renderer: the camera looks from
+# `toward` with screen-up `up`, and screen-right = up x toward. Anterior lands
+# on screen-right when right[2] > 0 and on screen-top when up[2] > 0. The
+# presentation-mode obliquity (a few degrees about the superior axis) never
+# changes these signs. Resulting placements:
+#   lateral-left (camera at -x): A left     medial-left (camera at +x): A right
+#   lateral-right (camera at +x): A right   medial-right (camera at -x): A left
+#   dorsal (up = +y): A top                 ventral (up = -y): A bottom
+.surface_anterior_screen_direction <- function(hemi, view) {
+  left <- hemi %in% c("left", "lh")
+  toward <- switch(view,
+    lateral = if (left) c(-1, 0, 0) else c(1, 0, 0),
+    medial = if (left) c(1, 0, 0) else c(-1, 0, 0),
+    dorsal = c(0, 0, 1),
+    ventral = c(0, 0, -1),
+    stop("Unsupported surface view: ", view, call. = FALSE)
+  )
+  up <- switch(view,
+    lateral = , medial = c(0, 0, 1),
+    dorsal = c(0, 1, 0),
+    ventral = c(0, -1, 0)
+  )
+  right <- c(up[2] * toward[3] - up[3] * toward[2],
+             up[3] * toward[1] - up[1] * toward[3],
+             up[1] * toward[2] - up[2] * toward[1])
+  c(x = sign(right[2]), y = sign(up[2]))
+}
+
 .surface_orientation_annotations <- function(hemi, view) {
-  if (view %in% c("lateral", "medial")) {
-    anterior_x <- if (hemi == "left") 0.03 else 0.97
-    posterior_x <- 1 - anterior_x
+  anterior <- .surface_anterior_screen_direction(hemi, view)
+  if (anterior[["x"]] != 0) {
+    anterior_x <- if (anterior[["x"]] > 0) 0.97 else 0.03
     return(data.frame(
-      x = c(anterior_x, posterior_x), y = c(0.04, 0.04),
+      x = c(anterior_x, 1 - anterior_x), y = c(0.04, 0.04),
       label = c("A", "P")
     ))
   }
-  data.frame(x = c(0.03, 0.03), y = c(0.96, 0.04), label = c("A", "P"))
+  anterior_y <- if (anterior[["y"]] > 0) 0.96 else 0.04
+  data.frame(
+    x = c(0.03, 0.03), y = c(anterior_y, 1 - anterior_y),
+    label = c("A", "P")
+  )
 }
 
 .plot_brain_cpu <- function(surfatlas,

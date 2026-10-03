@@ -23,6 +23,138 @@
   neuroim2::NeuroVol(out_arr, space = neuroim2::space(stat_map))
 }
 
+#' Project a Volume onto a Surface Atlas
+#'
+#' @description
+#' Samples a volumetric map (for example a thresholded statistic or cluster
+#' map) onto the vertices of both hemispheres of a surface atlas, using the
+#' same volume-to-surface projection that \code{\link{plot_brain}} applies
+#' when its \code{overlay} argument is a \code{NeuroVol}. The result holds
+#' one value per atlas vertex, so it can be passed back to
+#' \code{plot_brain(overlay = )}, summarised, or used to build a colour key
+#' that matches the rendered surface exactly.
+#'
+#' @param cluster_vol A \code{\link[neuroim2]{NeuroVol}} in the world (mm)
+#'   space of the surface meshes, typically MNI152 for fsaverage surfaces.
+#'   Zero voxels are treated as data, so mask the volume first if zero should
+#'   mean "no signal".
+#' @param surfatlas A surface atlas (class \code{"surfatlas"}), for example
+#'   from \code{\link{schaefer_surf}}. Its vertex count per hemisphere sets
+#'   the length of the returned vectors.
+#' @param space_override,density_override,resolution_override Optional
+#'   surface space (e.g. \code{"fsaverage6"}), TemplateFlow density, and
+#'   resolution used to look up the white and pial meshes. By default these
+#'   come from the atlas (\code{surfatlas$surface_space}, falling back to
+#'   \code{"fsaverage6"}).
+#' @param fun Vertex summary passed to \code{neurosurf::vol_to_surf()}: one
+#'   of \code{"avg"}, \code{"nn"}, or \code{"mode"}.
+#' @param sampling Sampling strategy between the white and pial surfaces:
+#'   \code{"midpoint"}, \code{"normal_line"}, or \code{"thickness"}.
+#' @param interpolation Voxel interpolation: \code{"legacy"},
+#'   \code{"nearest"}, or \code{"linear"}.
+#' @param aggregate Optional aggregation across depth samples
+#'   (\code{"mean"}, \code{"mode"}, or \code{"closest"}).
+#' @param n_samples Optional number of sampling depths.
+#' @param depth Optional explicit thickness fractions or normal-line offsets.
+#' @param surface_smooth_fwhm Tangential surface smoothing in mm (default
+#'   \code{0}, no smoothing).
+#'
+#' @return A list with two elements:
+#' \describe{
+#'   \item{overlay}{A list with numeric vectors \code{lh} and \code{rh},
+#'     one value per vertex of the corresponding atlas hemisphere. Vertices
+#'     the projection does not reach are \code{NA}. A hemisphere missing
+#'     from the atlas is \code{NULL}.}
+#'   \item{meta}{Projection provenance: \code{surface_space} and, per
+#'     hemisphere, the vertex counts and the sampling settings that were
+#'     applied (the same record \code{plot_brain()} stores).}
+#' }
+#'
+#' @details
+#' White and pial meshes are taken from the atlas when it was built on them
+#' and otherwise loaded for the atlas's surface space, so the projection is
+#' anatomically correct even for atlases displayed on inflated surfaces.
+#'
+#' If projection fails for a hemisphere (for example because the meshes
+#' cannot be loaded or do not match the atlas), that hemisphere is returned
+#' as all \code{NA} and a warning reports the reason; \code{plot_brain()}
+#' keeps its existing silent behaviour.
+#'
+#' @examples
+#' \dontrun{
+#' atlas <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
+#' stat <- neuroim2::read_vol("zstat1.nii.gz")
+#' proj <- project_cluster_overlay(stat, atlas, sampling = "thickness",
+#'                                 interpolation = "linear")
+#' range(proj$overlay$lh, na.rm = TRUE)
+#'
+#' # Draw exactly the projected values
+#' plot_brain(atlas, overlay = proj$overlay, overlay_threshold = 3.1)
+#' }
+#'
+#' @seealso \code{\link{plot_brain}}, \code{neurosurf::vol_to_surf()}
+#' @export
+project_cluster_overlay <- function(cluster_vol,
+                                    surfatlas,
+                                    space_override = NULL,
+                                    density_override = NULL,
+                                    resolution_override = NULL,
+                                    fun = c("avg", "nn", "mode"),
+                                    sampling = c("midpoint", "normal_line",
+                                                 "thickness"),
+                                    interpolation = c("legacy", "nearest",
+                                                      "linear"),
+                                    aggregate = NULL,
+                                    n_samples = NULL,
+                                    depth = NULL,
+                                    surface_smooth_fwhm = 0) {
+  if (!methods::is(cluster_vol, "NeuroVol")) {
+    cli::cli_abort("{.arg cluster_vol} must be a {.cls NeuroVol}.")
+  }
+  if (!inherits(surfatlas, "surfatlas")) {
+    cli::cli_abort("{.arg surfatlas} must be a surface atlas ({.cls surfatlas}).")
+  }
+  if (is.null(surfatlas$lh_atlas) && is.null(surfatlas$rh_atlas)) {
+    cli::cli_abort("{.arg surfatlas} has neither an lh nor an rh hemisphere.")
+  }
+  if (!requireNamespace("neurosurf", quietly = TRUE)) {
+    cli::cli_abort("Package {.pkg neurosurf} is required for surface projection.")
+  }
+  if (!is.numeric(surface_smooth_fwhm) || length(surface_smooth_fwhm) != 1L ||
+      is.na(surface_smooth_fwhm) || surface_smooth_fwhm < 0) {
+    cli::cli_abort("{.arg surface_smooth_fwhm} must be a non-negative number.")
+  }
+
+  out <- .project_cluster_overlay(
+    cluster_vol = cluster_vol,
+    surfatlas = surfatlas,
+    space_override = space_override,
+    density_override = density_override,
+    resolution_override = resolution_override,
+    fun = match.arg(fun),
+    sampling = match.arg(sampling),
+    interpolation = match.arg(interpolation),
+    aggregate = aggregate,
+    n_samples = n_samples,
+    depth = depth,
+    surface_smooth_fwhm = surface_smooth_fwhm
+  )
+
+  for (hemi in names(out$meta$hemis)) {
+    err <- out$meta$hemis[[hemi]]$error
+    if (!is.null(err)) {
+      cli::cli_warn(c(
+        "Projection onto the {hemi} hemisphere failed; its values are all NA.",
+        "x" = "{err}"
+      ))
+    }
+  }
+  out
+}
+
+# Internal implementation shared by plot_brain(), the CPU renderer, and the
+# cluster explorer. Kept under its historical name for callers that look it
+# up directly; new code should use project_cluster_overlay().
 .project_cluster_overlay <- function(cluster_vol,
                                      surfatlas,
                                      space_override = NULL,
@@ -85,6 +217,10 @@
       depth = depth,
       surface_smooth_fwhm = surface_smooth_fwhm
     )
+    if (!is.null(attr(vals, "projection_error"))) {
+      meta$hemis[[hemi]]$error <- attr(vals, "projection_error")
+      attr(out[[hemi]], "projection_error") <- NULL
+    }
   }
 
   list(overlay = out, meta = meta)
@@ -152,6 +288,10 @@
                                       n_samples = NULL,
                                       depth = NULL,
                                       surface_smooth_fwhm = 0) {
+  failed <- function(reason) {
+    structure(rep(NA_real_, target_n), projection_error = reason)
+  }
+  error <- NULL
   proj <- tryCatch(
     neurosurf::vol_to_surf(
       surf_wm = surf_wm,
@@ -166,16 +306,25 @@
       surface_smooth_fwhm = surface_smooth_fwhm,
       fill = NA_real_
     ),
-    error = function(e) NULL
+    error = function(e) {
+      error <<- conditionMessage(e)
+      NULL
+    }
   )
+  if (!is.null(error)) {
+    return(failed(error))
+  }
 
   vals <- .surface_values_to_numeric(proj)
   if (is.null(vals)) {
-    return(rep(NA_real_, target_n))
+    return(failed("neurosurf::vol_to_surf() returned no vertex values."))
   }
 
   if (length(vals) != target_n) {
-    return(rep(NA_real_, target_n))
+    return(failed(sprintf(
+      "Projected %d vertices but the atlas hemisphere has %d.",
+      length(vals), target_n
+    )))
   }
 
   vals

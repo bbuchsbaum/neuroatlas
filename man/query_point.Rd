@@ -72,6 +72,15 @@ If the atlas carries a coordinate-space annotation
 (`atlas$atlas_ref$coord_space`) that differs from `from_space`, the input
 coordinates are transformed automatically via
 \code{\link{transform_coords}}.
+
+An atlas whose `coord_space` is `NA`, empty or `"Unknown"` has no single
+coordinate space to transform into. This is the case for
+\code{\link{merge_atlases}} composites whose parents declare different
+spaces, and for atlases built without a space annotation. Such atlases are
+queried directly in their own world coordinates: the input coordinates are
+assumed to be in the atlas's space, no transform is applied, and a warning
+of class `"neuroatlas_unknown_coord_space"` says so. Check that the input
+coordinates match the atlas grid before relying on the result.
 }
 \examples{
 \dontrun{
