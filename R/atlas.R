@@ -61,7 +61,8 @@ clear_cache <- function() {
 #' \itemize{
 #'   \item Verifies that both atlases have the same dimensions
 #'   \item Adjusts region IDs in the second atlas to avoid overlap
-#'   \item Combines color maps, labels, and hemisphere information
+#'   \item Combines color maps, labels, hemisphere information, and other
+#'     per-region metadata such as Schaefer network assignments
 #'   \item Creates a new ClusteredNeuroVol object for the merged atlas
 #' }
 #'
@@ -77,7 +78,14 @@ clear_cache <- function() {
 #'   \item{labels}{Combined vector of region labels}
 #'   \item{orig_labels}{Original labels from both atlases}
 #'   \item{hemi}{Combined hemisphere designations}
+#'   \item{network}{Combined network assignments, when either parent has
+#'     them (e.g. Schaefer); regions from a parent without networks are
+#'     \code{NA}}
 #' }
+#' Other per-region attributes reported by \code{\link{roi_metadata}} for
+#' either parent are carried over in the same way, so
+#' \code{roi_metadata()} and \code{\link{query_point}} on the merged atlas
+#' report them for the regions that had them.
 #'
 #' @examples
 #' \dontrun{
@@ -131,18 +139,24 @@ merge_atlases <- function(atlas1, atlas2) {
 
   max_atlas1_id <- if (length(atlas1$ids)) max(atlas1$ids) else 0L
 
-  a2_vals <- sort(unique(as.integer(a2[a2 != 0])))
+  # Every atlas2 id (declared or present in the volume) gets its own new id
+  # above atlas1's range, so declared ids absent from the volume cannot
+  # collide with remapped ones.
+  a2_vals <- sort(unique(c(as.integer(atlas2$ids),
+                           as.integer(a2[a2 != 0]))))
   remap <- if (length(a2_vals)) {
     stats::setNames(max_atlas1_id + seq_along(a2_vals), as.character(a2_vals))
   } else {
     integer(0)
   }
 
+  # Remap in one lookup: replacing value by value would remap a voxel twice
+  # whenever a new id equals a later old id (e.g. ASEG first, Schaefer
+  # second: Schaefer 38 -> 98, then 98 -> 158).
   a2_remapped <- a2
-  if (length(remap)) {
-    for (old_val in names(remap)) {
-      a2_remapped[a2_remapped == as.integer(old_val)] <- remap[[old_val]]
-    }
+  nz <- a2 != 0
+  if (length(remap) && any(nz)) {
+    a2_remapped[nz] <- remap[as.character(as.integer(a2[nz]))]
   }
 
   merged_array <- a1
@@ -154,13 +168,7 @@ merge_atlases <- function(atlas1, atlas2) {
   cluster_values <- as.integer(merged_array[merged_mask])
   atlmerged <- neuroim2::ClusteredNeuroVol(mask = mask_vol, clusters = cluster_values)
 
-  shifted_ids <- integer(length(atlas2$ids))
-  if (length(shifted_ids)) {
-    mapped <- remap[as.character(atlas2$ids)]
-    shifted_ids <- as.integer(ifelse(is.na(mapped),
-                                     atlas2$ids + max_atlas1_id,
-                                     mapped))
-  }
+  shifted_ids <- as.integer(remap[as.character(as.integer(atlas2$ids))])
 
 
 
@@ -179,6 +187,10 @@ merge_atlases <- function(atlas1, atlas2) {
     orig_labels=c(atlas1$orig_labels, atlas2$orig_labels),
     hemi=c(atlas1$hemi, atlas2$hemi)
   )
+  region_fields <- .merge_region_fields(atlas1, atlas2)
+  for (nm in names(region_fields)) {
+    ret[[nm]] <- region_fields[[nm]]
+  }
 
   class(ret) <- c(paste0(atlas1$name,"::", atlas2$name), "atlas")
   common_space <- if (identical(space1, space2)) space1 else NA_character_
@@ -214,6 +226,61 @@ merge_atlases <- function(atlas1, atlas2) {
   meta$provenance$issues <- unique(c(parents$atlas1$provenance$issues,
                                     parents$atlas2$provenance$issues))
   .store_atlas_metadata(ret, meta)
+}
+
+
+# Per-region metadata beyond id/label/hemi/colour (e.g. Schaefer `network`)
+# for merge_atlases(), in merged region order: atlas1's regions, then
+# atlas2's. Columns are taken from each parent's roi_metadata(), aligned to
+# its `ids`, and from per-region fields stored on the atlas itself; a parent
+# without a column contributes NA. Atlas-level provenance
+# columns are rebuilt from the merged atlas_ref and are not copied.
+#' @noRd
+.merge_region_fields <- function(atlas1, atlas2) {
+  skip <- c(
+    "id", "label", "label_full", "hemi", "color_r", "color_g", "color_b",
+    "id_convention", "template_space", "coord_space", "atlas_family",
+    "atlas_model", "atlas_representation", "atlas_source", "atlas_confidence",
+    # Top-level atlas fields that must not be overwritten.
+    "name", "atlas", "cmap", "ids", "labels", "orig_labels", "roi_metadata",
+    "atlas_ref", "atlas_artifacts", "atlas_history", "metadata",
+    "metadata_parameters", "metadata_processing", "space", "confidence"
+  )
+  region_columns <- function(x) {
+    n <- length(x$ids)
+    meta <- tryCatch(roi_metadata(x), error = function(e) NULL)
+    cols <- list()
+    if (!is.null(meta) && "id" %in% names(meta)) {
+      idx <- match(x$ids, meta$id)
+      for (nm in setdiff(names(meta), skip)) {
+        val <- meta[[nm]]
+        if (is.atomic(val) && length(val) == nrow(meta)) {
+          if (is.factor(val)) val <- as.character(val)
+          cols[[nm]] <- val[idx]
+        }
+      }
+    }
+    # Per-region fields stored directly on the atlas (the legacy
+    # roi_metadata() path only reports `network` among them).
+    for (nm in setdiff(names(x), c(skip, names(cols)))) {
+      val <- x[[nm]]
+      if (is.atomic(val) && !is.null(val) && length(val) == n) {
+        cols[[nm]] <- if (is.factor(val)) as.character(val) else val
+      }
+    }
+    list(n = n, cols = cols)
+  }
+
+  p1 <- region_columns(atlas1)
+  p2 <- region_columns(atlas2)
+  out <- list()
+  for (nm in union(names(p1$cols), names(p2$cols))) {
+    v1 <- p1$cols[[nm]] %||% rep(NA, p1$n)
+    v2 <- p2$cols[[nm]] %||% rep(NA, p2$n)
+    val <- c(v1, v2)
+    if (!all(is.na(val))) out[[nm]] <- val
+  }
+  out
 }
 
 

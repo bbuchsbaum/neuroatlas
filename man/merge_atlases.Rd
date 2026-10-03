@@ -21,7 +21,14 @@ A new atlas object containing:
   \item{labels}{Combined vector of region labels}
   \item{orig_labels}{Original labels from both atlases}
   \item{hemi}{Combined hemisphere designations}
+  \item{network}{Combined network assignments, when either parent has
+    them (e.g. Schaefer); regions from a parent without networks are
+    \code{NA}}
 }
+Other per-region attributes reported by \code{\link{roi_metadata}} for
+either parent are carried over in the same way, so
+\code{roi_metadata()} and \code{\link{query_point}} on the merged atlas
+report them for the regions that had them.
 }
 \description{
 Combines two brain atlases into a single unified atlas object, preserving all
@@ -33,7 +40,8 @@ The merging process:
 \itemize{
   \item Verifies that both atlases have the same dimensions
   \item Adjusts region IDs in the second atlas to avoid overlap
-  \item Combines color maps, labels, and hemisphere information
+  \item Combines color maps, labels, hemisphere information, and other
+    per-region metadata such as Schaefer network assignments
   \item Creates a new ClusteredNeuroVol object for the merged atlas
 }
 }
