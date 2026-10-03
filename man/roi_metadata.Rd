@@ -20,7 +20,10 @@ A tibble with one row per ROI and columns for each attribute.
   \describe{
     \item{id}{Numeric ROI identifier}
     \item{label}{Simplified region name}
-    \item{label_full}{Original/full region label}
+    \item{label_full}{Full region label. Glasser uses a shared
+      hemisphere-qualified key such as \code{"L_V1_ROI"} in both representations.}
+    \item{area}{Glasser area name without hemisphere, e.g. \code{"V1"}.}
+    \item{id_convention}{Parcel ID convention, when recorded by the loader.}
     \item{hemi}{Hemisphere ("left", "right", or NA for bilateral/midline)}
     \item{color_r, color_g, color_b}{RGB color values (0-255)}
     \item{template_space}{Template space identifier (e.g., "MNI152NLin6Asym"), when atlas_ref is available}

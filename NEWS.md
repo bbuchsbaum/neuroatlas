@@ -7,6 +7,13 @@
   cropping, and region-ID mapping tolerates non-numeric slice values. Older
   neuroim2 releases are handled unchanged.
 
+* Glasser volume and surface atlases now share hemisphere-qualified
+  `label_full` and `area` metadata. Their existing, opposite ID conventions
+  are recorded in atlas and parcel metadata. Glasser table joins on `id`
+  require an explicit matching `id_convention`, preventing silent hemisphere
+  swaps. Use `label_full` plus value columns to transfer results between
+  representations.
+
 * `surface_anatomy()` gains `type = "sulcal_depth"`, a FreeSurfer-style
   sulcal-depth proxy from the white and displayed (inflated) surfaces. It gives
   the broad two-tone gyral/sulcal underlay used by Workbench and pycortex; the

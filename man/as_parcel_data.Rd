@@ -63,3 +63,9 @@ An object of class `"parcel_data"`.
 \description{
 Convert an Object to `parcel_data`
 }
+\details{
+Glasser ID joins require a matching \code{id_convention} in the input table or
+\code{parcel_data} atlas metadata. See \code{\link{align_parcel_values}()} for safe joins
+between Glasser volume and surface representations. Numeric vectors are
+positional: they must already follow the target atlas's parcel order.
+}

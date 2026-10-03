@@ -41,6 +41,23 @@ hemispheres or networks.
 
 Atlas metadata columns supplied in `data` are treated as consistency checks.
 They are never allowed to overwrite canonical metadata.
+
+Glasser volume and surface IDs number opposite hemispheres first. Any
+Glasser join using \code{id} (including renamed or composite keys) therefore
+requires a matching \code{id_convention} column, or a \code{parcel_data} object
+with a matching \code{atlas$id_convention}. The convention is
+\code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.
+Only declare a convention
+when the source of the IDs is known; missing or conflicting conventions
+cause an error. Reload older Glasser atlas objects that lack this metadata.
+
+To move Glasser values between representations, supply only the shared
+\code{label_full} key and value columns, then use \code{by = "label_full"};
+alternatively use \code{by = c("area", "hemi")}. For example, select
+\code{source$parcels[c("label_full", "value")]} from a \code{parcel_data} object.
+Representation-specific IDs, labels, colours and provenance in a full
+source table remain consistency checks and must be omitted for such a join.
+A complete \code{parcel_data} object remains bound to its source representation.
 }
 \examples{
 atlas <- structure(

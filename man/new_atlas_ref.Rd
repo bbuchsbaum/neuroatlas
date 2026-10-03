@@ -16,7 +16,8 @@ new_atlas_ref(
   source = NA_character_,
   lineage = NA_character_,
   confidence = c("uncertain", "exact", "high", "approximate"),
-  notes = NA_character_
+  notes = NA_character_,
+  id_convention = NA_character_
 )
 }
 \arguments{
@@ -47,6 +48,9 @@ new_atlas_ref(
 `"uncertain"`.}
 
 \item{notes}{Optional free-text notes.}
+
+\item{id_convention}{Optional parcel ID convention. Glasser uses
+\code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.}
 }
 \value{
 An object of class `"atlas_ref"`.
