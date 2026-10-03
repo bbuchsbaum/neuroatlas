@@ -1,5 +1,11 @@
 # neuroatlas 0.1.0.9006
 
+* `query_point()` gains `nearest = TRUE`, which returns one row per point and
+  atlas: the containing region at distance 0, otherwise the closest labelled
+  voxel within `radius` mm, with the distance in a new `distance` column.
+  Equidistant ties go to the smallest region id. `query_coord()` and
+  `query_vox()` pass it through `...`; the default output is unchanged.
+
 * New exported `project_cluster_overlay()` projects a `NeuroVol` overlay onto
   a surface atlas's vertices and returns the per-vertex values `plot_brain()`
   draws (`list(overlay = list(lh, rh), meta)`), so callers no longer need the

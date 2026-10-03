@@ -16,7 +16,7 @@ query_vox(x, ijk, ...)
 coordinates.}
 
 \item{...}{Additional arguments passed to `query_point()`, such as
-`radius` or `from_space`.}
+`radius`, `from_space`, or `nearest`.}
 
 \item{ijk}{Numeric/integer vector of length 3 or an N x 3 matrix of R-style
 1-based voxel grid indices.}
