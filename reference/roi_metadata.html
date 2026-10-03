@@ -9,7 +9,7 @@ different atlas types."><meta property="og:description" content="Functions for a
   interface for working with multiple ROI attributes across different atlas types.
 Returns a tibble containing metadata for all regions of interest (ROIs) in an atlas.
 This provides a unified, tidy interface for accessing ROI attributes across
-different atlas types."></head><body>
+different atlas types."><link href="../albers.css" rel="stylesheet"><script>window.albersdownDefaults = window.albersdownDefaults || { family: "red", preset: "homage", style: "minimal" };</script><script src="../albers.js"></script></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -17,7 +17,7 @@ different atlas types."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,14 @@ different atlas types.</p>
 <dd><p>Simplified region name</p></dd>
 
     <dt>label_full</dt>
-<dd><p>Original/full region label</p></dd>
+<dd><p>Full region label. Glasser uses a shared
+      hemisphere-qualified key such as <code>"L_V1_ROI"</code> in both representations.</p></dd>
+
+    <dt>area</dt>
+<dd><p>Glasser area name without hemisphere, e.g. <code>"V1"</code>.</p></dd>
+
+    <dt>id_convention</dt>
+<dd><p>Parcel ID convention, when recorded by the loader.</p></dd>
 
     <dt>hemi</dt>
 <dd><p>Hemisphere ("left", "right", or NA for bilateral/midline)</p></dd>

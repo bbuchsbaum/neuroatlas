@@ -62,6 +62,15 @@ supported. TemplateFlow provides `"pial"`, `"white"`, and
 `"midthickness"` geometry at the required 164k density; it does not
 provide an `"inflated"` fsaverage surface.
 
+Surface IDs 1–180 are left hemisphere and 181–360 are right hemisphere
+(`"surfatlas_L_first"`), opposite to
+[`get_glasser_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_glasser_atlas.md).
+Use the shared `label_full` or `c("area", "hemi")` keys from
+[`roi_metadata()`](https://bbuchsbaum.github.io/neuroatlas/reference/roi_metadata.md)
+when moving parcel values between representations. ID-keyed tables must
+declare a matching `id_convention` column; see
+[`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md).
+
 ## Examples
 
 ``` r

@@ -19,6 +19,9 @@ library(neuroatlas)
 
 atlas <- get_aseg_atlas()
 plot(atlas)
+#> ℹ `zlevels` are read as voxel indices; panels are labelled in mm.
+#>   Pass `unit = "mm"` to give positions in world coordinates.
+#> This message is displayed once every 8 hours.
 ```
 
 ![Axial montage of the bundled FreeSurfer ASEG atlas, with subcortical
@@ -38,10 +41,7 @@ plot(atlas, view = "ortho")
 
 ![Orthogonal sagittal, coronal, and axial planes through the bundled
 ASEG atlas, with each anatomical region in a distinct
-colour.](atlas-visualization_files/figure-html/quick-ortho-1.png)![Orthogonal
-sagittal, coronal, and axial planes through the bundled ASEG atlas, with
-each anatomical region in a distinct
-colour.](atlas-visualization_files/figure-html/quick-ortho-2.png)
+colour.](atlas-visualization_files/figure-html/quick-ortho-1.png)
 
 ### Region legends
 

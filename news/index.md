@@ -1,5 +1,29 @@
 # Changelog
 
+## neuroatlas 0.1.0.9006
+
+- `plot(<atlas>, view = "ortho")` works again with neuroim2 \>= 0.19,
+  whose redesigned `plot_ortho()` returns one assembled figure by
+  default. The per-plane panels are now requested with
+  `assemble = FALSE`, drawn without raster interpolation (which blended
+  neighbouring region colours) or head cropping, and region-ID mapping
+  tolerates non-numeric slice values. Older neuroim2 releases are
+  handled unchanged.
+
+- Glasser volume and surface atlases now share hemisphere-qualified
+  `label_full` and `area` metadata. Their existing, opposite ID
+  conventions are recorded in atlas and parcel metadata. Glasser table
+  joins on `id` require an explicit matching `id_convention`, preventing
+  silent hemisphere swaps. Use `label_full` plus value columns to
+  transfer results between representations.
+
+- [`surface_anatomy()`](https://bbuchsbaum.github.io/neuroatlas/reference/surface_anatomy.md)
+  gains `type = "sulcal_depth"`, a FreeSurfer-style sulcal-depth proxy
+  from the white and displayed (inflated) surfaces. It gives the broad
+  two-tone gyral/sulcal underlay used by Workbench and pycortex; the
+  default (`"curvature"`) is unchanged, and explicit or atlas metrics
+  still win.
+
 ## neuroatlas 0.1.0.9005
 
 - The CPU parcel renderer again uses the sulcal-depth underlay on

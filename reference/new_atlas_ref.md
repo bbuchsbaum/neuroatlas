@@ -17,7 +17,8 @@ new_atlas_ref(
   source = NA_character_,
   lineage = NA_character_,
   confidence = c("uncertain", "exact", "high", "approximate"),
-  notes = NA_character_
+  notes = NA_character_,
+  id_convention = NA_character_
 )
 ```
 
@@ -72,6 +73,11 @@ new_atlas_ref(
 - notes:
 
   Optional free-text notes.
+
+- id_convention:
+
+  Optional parcel ID convention. Glasser uses `"hcp_R_first"` for
+  volumes and `"surfatlas_L_first"` for surfaces.
 
 ## Value
 

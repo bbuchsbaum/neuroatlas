@@ -43,7 +43,16 @@ columns include:
 
 - label_full:
 
-  Original/full region label
+  Full region label. Glasser uses a shared hemisphere-qualified key such
+  as `"L_V1_ROI"` in both representations.
+
+- area:
+
+  Glasser area name without hemisphere, e.g. `"V1"`.
+
+- id_convention:
+
+  Parcel ID convention, when recorded by the loader.
 
 - hemi:
 

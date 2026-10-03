@@ -84,3 +84,12 @@ as_parcel_data(x, ...)
 ## Value
 
 An object of class \`"parcel_data"\`.
+
+## Details
+
+Glasser ID joins require a matching `id_convention` in the input table
+or `parcel_data` atlas metadata. See
+[`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md)
+for safe joins between Glasser volume and surface representations.
+Numeric vectors are positional: they must already follow the target
+atlas's parcel order.

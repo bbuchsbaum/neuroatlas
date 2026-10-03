@@ -149,9 +149,11 @@ three `ggplot2` objects.
 # \donttest{
 atlas <- get_aseg_atlas()
 plot(atlas)
+#> ℹ `zlevels` are read as voxel indices; panels are labelled in mm.
+#>   Pass `unit = "mm"` to give positions in world coordinates.
+#> This message is displayed once every 8 hours.
 
 plot(atlas, view = "ortho")
-
 
 plot(atlas, method = "maximin_view", nslices = 6)
 

@@ -7,7 +7,7 @@ atlas metadata.'><meta property="og:description" content='Load the Glasser HCP-M
 FreeSurfer fsaverage surface, as distributed by Kathryn Mills
 (see Figshare dataset "HCP-MMP1.0 projected on fsaverage").
 The result is a pair of neurosurf LabeledNeuroSurface objects plus
-atlas metadata.'></head><body>
+atlas metadata.'><link href="../albers.css" rel="stylesheet"><script>window.albersdownDefaults = window.albersdownDefaults || { family: "red", preset: "homage", style: "minimal" };</script><script src="../albers.js"></script></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +15,7 @@ atlas metadata.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,6 +106,12 @@ Currently only the <code>"fsaverage"</code> surface space is supported. Template
 provides <code>"pial"</code>, <code>"white"</code>, and <code>"midthickness"</code> geometry
 at the required 164k density; it does not provide an <code>"inflated"</code>
 fsaverage surface.</p>
+<p>Surface IDs 1–180 are left hemisphere and 181–360 are right hemisphere
+(<code>"surfatlas_L_first"</code>), opposite to <code><a href="get_glasser_atlas.html">get_glasser_atlas()</a></code>.
+Use the shared <code>label_full</code> or <code>c("area", "hemi")</code> keys from
+<code><a href="roi_metadata.html">roi_metadata()</a></code> when moving
+parcel values between representations. ID-keyed tables must declare a
+matching <code>id_convention</code> column; see <code><a href="align_parcel_values.html">align_parcel_values()</a></code>.</p>
     </div>
 
     <div class="section level2">

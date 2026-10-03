@@ -75,6 +75,16 @@ serve a small git-annex pointer stub rather than the real NIfTI payload.
 Region labels are read from the xcpEngine node-name table to provide
 stable parcel naming across sources.
 
+Parcel IDs are representation-specific: volume IDs 1–180 refer to the
+right hemisphere (`"hcp_R_first"`), whereas
+[`glasser_surf()`](https://bbuchsbaum.github.io/neuroatlas/reference/glasser_surf.md)
+uses left-first IDs (`"surfatlas_L_first"`). For cross-representation
+tables, join on `roi_metadata(atlas)$label_full` (`"L_V1_ROI"`,
+`"R_V1_ROI"`, etc.), or on `c("area", "hemi")`. Both loaders expose
+these shared keys. Original source labels remain in `orig_labels`.
+ID-keyed tables must declare a matching `id_convention` column; see
+[`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md).
+
 ## References
 
 Glasser, M. F., et al. (2016). A multi-modal parcellation of human
