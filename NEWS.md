@@ -7,6 +7,11 @@
   swaps. Use `label_full` plus value columns to transfer results between
   representations.
 
+* CPU surface figures (`plot_brain(static_backend = "cpu",
+  orientation_labels = TRUE)`) place the anterior/posterior marks from the
+  view's camera, not the hemisphere alone. Medial panels had A and P swapped,
+  and ventral panels drew anterior at the top.
+
 * `surface_anatomy()` gains `type = "sulcal_depth"`, a FreeSurfer-style
   sulcal-depth proxy from the white and displayed (inflated) surfaces. It gives
   the broad two-tone gyral/sulcal underlay used by Workbench and pycortex; the
