@@ -2,6 +2,16 @@
 
 ## neuroatlas 0.1.0.9006
 
+- New exported
+  [`project_cluster_overlay()`](https://bbuchsbaum.github.io/neuroatlas/reference/project_cluster_overlay.md)
+  projects a `NeuroVol` overlay onto a surface atlas’s vertices and
+  returns the per-vertex values
+  [`plot_brain()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot_brain.md)
+  draws (`list(overlay = list(lh, rh), meta)`), so callers no longer
+  need the internal `.project_cluster_overlay()`. A hemisphere that
+  cannot be projected now raises a warning and records the reason in
+  `meta$hemis[[hemi]]$error` instead of silently becoming all `NA`.
+
 - `plot(<atlas>, view = "ortho")` works again with neuroim2 \>= 0.19,
   whose redesigned `plot_ortho()` returns one assembled figure by
   default. The per-plane panels are now requested with

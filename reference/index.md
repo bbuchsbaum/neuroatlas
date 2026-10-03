@@ -225,6 +225,8 @@
   : Print Method for Transform Plans
 - [`print(`*`<templateflow>`*`)`](https://bbuchsbaum.github.io/neuroatlas/reference/print.templateflow.md)
   : Print a TemplateFlow Object
+- [`project_cluster_overlay()`](https://bbuchsbaum.github.io/neuroatlas/reference/project_cluster_overlay.md)
+  : Project a Volume onto a Surface Atlas
 - [`project_surface_view()`](https://bbuchsbaum.github.io/neuroatlas/reference/project_surface_view.md)
   : Project Surface Vertices to a Canonical 2D View
 - [`query_coord()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.md)
