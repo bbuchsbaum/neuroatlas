@@ -25,8 +25,8 @@ query_vox(x, ijk, ...)
 
 - ...:
 
-  Additional arguments passed to \`query_point()\`, such as \`radius\`
-  or \`from_space\`.
+  Additional arguments passed to \`query_point()\`, such as \`radius\`,
+  \`from_space\`, or \`nearest\`.
 
 - ijk:
 

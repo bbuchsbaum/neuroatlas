@@ -2,6 +2,16 @@
 
 ## neuroatlas 0.1.0.9006
 
+- [`query_point()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_point.md)
+  gains `nearest = TRUE`, which returns one row per point and atlas: the
+  containing region at distance 0, otherwise the closest labelled voxel
+  within `radius` mm, with the distance in a new `distance` column.
+  Equidistant ties go to the smallest region id.
+  [`query_coord()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.md)
+  and
+  [`query_vox()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.md)
+  pass it through `...`; the default output is unchanged.
+
 - New exported
   [`project_cluster_overlay()`](https://bbuchsbaum.github.io/neuroatlas/reference/project_cluster_overlay.md)
   projects a `NeuroVol` overlay onto a surface atlas’s vertices and
