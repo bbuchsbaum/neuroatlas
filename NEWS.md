@@ -7,6 +7,13 @@
   now raises a warning and records the reason in `meta$hemis[[hemi]]$error`
   instead of silently becoming all `NA`.
 
+* `plot(<atlas>, view = "ortho")` works again with neuroim2 >= 0.19, whose
+  redesigned `plot_ortho()` returns one assembled figure by default. The
+  per-plane panels are now requested with `assemble = FALSE`, drawn without
+  raster interpolation (which blended neighbouring region colours) or head
+  cropping, and region-ID mapping tolerates non-numeric slice values. Older
+  neuroim2 releases are handled unchanged.
+
 * Glasser volume and surface atlases now share hemisphere-qualified
   `label_full` and `area` metadata. Their existing, opposite ID conventions
   are recorded in atlas and parcel metadata. Glasser table joins on `id`
@@ -14,10 +21,27 @@
   swaps. Use `label_full` plus value columns to transfer results between
   representations.
 
+* CPU surface figures (`plot_brain(static_backend = "cpu",
+  orientation_labels = TRUE)`) place the anterior/posterior marks from the
+  view's camera, not the hemisphere alone. Medial panels had A and P swapped,
+  and ventral panels drew anterior at the top.
+
 * `surface_anatomy()` gains `type = "sulcal_depth"`, a FreeSurfer-style
   sulcal-depth proxy from the white and displayed (inflated) surfaces. It gives
   the broad two-tone gyral/sulcal underlay used by Workbench and pycortex; the
   default (`"curvature"`) is unchanged, and explicit or atlas metrics still win.
+
+* `merge_atlases()` keeps every per-region column of both parents (e.g.
+  Schaefer `network`), filling `NA` for regions from a parent that lacks it,
+  so `roi_metadata()` and `query_point()` on a composite report them. It also
+  remaps the second atlas's ids in a single lookup: previously a voxel could be
+  remapped twice (with ASEG first, Schaefer parcel 38 was reported as another
+  parcel).
+
+* `query_point()` no longer errors on atlases whose `coord_space` is `NA`,
+  empty or `"Unknown"`, such as `merge_atlases()` composites of parents in
+  different spaces. They are queried in their own world coordinates without a
+  transform, with a warning of class `"neuroatlas_unknown_coord_space"`.
 
 # neuroatlas 0.1.0.9005
 
