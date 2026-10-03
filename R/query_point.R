@@ -203,7 +203,13 @@ query_vox <- function(x, ijk, ...) {
     return(FALSE)
   }
   if (.coord_space_is_unknown(target)) {
-    shown <- if (length(target)) dQuote(target[1], FALSE) else "empty"
+    shown <- if (!length(target)) {
+      "empty"
+    } else if (is.na(target[1])) {
+      "NA"
+    } else {
+      dQuote(target[1], FALSE)
+    }
     warning(warningCondition(
       paste0(
         "Atlas '", atlas_name, "' has no single coordinate space ",
