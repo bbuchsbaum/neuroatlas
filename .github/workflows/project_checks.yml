@@ -2,9 +2,6 @@ name: Project package checks
 
 on:
   workflow_call:
-    secrets:
-      CODECOV_TOKEN:
-        required: false
 
 permissions:
   contents: read
@@ -12,6 +9,9 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RGL_USE_NULL: "true"
@@ -62,7 +62,9 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: tmp/coverage.xml
-          token: ${{ secrets.CODECOV_TOKEN }}
+          disable_search: true
+          use_oidc: true
+          fail_ci_if_error: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:

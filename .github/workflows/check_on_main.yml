@@ -5,6 +5,7 @@ on:
       - master
 permissions:
   contents: read
+  id-token: write
 
 name: "check package on main with project conventions"
 

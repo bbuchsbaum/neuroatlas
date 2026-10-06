@@ -7,6 +7,10 @@ on:
 
 name: "check package with project conventions"
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   check-package:
     uses: ./.github/workflows/project_checks.yml
