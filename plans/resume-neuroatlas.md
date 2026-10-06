@@ -14,6 +14,7 @@ git clone --branch feat/native-surface-transforms \
 cd neuroatlas
 git status --short --branch
 git log -1 --oneline
+mkdir -p .mote/local .mote/tmp
 mote actor set your-machine-actor
 mote doctor
 mote board
