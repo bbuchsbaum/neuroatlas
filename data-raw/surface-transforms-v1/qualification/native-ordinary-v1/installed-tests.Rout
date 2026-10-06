@@ -1,0 +1,106 @@
+
+R version 4.5.1 (2025-06-13) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # This file is part of the standard devtools suite.
+> # All unit tests are placed within the tests/testthat/ directory.
+> 
+> library(testthat)
+Warning message:
+package 'testthat' was built under R version 4.5.2 
+> library(neuroatlas)
+> 
+> test_check("neuroatlas")
+<atlas_alignment>
+  compatible: TRUE 
+  relation: identical 
+  method: identity 
+  confidence: exact 
+  status: available 
+  requires_transform: FALSE 
+Loading required package: shiny
+2026-09-27 10:04:59.521 R[79215:167358461] XType: Using static font registry.
+downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_400Parcels_17Networks_order.txt
+downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_400Parcels_17Networks_order.txt
+Attempting to resolve 'outspace' argument via TemplateFlow...
+Attempting to resolve 'outspace' argument via TemplateFlow...
+<atlas_transform_plan>
+  from_space: MNI305 
+  to_space: MNI152 
+  n_steps: 1 
+  status: available 
+  confidence: exact 
+[ FAIL 0 | WARN 41 | SKIP 95 | PASS 1458 ]
+
+══ Skipped tests (95) ══════════════════════════════════════════════════════════
+• {sf} is not installed (2): 'test-ggschaefer.R:59:3',
+  'test-ggschaefer.R:170:3'
+• artifact build scripts are source-repository only (4):
+  'test-transform-artifacts-v1.R:1:1', 'test-transform-measurement.R:2:1',
+  'test-transform-qualification-gates.R:2:1',
+  'test-transform-release-assembly.R:2:1'
+• artifact integration scripts are source-only (1):
+  'test-transform-live-verification.R:2:1'
+• On CRAN (87): 'test-atlas-connectivity.R:2:3',
+  'test-atlas-connectivity.R:47:3', 'test-atlas-connectivity.R:71:3',
+  'test-atlas-connectivity.R:85:3', 'test-atlas-constructor.R:101:3',
+  'test-atlas-constructor.R:118:3', 'test-atlas-integrity.R:2:3',
+  'test-atlas-integrity.R:53:3', 'test-atlas-integrity.R:76:3',
+  'test-atlas-ref.R:60:3', 'test-atlas-ref.R:77:3', 'test-atlas-ref.R:107:3',
+  'test-batch-reduce.R:2:3', 'test-batch-reduce.R:36:3',
+  'test-batch-reduce.R:61:3', 'test-brainnetome.R:11:3',
+  'test-brainnetome.R:30:3', 'test-brainnetome.R:59:3',
+  'test-brainnetome.R:72:3', 'test-data-integrity.R:2:3',
+  'test-data-integrity.R:55:3', 'test-data-integrity.R:115:3',
+  'test-dilation.R:169:3', 'test-fsl-atlas.R:88:3', 'test-hcpex.R:172:3',
+  'test-merge-atlases.R:4:3', 'test-plot-brain-layout.R:295:3',
+  'test-plot-brain-layout.R:387:3', 'test-plot-brain-layout.R:425:3',
+  'test-plot-brain-layout.R:457:3', 'test-plot-brain-layout.R:499:3',
+  'test-plot-brain-layout.R:538:3', 'test-plot-brain-layout.R:576:3',
+  'test-plot-brain.R:713:3', 'test-plot-brain.R:723:3',
+  'test-plot-brain.R:746:3', 'test-plot-brain.R:782:3',
+  'test-plot-brain.R:811:3', 'test-plot-brain.R:835:3',
+  'test-plot-brain.R:873:3', 'test-query-point.R:1:1',
+  'test-reduce-atlas-vec.R:181:3', 'test-reduce-atlas.R:2:3',
+  'test-reduce-atlas.R:18:3', 'test-reduce-atlas.R:36:3',
+  'test-reduce-atlas.R:46:3', 'test-reduce-atlas.R:61:3',
+  'test-reduce-atlas.R:76:3', 'test-roi-colors.R:59:1',
+  'test-roi-colors.R:74:1', 'test-roi-metadata.R:4:3',
+  'test-roi-metadata.R:18:3', 'test-roi-metadata.R:30:3',
+  'test-roi-metadata.R:50:3', 'test-roi-metadata.R:65:3',
+  'test-roi-metadata.R:76:3', 'test-roi-metadata.R:87:3',
+  'test-roi-metadata.R:107:3', 'test-roi-metadata.R:127:3',
+  'test-roi-metadata.R:134:3', 'test-roi-metadata.R:143:3',
+  'test-roi-metadata.R:168:3', 'test-roi-metadata.R:179:3',
+  'test-roi-operations.R:2:3', 'test-roi-operations.R:125:3',
+  'test-roi-operations.R:209:3', 'test-space-transforms.R:2:3',
+  'test-space-transforms.R:74:3', 'test-space-transforms.R:153:3',
+  'test-surface-anatomy.R:17:3', 'test-surface-anatomy.R:28:3',
+  'test-surface-atlases.R:78:3', 'test-surface-atlases.R:168:3',
+  'test-surface-atlases.R:223:3', 'test-surface-atlases.R:257:3',
+  'test-surface-atlases.R:412:3', 'test-surface-atlases.R:501:3',
+  'test-templateflow-advanced.R:2:3', 'test-templateflow-advanced.R:55:3',
+  'test-templateflow-advanced.R:114:3', 'test-templateflow-advanced.R:183:3',
+  'test-templateflow-advanced.R:304:3', 'test-templateflow-advanced.R:363:3',
+  'test-visfatlas.R:38:3', 'test-visual-atlas.R:30:3', 'test-wang.R:240:3',
+  'test-wang.R:347:3'
+• source package metadata check (1): 'test-schaefer-cache-transform.R:245:3'
+
+[ FAIL 0 | WARN 41 | SKIP 95 | PASS 1458 ]
+> 
+> proc.time()
+   user  system elapsed 
+ 49.964   2.300  56.060 

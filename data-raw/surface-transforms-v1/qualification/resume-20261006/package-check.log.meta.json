@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-06T02:48:28.692172+00:00",
+  "finished_utc": "2026-10-06T02:53:35.442189+00:00",
+  "duration_seconds": 306.748829,
+  "command": [
+    "Rscript",
+    "-e",
+    "rcmdcheck::rcmdcheck(\"/tmp/neuroatlas-resume-20261006/package-source\", args=c(\"--as-cran\", \"--no-manual\"), build_args=\"--no-manual\", check_dir=\"/tmp/neuroatlas-resume-20261006/check\", error_on=\"error\")"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/tmp/neuroatlas-resume-20261006/package-check.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 6422
+}

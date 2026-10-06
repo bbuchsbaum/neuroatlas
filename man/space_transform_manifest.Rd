@@ -18,6 +18,10 @@ record `artifact_id`, `artifact_version`, `provider`, `url`, `sha256`,
 `size_bytes`, `format`, `convention`, `qualification`, `qualification_scope`,
 `qa_url`, and `license`. These fields are missing for routes without a
 downloadable artifact.
+`source_representation` and `target_representation` distinguish volumes and
+surfaces. `executable` indicates support by the template-transform API, given
+the required optional dependencies and artifacts; it is not a local readiness
+check. Surface and mixed routes remain advisory until independently qualified.
 }
 \description{
 Returns known transforms between coordinate/template spaces from a static

@@ -1,0 +1,7 @@
+Warning message:
+package ‘testthat’ was built under R version 4.5.2 
+Building fsaverage-164k-L_to_fsLR-32k-L 
+2026-10-05 22:55:17.812 R[90863:94987649] XType: Using static font registry.
+Building fsLR-32k-L_to_fsaverage-164k-L 
+Building fsaverage-164k-R_to_fsLR-32k-R 
+Building fsLR-32k-R_to_fsaverage-164k-R 

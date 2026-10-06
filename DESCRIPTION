@@ -58,8 +58,9 @@ Suggests:
     knitr,
     mockery,
     neurosurf (>= 0.1.0.9002),
-    neurotransform,
+    neurotransform (>= 0.2.0),
     patchwork,
+    png,
     ragg,
     reticulate,
     RNifti,
@@ -75,7 +76,7 @@ VignetteBuilder:
     knitr
 Remotes:
     bbuchsbaum/neurosurf,
-    bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e,
+    bbuchsbaum/neurotransform@933edddda462593941e167726e8aaa7168ff103a,
     bbuchsbaum/albersdown,
     bbuchsbaum/templateflow,
     ggsegverse/ggsegSchaefer
@@ -141,6 +142,8 @@ Collate:
     'schaefer.R'
     'spin_test.R'
     'subcortical_atlases.R'
+    'surface_domain.R'
+    'surface_transform.R'
     'template_flow.R'
     'template_metadata.R'
     'template_transform.R'

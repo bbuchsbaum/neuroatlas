@@ -3,6 +3,7 @@ on:
     branches:
       - main
       - master
+      - feat/native-surface-transforms
   pull_request:
     branches:
       - main

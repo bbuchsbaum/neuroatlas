@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-06T02:54:59.564965+00:00",
+  "finished_utc": "2026-10-06T02:55:09.087302+00:00",
+  "duration_seconds": 9.522246,
+  "command": [
+    "python3",
+    "data-raw/surface-transforms-v1/test-engine-binding.py",
+    "/tmp/neuroatlas-resume-20261006/library-portable/engine-build.json"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/tmp/neuroatlas-resume-20261006/engine-binding-test-final.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 120.0,
+  "log_bytes": 62
+}

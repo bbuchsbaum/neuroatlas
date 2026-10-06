@@ -14,6 +14,10 @@
 #' `size_bytes`, `format`, `convention`, `qualification`, `qualification_scope`,
 #' `qa_url`, and `license`. These fields are missing for routes without a
 #' downloadable artifact.
+#' `source_representation` and `target_representation` distinguish volumes and
+#' surfaces. `executable` indicates support by the template-transform API, given
+#' the required optional dependencies and artifacts; it is not a local readiness
+#' check. Surface and mixed routes remain advisory until independently qualified.
 #'
 #' @examples
 #' # All known routes
@@ -40,15 +44,20 @@ space_transform_manifest <- function(status = NULL) {
 #' Space identifiers are normalized internally, so aliases such as `"fslr32k"`
 #' are accepted.
 #'
-#' @param from_space Source space identifier.
-#' @param to_space Target space identifier.
+#' @param from_space Source space identifier or a [surface_domain()] descriptor.
+#' @param to_space Target space identifier or a [surface_domain()] descriptor.
+#'   Supply descriptors for both endpoints when using typed surface domains.
+#'   Only identical domain descriptors establish surface identity. Named surface
+#'   routes remain advisory: template names do not bind exact meshes or methods.
 #' @param data_type Data type being transformed (`"parcel"`, `"vertex"`,
-#'   `"voxel"`). Used for advisory warnings.
+#'   `"voxel"`). Voxel routes stay in volumes; vertex routes stay on surfaces.
+#'   Parcel planning can also describe a single directed projection. Projection
+#'   steps are not automatically composed with other routes.
 #' @param mode Planning mode. `"auto"` returns `NULL` if no route exists,
 #'   `"strict"` errors.
 #' @param available_only Restrict routing to available edges. The default also
 #'   shows planned routes for diagnostic compatibility. Execution always uses
-#'   available edges only; retired edges are never selected.
+#'   available, executable edges only; retired edges are never selected.
 #' @param provider Provider filter, `"auto"`, `"neuroatlas"`, or `"templateflow"`.
 #'
 #' @return
@@ -79,6 +88,22 @@ atlas_transform_plan <- function(from_space,
   assertthat::assert_that(is.logical(available_only),
                          length(available_only) == 1L, !is.na(available_only))
 
+  from_domain <- to_domain <- NULL
+  typed <- inherits(from_space, "SurfaceDomain") ||
+    inherits(to_space, "SurfaceDomain")
+  if (typed) {
+    .validate_surface_domain(from_space)
+    .validate_surface_domain(to_space)
+    if (data_type == "voxel") stop("Surface domains cannot define voxel routes.")
+    if (from_space$hemisphere != to_space$hemisphere) {
+      stop("Surface routes must use the same hemisphere.")
+    }
+    from_domain <- from_space
+    to_domain <- to_space
+    from_space <- .surface_domain_space(from_domain)
+    to_space <- .surface_domain_space(to_domain)
+  }
+
   if (!is.character(from_space) || length(from_space) != 1L ||
       is.na(from_space) || !nzchar(from_space)) {
     stop("'from_space' must be a non-empty character scalar")
@@ -91,7 +116,25 @@ atlas_transform_plan <- function(from_space,
   from_space <- .normalize_space_id(from_space)
   to_space <- .normalize_space_id(to_space)
 
-  if (identical(from_space, to_space)) {
+  reg <- .space_route_capabilities(.space_transform_registry())
+  surface_spaces <- unique(c(
+    reg$from_space[reg$source_representation == "surface"],
+    reg$to_space[reg$target_representation == "surface"]
+  ))
+  surface_identity <- typed || from_space %in% surface_spaces ||
+    grepl("^(fsaverage[0-9]*|fsLR([_-]?[0-9]+k)?)$", from_space,
+          ignore.case = TRUE) || data_type == "vertex"
+
+  identity <- identical(from_space, to_space) &&
+    (!surface_identity || (typed && identical(from_domain$id, to_domain$id)))
+  if (identical(from_space, to_space) && !identity) {
+    message <- paste0("Surface identity requires identical exact surface domains; ",
+                      "a template name or vertex count is insufficient.")
+    if (mode == "strict") stop(message)
+    warning(message, call. = FALSE)
+    return(NULL)
+  }
+  if (identity) {
     step <- data.frame(
       from_space = from_space,
       to_space = to_space,
@@ -112,16 +155,23 @@ atlas_transform_plan <- function(from_space,
         n_steps = 1L,
         status = "available",
         confidence = "exact",
+        from_domain = from_domain,
+        to_domain = to_domain,
         warnings = character(0)
       ),
       class = c("atlas_transform_plan", "list")
     ))
   }
 
-  reg <- .space_transform_registry()
   reg <- reg[reg$status %in% if (available_only) "available" else {
     c("available", "candidate", "planned")
   }, , drop = FALSE]
+  if (available_only) reg <- reg[reg$executable, , drop = FALSE]
+  if (data_type %in% c("voxel", "vertex") || typed) {
+    representation <- if (data_type == "voxel") "volume" else "surface"
+    reg <- reg[reg$source_representation == representation &
+                 reg$target_representation == representation, , drop = FALSE]
+  }
   if (provider != "auto") {
     reg <- reg[reg$backend %in% c("identity", "internal_affine") |
                  (!is.na(reg$provider) & reg$provider == provider), , drop = FALSE]
@@ -129,6 +179,12 @@ atlas_transform_plan <- function(from_space,
   route <- .find_space_route(reg, from_space, to_space)
   if (!is.null(route)) {
     plan <- .build_transform_plan(from_space, to_space, route, data_type)
+    plan$from_domain <- from_domain
+    plan$to_domain <- to_domain
+    if (typed) {
+      plan$warnings <- c(plan$warnings,
+        "Named route is advisory; exact domains and method are not qualified.")
+    }
     return(structure(plan, class = c("atlas_transform_plan", "list")))
   }
 
@@ -182,6 +238,24 @@ print.atlas_transform_plan <- function(x, ...) {
               "license", "convention")
   for (field in setdiff(fields, names(reg))) reg[[field]] <- NA_character_
   if (!"size_bytes" %in% names(reg)) reg$size_bytes <- NA_real_
+  .space_route_capabilities(reg)
+}
+
+# Capabilities describe registered API support, not software installation.
+.space_route_capabilities <- function(reg) {
+  reg$source_representation <- ifelse(
+    reg$transform_type %in% c("sphere_resample", "surf2vol"), "surface", "volume")
+  reg$target_representation <- ifelse(
+    reg$transform_type %in% c("sphere_resample", "vol2surf"), "surface", "volume")
+  qualified_h5 <- rep(FALSE, nrow(reg))
+  if (all(c("format", "qualification") %in% names(reg))) {
+    qualified_h5 <- !is.na(reg$format) & reg$format == "ants_h5" &
+      !is.na(reg$qualification) & reg$qualification == "passed"
+  }
+  reg$executable <- reg$status == "available" &
+    reg$source_representation == "volume" &
+    reg$target_representation == "volume" &
+    (reg$backend %in% c("identity", "internal_affine") | qualified_h5)
   reg
 }
 
@@ -189,10 +263,14 @@ print.atlas_transform_plan <- function(x, ...) {
 # available paths before diagnostic candidates, then direct/fewer-hop routes,
 # confidence, and stable artifact identity. Input CSV order never breaks ties.
 .find_space_route <- function(reg, from_space, to_space) {
+  projection <- reg$transform_type %in% c("vol2surf", "surf2vol")
   paths <- list()
   visit <- function(node, visited, indices) {
     outgoing <- which(reg$from_space == node & !reg$to_space %in% visited)
     for (i in outgoing) {
+      # A projection needs its own frame, coverage, and conflict contract.
+      # Do not discover implicit lossy shortcuts through another representation.
+      if (length(indices) && (projection[[i]] || any(projection[indices]))) next
       next_indices <- c(indices, i)
       next_node <- reg$to_space[[i]]
       if (identical(next_node, to_space)) {

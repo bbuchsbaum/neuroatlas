@@ -14,19 +14,24 @@ atlas_transform_plan(
 )
 }
 \arguments{
-\item{from_space}{Source space identifier.}
+\item{from_space}{Source space identifier or a [surface_domain()] descriptor.}
 
-\item{to_space}{Target space identifier.}
+\item{to_space}{Target space identifier or a [surface_domain()] descriptor.
+Supply descriptors for both endpoints when using typed surface domains.
+Only identical domain descriptors establish surface identity. Named surface
+routes remain advisory: template names do not bind exact meshes or methods.}
 
 \item{data_type}{Data type being transformed (`"parcel"`, `"vertex"`,
-`"voxel"`). Used for advisory warnings.}
+`"voxel"`). Voxel routes stay in volumes; vertex routes stay on surfaces.
+Parcel planning can also describe a single directed projection. Projection
+steps are not automatically composed with other routes.}
 
 \item{mode}{Planning mode. `"auto"` returns `NULL` if no route exists,
 `"strict"` errors.}
 
 \item{available_only}{Restrict routing to available edges. The default also
 shows planned routes for diagnostic compatibility. Execution always uses
-available edges only; retired edges are never selected.}
+available, executable edges only; retired edges are never selected.}
 
 \item{provider}{Provider filter, `"auto"`, `"neuroatlas"`, or `"templateflow"`.}
 }

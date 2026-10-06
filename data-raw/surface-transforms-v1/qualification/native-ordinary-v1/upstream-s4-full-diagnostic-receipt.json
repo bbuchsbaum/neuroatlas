@@ -1,0 +1,573 @@
+{
+  "generator_sha256": "8a19be243b950255a47b0f4d96749484544f07650dfce8707ad3cb2e4fd3b3c7",
+  "cases": [
+    {
+      "name": "L-164k-to-32k",
+      "queries": [
+        {
+          "target_one_based": 18069,
+          "native": {
+            "16400": 2.51504270118996e-05,
+            "47119": 0.602053285963421,
+            "103245": 0.397921563609567
+          },
+          "oracle": {
+            "16400": 2.5150427003906017e-05,
+            "103245": 0.3979215636095593,
+            "47119": 0.6020532859634368
+          },
+          "distance": 0.0011640647290679673,
+          "candidates": 7,
+          "native_oracle_max_error": 1.5765166949677223e-14,
+          "workbench": {
+            "47119": 0.6020674109458923,
+            "103245": 0.39793258905410767
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 5.030085402391024e-05,
+          "float_geometry_face_weights": [
+            2.5568734173031515e-05,
+            0.6020529824079356,
+            0.39792144885789144
+          ],
+          "float_geometry_edge_minus_face_distance2": 5.003671982213722e-10
+        }
+      ],
+      "argv": [
+        "/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/tmp/neurotransform-full-barycentric-20260926/L-164k-to-32k/diagnostic-impulses.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-L_den-164k_sphere.surf.gii",
+        "/tmp/neurotransform-full-barycentric-20260926/L-164k-to-32k/diagnostic-target.surf.gii",
+        "BARYCENTRIC",
+        "/tmp/neurotransform-full-barycentric-20260926/L-164k-to-32k/diagnostic-output.func.gii"
+      ],
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "name": "L-32k-to-164k",
+      "queries": [
+        {
+          "target_one_based": 48010,
+          "native": {
+            "242": 0.00012549588722105,
+            "295": 0.764919371221574,
+            "296": 0.234955132891205
+          },
+          "oracle": {
+            "296": 0.23495513289120606,
+            "242": 0.00012549588722192553,
+            "295": 0.764919371221572
+          },
+          "distance": 0.010091543985893873,
+          "candidates": 6,
+          "native_oracle_max_error": 1.9984014443252818e-15,
+          "workbench": {
+            "295": 0.7649929523468018,
+            "296": 0.23500707745552063
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00025102157676437653,
+          "float_geometry_face_weights": [
+            0.00012610814191349462,
+            0.7649186442894953,
+            0.23495524756859126
+          ],
+          "float_geometry_edge_minus_face_distance2": 7.291583585087734e-08
+        },
+        {
+          "target_one_based": 77878,
+          "native": {
+            "17358": 0.24531908398142,
+            "17359": 5.83918668411006e-05,
+            "17399": 0.754622524151739
+          },
+          "oracle": {
+            "17399": 0.7546225241517341,
+            "17359": 5.839186684463828e-05,
+            "17358": 0.24531908398142122
+          },
+          "distance": 0.004550636328571226,
+          "candidates": 6,
+          "native_oracle_max_error": 4.884981308350689e-15,
+          "workbench": {
+            "17358": 0.24534296989440918,
+            "17399": 0.7546570301055908
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00011678373368207946,
+          "float_geometry_face_weights": [
+            0.24531819420651668,
+            5.929721630642403e-05,
+            0.7546225085771769
+          ],
+          "float_geometry_edge_minus_face_distance2": 8.691801447932015e-09
+        },
+        {
+          "target_one_based": 83734,
+          "native": {
+            "19969": 0.420388896536555,
+            "19970": 0.000106410836279002,
+            "20023": 0.579504692627166
+          },
+          "oracle": {
+            "20023": 0.5795046926271664,
+            "19970": 0.00010641083628003272,
+            "19969": 0.42038889653655354
+          },
+          "distance": 0.005515598738999542,
+          "candidates": 7,
+          "native_oracle_max_error": 1.4432899320127035e-15,
+          "workbench": {
+            "19969": 0.4204496145248413,
+            "20023": 0.5795503854751587
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00021282167255804924,
+          "float_geometry_face_weights": [
+            0.4203895566146699,
+            0.00010580322127633736,
+            0.5795046401640538
+          ],
+          "float_geometry_edge_minus_face_distance2": 3.388739547814917e-08
+        },
+        {
+          "target_one_based": 116495,
+          "native": {
+            "1905": 0.749031056895938,
+            "1906": 7.15365571764336e-05,
+            "1959": 0.250897406546886
+          },
+          "oracle": {
+            "1959": 0.25089740654688475,
+            "1906": 7.15365571782844e-05,
+            "1905": 0.749031056895937
+          },
+          "distance": 0.004073321290508731,
+          "candidates": 6,
+          "native_oracle_max_error": 1.8508008710685364e-15,
+          "workbench": {
+            "1905": 0.74907386302948,
+            "1959": 0.2509261667728424
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.000143102916674832,
+          "float_geometry_face_weights": [
+            0.749030970746426,
+            7.216699035217735e-05,
+            0.25089686226322183
+          ],
+          "float_geometry_edge_minus_face_distance2": 1.5902138900328317e-08
+        },
+        {
+          "target_one_based": 158189,
+          "native": {
+            "25308": 5.14045998372126e-05,
+            "25351": 0.677912988134873,
+            "25352": 0.32203560726529
+          },
+          "oracle": {
+            "25352": 0.32203560726528735,
+            "25308": 5.140459983772136e-05,
+            "25351": 0.6779129881348749
+          },
+          "distance": 0.004633219908056852,
+          "candidates": 6,
+          "native_oracle_max_error": 2.6645352591003757e-15,
+          "workbench": {
+            "25351": 0.6779367327690125,
+            "25352": 0.32206326723098755
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00010280919967420313,
+          "float_geometry_face_weights": [
+            5.0872979591609635e-05,
+            0.6779133069653175,
+            0.32203582005509085
+          ],
+          "float_geometry_edge_minus_face_distance2": 7.060364577386052e-09
+        },
+        {
+          "target_one_based": 161613,
+          "native": {
+            "22552": 0.463345471430823,
+            "22585": 6.11105877118684e-05,
+            "22586": 0.536593417981465
+          },
+          "oracle": {
+            "22586": 0.5365934179814641,
+            "22552": 0.46334547143082394,
+            "22585": 6.111058771195186e-05
+          },
+          "distance": 0.005506720378641578,
+          "candidates": 11,
+          "native_oracle_max_error": 9.43689570931383e-16,
+          "workbench": {
+            "22552": 0.46336638927459717,
+            "22586": 0.5366336107254028
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00012222117542388944,
+          "float_geometry_face_weights": [
+            0.4633456589578636,
+            6.1017826614189894e-05,
+            0.5365933232155222
+          ],
+          "float_geometry_edge_minus_face_distance2": 1.150247535975564e-08
+        }
+      ],
+      "argv": [
+        "/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/tmp/neurotransform-full-barycentric-20260926/L-32k-to-164k/diagnostic-impulses.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-L_den-32k_sphere.surf.gii",
+        "/tmp/neurotransform-full-barycentric-20260926/L-32k-to-164k/diagnostic-target.surf.gii",
+        "BARYCENTRIC",
+        "/tmp/neurotransform-full-barycentric-20260926/L-32k-to-164k/diagnostic-output.func.gii"
+      ],
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "name": "R-164k-to-32k",
+      "queries": [
+        {
+          "target_one_based": 2527,
+          "native": {
+            "77903": 0.411420442873787,
+            "77904": 0.588516732309433,
+            "77905": 6.28248167797544e-05
+          },
+          "oracle": {
+            "77905": 6.282481677910567e-05,
+            "77904": 0.5885167323094248,
+            "77903": 0.41142044287379603
+          },
+          "distance": 0.0012624373813602348,
+          "candidates": 9,
+          "native_oracle_max_error": 9.048317650695026e-15,
+          "workbench": {
+            "77903": 0.411451131105423,
+            "77904": 0.5885488986968994
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00012567943588213595,
+          "float_geometry_face_weights": [
+            0.41142191766520586,
+            0.5885180677901709,
+            6.001454462320548e-05
+          ],
+          "float_geometry_edge_minus_face_distance2": 1.9597080863356317e-09
+        },
+        {
+          "target_one_based": 2635,
+          "native": {
+            "7710": 0.547530079314562,
+            "73838": 0.452359522064932,
+            "73840": 0.000110398620505448
+          },
+          "oracle": {
+            "7710": 0.547530079314565,
+            "73840": 0.00011039862050410487,
+            "73838": 0.45235952206493085
+          },
+          "distance": 0.001334488582358419,
+          "candidates": 8,
+          "native_oracle_max_error": 2.9976021664879227e-15,
+          "workbench": {
+            "7710": 0.5475855469703674,
+            "73838": 0.45241445302963257
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.0002207972410114395,
+          "float_geometry_face_weights": [
+            0.5475299928814007,
+            0.4523594602197563,
+            0.00011054689884298668
+          ],
+          "float_geometry_edge_minus_face_distance2": 8.908839045021087e-09
+        },
+        {
+          "target_one_based": 5510,
+          "native": {
+            "4014": 6.64694444732494e-05,
+            "94776": 0.621525512651213,
+            "144990": 0.378408017904314
+          },
+          "oracle": {
+            "144990": 0.37840801790431966,
+            "4014": 6.646944446489552e-05,
+            "94776": 0.6215255126512155
+          },
+          "distance": 0.0012097998857130018,
+          "candidates": 8,
+          "native_oracle_max_error": 8.35388615921806e-15,
+          "workbench": {
+            "94776": 0.6215589046478271,
+            "144990": 0.37844109535217285
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00013293888894622127,
+          "float_geometry_face_weights": [
+            6.699697428802498e-05,
+            0.6215252352772721,
+            0.37840776774843987
+          ],
+          "float_geometry_edge_minus_face_distance2": 2.460361955218612e-09
+        },
+        {
+          "target_one_based": 13802,
+          "native": {
+            "49194": 5.3605708544846e-05,
+            "122246": 0.223068115573298,
+            "147385": 0.776878278718158
+          },
+          "oracle": {
+            "147385": 0.776878278718158,
+            "49194": 5.36057085445958e-05,
+            "122246": 0.22306811557329745
+          },
+          "distance": 0.0007188767179422614,
+          "candidates": 6,
+          "native_oracle_max_error": 5.551115123125783e-16,
+          "workbench": {
+            "122246": 0.22308886051177979,
+            "147385": 0.7769111394882202
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00010721141708888712,
+          "float_geometry_face_weights": [
+            5.3821713828838824e-05,
+            0.22306818750657736,
+            0.7768779907795939
+          ],
+          "float_geometry_edge_minus_face_distance2": 1.983712174471781e-09
+        }
+      ],
+      "argv": [
+        "/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/tmp/neurotransform-full-barycentric-20260926/R-164k-to-32k/diagnostic-impulses.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-R_den-164k_sphere.surf.gii",
+        "/tmp/neurotransform-full-barycentric-20260926/R-164k-to-32k/diagnostic-target.surf.gii",
+        "BARYCENTRIC",
+        "/tmp/neurotransform-full-barycentric-20260926/R-164k-to-32k/diagnostic-output.func.gii"
+      ],
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "name": "R-32k-to-164k",
+      "queries": [
+        {
+          "target_one_based": 20122,
+          "native": {
+            "18466": 9.58912513274179e-05,
+            "18467": 0.738087176453728,
+            "18517": 0.261816932294945
+          },
+          "oracle": {
+            "18466": 9.589125132680731e-05,
+            "18467": 0.7380871764537285,
+            "18517": 0.26181693229494474
+          },
+          "distance": 0.004974166700185281,
+          "candidates": 7,
+          "native_oracle_max_error": 6.105820059623679e-16,
+          "workbench": {
+            "18467": 0.7381395697593689,
+            "18517": 0.2618604302406311
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00019178250265439173,
+          "float_geometry_face_weights": [
+            9.612964470695484e-05,
+            0.7380868533864525,
+            0.2618170169688405
+          ],
+          "float_geometry_edge_minus_face_distance2": 2.0509345600794933e-08
+        },
+        {
+          "target_one_based": 26585,
+          "native": {
+            "1752": 4.76220660924342e-05,
+            "1863": 0.194706726089083,
+            "1864": 0.805245651844824
+          },
+          "oracle": {
+            "1863": 0.19470672608907935,
+            "1752": 4.762206609352889e-05,
+            "1864": 0.8052456518448271
+          },
+          "distance": 0.0025695169073813246,
+          "candidates": 6,
+          "native_oracle_max_error": 3.635980405647388e-15,
+          "workbench": {
+            "1863": 0.19472335278987885,
+            "1864": 0.80527663230896
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 9.522923102425746e-05,
+          "float_geometry_face_weights": [
+            4.6563425982526496e-05,
+            0.19470758315592054,
+            0.805245853418097
+          ],
+          "float_geometry_edge_minus_face_distance2": 8.428227311636766e-09
+        },
+        {
+          "target_one_based": 28837,
+          "native": {
+            "5796": 0.166936570449851,
+            "5837": 0.000101423659076928,
+            "5838": 0.832962005891072
+          },
+          "oracle": {
+            "5837": 0.00010142365907761519,
+            "5796": 0.16693657044985022,
+            "5838": 0.8329620058910722
+          },
+          "distance": 0.003856962073010916,
+          "candidates": 6,
+          "native_oracle_max_error": 7.771561172376096e-16,
+          "workbench": {
+            "5796": 0.16698598861694336,
+            "5838": 0.8330140113830566
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00020284731815387705,
+          "float_geometry_face_weights": [
+            0.16693677015102815,
+            0.00010111369569801587,
+            0.8329621161532739
+          ],
+          "float_geometry_edge_minus_face_distance2": 2.8940743834764458e-08
+        },
+        {
+          "target_one_based": 49902,
+          "native": {
+            "29885": 0.90022496478944,
+            "29930": 0.0997210619535916,
+            "29931": 5.39732569685484e-05
+          },
+          "oracle": {
+            "29930": 0.0997210619535902,
+            "29885": 0.9002249647894454,
+            "29931": 5.397325696442843e-05
+          },
+          "distance": 0.0021541454829293993,
+          "candidates": 6,
+          "native_oracle_max_error": 5.329070518200751e-15,
+          "workbench": {
+            "29885": 0.9002487063407898,
+            "29930": 0.0997512936592102
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00010794651393692436,
+          "float_geometry_face_weights": [
+            0.900225156674013,
+            0.09972196715764299,
+            5.287616834393828e-05
+          ],
+          "float_geometry_edge_minus_face_distance2": 8.893298544680376e-09
+        },
+        {
+          "target_one_based": 136245,
+          "native": {
+            "10045": 0.44209630527115,
+            "10046": 0.557859654355839,
+            "30997": 4.40403730105453e-05
+          },
+          "oracle": {
+            "10046": 0.5578596543558374,
+            "10045": 0.4420963052711543,
+            "30997": 4.404037300830228e-05
+          },
+          "distance": 0.004968236768307735,
+          "candidates": 8,
+          "native_oracle_max_error": 4.274358644806853e-15,
+          "workbench": {
+            "10045": 0.4421273469924927,
+            "10046": 0.5578726530075073
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 8.808074602157921e-05,
+          "float_geometry_face_weights": [
+            0.44209473075439554,
+            0.5578606001109959,
+            4.466913460854835e-05
+          ],
+          "float_geometry_edge_minus_face_distance2": 7.048682574896809e-09
+        },
+        {
+          "target_one_based": 145744,
+          "native": {
+            "18774": 5.65417562726211e-05,
+            "18818": 0.766134121193146,
+            "18819": 0.233809337050581
+          },
+          "oracle": {
+            "18818": 0.7661341211931422,
+            "18774": 5.6541756273143854e-05,
+            "18819": 0.2338093370505847
+          },
+          "distance": 0.004175604358737335,
+          "candidates": 6,
+          "native_oracle_max_error": 3.774758283725532e-15,
+          "workbench": {
+            "18818": 0.7661660313606262,
+            "18819": 0.23383396863937378
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00011308351254568633,
+          "float_geometry_face_weights": [
+            5.643263360044504e-05,
+            0.7661336169450815,
+            0.23380995042131802
+          ],
+          "float_geometry_edge_minus_face_distance2": 9.834904747299772e-09
+        },
+        {
+          "target_one_based": 157505,
+          "native": {
+            "13732": 0.41800812025275,
+            "13733": 5.32187048946813e-05,
+            "13782": 0.581938661042355
+          },
+          "oracle": {
+            "13732": 0.4180081202527509,
+            "13733": 5.321870489450801e-05,
+            "13782": 0.5819386610423546
+          },
+          "distance": 0.005685815867896455,
+          "candidates": 8,
+          "native_oracle_max_error": 8.881784197001252e-16,
+          "workbench": {
+            "13732": 0.41803744435310364,
+            "13782": 0.5819625854492188
+          },
+          "workbench_row_sum": 1.0,
+          "weight_l1_difference": 0.00010646721211201073,
+          "float_geometry_face_weights": [
+            0.41800813892259503,
+            5.326378487274415e-05,
+            0.5819385972925323
+          ],
+          "float_geometry_edge_minus_face_distance2": 9.591086836417868e-09
+        }
+      ],
+      "argv": [
+        "/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/tmp/neurotransform-full-barycentric-20260926/R-32k-to-164k/diagnostic-impulses.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-R_den-32k_sphere.surf.gii",
+        "/tmp/neurotransform-full-barycentric-20260926/R-32k-to-164k/diagnostic-target.surf.gii",
+        "BARYCENTRIC",
+        "/tmp/neurotransform-full-barycentric-20260926/R-32k-to-164k/diagnostic-output.func.gii"
+      ],
+      "exit": 0,
+      "stderr": ""
+    }
+  ]
+}

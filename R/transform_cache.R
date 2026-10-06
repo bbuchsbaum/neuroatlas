@@ -59,7 +59,9 @@ clear_transform_cache <- function(artifact_version = NULL,
     artifacts <- entries[
       vapply(entries, function(path) {
         !dir.exists(path) && !.transform_cache_is_symlink(path) &&
-          grepl("^[A-Za-z0-9][A-Za-z0-9._-]*\\.h5$", basename(path)) &&
+          (grepl("^[A-Za-z0-9][A-Za-z0-9._-]*\\.h5$", basename(path)) ||
+           (version == "surface-operators-v1" &&
+            grepl("^[0-9a-f]{64}\\.rds$", basename(path)))) &&
           .transform_cache_owned(path)
       }, logical(1))
     ]

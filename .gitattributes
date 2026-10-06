@@ -1,2 +1,8 @@
 # Preserve the frozen upstream label table, including its empty TSV field.
 data-raw/transform-artifacts-v1/landmarks-v1/tpl-MNI152NLin6Asym_atlas-HOSPA_dseg.tsv -text -whitespace
+
+# Frozen receipts and raw console output must keep their checksum-bound bytes.
+data-raw/surface-transforms-v1/qualification/** -text
+data-raw/surface-transforms-v1/qualification/**/*.log -whitespace
+data-raw/surface-transforms-v1/qualification/**/*.Rout -whitespace
+data-raw/surface-transforms-v1/*.json -text

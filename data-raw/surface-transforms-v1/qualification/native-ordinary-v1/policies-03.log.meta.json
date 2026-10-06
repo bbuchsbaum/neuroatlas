@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-27T13:59:28.398479+00:00",
+  "finished_utc": "2026-09-27T13:59:40.425478+00:00",
+  "duration_seconds": 12.026858,
+  "command": [
+    "env",
+    "RGL_USE_NULL=true",
+    "R_LIBS=/tmp/neurotransform-surface-library",
+    "Rscript",
+    "data-raw/surface-transforms-v1/qualify-native-policies.R",
+    "data-raw/surface-transforms-v1/work/integration-20260927/native-03"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/integration-20260927/policies-03.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 486
+}

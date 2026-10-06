@@ -1,0 +1,23 @@
+{
+  "schema": "neuroatlas.native-ordinary-qualification.v1",
+  "frozen": "2026-09-27",
+  "engine_revision": "933edddda462593941e167726e8aaa7168ff103a",
+  "method": "native_closest_barycentric",
+  "scope": "fsaverage 164k <-> registered fsLR 32k, L and R; pinned inputs.lock.json",
+  "radius": 100,
+  "outside": "error",
+  "normalization": "element",
+  "seed": 20260927,
+  "absolute_weight_tolerance": 1e-12,
+  "relative_projection_tolerance": 1e-12,
+  "bounded_value_tolerance": 1e-12,
+  "random_targets_per_route": 256,
+  "small_positive_weight_targets_per_route": 64,
+  "geometry_oracle": "Independent exhaustive least-squares interior and segment projections over every source triangle, no production search or pruning",
+  "synthetic": ["closed octahedron and rotations/scales", "interior edge vertex", "signed boundary perturbations 0 +/-1e-2 +/-1e-4 +/-1e-6 +/-1e-8", "face order and winding", "complete impulse responses", "exact vertex zero support"],
+  "full_density": ["triangle support everywhere", "finite positive sparse weights", "unit row mass", "constant preservation", "convex range", "face order and winding invariance"],
+  "policies": ["continuous matrices", "aggregate and largest labels with exact ties", "all-source and pinned medial-wall masks", "target masks", "all-excluded support", "positive and zero-weight missingness", "propagate omit error", "label table preservation", "tiny positive third contributor alone remains available"],
+  "workbench": "Retain original 5e-5 full-field and 2e-6 small-basis failures. Known 17 discrepancies are retrospective regressions, not fresh validation. No tolerance widening or whitelisting.",
+  "excluded_claims": ["Workbench equivalence", "adaptive resampling", "area conservation", "reversibility", "registration accuracy", "other meshes"],
+  "admission": "All gates must pass. Unresolved ties or conditioning failures block admission; do not omit cases. Record exact engine, DLL, code, ordered arrays, masks, seeds and command hashes."
+}

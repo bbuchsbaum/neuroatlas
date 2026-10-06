@@ -1,0 +1,17 @@
+{
+  "source_revision": "9ab40ffd9b3b9fd46ac2e805826cbc8fde60b429",
+  "manifest_sha256": "92e1aa72d06aca3d7bcf4dbdfb778e066da843bf3af55b65fa35f92805851fb7",
+  "source_files_match_revision": true,
+  "installed_artifacts_sha256": {
+    "DESCRIPTION": "d13109d338bf0a6c26157fd546c29410a89fe6cfafed6e87a6282fc59a4e3915",
+    "R/neurotransform.rdb": "a990f26b6e2df5b1f6925218b0e2ece3acdcaef016ac35ccd848382b71fc90da",
+    "R/neurotransform.rdx": "3fa38c16bd6403adc74c010b545830d007396e8d68ca1705434a081edd234077",
+    "libs/neurotransform.so": "6a785f16aba7ccae2063345928155b048c6060aaaeeab0397c0dd41bfb1a405a"
+  },
+  "package_tarball_sha256": "0f1ff36d1cb8ca9c731a57bdaed131a4d2688fecd1512e04a12e2e7ab6c2f50e",
+  "evidence_sha256": {
+    "output/surface-completion/s8-consumer-probe.json": "15ce6fe3f92f51c3d4781f0a559234044b8de175fae10aaf6de25b712921b997",
+    "output/surface-completion/s8-ordinary/receipt.json": "0b83211398573db0ad7d415d4aa83206ef2bfc60796c5dfe0fbaa27f0f931be5",
+    "output/surface-completion/s8-adaptive/receipt.json": "970ed05f3e154d828fb1afffb827e65dcec15bfc80541ba6f5fa9f19de234433"
+  }
+}

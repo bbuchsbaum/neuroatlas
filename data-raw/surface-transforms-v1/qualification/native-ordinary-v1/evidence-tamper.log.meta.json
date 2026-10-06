@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-27T14:00:35.798033+00:00",
+  "finished_utc": "2026-09-27T14:00:36.254630+00:00",
+  "duration_seconds": 0.456528,
+  "command": [
+    "python3",
+    "data-raw/surface-transforms-v1/test-native-evidence.py",
+    "data-raw/surface-transforms-v1/work/integration-20260927/native-03"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/integration-20260927/evidence-tamper.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 120.0,
+  "log_bytes": 66
+}

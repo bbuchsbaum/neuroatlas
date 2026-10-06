@@ -46,8 +46,8 @@ test_that("atlas_transform_plan finds a two-hop route", {
   plan <- atlas_transform_plan("fsaverage5", "fsaverage6")
   expect_s3_class(plan, "atlas_transform_plan")
   expect_equal(plan$n_steps, 2L)
-  expect_equal(plan$status, "available")
-  expect_equal(plan$confidence, "exact")
+  expect_equal(plan$status, "planned")
+  expect_equal(plan$confidence, "approximate")
   expect_equal(plan$steps$to_space[[1]], "fsaverage")
   expect_equal(plan$steps$from_space[[2]], "fsaverage")
 })
@@ -199,4 +199,47 @@ test_that("qualified MNI routes resolve to executable release artifacts", {
     expect_identical(plan$steps$convention, "ants_image_pullback_ras")
     expect_no_error(neuroatlas:::.validate_transform_artifact(plan$steps))
   }
+})
+
+test_that("surface registry entries make no execution or invertibility claim", {
+  registry <- space_transform_manifest()
+  surface <- registry$source_representation == "surface" |
+    registry$target_representation == "surface"
+  expect_true(all(registry$status[surface] == "planned"))
+  expect_false(any(registry$executable[surface]))
+  expect_false(any(registry$reversible[surface]))
+  expect_false(any(registry$confidence[surface] == "exact"))
+  expect_error(atlas_transform_plan("fsaverage5", "fsaverage6",
+    available_only = TRUE, mode = "strict"), "No transform route")
+  expect_error(atlas_transform_plan("fsaverage", "fsaverage", mode = "strict"),
+               "Surface identity requires")
+  expect_warning(expect_null(atlas_transform_plan("fslr32k", "fsLR_32k")),
+                 "Surface identity requires")
+  expect_error(atlas_transform_plan("fsLR_164k", "fsLR_164k", mode = "strict"),
+               "Surface identity requires")
+})
+
+test_that("routing cannot turn two projections into a volume transform", {
+  registry <- rbind(plan_route("A", "S"), plan_route("S", "B"))
+  registry$transform_type <- c("vol2surf", "surf2vol")
+  registry$status <- "planned"
+  local_mocked_bindings(.space_transform_registry = function() registry,
+                        .package = "neuroatlas")
+  expect_error(atlas_transform_plan("A", "B", mode = "strict"),
+               "No transform route")
+  expect_equal(atlas_transform_plan("A", "S")$n_steps, 1L)
+  expect_error(atlas_transform_plan("A", "S", data_type = "voxel",
+                                    mode = "strict"), "No transform route")
+  expect_error(atlas_transform_plan("S", "B", data_type = "vertex",
+                                    mode = "strict"), "No transform route")
+})
+
+test_that("unimplemented available edges do not enter execution plans", {
+  registry <- plan_route("A", "B")
+  registry$format <- "unknown"
+  local_mocked_bindings(.space_transform_registry = function() registry,
+                        .package = "neuroatlas")
+  expect_equal(atlas_transform_plan("A", "B")$n_steps, 1L)
+  expect_error(atlas_transform_plan("A", "B", available_only = TRUE,
+                                    mode = "strict"), "No transform route")
 })

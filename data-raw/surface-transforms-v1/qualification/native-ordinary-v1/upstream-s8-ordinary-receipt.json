@@ -1,0 +1,836 @@
+{
+  "method": "BARYCENTRIC",
+  "tolerance": 5e-05,
+  "seed": 20926,
+  "full": true,
+  "target_sample_size": null,
+  "platform": "macOS-14.3-arm64-arm-64bit-Mach-O",
+  "threads": "4",
+  "version": "Connectome Workbench\nType: Command Line Application\nVersion: 2.2.1\nQt Compiled Version: 6.11.1\nQt Runtime Version: 6.11.1\nCommit: 01164ffa47f2778088bd6ff472ec9cd9a57f5b42\nCommit Date: 2026-07-13 18:19:49 -0500\nCompiler: c++ (/usr/bin)\nCompiler Version: 17.0.0.17000604\nCompiled Debug: NO\nOperating System: Apple OSX\nCompiled with OpenMP: YES\n",
+  "binary_sha256": "b2506d131aec9bc8e32930b8e8fdd055dd926b060ae661a1eb09b8c0a9f7ba27",
+  "generator_sha256": "cddf909e69eed8a9eb713b51836d915e23204c388d4bc89bdfec62713c9866c3",
+  "input_receipt": "/private/tmp/neurotransform-full-barycentric-measured-20260926/receipt.json",
+  "input_receipt_sha256": "465498a8790a642d0e0f53d077a7467bd2ddf340b536f1e03f087414796aa08c",
+  "comparison_sha256": "044fc023a271bac19bd417cab372db0cf2612427759c9343f0fc64d1de359afc",
+  "revision": "ffb39960f407cfd491c5954e4a4ee2114ac1b250",
+  "build_manifest": {
+    "base_revision": "ffb39960f407cfd491c5954e4a4ee2114ac1b250",
+    "source_sha256": {
+      "DESCRIPTION": "4dbdee3c5d42e827d88cced9e5c973bf312a02fbeb0ea9cebf4eeaf95409b376",
+      "NAMESPACE": "c9c71b07d1d0142c055a06bb70520ad7ee6656cdd3639cc1fb2b057e59d4b7f1",
+      "R/RcppExports.R": "3d73a7dd688c1c2665406bf1c2cc883a2abe28ffd5ac9fed7bf490be21ccf700",
+      "R/aaa_utils.R": "22be3a83f13dd912c6950b1d891f4a8df2fe7668551d646ac58edc801f1a6cae",
+      "R/affine_utils.R": "43831de1d6ae4286d08710b14283ef6220921a41a932a0a75b9ae18aed64fa5e",
+      "R/afni_io.R": "9fd93574e8cf2d9ff32284022bba7db64f0eb10444ff5f3bf77093a3f4d3a9d6",
+      "R/afni_warp.R": "cfa367b694c77f6727f6cb32b9bb195ad83948c104e77180357fcfaa2fb439af",
+      "R/all_class.R": "242694e99b6e586e162324655c9d7bd938df1fea58939f1d45675cc49b77c89b",
+      "R/all_generic.R": "2df9a83946882e5ae38954be46e78fdd2fccf8dd978e59247b9abc39bf184588",
+      "R/coordinates.R": "ba1727981d16dd3919b87ed70fa2b4deff8ef2c9474374a24281d9238b001487",
+      "R/deformation_field.R": "98ad11e21a9e325e9ed23cdaab65576f7e43c52590b3e17e6c32c9e12712e171",
+      "R/fsl_ingest.R": "39de9cd60a957fe7c9fac726e3c3734cb921b35c7bc532b74433d402b84b6ccf",
+      "R/io_helpers.R": "ee3b9f9df05c5bf010d4027b68afb0b4e22a1bb1f19aa671a0bd705a7e60f4c1",
+      "R/jacobian.R": "53ed3617f5fa074d102352fe1b139cdb03a67135a0e6bdfeaa9370d3e9255964",
+      "R/lta_io.R": "cbc82ea4ed71d322a0af284e2061808b7ff1937622d2f7f84e878f337d655307",
+      "R/morphism.R": "6b28ccd51f0470022e8ddf34bd0694d5b10040b9588c8680a008bedd94f6893e",
+      "R/overlap_metrics.R": "ade5ae2fb0b833556dffe354173e6d144141d5d818db9d4a5911b0be90bde589",
+      "R/resampling_plan.R": "b60ab144a93b07b6a7f8b7a4f78a39ba045fa89e82869bbff99168bae6337a9e",
+      "R/sampler.R": "8aebdf428edeaf85a3973e209d3a99566a3c5118d199b3f71d0c855db01e53ae",
+      "R/surface_area.R": "076669b67e5e327aac32c9a6027345e97d7bc54366d63ec34bf8e3d2c1b9a1b6",
+      "R/surface_resampling.R": "1a51713dec165f04122b0555de956ad09505dc3703c483ca7116bb68adfe0bf4",
+      "R/transform_io.R": "5ddf358975d28125bcbdbe035c27f3a4a24bdf4f9e5cf2c5a39192b70c6deb16",
+      "R/transform_path.R": "9032ee874ace9a383994c0102b8a411bd5a0d6e51a92b40256c88ff3e6b6fa8e",
+      "R/warp_chain.R": "75d842df2e453debd6bae32ae7f08cfe86937e7944873bbdb81232581425f752",
+      "R/warp_loader.R": "05a97ab6f3b6f44e3979b5d090e0afdd9f113c10fd3c40bba339511c6d8c4720",
+      "R/warp_transform.R": "8ef8edc649d940e21150dee2a047ccd9318ce572a86084b237944c22e346587c",
+      "R/x5_io.R": "8077dcbdfec22ec8ecd3438709566dcf1b524fe1438d47a8422bee9c4af1eb36",
+      "R/zzz.R": "e3e80ded40c555aea3c3c8576f7e7618ed7fd9c9db716dc636421b666520ca89",
+      "src/RcppExports.cpp": "cde2647b7f6bae06539318e375762f1c2573b929e6cea14551de328375a9c371",
+      "src/rcpp_apply.cpp": "2ed6371a9ec2bb56f907e85e0436968a7aa1812ab871784ea824c3aad283fa92",
+      "src/rcpp_bary.cpp": "1599fc566e918a0474dc57e6b40251a89a8144f4f2c64ced09822d64dd1c828b",
+      "src/rcpp_jacobian.cpp": "04c551c6602cda01007b0f528700bec6e3b4cfc2a154ae7653ea5f6da76c3d54",
+      "src/rcpp_resample_path.cpp": "9dc2d153597daaff39d532bc54d21eb3915815d6aecb7f56cb9474e4ebbbea9b",
+      "src/rcpp_resample_plan.cpp": "2f70aaa103ff8421acd041fb7d5ac8ee182f4751ddb7efdb9b61689104776a38",
+      "src/rcpp_ribbon.cpp": "b536feb60d26476fcc04dcc22177010e7934f0065ecc1534cb77d98230d20df3",
+      "src/rcpp_sample.cpp": "a60a63f1e5630de7a746a5708af338179ad556d34033a64c728cba8396d0bad3",
+      "src/rcpp_surface_geometry.cpp": "f292e71a0572c37638ab2f00df50ff796b0238a2fcdd868ec36958b113b61cbe",
+      "src/rcpp_surface_index.cpp": "3ab8ab5776752245331f858a0fdcc00cf339339c1afc7af624f6a75255ed9c83",
+      "src/rcpp_triplet.cpp": "6f5aea08110394616e9074c9cd1d8fc3c579f19982a9d5d590f92535ce23152a",
+      "src/rcpp_warp.cpp": "9d52bde5706a908f3f2aa7285ccb2484862e92c5c7ca52142fd2317afb021a72",
+      "src/rcpp_weights.cpp": "ffa19c87d0f27dad6a20927f3ec153d2ea67022bb7f5873fac8d06bd53ff23d4",
+      "src/rcpp_worldcoords.cpp": "15e59208f81a0743ed65452f613133947d17414730a3e1799f0b92d7614e06d0",
+      "src/surface_index.h": "dca037ab02802f813cde9080be01076bb7a1ca3c96a00a115a50e8b535667b18",
+      "src/surface_projection.h": "fa612c3ee5c07b205fb7ab6a4c351df257a20646363beb7c90a289ef9b9d11a9"
+    },
+    "dll_sha256": "6a785f16aba7ccae2063345928155b048c6060aaaeeab0397c0dd41bfb1a405a"
+  },
+  "cases": [
+    {
+      "name": "L-164k-to-32k",
+      "source": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-L_den-164k_sphere.surf.gii",
+      "target": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-L_den-32k_sphere.surf.gii",
+      "source_sha256": "3b9219cb95973baa491f0663562d78c3a1f5cf8d2da87294e3bcabb8bb0ad24c",
+      "target_sha256": "31987d139b6cdf1040188d1795bf23c213c57f8e84fb45f2c04823d996b0defc",
+      "target_vertices": 32492,
+      "selected_target_indices_zero_based": "all",
+      "argv": [
+        "/private/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/L-164k-to-32k/input.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-L_den-164k_sphere.surf.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-L_den-32k_sphere.surf.gii",
+        "BARYCENTRIC",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/L-164k-to-32k/output.func.gii"
+      ],
+      "workbench_exit": 0,
+      "workbench_stderr": "",
+      "comparison_argv": [
+        "/usr/bin/time",
+        "-l",
+        "Rscript",
+        "/private/tmp/neurotransform-s8-ordinary/compare.R",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/L-164k-to-32k",
+        "5e-05",
+        "/private/tmp/neurotransform-s8-ordinary/L-164k-to-32k/result.json"
+      ],
+      "comparison_exit": 0,
+      "input_csv_sha256": {
+        "query.csv": "1715c88482ca083444ead0ee8e0b607812e579259eaa3e89b915ed72b8d77a2b",
+        "faces.csv": "0b72afa2962b2e794d4d1e9782df7b2fcd403e7f37309e78abe8b49a13e91f68",
+        "data.csv": "381ec470c70d18b5c515daf4af035f1e0c3daf5e78e03e7af7beab6d33760ea4",
+        "vertices.csv": "4bfacdc6aa06da52e2453a8330df5b83789e61d05684094e27d2ad0d62dabd4e",
+        "expected.csv": "0ef3b777f0ebd9ab60f65dc20bd566b1294de5ba8ea211e52ca964a8411d274b"
+      },
+      "result": {
+        "max_absolute_error": 4.40728552362213e-05,
+        "elapsed_seconds": 0.451,
+        "rms_error": 1.04372885818583e-06,
+        "error_quantiles": [
+          7.31415627369669e-09,
+          2.19514988838432e-06,
+          4.96145878218224e-06,
+          4.40728552362213e-05
+        ],
+        "worst": [
+          [
+            18069,
+            6
+          ],
+          [
+            29181,
+            7
+          ],
+          [
+            29097,
+            7
+          ],
+          [
+            18069,
+            7
+          ],
+          [
+            18335,
+            5
+          ],
+          [
+            29097,
+            6
+          ],
+          [
+            29461,
+            6
+          ],
+          [
+            3568,
+            5
+          ],
+          [
+            3568,
+            6
+          ],
+          [
+            20648,
+            6
+          ]
+        ],
+        "worst_query_coordinates": [
+          [
+            -57.3574180603027,
+            14.459755897522,
+            80.629035949707
+          ],
+          [
+            80.0779190063476,
+            54.2323341369629,
+            25.4240264892578
+          ],
+          [
+            57.954891204834,
+            72.2690353393555,
+            37.6618804931641
+          ],
+          [
+            -57.3574180603027,
+            14.459755897522,
+            80.629035949707
+          ],
+          [
+            -32.2459678649902,
+            92.650146484375,
+            19.3945922851562
+          ],
+          [
+            57.954891204834,
+            72.2690353393555,
+            37.6618804931641
+          ],
+          [
+            58.7121238708496,
+            51.0671501159668,
+            62.8095016479492
+          ],
+          [
+            68.6224975585938,
+            -54.9204483032227,
+            47.6937942504883
+          ],
+          [
+            68.6224975585938,
+            -54.9204483032227,
+            47.6937942504883
+          ],
+          [
+            8.18709278106689,
+            71.6238021850586,
+            -69.3036956787109
+          ]
+        ],
+        "field_max_errors": [
+          1.45660585149088e-07,
+          1.79069734956849e-07,
+          4.58438813299988e-07,
+          1.66290509584499e-07,
+          1.80499097652831e-05,
+          4.40728552362213e-05,
+          2.96366940331638e-05,
+          0,
+          1.70740733718144e-06,
+          2.01724343529275e-06,
+          0
+        ],
+        "application_seconds": 0.208,
+        "native_timing": {
+          "index_seconds": 0.09760825,
+          "query_seconds": 0.014549375
+        },
+        "max_row_sum_error": 2.22044604925031e-16,
+        "geometry_valid": true,
+        "permutation_error": 0,
+        "targets": 32492,
+        "nnz": 97475,
+        "passed": true,
+        "dll_sha256": "6a785f16aba7ccae2063345928155b048c6060aaaeeab0397c0dd41bfb1a405a",
+        "session": [
+          "R version 4.5.1 (2025-06-13)",
+          "Platform: aarch64-apple-darwin20",
+          "Running under: macOS Sonoma 14.3",
+          "",
+          "Matrix products: default",
+          "BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib ",
+          "LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1",
+          "",
+          "locale:",
+          "[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8",
+          "",
+          "time zone: America/Toronto",
+          "tzcode source: internal",
+          "",
+          "attached base packages:",
+          "[1] stats     graphics  grDevices utils     datasets  methods   base     ",
+          "",
+          "other attached packages:",
+          "[1] jsonlite_2.0.0       neurotransform_0.2.0",
+          "",
+          "loaded via a namespace (and not attached):",
+          "[1] compiler_4.5.1 tools_4.5.1    Rcpp_1.1.2     digest_0.6.39 "
+        ],
+        "peak_resident_bytes": 652640256
+      }
+    },
+    {
+      "name": "L-32k-to-164k",
+      "source": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-L_den-32k_sphere.surf.gii",
+      "target": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-L_den-164k_sphere.surf.gii",
+      "source_sha256": "31987d139b6cdf1040188d1795bf23c213c57f8e84fb45f2c04823d996b0defc",
+      "target_sha256": "3b9219cb95973baa491f0663562d78c3a1f5cf8d2da87294e3bcabb8bb0ad24c",
+      "target_vertices": 163842,
+      "selected_target_indices_zero_based": "all",
+      "argv": [
+        "/private/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/L-32k-to-164k/input.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-L_den-32k_sphere.surf.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-L_den-164k_sphere.surf.gii",
+        "BARYCENTRIC",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/L-32k-to-164k/output.func.gii"
+      ],
+      "workbench_exit": 0,
+      "workbench_stderr": "",
+      "comparison_argv": [
+        "/usr/bin/time",
+        "-l",
+        "Rscript",
+        "/private/tmp/neurotransform-s8-ordinary/compare.R",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/L-32k-to-164k",
+        "5e-05",
+        "/private/tmp/neurotransform-s8-ordinary/L-32k-to-164k/result.json"
+      ],
+      "comparison_exit": 1,
+      "input_csv_sha256": {
+        "query.csv": "4bfacdc6aa06da52e2453a8330df5b83789e61d05684094e27d2ad0d62dabd4e",
+        "faces.csv": "ba19ca3ba168300aea311211d6d064eb905f293fecbdf54cf77ce2394336a0f1",
+        "data.csv": "f5449dcd612cd825e9558c8fbb3f2db24a3ee52d66659976e447c4065b6d625f",
+        "vertices.csv": "1715c88482ca083444ead0ee8e0b607812e579259eaa3e89b915ed72b8d77a2b",
+        "expected.csv": "82e79282d62808bcc4f3c90f87982a763ef12d4cd4da395a9eeb5f8a6cee5246"
+      },
+      "result": {
+        "max_absolute_error": 0.000164333806763728,
+        "elapsed_seconds": 0.23,
+        "rms_error": 4.46696115163336e-07,
+        "error_quantiles": [
+          7.34381828959574e-09,
+          8.14785308439481e-07,
+          1.85945582561298e-06,
+          0.000164333806763728
+        ],
+        "worst": [
+          [
+            48010,
+            6
+          ],
+          [
+            116495,
+            7
+          ],
+          [
+            77878,
+            7
+          ],
+          [
+            83734,
+            7
+          ],
+          [
+            158189,
+            7
+          ],
+          [
+            161613,
+            7
+          ],
+          [
+            83734,
+            6
+          ],
+          [
+            110976,
+            6
+          ],
+          [
+            105498,
+            6
+          ],
+          [
+            77878,
+            6
+          ]
+        ],
+        "worst_query_coordinates": [
+          [
+            94.2900009155273,
+            -30.3099994659424,
+            -13.7799997329712
+          ],
+          [
+            97.0299987792969,
+            -10.0799999237061,
+            21.9799995422363
+          ],
+          [
+            -87.6600036621094,
+            32.2600021362305,
+            35.7000007629395
+          ],
+          [
+            -6.53999948501587,
+            95.7900009155273,
+            -27.9599990844727
+          ],
+          [
+            46.3600006103516,
+            -73.6699981689453,
+            -49.2199974060059
+          ],
+          [
+            -12.1499996185303,
+            10.710000038147,
+            -98.6800003051758
+          ],
+          [
+            -6.53999948501587,
+            95.7900009155273,
+            -27.9599990844727
+          ],
+          [
+            -89.9000015258789,
+            41.1700019836426,
+            -14.8900003433228
+          ],
+          [
+            -28.8299999237061,
+            26.1000003814697,
+            92.129997253418
+          ],
+          [
+            -87.6600036621094,
+            32.2600021362305,
+            35.7000007629395
+          ]
+        ],
+        "field_max_errors": [
+          1.35871355871897e-06,
+          1.28342030369932e-06,
+          2.2600216064983e-06,
+          1.04498361316874e-06,
+          3.65719445742096e-05,
+          0.000164333806763728,
+          8.05872231289806e-05,
+          2.2319129912296e-06,
+          1.91444456935919e-06,
+          8.13035199068168e-07,
+          1.9669376493392e-06
+        ],
+        "application_seconds": 1.991,
+        "native_timing": {
+          "index_seconds": 0.015876667,
+          "query_seconds": 0.090180625
+        },
+        "max_row_sum_error": 2.22044604925031e-16,
+        "geometry_valid": true,
+        "permutation_error": 0,
+        "targets": 163842,
+        "nnz": 491512,
+        "passed": false,
+        "dll_sha256": "6a785f16aba7ccae2063345928155b048c6060aaaeeab0397c0dd41bfb1a405a",
+        "session": [
+          "R version 4.5.1 (2025-06-13)",
+          "Platform: aarch64-apple-darwin20",
+          "Running under: macOS Sonoma 14.3",
+          "",
+          "Matrix products: default",
+          "BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib ",
+          "LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1",
+          "",
+          "locale:",
+          "[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8",
+          "",
+          "time zone: America/Toronto",
+          "tzcode source: internal",
+          "",
+          "attached base packages:",
+          "[1] stats     graphics  grDevices utils     datasets  methods   base     ",
+          "",
+          "other attached packages:",
+          "[1] jsonlite_2.0.0       neurotransform_0.2.0",
+          "",
+          "loaded via a namespace (and not attached):",
+          "[1] compiler_4.5.1 tools_4.5.1    Rcpp_1.1.2     digest_0.6.39 "
+        ],
+        "peak_resident_bytes": 828063744
+      }
+    },
+    {
+      "name": "R-164k-to-32k",
+      "source": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-R_den-164k_sphere.surf.gii",
+      "target": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-R_den-32k_sphere.surf.gii",
+      "source_sha256": "76fdf4066dd52e867e1d768f059caf1342bd4c957b3f016eab5774e9701d30fb",
+      "target_sha256": "8c1f67fa8fb3024ad3b292be995d5c9bae07dc4dbdd53fbac48e511e1366553d",
+      "target_vertices": 32492,
+      "selected_target_indices_zero_based": "all",
+      "argv": [
+        "/private/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/R-164k-to-32k/input.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-R_den-164k_sphere.surf.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-R_den-32k_sphere.surf.gii",
+        "BARYCENTRIC",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/R-164k-to-32k/output.func.gii"
+      ],
+      "workbench_exit": 0,
+      "workbench_stderr": "",
+      "comparison_argv": [
+        "/usr/bin/time",
+        "-l",
+        "Rscript",
+        "/private/tmp/neurotransform-s8-ordinary/compare.R",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/R-164k-to-32k",
+        "5e-05",
+        "/private/tmp/neurotransform-s8-ordinary/R-164k-to-32k/result.json"
+      ],
+      "comparison_exit": 1,
+      "input_csv_sha256": {
+        "query.csv": "d59bc19a33a8b84b4427ad272f3dbd9e8fd5800ac396f8a03b6b96b6fa22f7c8",
+        "faces.csv": "0b72afa2962b2e794d4d1e9782df7b2fcd403e7f37309e78abe8b49a13e91f68",
+        "data.csv": "381ec470c70d18b5c515daf4af035f1e0c3daf5e78e03e7af7beab6d33760ea4",
+        "vertices.csv": "4bfacdc6aa06da52e2453a8330df5b83789e61d05684094e27d2ad0d62dabd4e",
+        "expected.csv": "2ab3c1ba75f5e2768e367dc640c5707151a4776a4b8861903e2be13712a5ce77"
+      },
+      "result": {
+        "max_absolute_error": 9.74983517426642e-05,
+        "elapsed_seconds": 0.662,
+        "rms_error": 1.09962577125049e-06,
+        "error_quantiles": [
+          7.18757030976347e-09,
+          2.19661117873415e-06,
+          4.96587631420243e-06,
+          9.74983517426642e-05
+        ],
+        "worst": [
+          [
+            5510,
+            5
+          ],
+          [
+            13802,
+            5
+          ],
+          [
+            2635,
+            6
+          ],
+          [
+            2527,
+            7
+          ],
+          [
+            5510,
+            6
+          ],
+          [
+            13802,
+            7
+          ],
+          [
+            2635,
+            7
+          ],
+          [
+            13802,
+            6
+          ],
+          [
+            14469,
+            6
+          ],
+          [
+            28002,
+            5
+          ]
+        ],
+        "worst_query_coordinates": [
+          [
+            -5.1770658493042,
+            -36.0500755310059,
+            93.1321105957031
+          ],
+          [
+            37.6016426086426,
+            -89.9663238525391,
+            22.1850318908691
+          ],
+          [
+            -98.3681488037109,
+            14.2851190567017,
+            10.9381427764893
+          ],
+          [
+            -91.786735534668,
+            24.7800350189209,
+            31.0023250579834
+          ],
+          [
+            -5.1770658493042,
+            -36.0500755310059,
+            93.1321105957031
+          ],
+          [
+            37.6016426086426,
+            -89.9663238525391,
+            22.1850318908691
+          ],
+          [
+            -98.3681488037109,
+            14.2851190567017,
+            10.9381427764893
+          ],
+          [
+            37.6016426086426,
+            -89.9663238525391,
+            22.1850318908691
+          ],
+          [
+            -15.9986343383789,
+            -93.3821334838867,
+            31.9972038269043
+          ],
+          [
+            -13.7121515274048,
+            98.3949584960938,
+            11.4196615219116
+          ]
+        ],
+        "field_max_errors": [
+          3.36162900294035e-07,
+          7.96422678611686e-07,
+          4.85330323471422e-07,
+          7.89260230421585e-07,
+          9.74983517426642e-05,
+          7.79864035373445e-05,
+          7.45369021842024e-05,
+          3.14954861924122e-06,
+          2.61131204104537e-07,
+          0,
+          0
+        ],
+        "application_seconds": 0.391999999999999,
+        "native_timing": {
+          "index_seconds": 0.107559375,
+          "query_seconds": 0.023780666
+        },
+        "max_row_sum_error": 2.22044604925031e-16,
+        "geometry_valid": true,
+        "permutation_error": 0,
+        "targets": 32492,
+        "nnz": 97476,
+        "passed": false,
+        "dll_sha256": "6a785f16aba7ccae2063345928155b048c6060aaaeeab0397c0dd41bfb1a405a",
+        "session": [
+          "R version 4.5.1 (2025-06-13)",
+          "Platform: aarch64-apple-darwin20",
+          "Running under: macOS Sonoma 14.3",
+          "",
+          "Matrix products: default",
+          "BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib ",
+          "LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1",
+          "",
+          "locale:",
+          "[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8",
+          "",
+          "time zone: America/Toronto",
+          "tzcode source: internal",
+          "",
+          "attached base packages:",
+          "[1] stats     graphics  grDevices utils     datasets  methods   base     ",
+          "",
+          "other attached packages:",
+          "[1] jsonlite_2.0.0       neurotransform_0.2.0",
+          "",
+          "loaded via a namespace (and not attached):",
+          "[1] compiler_4.5.1 tools_4.5.1    Rcpp_1.1.2     digest_0.6.39 "
+        ],
+        "peak_resident_bytes": 631193600
+      }
+    },
+    {
+      "name": "R-32k-to-164k",
+      "source": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-R_den-32k_sphere.surf.gii",
+      "target": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-R_den-164k_sphere.surf.gii",
+      "source_sha256": "8c1f67fa8fb3024ad3b292be995d5c9bae07dc4dbdd53fbac48e511e1366553d",
+      "target_sha256": "76fdf4066dd52e867e1d768f059caf1342bd4c957b3f016eab5774e9701d30fb",
+      "target_vertices": 163842,
+      "selected_target_indices_zero_based": "all",
+      "argv": [
+        "/private/tmp/neurotransform-bary-qa/wb-mount/ConnectomeWorkbench.app/Contents/usr/bin/wb_command",
+        "-metric-resample",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/R-32k-to-164k/input.func.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsLR_space-fsaverage_hemi-R_den-32k_sphere.surf.gii",
+        "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/inputs/tpl-fsaverage_hemi-R_den-164k_sphere.surf.gii",
+        "BARYCENTRIC",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/R-32k-to-164k/output.func.gii"
+      ],
+      "workbench_exit": 0,
+      "workbench_stderr": "",
+      "comparison_argv": [
+        "/usr/bin/time",
+        "-l",
+        "Rscript",
+        "/private/tmp/neurotransform-s8-ordinary/compare.R",
+        "/private/tmp/neurotransform-full-barycentric-measured-20260926/R-32k-to-164k",
+        "5e-05",
+        "/private/tmp/neurotransform-s8-ordinary/R-32k-to-164k/result.json"
+      ],
+      "comparison_exit": 1,
+      "input_csv_sha256": {
+        "query.csv": "4bfacdc6aa06da52e2453a8330df5b83789e61d05684094e27d2ad0d62dabd4e",
+        "faces.csv": "7141e20118d959b585f4dfb85b415235747048a129e8eeecba069d064f8e387e",
+        "data.csv": "92f540971f43c022bf8c8197a73db4080979df61e33bb5e701c794ccc79833fe",
+        "vertices.csv": "d59bc19a33a8b84b4427ad272f3dbd9e8fd5800ac396f8a03b6b96b6fa22f7c8",
+        "expected.csv": "c2ebc39e5868be8121955798d760894e313c154af333137d735a870bb914d435"
+      },
+      "result": {
+        "max_absolute_error": 8.09990540241445e-05,
+        "elapsed_seconds": 0.375,
+        "rms_error": 4.43816103326653e-07,
+        "error_quantiles": [
+          7.38457206495013e-09,
+          8.11791560031971e-07,
+          1.85993535473938e-06,
+          8.09990540241445e-05
+        ],
+        "worst": [
+          [
+            136245,
+            6
+          ],
+          [
+            136245,
+            5
+          ],
+          [
+            145744,
+            6
+          ],
+          [
+            20122,
+            6
+          ],
+          [
+            157505,
+            7
+          ],
+          [
+            26585,
+            7
+          ],
+          [
+            26585,
+            5
+          ],
+          [
+            49902,
+            7
+          ],
+          [
+            28837,
+            6
+          ],
+          [
+            54605,
+            7
+          ]
+        ],
+        "worst_query_coordinates": [
+          [
+            85,
+            39.2399978637695,
+            -35.1399993896484
+          ],
+          [
+            85,
+            39.2399978637695,
+            -35.1399993896484
+          ],
+          [
+            65.3800048828125,
+            70.2200012207031,
+            28.189998626709
+          ],
+          [
+            87.2600021362305,
+            48.7199974060059,
+            3.51999998092651
+          ],
+          [
+            3.20000004768372,
+            -99.7200012207031,
+            6.75999975204468
+          ],
+          [
+            -78.8399963378906,
+            18.9799995422363,
+            58.5099983215332
+          ],
+          [
+            -78.8399963378906,
+            18.9799995422363,
+            58.5099983215332
+          ],
+          [
+            17.1900005340576,
+            79.5999984741211,
+            58.0299987792969
+          ],
+          [
+            9.72000026702881,
+            -3.29000020027161,
+            99.4700012207031
+          ],
+          [
+            -88.3400039672852,
+            -42.5299987792969,
+            19.689998626709
+          ]
+        ],
+        "field_max_errors": [
+          1.64498670057744e-06,
+          1.11930231527779e-06,
+          1.28004890498357e-06,
+          1.02935504883717e-06,
+          7.24544138911432e-05,
+          8.09990540241445e-05,
+          6.07026088635942e-05,
+          2.50531042336744e-06,
+          1.10968987254711e-06,
+          1.42703126432275e-06,
+          2.54314617464946e-06
+        ],
+        "application_seconds": 2.638,
+        "native_timing": {
+          "index_seconds": 0.024404916,
+          "query_seconds": 0.258965209
+        },
+        "max_row_sum_error": 2.22044604925031e-16,
+        "geometry_valid": true,
+        "permutation_error": 0,
+        "targets": 163842,
+        "nnz": 491514,
+        "passed": false,
+        "dll_sha256": "6a785f16aba7ccae2063345928155b048c6060aaaeeab0397c0dd41bfb1a405a",
+        "session": [
+          "R version 4.5.1 (2025-06-13)",
+          "Platform: aarch64-apple-darwin20",
+          "Running under: macOS Sonoma 14.3",
+          "",
+          "Matrix products: default",
+          "BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib ",
+          "LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1",
+          "",
+          "locale:",
+          "[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8",
+          "",
+          "time zone: America/Toronto",
+          "tzcode source: internal",
+          "",
+          "attached base packages:",
+          "[1] stats     graphics  grDevices utils     datasets  methods   base     ",
+          "",
+          "other attached packages:",
+          "[1] jsonlite_2.0.0       neurotransform_0.2.0",
+          "",
+          "loaded via a namespace (and not attached):",
+          "[1] compiler_4.5.1 tools_4.5.1    Rcpp_1.1.2     digest_0.6.39 "
+        ],
+        "peak_resident_bytes": 1115652096
+      }
+    }
+  ]
+}
