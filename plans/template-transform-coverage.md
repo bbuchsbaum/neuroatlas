@@ -175,15 +175,17 @@ artifact, checksum, cache/offline, provenance, and retained-failure discipline.
 
 ## Next action
 
-Step 1's surface identity and representation-safe routing are implemented. The
-explicit-domain closest-point native consumer is implemented and has retained
-method-specific evidence in
-`data-raw/surface-transforms-v1/native-qualification.md`. The historical strict
-Workbench comparison still fails in three of four ordinary cases; do not relax
-its threshold or activate broad aliases from the native evidence.
+The 0.2.0 slice implements representation-safe planning, the four pinned ordinary
+fsaverage 164k / fsLR 32k routes, exact MNI6/MNI2009c population cortical
+projection, and separately declared aligned ribbon sampling. Broad aliases,
+other densities, CIFTI, directed backprojection and specialist coverage remain
+future work. The implementation Mote continues to track that broader scope.
 
-Follow [the machine handoff](resume-neuroatlas.md) to rebuild the pinned engine,
-run current engineering checks, and regenerate qualification on fresh inputs.
-Then review admission of the exact domain/method pairs, finish per-asset license
-review, and design registration fusion separately. Keep the implementation issue
-open until its declared release scope and qualification evidence are complete.
+Read [the source-bound release evidence](../data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md)
+and [the machine handoff](resume-neuroatlas.md) for qualification and engineering
+status. The historical strict Workbench comparison still fails in three of four
+ordinary cases. Preserve its threshold and failed evidence; native interpolation
+agreement does not establish Workbench equivalence, anatomical accuracy, area
+conservation or an inverse. AI figure inspection and human review are recorded
+separately. The per-asset license audit governs downloads independently of the
+package code license.

@@ -13,11 +13,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-# neuroatlas <img src="man/figures/logo.png" align="right" height="139" alt="" />
+# neuroatlas <img src="man/figures/logo-en.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/check_on_different_r_os.yml/badge.svg)](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/check_on_different_r_os.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
@@ -126,7 +126,7 @@ is an optional dependency; install the pinned revision used for qualification:
 
 ```r
 pak::pak(c("hdf5r",
-  "bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e"))
+  "bbuchsbaum/neurotransform@933edddda462593941e167726e8aaa7168ff103a"))
 ```
 
 ```{r template-transform, eval = FALSE}
@@ -150,6 +150,43 @@ Template-derived artifacts have separate [distribution conditions](https://githu
 An image-space transform does not establish correspondence between different
 parcellations. Use `atlas_overlap()` after alignment to compare their regions.
 See [Verified template transforms](vignettes/template-transforms.Rmd).
+
+### Map exact cortical domains
+
+The pinned fsaverage 164k and fsLR 32k domains support directed native surface
+resampling in both hemispheres. Exact geometry identifies vertex ordering,
+registration, cortical masks and method; a broad name such as `"fsaverage"`
+does not admit a route. Install the pinned engine above and optional `gifti`.
+
+```{r exact-surface-transform, eval = FALSE}
+source <- get_surface_geometry("fsaverage", "164k", "L")
+target <- get_surface_geometry("fsLR", "32k", "L")
+operator <- get_template_transform(source, target)
+metric <- surface_data(rep(0.25, source$domain$n_vertices), source$domain)
+mapped <- apply_template_transform(metric, operator)
+mapped$coverage$available
+
+# Population cortical projection preserves atlas region IDs and names.
+atlas <- get_harvard_oxford_atlas("cortical", threshold = 25, resolution = "02")
+cortex <- transform_atlas(atlas, target)
+cortex$label_table
+```
+
+Population projection supports exact MNI152NLin6Asym and MNI152NLin2009cAsym
+sources. Numerical qualification covers their locked 1 mm and 2 mm grids.
+Labels use nearest voxel sampling and categorical surface votes; continuous
+and probability maps use trilinear sampling. Unsupported cortical values remain
+`NA`; supported zero is valid. Outputs record coverage, lost labels, input hashes
+and directed provenance. Verified inputs and operators can be replayed with
+`offline = TRUE`.
+
+`ribbon_projection()` separately declares ordered white/pial coordinates aligned
+with a source volume. The caller supplies that alignment; this function does not
+fit registration. Population projection and numerical agreement do not establish
+subject registration, anatomical accuracy, area conservation or a lossless inverse.
+The native surface method has separate qualification from Workbench's area-aware
+resampling. Input assets retain their
+[upstream licenses](data-raw/surface-transforms-v1/LICENSES.md).
 
 ## Palette demos
 

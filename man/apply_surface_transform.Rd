@@ -29,10 +29,33 @@ ties select the smallest source index. Used only for categorical data.}
 }
 \description{
 Continuous maps use row-normalized interpolation. Label keys use categorical
-voting and are never averaged. Unsupported and target-masked outputs are `NA`;
+voting and are never averaged. Unsupported and target-masked outputs are
+`NA`;
 supported zero, including label key zero, remains a valid value. Missingness
 and source weight mass are returned separately for every map.
 Probability output roundoff within `1e-12` of [0,1] is clipped to that
 interval; larger excursions are errors. Input bounds remain strict and
 probability channels are never renormalized across maps.
+}
+\examples{
+sphere <- rbind(
+  c(1, 0, 0), c(-1, 0, 0), c(0, 1, 0),
+  c(0, -1, 0), c(0, 0, 1), c(0, 0, -1)
+)
+faces <- rbind(
+  c(0, 2, 4), c(2, 1, 4), c(1, 3, 4), c(3, 0, 4),
+  c(2, 0, 5), c(1, 2, 5), c(3, 1, 5), c(0, 3, 5)
+)
+cortex <- rep(TRUE, 6)
+domain <- surface_domain(
+  "toy", "L", "6v", sphere, faces, cortex,
+  "analytic", "v1"
+)
+if (requireNamespace("neurotransform", quietly = TRUE) &&
+  utils::packageVersion("neurotransform") >= "0.2.0") {
+  geometry <- surface_geometry(domain, sphere, faces, cortex)
+  operator <- get_surface_transform(geometry, geometry, cache_dir = NULL)
+  values <- surface_data(seq(0, 0.5, length.out = 6), domain)
+  apply_surface_transform(values, operator)
+}
 }

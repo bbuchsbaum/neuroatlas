@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "scope": "all 20 binary plotting inputs match the previously inspected public examples",
+  "files_sha256": {
+    "MNI152NLin6Asym-fsaverage-L.bin": "facf35fba616fe8db67a77b91450a806111b801358903911cac8e710000b9905",
+    "MNI152NLin2009cAsym-fsLR-R.bin": "30548bf721c11da58031fea5d5373924dd11e079cd3d52eb995bcb27906e2258",
+    "MNI152NLin6Asym-fsLR-R-sampling.bin": "6c0cf32bdc006735bdf8fd1173bd5384e41eebeb190e4e17b17ecff51dad5294",
+    "MNI152NLin6Asym-fsaverage-L-labels.bin": "2c962d7007a42d57377a5ad85c3dd0ba20a22fa0c8d2f1e2608ee70c182265cd",
+    "MNI152NLin2009cAsym-fsLR-L.bin": "8e048a99f7498916d6837fa889ac8d911266dd30e42718399429e87de28c6925",
+    "MNI152NLin6Asym-fsaverage-R-sampling.bin": "6c0cf32bdc006735bdf8fd1173bd5384e41eebeb190e4e17b17ecff51dad5294",
+    "MNI152NLin6Asym-fsLR-R-labels.bin": "c5efac5322a6250d5f5c3ac223a88ae49de3aedbfeda636f4137e0bbcc91ff70",
+    "MNI152NLin6Asym-fsLR-L-labels.bin": "910085a0b379946575f87624870908ed8eae8e992107ddd2970dd3694a048399",
+    "MNI152NLin2009cAsym-fsaverage-R-sampling.bin": "b0348e8c16d5f79f28ccc113f194cadb7666f7453800cc5ac2da10c2ab854718",
+    "MNI152NLin2009cAsym-fsaverage-R.bin": "7978b577f8d5aca22bb1504d4f8f3ada0837a66d86bd0dde473e98d5966c6a9a",
+    "MNI152NLin2009cAsym-fsLR-L-sampling.bin": "7acbb0f38d897b680c9a248b47905367a8361d1b0fe4bd1b1bdc19aa995158cf",
+    "MNI152NLin2009cAsym-fsLR-R-sampling.bin": "b0348e8c16d5f79f28ccc113f194cadb7666f7453800cc5ac2da10c2ab854718",
+    "MNI152NLin6Asym-fsaverage-R.bin": "d6ea5d06db173297d040fd50d9ead7911145ad17fb36219f4df1fbd47b2727da",
+    "MNI152NLin2009cAsym-fsaverage-L-sampling.bin": "7acbb0f38d897b680c9a248b47905367a8361d1b0fe4bd1b1bdc19aa995158cf",
+    "MNI152NLin6Asym-fsaverage-L-sampling.bin": "d20d0f1731718cb77e5697ba4c04a5c5df10806b42f4ccf377c1a9c8814781ea",
+    "MNI152NLin6Asym-fsaverage-R-labels.bin": "f28c5be6e397dfb1ceea7ade8ab49063a2cceb6393cbe03e16716f388d1ef9ad",
+    "MNI152NLin6Asym-fsLR-L-sampling.bin": "d20d0f1731718cb77e5697ba4c04a5c5df10806b42f4ccf377c1a9c8814781ea",
+    "MNI152NLin2009cAsym-fsaverage-L.bin": "f7bd3ec88731ec564cd65329eb41c90015d8178f04d6a0a84cce0a3e294dbc19",
+    "MNI152NLin6Asym-fsLR-L.bin": "c1ed1f8aea8a1ac524833507bdc3fae0764be27573d1a23c325587ff1ccb8da2",
+    "MNI152NLin6Asym-fsLR-R.bin": "95a23705c01ff754ca4b03187a83976edfe38f3d970925025f5785eee2a25827"
+  }
+}

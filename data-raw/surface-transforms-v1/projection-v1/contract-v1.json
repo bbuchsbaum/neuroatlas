@@ -1,0 +1,30 @@
+{
+  "schema": "neuroatlas.projection-contract.v1",
+  "frozen_before_candidate_execution": true,
+  "engine_revision": "933edddda462593941e167726e8aaa7168ff103a",
+  "cbig_revision": "634f676630929a71297852d01dd92a287103e861",
+  "source_frames": ["MNI152NLin6Asym", "MNI152NLin2009cAsym"],
+  "target_domains": ["fsaverage-164k-L", "fsaverage-164k-R", "fsLR-32k-L", "fsLR-32k-R"],
+  "continuous_interpolation": "trilinear",
+  "label_interpolation": "nearest; exact half-voxel ties select lower index",
+  "probability_channels": "independent; no channel normalization",
+  "sampling_extent": "closed voxel-center box [0, dim-1]; outside is unsupported",
+  "missingness": "positive contributors only; propagate, finite-weight omit, or error",
+  "ribbon": "equal-weight nodes including aligned white and pial endpoints; categorical vote, smallest-key ties; not Workbench voxel-intersection ribbon mapping",
+  "fusion": "2009c-to-MNI6 image pullback composed with CBIG MNI6 sampling coordinates; fsLR values resampled through exact admitted native barycentric route",
+  "acceptance": {
+    "linear_absolute_error": 1e-10,
+    "probability_absolute_error": 1e-12,
+    "label_mismatches": 0,
+    "availability_mismatches": 0,
+    "warp_coordinate_absolute_error_mm": 1e-7,
+    "workbench_float32_absolute_error": 5e-5,
+    "full_domain_constant_absolute_error": 1e-12,
+    "ribbon_node_counts": [3, 5, 9],
+    "seed": 20261006,
+    "random_synthetic_points": 1024,
+    "registration_anatomical_accuracy": "not established by numerical agreement"
+  },
+  "reference": "independent SciPy interpn using pinned CBIG coordinates; Workbench trilinear on the same explicit point geometry; SimpleITK for fused pullback coordinates",
+  "unchanged_prior_gates": "native-contract-v1.json and failed historical strict Workbench comparisons remain unchanged"
+}

@@ -22,7 +22,8 @@ correspondence frame and hemisphere.}
 \value{
 A `SurfaceTransform` with sparse weights, exact domains, engine
   fingerprint, integrity digest and directed provenance. Reverse resampling
-  requires calling this function with swapped geometries; it is not an inverse.
+  requires calling this function with swapped geometries; it is not an
+inverse.
 }
 \description{
 Constructs ordinary native closest-point barycentric weights between explicit
@@ -30,6 +31,28 @@ registered spheres. Source mask exclusion precedes row normalization; target
 masking follows it. No registration is fitted. Native geometric correctness
 and exact Workbench parity are distinct qualification claims. Arbitrary
 supplied geometries are always marked `"unqualified"`.
+}
+\examples{
+sphere <- rbind(
+  c(1, 0, 0), c(-1, 0, 0), c(0, 1, 0),
+  c(0, -1, 0), c(0, 0, 1), c(0, 0, -1)
+)
+faces <- rbind(
+  c(0, 2, 4), c(2, 1, 4), c(1, 3, 4), c(3, 0, 4),
+  c(2, 0, 5), c(1, 2, 5), c(3, 1, 5), c(0, 3, 5)
+)
+cortex <- rep(TRUE, 6)
+domain <- surface_domain(
+  "toy", "L", "6v", sphere, faces, cortex,
+  "analytic", "v1"
+)
+if (requireNamespace("neurotransform", quietly = TRUE) &&
+  utils::packageVersion("neurotransform") >= "0.2.0") {
+  geometry <- surface_geometry(domain, sphere, faces, cortex)
+  operator <- get_surface_transform(geometry, geometry, cache_dir = NULL)
+  values <- surface_data(seq(0, 0.5, length.out = 6), domain)
+  apply_surface_transform(values, operator)
+}
 }
 \seealso{
 [surface_geometry()], [surface_data()], [apply_surface_transform()]

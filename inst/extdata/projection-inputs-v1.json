@@ -1,0 +1,55 @@
+{
+  "schema": "neuroatlas.projection-inputs.v1",
+  "qualification": "passed",
+  "assets": {
+    "L": {
+      "hemisphere": "L",
+      "sha256": "3961b1e1f04621f8c1961ac8e4e5385813e47579214e0ccd5e62d685265205fd",
+      "size_bytes": 3584268,
+      "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/lh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat",
+      "source_revision": "634f676630929a71297852d01dd92a287103e861",
+      "sampling_frame": "MNI152NLin6Asym",
+      "original_reference_volume": "FSL_MNI152_FS4.5.0",
+      "license": "https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md",
+      "citation": "https://doi.org/10.1002/hbm.24213",
+      "target_ordering_audit": {
+        "asset": {
+          "hemisphere": "L",
+          "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/data/templates/surface/standard_mesh_atlases_20160827/fs_L/fsaverage.L.sphere.164k_fs_L.surf.gii",
+          "sha256": "9bf5b673cc1c4738b1137ac53ff724ff0ef45e12f5550448efa2da50bb521c32",
+          "size_bytes": 4093613
+        },
+        "ordered_coordinates_equal": false,
+        "ordered_triangles_equal": true,
+        "max_coordinate_error": 0.0064849853515625,
+        "nearest_vertex_index_mismatches": 0,
+        "maximum_matched_vertex_distance": 0.008032683675449409
+      }
+    },
+    "R": {
+      "hemisphere": "R",
+      "sha256": "c44a8a824ade7c7c2203f2cd91cc6dced7c064d4371a45270cc50bb02d182319",
+      "size_bytes": 3573633,
+      "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/rh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat",
+      "source_revision": "634f676630929a71297852d01dd92a287103e861",
+      "sampling_frame": "MNI152NLin6Asym",
+      "original_reference_volume": "FSL_MNI152_FS4.5.0",
+      "license": "https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md",
+      "citation": "https://doi.org/10.1002/hbm.24213",
+      "target_ordering_audit": {
+        "asset": {
+          "hemisphere": "R",
+          "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/data/templates/surface/standard_mesh_atlases_20160827/fs_R/fsaverage.R.sphere.164k_fs_R.surf.gii",
+          "sha256": "a2fada23394286212f38cd44303bce0b3252759e09fe693f92d463286ca28b45",
+          "size_bytes": 4093614
+        },
+        "ordered_coordinates_equal": false,
+        "ordered_triangles_equal": true,
+        "max_coordinate_error": 0.0064849853515625,
+        "nearest_vertex_index_mismatches": 0,
+        "maximum_matched_vertex_distance": 0.008032683675449409
+      }
+    }
+  },
+  "qualification_scope": "numerical sampling and exact-domain composition; tested 1mm and 2mm grids; no independent anatomical accuracy claim"
+}

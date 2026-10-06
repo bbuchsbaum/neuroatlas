@@ -1,0 +1,190 @@
+{
+  "status": "PASS",
+  "contract_sha256": "e9f217406649773f795a00a75cf0f5172986b6d3724408e4cc55681a2fed882d",
+  "consumer_receipt_sha256": "2b5b8aa2025cbe3af65f2cdfe151ba97ad1d860671089bfc78bfe5fd2fdbc7e8",
+  "oracle_sha256": "3217a69a2e62872d8f2ccb823f3e9bb66fe408e91a3f431d44ca335812556713",
+  "numpy_version": "2.4.3",
+  "cases": [
+    {
+      "name": "synthetic-01",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 0.0,
+      "maximum_relative_point_error": 0.0,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-02",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 0.0,
+      "maximum_relative_point_error": 0.0,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-03",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 0.0,
+      "maximum_relative_point_error": 0.0,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-04",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 2.220446049250313e-16,
+      "maximum_relative_point_error": 2.274846706538671e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-05",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 0.0,
+      "maximum_relative_point_error": 0.0,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-06",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 3.608224830031759e-16,
+      "maximum_relative_point_error": 4.934988175916502e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-07",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 2.636779683484747e-16,
+      "maximum_relative_point_error": 3.144264507747771e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-08",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 5.551115123125783e-16,
+      "maximum_relative_point_error": 6.789338321539646e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-09",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 2.636779683484747e-16,
+      "maximum_relative_point_error": 3.2174255591641475e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-10",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 2.498001805406602e-16,
+      "maximum_relative_point_error": 3.0719291298313435e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-11",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 2.7755575615628914e-16,
+      "maximum_relative_point_error": 3.5371364063045755e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-12",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 3.7470027081099033e-16,
+      "maximum_relative_point_error": 5.664879665481939e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-13",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 3.7470027081099033e-16,
+      "maximum_relative_point_error": 4.22351952988383e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-14",
+      "queries": 6,
+      "triangles_per_query": 8,
+      "maximum_weight_error": 4.440892098500626e-16,
+      "maximum_relative_point_error": 5.326849609365726e-16,
+      "maximum_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "fsaverage-164k-L_to_fsLR-32k-L",
+      "queries": 319,
+      "triangles_per_query": 327680,
+      "maximum_weight_error": 3.397282455352979e-14,
+      "maximum_relative_point_error": 4.2780337774645346e-16,
+      "maximum_masked_value_error": 6.661338147750939e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "fsLR-32k-L_to_fsaverage-164k-L",
+      "queries": 320,
+      "triangles_per_query": 64980,
+      "maximum_weight_error": 1.1268763699945339e-14,
+      "maximum_relative_point_error": 3.1778182645451764e-16,
+      "maximum_masked_value_error": 7.771561172376096e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "fsaverage-164k-R_to_fsLR-32k-R",
+      "queries": 319,
+      "triangles_per_query": 327680,
+      "maximum_weight_error": 2.4619195571062846e-14,
+      "maximum_relative_point_error": 3.1174936010075253e-16,
+      "maximum_masked_value_error": 7.216449660063518e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "fsLR-32k-R_to_fsaverage-164k-R",
+      "queries": 320,
+      "triangles_per_query": 64980,
+      "maximum_weight_error": 1.0658141036401503e-14,
+      "maximum_relative_point_error": 3.014577520672848e-16,
+      "maximum_masked_value_error": 4.996003610813204e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    }
+  ],
+  "scope": "Fresh exhaustive geometry and sampled policy comparison; no Workbench equivalence claim"
+}

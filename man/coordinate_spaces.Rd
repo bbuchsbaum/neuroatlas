@@ -3,15 +3,21 @@
 \name{coordinate_spaces}
 \alias{coordinate_spaces}
 \title{Coordinate Space Transforms for Neuroimaging Templates}
+\value{
+This documentation topic describes legacy coordinate-family constants
+  and affine helpers. Use exact template identifiers for qualified
+registration.
+}
 \description{
 Functions and constants for transforming coordinates between standard
 neuroimaging coordinate spaces, particularly MNI305 (fsaverage) and
 MNI152 (common fMRI template space).
 }
 \details{
-FreeSurfer's fsaverage surfaces are defined in MNI305 (Talairach-like) space,
-while most modern fMRI pipelines output data in MNI152 space. The difference
-is approximately 4mm, which matters for accurate volume-to-surface projections.
+These legacy helpers classify broad coordinate families and apply a fixed
+FreeSurfer affine. They do not establish template-specific registration or
+cortical correspondence. Use exact MNI template identifiers and qualified
+transforms for image resampling or population cortical projection.
 }
 \section{Coordinate Spaces}{
 
@@ -19,12 +25,17 @@ is approximately 4mm, which matters for accurate volume-to-surface projections.
   \item{MNI305}{FreeSurfer/Talairach space. Native space for fsaverage,
     fsaverage5, and fsaverage6 surfaces. Based on 305 subjects with linear
     registration to approximate Talairach space.}
-  \item{MNI152}{ICBM 2009c space. The de facto standard for volumetric fMRI
-    analysis. Used by FSL, SPM, fMRIPrep, and TemplateFlow's
-    MNI152NLin2009cAsym template.}
+  \item{MNI152}{A broad coordinate-family label. MNI152NLin6Asym and
+    MNI152NLin2009cAsym are distinct templates; this shorthand does not
+    identify either variant or a registration between them.}
 }
 }
 
+\examples{
+transform_coords(matrix(c(0, 0, 0), nrow = 1),
+  from = "MNI305", to = "MNI152"
+)
+}
 \references{
 FreeSurfer CoordinateSystems documentation:
 \url{https://surfer.nmr.mgh.harvard.edu/fswiki/CoordinateSystems}

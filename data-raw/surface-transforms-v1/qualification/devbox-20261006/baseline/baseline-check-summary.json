@@ -1,0 +1,10 @@
+{
+  "totals": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 1
+  },
+  "errors": [],
+  "warnings": "checking data for ASCII and uncompressed saves ... OK\n WARNING\n‘qpdf’ is needed for checks on size reduction of PDFs",
+  "notes": "checking installed package size ... NOTE\n  installed size is 29.9Mb\n  sub-directories of 1Mb or more:\n    data  19.5Mb\n    doc    8.2Mb\n    R      1.2Mb"
+}

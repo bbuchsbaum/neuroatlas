@@ -1,0 +1,30 @@
+[
+  {
+    "asset": {
+      "hemisphere": "L",
+      "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/data/templates/surface/standard_mesh_atlases_20160827/fs_L/fsaverage.L.sphere.164k_fs_L.surf.gii",
+      "sha256": "9bf5b673cc1c4738b1137ac53ff724ff0ef45e12f5550448efa2da50bb521c32",
+      "size_bytes": 4093613,
+      "path": "data-raw/surface-transforms-v1/work/archives/cbig-fsaverage-L-sphere.gii"
+    },
+    "ordered_coordinates_equal": false,
+    "ordered_triangles_equal": true,
+    "max_coordinate_error": 0.0064849853515625,
+    "nearest_vertex_index_mismatches": 0,
+    "maximum_matched_vertex_distance": 0.008032683675449409
+  },
+  {
+    "asset": {
+      "hemisphere": "R",
+      "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/data/templates/surface/standard_mesh_atlases_20160827/fs_R/fsaverage.R.sphere.164k_fs_R.surf.gii",
+      "sha256": "a2fada23394286212f38cd44303bce0b3252759e09fe693f92d463286ca28b45",
+      "size_bytes": 4093614,
+      "path": "data-raw/surface-transforms-v1/work/archives/cbig-fsaverage-R-sphere.gii"
+    },
+    "ordered_coordinates_equal": false,
+    "ordered_triangles_equal": true,
+    "max_coordinate_error": 0.0064849853515625,
+    "nearest_vertex_index_mismatches": 0,
+    "maximum_matched_vertex_distance": 0.008032683675449409
+  }
+]

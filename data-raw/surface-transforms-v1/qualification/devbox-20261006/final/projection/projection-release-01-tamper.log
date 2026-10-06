@@ -1,0 +1,5 @@
+PASS: changed synthetic-continuous-FALSE-2-propagate/case.json rejected
+PASS: changed synthetic-continuous-FALSE-2-propagate/points-1.bin rejected
+PASS: changed synthetic-continuous-FALSE-2-propagate/cortex.bin rejected
+PASS: changed synthetic-continuous-FALSE-2-propagate/values.bin rejected
+PASS: changed synthetic-continuous-FALSE.bin rejected

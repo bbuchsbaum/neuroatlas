@@ -1,0 +1,1627 @@
+Converting Rd files to LaTeX ...............
+Creating pdf output from LaTeX ...
+Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+  texi2dvi script/program not available, using emulation
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/usr/share/texlive/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex)))))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+No file Rd2.aux.
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
+No file Rd2.toc.
+
+Package hyperref Warning: Glyph not defined in PU encoding,
+(hyperref)                removing `\Rpercent' on input line 16.
+
+
+Package hyperref Warning: Glyph not defined in PU encoding,
+(hyperref)                removing `\Rpercent' on input line 16.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
+onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
+s/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-
+0.enc}]
+Overfull \hbox (0.52841pt too wide) in paragraph at lines 89--93
+\T1/ptm/m/n/10 col-umn, for ex-am-ple `c(id = "roi_index")`. Com-pos-ite keys a
+re sup-ported. When
+[2]
+Overfull \hbox (6.58908pt too wide) in paragraph at lines 118--125
+\T1/ptm/m/n/10 se-lect []\T1/zi4/m/n/10 source$parcels[c("label_full", "value")
+] []\T1/ptm/m/n/10 from a []\T1/zi4/m/n/10 parcel_data []\T1/ptm/m/n/10 ob-ject
+. Representation-
+[3]
+Overfull \hbox (4.1874pt too wide) in paragraph at lines 191--194
+[]\T1/ptm/m/n/10 `"aggregate"` votes by to-tal weight per key; ties se-lect the
+ small-est key. `"largest"`
+[4] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [5{/usr/sha
+re/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}] [6] [7] [8]
+Overfull \hbox (4.60672pt too wide) in paragraph at lines 454--456
+[]\T1/ptm/m/n/10 Optional ci-ta-tion role(s), such as `"at-las"`, `"dis-tri-bu-
+tion"`, `"tem-plate"`, or `"soft-
+[9]
+Overfull \hbox (24.22807pt too wide) in paragraph at lines 500--503
+[]\T1/ptm/m/n/10 Character string spec-i-fy-ing the cor-re-la-tion method: []\T
+1/zi4/m/n/10 "pearson" []\T1/ptm/m/n/10 (de-fault), []\T1/zi4/m/n/10 "spearman"
+[]\T1/ptm/m/n/10 ,
+[10] [11] [12]
+Overfull \hbox (19.70792pt too wide) in paragraph at lines 671--673
+[]\T1/ptm/m/n/10 Character vec-tor of hi-er-ar-chy level names, from finest to 
+coars-est (e.g., []\T1/zi4/m/n/10 c("parcel", "network",
+[13]
+Overfull \hbox (2.40729pt too wide) in paragraph at lines 760--762
+[]\T1/ptm/m/n/10 An at-las, or a tem-plate re-turned by [get_template()] or [lo
+ad_surface_template()].
+[14]
+Overfull \hbox (5.48578pt too wide) in paragraph at lines 786--791
+[]\T1/ptm/m/n/10 The older [at-las_ref()], [at-las_artifacts()] and [at-las_his
+tory()] ac-ces-sors read this au-thor-i-ta-tive record.
+
+Overfull \hbox (33.86563pt too wide) in paragraph at lines 794--798
+[]\T1/ptm/m/n/10 `atlas_metadata()` and `tem-plate_metadata()` re-turn a `Neu-r
+oRe-sourceMeta-data` list with `schema_version`,
+[15] [16] [17]
+Overfull \hbox (23.13042pt too wide) in paragraph at lines 980--983
+[]\T1/ptm/m/n/10 One of []\T1/zi4/m/n/10 "rule_hcl" []\T1/ptm/m/n/10 (de-fault)
+, []\T1/zi4/m/n/10 "network_harmony"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "maximi
+n_view"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "embedding"[]\T1/ptm/m/n/10 ,
+[18]
+Overfull \hbox (26.0963pt too wide) in paragraph at lines 1054--1059
+\T1/ptm/m/n/10 routes. For `scope = "space"` this is the space trans-form reg-i
+stry re-turned by [space_transform_manifest()]. 
+[19] [20] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [21]
+Overfull \hbox (48.49823pt too wide) in paragraph at lines 1222--1224
+[]\T1/ptm/m/n/10 Downloads (if needed) and re-turns the Brain-netome 246-region
+ la-bel ta-ble used by [][][]\T1/zi4/m/n/10 get_brainnetome_atlas[][][]()[]\T1/
+ptm/m/n/10 . 
+[22] [23]
+Overfull \hbox (8.51714pt too wide) in paragraph at lines 1342--1346
+[]\T1/ptm/m/n/10 di-men-sions dif-fer, the at-las is au-to-mat-i-cally re-sam-p
+led to []\T1/zi4/m/n/10 stat_map []\T1/ptm/m/n/10 space (nearest-
+[24] [25] [26]
+Overfull \hbox (2.40909pt too wide) in paragraph at lines 1520--1522
+[]\T1/ptm/m/n/10 Character vec-tor of views to in-clude. Any com-bi-na-tion of 
+[]\T1/zi4/m/n/10 "lateral"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "medial"[]\T1/ptm
+/m/n/10 ,
+[27] [28]
+Overfull \hbox (5.127pt too wide) in paragraph at lines 1641--1644
+\T1/ptm/m/n/10 plots. Clus-ters are formed vol-u-met-ri-cally from []\T1/zi4/m/
+n/10 stat_map[]\T1/ptm/m/n/10 ; vi-su-al-iza-tion is parcel-level on []\T1/zi4/
+m/n/10 surfatlas[]\T1/ptm/m/n/10 . 
+[29]
+Overfull \hbox (8.51714pt too wide) in paragraph at lines 1689--1693
+[]\T1/ptm/m/n/10 di-men-sions dif-fer, the at-las is au-to-mat-i-cally re-sam-p
+led to []\T1/zi4/m/n/10 stat_map []\T1/ptm/m/n/10 space (nearest-
+[30]
+Overfull \hbox (12.56885pt too wide) in paragraph at lines 1762--1764
+[]\T1/ptm/m/n/10 How to com-bine mul-ti-ple spheres: []\T1/zi4/m/n/10 "separate
+" []\T1/ptm/m/n/10 (one re-gion per sphere) or []\T1/zi4/m/n/10 "union"[]\T1/pt
+m/m/n/10 . 
+[31] [32]
+Overfull \hbox (4.13872pt too wide) in paragraph at lines 1850--1852
+[]\T1/ptm/m/n/10 FreeSurfer Co-or-di-nateSys-tems doc-u-men-ta-tion: [][]$\T1/z
+i4/m/n/10 https : / / surfer . nmr . mgh . harvard . edu / fswiki /
+[33] [34] [35]
+Overfull \hbox (0.29767pt too wide) in paragraph at lines 2028--2031
+[][][]\T1/zi4/m/n/10 roi_metadata[][][] []\T1/ptm/m/n/10 for view-ing avail-abl
+e fil-ter columns, [][][]\T1/zi4/m/n/10 roi_attributes[][][] []\T1/ptm/m/n/10 f
+or list-ing avail-able at-tributes,
+[36] [37] [38] [39]
+Overfull \hbox (71.4573pt too wide) in paragraph at lines 2276--2279
+\T1/ptm/m/n/10 vard_oxford_cortical"`, `"har-vard_oxford_subcortical"`, `"har-v
+ard_oxford_cortical_subcortical"`,
+
+Overfull \hbox (40.47617pt too wide) in paragraph at lines 2280--2283
+[]\T1/ptm/m/n/10 FSL in-stal-la-tion di-rec-tory. De-faults to `Sys.getenv("FSL
+DIR")`. `get_julich_brain_atlas()`
+[40]
+Overfull \hbox (20.88887pt too wide) in paragraph at lines 2309--2313
+[]\T1/ptm/m/n/10 This func-tion has been dep-re-cated in favour of the na-tive 
+[][][]\T1/zi4/m/n/10 plot_brain[][][]() []\T1/ptm/m/n/10 ren-derer. Use []\T1/z
+i4/m/n/10 schaefer_surf()
+[41]
+Overfull \hbox (2.79953pt too wide) in paragraph at lines 2374--2377
+[]\T1/zi4/m/n/10 "mni2009c"[]\T1/ptm/m/n/10 : MNI152NLin2009cAsym-provenance vo
+l-ume file ([]\T1/zi4/m/n/10 MMP_in_MNI_corr.nii.gz[]\T1/ptm/m/n/10 ).
+
+Overfull \hbox (7.9378pt too wide) in paragraph at lines 2381--2385
+[]\T1/ptm/m/n/10 If []\T1/zi4/m/n/10 source = "mni2009c" []\T1/ptm/m/n/10 is un
+-avail-able at run-time, the loader au-to-mat-i-cally falls back to []\T1/zi4/m
+/n/10 "xcpengine"
+
+Overfull \hbox (20.53732pt too wide) in paragraph at lines 2389--2397
+[]\T1/ptm/m/n/10 Parcel IDs are representation-specific: vol-ume IDs 1--180 re-
+fer to the right hemi-sphere ([]\T1/zi4/m/n/10 "hcp_R_first"[]\T1/ptm/m/n/10 ),
+
+
+Overfull \hbox (8.18024pt too wide) in paragraph at lines 2389--2397
+\T1/ptm/m/n/10 bles, join on []\T1/zi4/m/n/10 roi_metadata(atlas)$label_full []
+\T1/ptm/m/n/10 ([]\T1/zi4/m/n/10 "L_V1_ROI"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 
+"R_V1_ROI"[]\T1/ptm/m/n/10 , etc.), or on []\T1/zi4/m/n/10 c("area",
+[42] [43]
+Overfull \hbox (0.66841pt too wide) in paragraph at lines 2493--2495
+[]\T1/ptm/m/n/10 Arguments passed by the con-ve-nience wrap-pers to `get_harvar
+d_oxford_atlas()`. 
+[44] [45] [46]
+Overfull \hbox (27.47577pt too wide) in paragraph at lines 2645--2648
+\T1/ptm/m/n/10 This re-quires a lo-cal FSL-style at-las di-rec-tory and uses th
+e XML/image files un-der `$FSLDIR/data/atlases`. 
+
+Overfull \hbox (40.47617pt too wide) in paragraph at lines 2658--2661
+[]\T1/ptm/m/n/10 FSL in-stal-la-tion di-rec-tory. De-faults to `Sys.getenv("FSL
+DIR")`. `get_julich_brain_atlas()`
+[47] [48]
+Overfull \hbox (6.25902pt too wide) in paragraph at lines 2764--2769
+[]\T1/zi4/m/n/10 get_roi() []\T1/ptm/m/n/10 method for sur-face at-lases (class
+ []\T1/zi4/m/n/10 surfatlas[]\T1/ptm/m/n/10 , e.g. from [][][]\T1/zi4/m/n/10 ge
+t_wang_atlas[][][][]\T1/ptm/m/n/10 , [][][]\T1/zi4/m/n/10 glasser_surf[][][][]\
+T1/ptm/m/n/10 ,
+
+Overfull \hbox (8.06992pt too wide) in paragraph at lines 2834--2834
+ []  \T1/zi4/m/n/10 parcels = c("100", "200", "300", "400", "500", "600", "700"
+, "800", "900", "1000"),[] 
+[49] [50]
+Underfull \vbox (badness 10000) has occurred while \output is active [51]
+Underfull \vbox (badness 10000) has occurred while \output is active [52]
+Underfull \vbox (badness 10000) has occurred while \output is active [53]
+Overfull \hbox (2.81758pt too wide) in paragraph at lines 3038--3040
+[]\T1/ptm/m/n/10 Logical. Whether to smooth par-cel bound-aries af-ter re-sam-p
+ling. De-fault: FALSE 
+
+Overfull \hbox (7.96828pt too wide) in paragraph at lines 3043--3047
+\T1/ptm/m/n/10 tion, and fi-nally the plat-form cache di-rec-tory. Ig-nored whe
+n `use_cache = FALSE`,
+[54]
+Overfull \hbox (13.24922pt too wide) in paragraph at lines 3088--3089
+[]\T1/zi4/m/n/10 get_schaefer_atlas []\T1/ptm/m/n/10 with the []\T1/zi4/m/n/10 
+parcels []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 networks []\T1/ptm/m/n/10 ar-gu-m
+ents pre-set. They all ac-cept []\T1/zi4/m/n/10 resolution
+[55] [56] [57] [58]
+Overfull \hbox (46.4596pt too wide) in paragraph at lines 3302--3305
+[]\T1/ptm/m/n/10 TemplateFlow space to down-load (e.g., []\T1/zi4/m/n/10 "MNI15
+2NLin6Asym" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "MNI152NLin2009cAsym"[]\T1/ptm
+/m/n/10 ).
+[59]
+Overfull \hbox (9.96935pt too wide) in paragraph at lines 3341--3344
+[]\T1/ptm/m/n/10 When []\T1/zi4/m/n/10 path_only=TRUE[]\T1/ptm/m/n/10 , a list 
+with class []\T1/zi4/m/n/10 c("subcortical_paths","list") []\T1/ptm/m/n/10 con-
+tain-ing []\T1/zi4/m/n/10 atlas_path[]\T1/ptm/m/n/10 ,
+[60] [61] [62]
+Overfull \hbox (1.22827pt too wide) in paragraph at lines 3523--3525
+[]\T1/ptm/m/n/10 Logical. If []\T1/zi4/m/n/10 TRUE[]\T1/ptm/m/n/10 , re-turns t
+he file path as a string in-stead of load-ing as a []\T1/zi4/m/n/10 NeuroVol[]\
+T1/ptm/m/n/10 .
+[63] [64] [65] [66]
+Overfull \hbox (63.93866pt too wide) in paragraph at lines 3748--3750
+[]\T1/ptm/m/n/10 Optional Julich-Brain res-o-lu-tion (e.g. []\T1/zi4/m/n/10 "1m
+m" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "2mm"[]\T1/ptm/m/n/10 ); passed to [][]
+[]\T1/zi4/m/n/10 get_julich_brain_atlas[][][]()[]\T1/ptm/m/n/10 . 
+[67]
+Overfull \hbox (56.40855pt too wide) in paragraph at lines 3856--3860
+[]\T1/ptm/m/n/10 A list with classes []\T1/zi4/m/n/10 c("wang", "surfatlas", "a
+tlas") []\T1/ptm/m/n/10 con-tain-ing []\T1/zi4/m/n/10 lh_atlas[]\T1/ptm/m/n/10 
+/[]\T1/zi4/m/n/10 rh_atlas []\T1/ptm/m/n/10 ([]\T1/zi4/m/n/10 LabeledNeuroSurfa
+ce
+[68]
+Overfull \hbox (71.07831pt too wide) in paragraph at lines 3898--3906
+\T1/ptm/m/n/10 for each of the 25 to-po-graphic ar-eas there is a con-tin-u-ous
+ prob-a-bil-ity map ([]\T1/zi4/m/n/10 perc_VTPM_vol_roi<n>_<hemi>.nii.gz[]\T1/p
+tm/m/n/10 )
+[69]
+Overfull \hbox (43.31808pt too wide) in paragraph at lines 3955--3963
+\T1/ptm/m/n/10 Prince-ton Pro-bAt-las_v4 dis-tri-bu-tion (Wang et al. 2015), wh
+ose orig-i-nal host ([]\T1/zi4/m/n/10 napl.scholar.princeton.edu[]\T1/ptm/m/n/1
+0 )
+
+Overfull \hbox (4.5586pt too wide) in paragraph at lines 3984--3990
+[]\T1/ptm/m/n/10 When []\T1/zi4/m/n/10 path_only = TRUE[]\T1/ptm/m/n/10 , an ob
+-ject of class []\T1/zi4/m/n/10 wang_prob_paths[]\T1/ptm/m/n/10 : a list with t
+he re-quested []\T1/zi4/m/n/10 image[]\T1/ptm/m/n/10 /[]\T1/zi4/m/n/10 hemi[]\T
+1/ptm/m/n/10 ,
+[70]
+Overfull \hbox (21.16943pt too wide) in paragraph at lines 4030--4033
+[]\T1/ptm/m/n/10 This func-tion has been dep-re-cated in favour of [][][]\T1/zi
+4/m/n/10 plot_brain[][][]()[]\T1/ptm/m/n/10 . Use []\T1/zi4/m/n/10 plot_brain(s
+chaefer_surf(...))
+[71] [72]
+Overfull \hbox (40.9284pt too wide) in paragraph at lines 4121--4123
+[]\T1/ptm/m/n/10 fsaverage []\T1/zi4/m/n/10 .annot []\T1/ptm/m/n/10 files from 
+the Mills Figshare dis-tri-bu-tion ([]\T1/zi4/m/n/10 lh.HCP-MMP1.annot[]\T1/ptm
+/m/n/10 , []\T1/zi4/m/n/10 rh.HCP-MMP1.annot[]\T1/ptm/m/n/10 ) 
+[73]
+Overfull \hbox (0.45692pt too wide) in paragraph at lines 4194--4196
+[]\T1/ptm/m/n/10 **DEPRECATED:** Tem-plate-Flow is now ac-cessed via the pure R
+ `tem-plate-flow` pack-age. Python
+[74] [75]
+Overfull \hbox (23.33865pt too wide) in paragraph at lines 4333--4336
+[]\T1/ptm/m/n/10 A []\T1/zi4/m/n/10 neurosurf::SurfaceGeometry []\T1/ptm/m/n/10
+ ob-ject when []\T1/zi4/m/n/10 hemi []\T1/ptm/m/n/10 is "L" or "R"; a named lis
+t of two []\T1/zi4/m/n/10 SurfaceGeometry
+[76] [77] [78] [79]
+Overfull \hbox (141.79854pt too wide) in paragraph at lines 4554--4556
+[]\T1/ptm/m/n/10 This ma-trix is de-rived from FreeSurfer's []\T1/zi4/m/n/10 mn
+i152.register.dat []\T1/ptm/m/n/10 file, lo-cated at []\T1/zi4/m/n/10 $FREESURF
+ER_HOME/average/mni152.register.dat[]\T1/ptm/m/n/10 . 
+[80]
+Overfull \hbox (141.79854pt too wide) in paragraph at lines 4598--4600
+[]\T1/ptm/m/n/10 This ma-trix is de-rived from FreeSurfer's []\T1/zi4/m/n/10 mn
+i152.register.dat []\T1/ptm/m/n/10 file, lo-cated at []\T1/zi4/m/n/10 $FREESURF
+ER_HOME/average/mni152.register.dat[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (66.20093pt too wide) in paragraph at lines 4614--4616
+[][][]$\T1/zi4/m/n/10 https : / / surfer . nmr . mgh . harvard . edu / fswiki /
+ CoordinateSystems$[][] [][][]MNI152_to_MNI305[][][][]\T1/ptm/m/n/10 , [][][]\T
+1/zi4/m/n/10 transform_coords[][][] 
+[81] [82] [83]
+Overfull \hbox (13.27757pt too wide) in paragraph at lines 4742--4744
+[]\T1/ptm/m/n/10 Character string iden-ti-fy-ing the vol-u-met-ric data's co-or
+-di-nate space (e.g., "MNI152",
+[84] [85] [86] [87] [88] [89] [90]
+Overfull \hbox (4.82843pt too wide) in paragraph at lines 5162--5165
+[]\T1/ptm/m/n/10 Optional pre-computed colour spec-i-fi-ca-tion: a tib-ble from
+ [][][]\T1/zi4/m/n/10 atlas_roi_colors[][][]()[]\T1/ptm/m/n/10 ,
+
+Overfull \hbox (52.9796pt too wide) in paragraph at lines 5179--5181
+[]\T1/ptm/m/n/10 Additional ar-gu-ments passed to []\T1/zi4/m/n/10 neuroim2::pl
+ot_montage() []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 neuroim2::plot_ortho()[]\T1/p
+tm/m/n/10 . 
+
+Overfull \hbox (16.48041pt too wide) in paragraph at lines 5194--5197
+[]\T1/zi4/m/n/10 "lateral"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "medial"[]\T1/ptm
+/m/n/10 , []\T1/zi4/m/n/10 "dorsal"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "ventral
+"[]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 c("lateral", "medial")[]\T1/ptm/
+m/n/10 . 
+[91] [92]
+Underfull \vbox (badness 10000) has occurred while \output is active [93]
+Overfull \hbox (5.89818pt too wide) in paragraph at lines 5369--5372
+[]\T1/ptm/m/n/10 Logical. If []\T1/zi4/m/n/10 TRUE []\T1/ptm/m/n/10 (de-fault),
+ re-turns a []\T1/zi4/m/n/10 ggiraph::girafe []\T1/ptm/m/n/10 wid-get with hove
+r tooltips.
+[94]
+Overfull \hbox (9.77805pt too wide) in paragraph at lines 5395--5403
+\T1/ptm/m/n/10 cleaner pub-li-ca-tion style and, un-less ex-plic-itly over-rid-
+den, switches []\T1/zi4/m/n/10 panel_layout
+
+Overfull \hbox (1.93875pt too wide) in paragraph at lines 5408--5411
+[]\T1/ptm/m/n/10 Boundary ren-der-ing method. []\T1/zi4/m/n/10 "path" []\T1/ptm
+/m/n/10 (de-fault) chains bound-ary edges into longer
+[95]
+Overfull \hbox (1.54048pt too wide) in paragraph at lines 5502--5507
+[]\T1/zi4/m/n/10 overlay_threshold []\T1/ptm/m/n/10 over which []\T1/zi4/m/n/10
+ overlay_alpha_mode = "threshold" []\T1/ptm/m/n/10 reaches
+[96]
+Overfull \hbox (17.17899pt too wide) in paragraph at lines 5528--5532
+[]\T1/ptm/m/n/10 Character: sam-pling strat-egy passed to []\T1/zi4/m/n/10 neur
+osurf::vol_to_surf() []\T1/ptm/m/n/10 when []\T1/zi4/m/n/10 overlay
+
+Overfull \hbox (15.7997pt too wide) in paragraph at lines 5533--5536
+[]\T1/ptm/m/n/10 Voxel in-ter-po-la-tion passed to []\T1/zi4/m/n/10 neurosurf::
+vol_to_surf()[]\T1/ptm/m/n/10 : []\T1/zi4/m/n/10 "legacy"[]\T1/ptm/m/n/10 , []\
+T1/zi4/m/n/10 "nearest"[]\T1/ptm/m/n/10 ,
+
+Overfull \hbox (15.18866pt too wide) in paragraph at lines 5537--5539
+[]\T1/ptm/m/n/10 Optional ex-plicit ag-gre-ga-tion across depth sam-ples: []\T1
+/zi4/m/n/10 "mean"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "mode"[]\T1/ptm/m/n/10 , 
+or []\T1/zi4/m/n/10 "closest"[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (6.09859pt too wide) in paragraph at lines 5554--5558
+[]\T1/ptm/m/n/10 Which mapped quan-tity sup-plies the static col-or-bar: []\T1/
+zi4/m/n/10 "auto"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "base"[]\T1/ptm/m/n/10 , [
+]\T1/zi4/m/n/10 "overlay"[]\T1/ptm/m/n/10 ,
+[97]
+Overfull \hbox (4.75928pt too wide) in paragraph at lines 5607--5609
+[]\T1/ptm/m/n/10 Fill colour for the cor-tex back-drop when []\T1/zi4/m/n/10 ba
+ckground = TRUE[]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 "grey80"[]\T1/ptm/
+m/n/10 . 
+
+Overfull \hbox (0.47833pt too wide) in paragraph at lines 5637--5641
+[]\T1/ptm/m/n/10 Optional non-negative mag-ni-tude for the CPU par-cel ren-dere
+r ([]\T1/zi4/m/n/10 static_backend
+[98]
+Overfull \hbox (10.13786pt too wide) in paragraph at lines 5650--5654
+[]\T1/ptm/m/n/10 A []\T1/zi4/m/n/10 ggplot2 []\T1/ptm/m/n/10 ob-ject (when []\T
+1/zi4/m/n/10 interactive = FALSE []\T1/ptm/m/n/10 and no stan-dalone col-or-bar
+ is re-quested), a []\T1/zi4/m/n/10 patchwork
+[99]
+Overfull \hbox (7.4074pt too wide) in paragraph at lines 5702--5705
+[]\T1/ptm/m/n/10 Arranges mul-ti-ple brain sur-face plots into a grid lay-out u
+s-ing \T1/ptm/b/n/10 patch-work\T1/ptm/m/n/10 . Each el-e-ment of []\T1/zi4/m/n
+/10 vals_list
+
+Overfull \hbox (23.87903pt too wide) in paragraph at lines 5743--5745
+[]\T1/ptm/m/n/10 Character vec-tor of views passed to [][][]\T1/zi4/m/n/10 plot
+_brain[][][][]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 c("lateral", "medial"
+)[]\T1/ptm/m/n/10 . 
+[100] [101] [102] [103] [104] [105]
+Overfull \hbox (22.65852pt too wide) in paragraph at lines 6089--6091
+[]\T1/ptm/m/n/10 Sampling strat-egy be-tween the white and pial sur-faces: []\T
+1/zi4/m/n/10 "midpoint"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "normal_line"[]\T1/p
+tm/m/n/10 ,
+[106]
+Overfull \hbox (6.15665pt too wide) in paragraph at lines 6112--6116
+\T1/ptm/m/n/10 match the at-las), that hemi-sphere is re-turned as all []\T1/zi
+4/m/n/10 NA []\T1/ptm/m/n/10 and a warn-ing re-ports the rea-son; []\T1/zi4/m/n
+/10 plot_brain()
+[107] [108] [109] [110] [111] [112]
+Overfull \hbox (23.89674pt too wide) in paragraph at lines 6472--6475
+[]\T1/ptm/m/n/10 Averages (or oth-er-wise sum-marises) a 4D im-age within each 
+at-las par-cel, re-turn-ing a [][][]\T1/zi4/m/n/10 ClusteredNeuroVec[][][]
+[113] [114]
+Overfull \hbox (41.90819pt too wide) in paragraph at lines 6589--6591
+[]\T1/ptm/m/n/10 Numeric. Ra-dius for smooth-ing neigh-bor-hood in vox-els. If 
+NULL, uses max(spacing)+0.5.
+[115] [116]
+Overfull \hbox (4.7877pt too wide) in paragraph at lines 6707--6709
+[]\T1/ptm/m/n/10 Character vec-tor of nu-meric or cat-e-gor-i-cal columns that 
+will be em-bed-ded (passed
+[117]
+Overfull \hbox (2.63692pt too wide) in paragraph at lines 6789--6792
+[]\T1/ptm/m/n/10 Optional col-umn iden-ti-fy-ing ho-mol-o-gous L/R ROI pairs. W
+hen sup-plied, colours
+[118]
+Overfull \hbox (7.0767pt too wide) in paragraph at lines 6802--6804
+[]\T1/ptm/m/n/10 Soft-min tem-per-a-ture; smaller em-pha-sises hard min-i-mum d
+is-tance, larger smooths
+[119]
+Overfull \hbox (7.0767pt too wide) in paragraph at lines 6899--6901
+[]\T1/ptm/m/n/10 Soft-min tem-per-a-ture; smaller em-pha-sises hard min-i-mum d
+is-tance, larger smooths
+[120] [121] [122]
+Overfull \hbox (23.09758pt too wide) in paragraph at lines 7087--7091
+[]\T1/ptm/m/n/10 Load the Schae-fer2018 cor-ti-cal par-cel-la-tion as a sur-fac
+e at-las, re-turn-ing neu-ro-surf []\T1/zi4/m/n/10 LabeledNeuroSurface
+[123]
+Overfull \hbox (1.46924pt too wide) in paragraph at lines 7113--7117
+\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "fsaverage5"[]\T1/ptm/m/n/10 . Cur-rently on
+ly []\T1/zi4/m/n/10 "fsaverage6" []\T1/ptm/m/n/10 uses pack-aged ge-om-e-try; o
+ther
+[124]
+Overfull \hbox (57.20941pt too wide) in paragraph at lines 7176--7178
+[]\T1/zi4/m/n/10 template_id[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 tf_resolution[]
+\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 tf_density[]\T1/ptm/m/n/10 : Tem-plate-Flow i
+den-ti-fiers used by []\T1/zi4/m/n/10 get_surface_template()[]\T1/ptm/m/n/10 . 
+
+[125] [126]
+Overfull \hbox (58.97797pt too wide) in paragraph at lines 7298--7302
+\T1/ptm/m/n/10 or-di-nates. If []\T1/zi4/m/n/10 NULL []\T1/ptm/m/n/10 (de-fault
+), sphere co-or-di-nates are fetched via [][][]\T1/zi4/m/n/10 load_surface_temp
+late[][][](...,
+[127] [128]
+Overfull \hbox (10.3663pt too wide) in paragraph at lines 7446--7451
+\T1/ptm/m/n/10 re-source (HCP tha-la-mus, MDTB10 cere-bel-lum, CIT168 sub-cor-t
+ex, and HCP hip-pocam-pus/amygdala).
+[129] [130] [131] [132] [133] [134]
+Overfull \hbox (80.07643pt too wide) in paragraph at lines 7735--7737
+[]\T1/ptm/m/n/10 [get_surface_coordinate_space()] for the surface-only ver-sion
+, [needs_coord_transform()] and [needs_template_warp()]
+
+Overfull \hbox (94.0269pt too wide) in paragraph at lines 7764--7766
+[]\T1/ptm/m/n/10 Character string. The Tem-plate-Flow iden-ti-fier for the tem-
+plate space (e.g., "MNI152NLin2009cAsym"). 
+[135] [136] [137] [138] [139] [140] [141]
+No file Rd2.ind.
+[142] (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)
+pdfTeX warning (dest): name{Rfn.ClusteredNeuroVol} has been referenced but does
+ not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.sub.Rul.clusters} has been referenced but does 
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.nn} has been referenced but does not exist, rep
+laced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.cor} has been referenced but does not exist, re
+placed by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.ClusteredNeuroVec} has been referenced but does
+ not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.coord.Rul.to.Rul.grid} has been referenced but 
+does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.NeuroVol} has been referenced but does not exis
+t, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.geom.Rul.segment} has been referenced but does 
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.geom.Rul.path} has been referenced but does not
+ exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.ROISurface} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.get.Rul.template.Rul.brainmask} has been refere
+nced but does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.tibble} has been referenced but does not exist,
+ replaced by a fixed one
+
+</usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr
+8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (142 pages, 367684 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.17 [TeX Live 2023] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (321 entries accepted, 0 rejected).
+Sorting entries.....done (2887 comparisons).
+Generating output file Rd2.ind....done (374 lines written, 4 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/usr/share/texlive/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex)))))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./Rd2.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (./Rd2.out) (./Rd2.out)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (./Rd2.toc
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
+onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
+s/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-
+0.enc}] [2] [3])
+
+Package hyperref Warning: Glyph not defined in PU encoding,
+(hyperref)                removing `\Rpercent' on input line 16.
+
+
+Package hyperref Warning: Glyph not defined in PU encoding,
+(hyperref)                removing `\Rpercent' on input line 16.
+
+[4]
+Overfull \hbox (0.52841pt too wide) in paragraph at lines 89--93
+\T1/ptm/m/n/10 col-umn, for ex-am-ple `c(id = "roi_index")`. Com-pos-ite keys a
+re sup-ported. When
+
+Overfull \hbox (6.58908pt too wide) in paragraph at lines 118--125
+\T1/ptm/m/n/10 se-lect []\T1/zi4/m/n/10 source$parcels[c("label_full", "value")
+] []\T1/ptm/m/n/10 from a []\T1/zi4/m/n/10 parcel_data []\T1/ptm/m/n/10 ob-ject
+. Representation-
+[5] [6]
+Overfull \hbox (4.1874pt too wide) in paragraph at lines 191--194
+[]\T1/ptm/m/n/10 `"aggregate"` votes by to-tal weight per key; ties se-lect the
+ small-est key. `"largest"`
+[7] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [8{/usr/sha
+re/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}] [9] [10]
+Overfull \hbox (4.60672pt too wide) in paragraph at lines 454--456
+[]\T1/ptm/m/n/10 Optional ci-ta-tion role(s), such as `"at-las"`, `"dis-tri-bu-
+tion"`, `"tem-plate"`, or `"soft-
+[11]
+Overfull \hbox (24.22807pt too wide) in paragraph at lines 500--503
+[]\T1/ptm/m/n/10 Character string spec-i-fy-ing the cor-re-la-tion method: []\T
+1/zi4/m/n/10 "pearson" []\T1/ptm/m/n/10 (de-fault), []\T1/zi4/m/n/10 "spearman"
+[]\T1/ptm/m/n/10 ,
+[12] [13] [14]
+Overfull \hbox (19.70792pt too wide) in paragraph at lines 671--673
+[]\T1/ptm/m/n/10 Character vec-tor of hi-er-ar-chy level names, from finest to 
+coars-est (e.g., []\T1/zi4/m/n/10 c("parcel", "network",
+[15]
+Overfull \hbox (2.40729pt too wide) in paragraph at lines 760--762
+[]\T1/ptm/m/n/10 An at-las, or a tem-plate re-turned by [get_template()] or [lo
+ad_surface_template()].
+[16]
+Overfull \hbox (5.48578pt too wide) in paragraph at lines 786--791
+[]\T1/ptm/m/n/10 The older [at-las_ref()], [at-las_artifacts()] and [at-las_his
+tory()] ac-ces-sors read this au-thor-i-ta-tive record.
+
+Overfull \hbox (33.86563pt too wide) in paragraph at lines 794--798
+[]\T1/ptm/m/n/10 `atlas_metadata()` and `tem-plate_metadata()` re-turn a `Neu-r
+oRe-sourceMeta-data` list with `schema_version`,
+[17] [18] [19]
+Overfull \hbox (23.13042pt too wide) in paragraph at lines 980--983
+[]\T1/ptm/m/n/10 One of []\T1/zi4/m/n/10 "rule_hcl" []\T1/ptm/m/n/10 (de-fault)
+, []\T1/zi4/m/n/10 "network_harmony"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "maximi
+n_view"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "embedding"[]\T1/ptm/m/n/10 ,
+[20]
+Overfull \hbox (26.0963pt too wide) in paragraph at lines 1054--1059
+\T1/ptm/m/n/10 routes. For `scope = "space"` this is the space trans-form reg-i
+stry re-turned by [space_transform_manifest()]. 
+[21] [22] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [23]
+Overfull \hbox (48.49823pt too wide) in paragraph at lines 1222--1224
+[]\T1/ptm/m/n/10 Downloads (if needed) and re-turns the Brain-netome 246-region
+ la-bel ta-ble used by [][][]\T1/zi4/m/n/10 get_brainnetome_atlas[][][]()[]\T1/
+ptm/m/n/10 . 
+[24] [25]
+Overfull \hbox (8.51714pt too wide) in paragraph at lines 1342--1346
+[]\T1/ptm/m/n/10 di-men-sions dif-fer, the at-las is au-to-mat-i-cally re-sam-p
+led to []\T1/zi4/m/n/10 stat_map []\T1/ptm/m/n/10 space (nearest-
+[26] [27] [28]
+Overfull \hbox (2.40909pt too wide) in paragraph at lines 1520--1522
+[]\T1/ptm/m/n/10 Character vec-tor of views to in-clude. Any com-bi-na-tion of 
+[]\T1/zi4/m/n/10 "lateral"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "medial"[]\T1/ptm
+/m/n/10 ,
+[29] [30]
+Overfull \hbox (5.127pt too wide) in paragraph at lines 1641--1644
+\T1/ptm/m/n/10 plots. Clus-ters are formed vol-u-met-ri-cally from []\T1/zi4/m/
+n/10 stat_map[]\T1/ptm/m/n/10 ; vi-su-al-iza-tion is parcel-level on []\T1/zi4/
+m/n/10 surfatlas[]\T1/ptm/m/n/10 . 
+[31]
+Overfull \hbox (8.51714pt too wide) in paragraph at lines 1689--1693
+[]\T1/ptm/m/n/10 di-men-sions dif-fer, the at-las is au-to-mat-i-cally re-sam-p
+led to []\T1/zi4/m/n/10 stat_map []\T1/ptm/m/n/10 space (nearest-
+[32]
+Overfull \hbox (12.56885pt too wide) in paragraph at lines 1762--1764
+[]\T1/ptm/m/n/10 How to com-bine mul-ti-ple spheres: []\T1/zi4/m/n/10 "separate
+" []\T1/ptm/m/n/10 (one re-gion per sphere) or []\T1/zi4/m/n/10 "union"[]\T1/pt
+m/m/n/10 . 
+[33] [34]
+Overfull \hbox (4.13872pt too wide) in paragraph at lines 1850--1852
+[]\T1/ptm/m/n/10 FreeSurfer Co-or-di-nateSys-tems doc-u-men-ta-tion: [][]$\T1/z
+i4/m/n/10 https : / / surfer . nmr . mgh . harvard . edu / fswiki /
+[35] [36] [37]
+Overfull \hbox (0.29767pt too wide) in paragraph at lines 2028--2031
+[][][]\T1/zi4/m/n/10 roi_metadata[][][] []\T1/ptm/m/n/10 for view-ing avail-abl
+e fil-ter columns, [][][]\T1/zi4/m/n/10 roi_attributes[][][] []\T1/ptm/m/n/10 f
+or list-ing avail-able at-tributes,
+[38] [39] [40] [41]
+Overfull \hbox (71.4573pt too wide) in paragraph at lines 2276--2279
+\T1/ptm/m/n/10 vard_oxford_cortical"`, `"har-vard_oxford_subcortical"`, `"har-v
+ard_oxford_cortical_subcortical"`,
+
+Overfull \hbox (40.47617pt too wide) in paragraph at lines 2280--2283
+[]\T1/ptm/m/n/10 FSL in-stal-la-tion di-rec-tory. De-faults to `Sys.getenv("FSL
+DIR")`. `get_julich_brain_atlas()`
+[42]
+Overfull \hbox (20.88887pt too wide) in paragraph at lines 2309--2313
+[]\T1/ptm/m/n/10 This func-tion has been dep-re-cated in favour of the na-tive 
+[][][]\T1/zi4/m/n/10 plot_brain[][][]() []\T1/ptm/m/n/10 ren-derer. Use []\T1/z
+i4/m/n/10 schaefer_surf()
+[43]
+Overfull \hbox (2.79953pt too wide) in paragraph at lines 2374--2377
+[]\T1/zi4/m/n/10 "mni2009c"[]\T1/ptm/m/n/10 : MNI152NLin2009cAsym-provenance vo
+l-ume file ([]\T1/zi4/m/n/10 MMP_in_MNI_corr.nii.gz[]\T1/ptm/m/n/10 ).
+
+Overfull \hbox (7.9378pt too wide) in paragraph at lines 2381--2385
+[]\T1/ptm/m/n/10 If []\T1/zi4/m/n/10 source = "mni2009c" []\T1/ptm/m/n/10 is un
+-avail-able at run-time, the loader au-to-mat-i-cally falls back to []\T1/zi4/m
+/n/10 "xcpengine"
+
+Overfull \hbox (20.53732pt too wide) in paragraph at lines 2389--2397
+[]\T1/ptm/m/n/10 Parcel IDs are representation-specific: vol-ume IDs 1--180 re-
+fer to the right hemi-sphere ([]\T1/zi4/m/n/10 "hcp_R_first"[]\T1/ptm/m/n/10 ),
+
+
+Overfull \hbox (8.18024pt too wide) in paragraph at lines 2389--2397
+\T1/ptm/m/n/10 bles, join on []\T1/zi4/m/n/10 roi_metadata(atlas)$label_full []
+\T1/ptm/m/n/10 ([]\T1/zi4/m/n/10 "L_V1_ROI"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 
+"R_V1_ROI"[]\T1/ptm/m/n/10 , etc.), or on []\T1/zi4/m/n/10 c("area",
+[44] [45]
+Overfull \hbox (0.66841pt too wide) in paragraph at lines 2493--2495
+[]\T1/ptm/m/n/10 Arguments passed by the con-ve-nience wrap-pers to `get_harvar
+d_oxford_atlas()`. 
+[46] [47] [48]
+Overfull \hbox (27.47577pt too wide) in paragraph at lines 2645--2648
+\T1/ptm/m/n/10 This re-quires a lo-cal FSL-style at-las di-rec-tory and uses th
+e XML/image files un-der `$FSLDIR/data/atlases`. 
+
+Overfull \hbox (40.47617pt too wide) in paragraph at lines 2658--2661
+[]\T1/ptm/m/n/10 FSL in-stal-la-tion di-rec-tory. De-faults to `Sys.getenv("FSL
+DIR")`. `get_julich_brain_atlas()`
+[49] [50]
+Overfull \hbox (6.25902pt too wide) in paragraph at lines 2764--2769
+[]\T1/zi4/m/n/10 get_roi() []\T1/ptm/m/n/10 method for sur-face at-lases (class
+ []\T1/zi4/m/n/10 surfatlas[]\T1/ptm/m/n/10 , e.g. from [][][]\T1/zi4/m/n/10 ge
+t_wang_atlas[][][][]\T1/ptm/m/n/10 , [][][]\T1/zi4/m/n/10 glasser_surf[][][][]\
+T1/ptm/m/n/10 ,
+
+Overfull \hbox (8.06992pt too wide) in paragraph at lines 2834--2834
+ []  \T1/zi4/m/n/10 parcels = c("100", "200", "300", "400", "500", "600", "700"
+, "800", "900", "1000"),[] 
+[51] [52]
+Underfull \vbox (badness 10000) has occurred while \output is active [53]
+Underfull \vbox (badness 10000) has occurred while \output is active [54]
+Underfull \vbox (badness 10000) has occurred while \output is active [55]
+Overfull \hbox (2.81758pt too wide) in paragraph at lines 3038--3040
+[]\T1/ptm/m/n/10 Logical. Whether to smooth par-cel bound-aries af-ter re-sam-p
+ling. De-fault: FALSE 
+
+Overfull \hbox (7.96828pt too wide) in paragraph at lines 3043--3047
+\T1/ptm/m/n/10 tion, and fi-nally the plat-form cache di-rec-tory. Ig-nored whe
+n `use_cache = FALSE`,
+[56]
+Overfull \hbox (13.24922pt too wide) in paragraph at lines 3088--3089
+[]\T1/zi4/m/n/10 get_schaefer_atlas []\T1/ptm/m/n/10 with the []\T1/zi4/m/n/10 
+parcels []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 networks []\T1/ptm/m/n/10 ar-gu-m
+ents pre-set. They all ac-cept []\T1/zi4/m/n/10 resolution
+[57] [58] [59] [60]
+Overfull \hbox (46.4596pt too wide) in paragraph at lines 3302--3305
+[]\T1/ptm/m/n/10 TemplateFlow space to down-load (e.g., []\T1/zi4/m/n/10 "MNI15
+2NLin6Asym" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "MNI152NLin2009cAsym"[]\T1/ptm
+/m/n/10 ).
+[61]
+Overfull \hbox (9.96935pt too wide) in paragraph at lines 3341--3344
+[]\T1/ptm/m/n/10 When []\T1/zi4/m/n/10 path_only=TRUE[]\T1/ptm/m/n/10 , a list 
+with class []\T1/zi4/m/n/10 c("subcortical_paths","list") []\T1/ptm/m/n/10 con-
+tain-ing []\T1/zi4/m/n/10 atlas_path[]\T1/ptm/m/n/10 ,
+[62] [63] [64]
+Overfull \hbox (1.22827pt too wide) in paragraph at lines 3523--3525
+[]\T1/ptm/m/n/10 Logical. If []\T1/zi4/m/n/10 TRUE[]\T1/ptm/m/n/10 , re-turns t
+he file path as a string in-stead of load-ing as a []\T1/zi4/m/n/10 NeuroVol[]\
+T1/ptm/m/n/10 .
+[65] [66] [67] [68]
+Overfull \hbox (63.93866pt too wide) in paragraph at lines 3748--3750
+[]\T1/ptm/m/n/10 Optional Julich-Brain res-o-lu-tion (e.g. []\T1/zi4/m/n/10 "1m
+m" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "2mm"[]\T1/ptm/m/n/10 ); passed to [][]
+[]\T1/zi4/m/n/10 get_julich_brain_atlas[][][]()[]\T1/ptm/m/n/10 . 
+[69]
+Overfull \hbox (56.40855pt too wide) in paragraph at lines 3856--3860
+[]\T1/ptm/m/n/10 A list with classes []\T1/zi4/m/n/10 c("wang", "surfatlas", "a
+tlas") []\T1/ptm/m/n/10 con-tain-ing []\T1/zi4/m/n/10 lh_atlas[]\T1/ptm/m/n/10 
+/[]\T1/zi4/m/n/10 rh_atlas []\T1/ptm/m/n/10 ([]\T1/zi4/m/n/10 LabeledNeuroSurfa
+ce
+[70]
+Overfull \hbox (71.07831pt too wide) in paragraph at lines 3898--3906
+\T1/ptm/m/n/10 for each of the 25 to-po-graphic ar-eas there is a con-tin-u-ous
+ prob-a-bil-ity map ([]\T1/zi4/m/n/10 perc_VTPM_vol_roi<n>_<hemi>.nii.gz[]\T1/p
+tm/m/n/10 )
+[71]
+Overfull \hbox (43.31808pt too wide) in paragraph at lines 3955--3963
+\T1/ptm/m/n/10 Prince-ton Pro-bAt-las_v4 dis-tri-bu-tion (Wang et al. 2015), wh
+ose orig-i-nal host ([]\T1/zi4/m/n/10 napl.scholar.princeton.edu[]\T1/ptm/m/n/1
+0 )
+
+Overfull \hbox (4.5586pt too wide) in paragraph at lines 3984--3990
+[]\T1/ptm/m/n/10 When []\T1/zi4/m/n/10 path_only = TRUE[]\T1/ptm/m/n/10 , an ob
+-ject of class []\T1/zi4/m/n/10 wang_prob_paths[]\T1/ptm/m/n/10 : a list with t
+he re-quested []\T1/zi4/m/n/10 image[]\T1/ptm/m/n/10 /[]\T1/zi4/m/n/10 hemi[]\T
+1/ptm/m/n/10 ,
+[72]
+Overfull \hbox (21.16943pt too wide) in paragraph at lines 4030--4033
+[]\T1/ptm/m/n/10 This func-tion has been dep-re-cated in favour of [][][]\T1/zi
+4/m/n/10 plot_brain[][][]()[]\T1/ptm/m/n/10 . Use []\T1/zi4/m/n/10 plot_brain(s
+chaefer_surf(...))
+[73] [74]
+Overfull \hbox (40.9284pt too wide) in paragraph at lines 4121--4123
+[]\T1/ptm/m/n/10 fsaverage []\T1/zi4/m/n/10 .annot []\T1/ptm/m/n/10 files from 
+the Mills Figshare dis-tri-bu-tion ([]\T1/zi4/m/n/10 lh.HCP-MMP1.annot[]\T1/ptm
+/m/n/10 , []\T1/zi4/m/n/10 rh.HCP-MMP1.annot[]\T1/ptm/m/n/10 ) 
+[75]
+Overfull \hbox (0.45692pt too wide) in paragraph at lines 4194--4196
+[]\T1/ptm/m/n/10 **DEPRECATED:** Tem-plate-Flow is now ac-cessed via the pure R
+ `tem-plate-flow` pack-age. Python
+[76] [77]
+Overfull \hbox (23.33865pt too wide) in paragraph at lines 4333--4336
+[]\T1/ptm/m/n/10 A []\T1/zi4/m/n/10 neurosurf::SurfaceGeometry []\T1/ptm/m/n/10
+ ob-ject when []\T1/zi4/m/n/10 hemi []\T1/ptm/m/n/10 is "L" or "R"; a named lis
+t of two []\T1/zi4/m/n/10 SurfaceGeometry
+[78] [79] [80] [81]
+Overfull \hbox (141.79854pt too wide) in paragraph at lines 4554--4556
+[]\T1/ptm/m/n/10 This ma-trix is de-rived from FreeSurfer's []\T1/zi4/m/n/10 mn
+i152.register.dat []\T1/ptm/m/n/10 file, lo-cated at []\T1/zi4/m/n/10 $FREESURF
+ER_HOME/average/mni152.register.dat[]\T1/ptm/m/n/10 . 
+[82]
+Overfull \hbox (141.79854pt too wide) in paragraph at lines 4598--4600
+[]\T1/ptm/m/n/10 This ma-trix is de-rived from FreeSurfer's []\T1/zi4/m/n/10 mn
+i152.register.dat []\T1/ptm/m/n/10 file, lo-cated at []\T1/zi4/m/n/10 $FREESURF
+ER_HOME/average/mni152.register.dat[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (66.20093pt too wide) in paragraph at lines 4614--4616
+[][][]$\T1/zi4/m/n/10 https : / / surfer . nmr . mgh . harvard . edu / fswiki /
+ CoordinateSystems$[][] [][][]MNI152_to_MNI305[][][][]\T1/ptm/m/n/10 , [][][]\T
+1/zi4/m/n/10 transform_coords[][][] 
+[83] [84] [85]
+Overfull \hbox (13.27757pt too wide) in paragraph at lines 4742--4744
+[]\T1/ptm/m/n/10 Character string iden-ti-fy-ing the vol-u-met-ric data's co-or
+-di-nate space (e.g., "MNI152",
+[86] [87] [88] [89] [90] [91] [92]
+Overfull \hbox (4.82843pt too wide) in paragraph at lines 5162--5165
+[]\T1/ptm/m/n/10 Optional pre-computed colour spec-i-fi-ca-tion: a tib-ble from
+ [][][]\T1/zi4/m/n/10 atlas_roi_colors[][][]()[]\T1/ptm/m/n/10 ,
+
+Overfull \hbox (52.9796pt too wide) in paragraph at lines 5179--5181
+[]\T1/ptm/m/n/10 Additional ar-gu-ments passed to []\T1/zi4/m/n/10 neuroim2::pl
+ot_montage() []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 neuroim2::plot_ortho()[]\T1/p
+tm/m/n/10 . 
+
+Overfull \hbox (16.48041pt too wide) in paragraph at lines 5194--5197
+[]\T1/zi4/m/n/10 "lateral"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "medial"[]\T1/ptm
+/m/n/10 , []\T1/zi4/m/n/10 "dorsal"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "ventral
+"[]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 c("lateral", "medial")[]\T1/ptm/
+m/n/10 . 
+[93] [94]
+Underfull \vbox (badness 10000) has occurred while \output is active [95]
+Overfull \hbox (5.89818pt too wide) in paragraph at lines 5369--5372
+[]\T1/ptm/m/n/10 Logical. If []\T1/zi4/m/n/10 TRUE []\T1/ptm/m/n/10 (de-fault),
+ re-turns a []\T1/zi4/m/n/10 ggiraph::girafe []\T1/ptm/m/n/10 wid-get with hove
+r tooltips.
+[96]
+Overfull \hbox (9.77805pt too wide) in paragraph at lines 5395--5403
+\T1/ptm/m/n/10 cleaner pub-li-ca-tion style and, un-less ex-plic-itly over-rid-
+den, switches []\T1/zi4/m/n/10 panel_layout
+
+Overfull \hbox (1.93875pt too wide) in paragraph at lines 5408--5411
+[]\T1/ptm/m/n/10 Boundary ren-der-ing method. []\T1/zi4/m/n/10 "path" []\T1/ptm
+/m/n/10 (de-fault) chains bound-ary edges into longer
+[97]
+Overfull \hbox (1.54048pt too wide) in paragraph at lines 5502--5507
+[]\T1/zi4/m/n/10 overlay_threshold []\T1/ptm/m/n/10 over which []\T1/zi4/m/n/10
+ overlay_alpha_mode = "threshold" []\T1/ptm/m/n/10 reaches
+[98]
+Overfull \hbox (17.17899pt too wide) in paragraph at lines 5528--5532
+[]\T1/ptm/m/n/10 Character: sam-pling strat-egy passed to []\T1/zi4/m/n/10 neur
+osurf::vol_to_surf() []\T1/ptm/m/n/10 when []\T1/zi4/m/n/10 overlay
+
+Overfull \hbox (15.7997pt too wide) in paragraph at lines 5533--5536
+[]\T1/ptm/m/n/10 Voxel in-ter-po-la-tion passed to []\T1/zi4/m/n/10 neurosurf::
+vol_to_surf()[]\T1/ptm/m/n/10 : []\T1/zi4/m/n/10 "legacy"[]\T1/ptm/m/n/10 , []\
+T1/zi4/m/n/10 "nearest"[]\T1/ptm/m/n/10 ,
+
+Overfull \hbox (15.18866pt too wide) in paragraph at lines 5537--5539
+[]\T1/ptm/m/n/10 Optional ex-plicit ag-gre-ga-tion across depth sam-ples: []\T1
+/zi4/m/n/10 "mean"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "mode"[]\T1/ptm/m/n/10 , 
+or []\T1/zi4/m/n/10 "closest"[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (6.09859pt too wide) in paragraph at lines 5554--5558
+[]\T1/ptm/m/n/10 Which mapped quan-tity sup-plies the static col-or-bar: []\T1/
+zi4/m/n/10 "auto"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "base"[]\T1/ptm/m/n/10 , [
+]\T1/zi4/m/n/10 "overlay"[]\T1/ptm/m/n/10 ,
+[99]
+Overfull \hbox (4.75928pt too wide) in paragraph at lines 5607--5609
+[]\T1/ptm/m/n/10 Fill colour for the cor-tex back-drop when []\T1/zi4/m/n/10 ba
+ckground = TRUE[]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 "grey80"[]\T1/ptm/
+m/n/10 . 
+
+Overfull \hbox (0.47833pt too wide) in paragraph at lines 5637--5641
+[]\T1/ptm/m/n/10 Optional non-negative mag-ni-tude for the CPU par-cel ren-dere
+r ([]\T1/zi4/m/n/10 static_backend
+[100]
+Overfull \hbox (10.13786pt too wide) in paragraph at lines 5650--5654
+[]\T1/ptm/m/n/10 A []\T1/zi4/m/n/10 ggplot2 []\T1/ptm/m/n/10 ob-ject (when []\T
+1/zi4/m/n/10 interactive = FALSE []\T1/ptm/m/n/10 and no stan-dalone col-or-bar
+ is re-quested), a []\T1/zi4/m/n/10 patchwork
+[101]
+Overfull \hbox (7.4074pt too wide) in paragraph at lines 5702--5705
+[]\T1/ptm/m/n/10 Arranges mul-ti-ple brain sur-face plots into a grid lay-out u
+s-ing \T1/ptm/b/n/10 patch-work\T1/ptm/m/n/10 . Each el-e-ment of []\T1/zi4/m/n
+/10 vals_list
+
+Overfull \hbox (23.87903pt too wide) in paragraph at lines 5743--5745
+[]\T1/ptm/m/n/10 Character vec-tor of views passed to [][][]\T1/zi4/m/n/10 plot
+_brain[][][][]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 c("lateral", "medial"
+)[]\T1/ptm/m/n/10 . 
+[102] [103] [104] [105] [106] [107]
+Overfull \hbox (22.65852pt too wide) in paragraph at lines 6089--6091
+[]\T1/ptm/m/n/10 Sampling strat-egy be-tween the white and pial sur-faces: []\T
+1/zi4/m/n/10 "midpoint"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "normal_line"[]\T1/p
+tm/m/n/10 ,
+[108]
+Overfull \hbox (6.15665pt too wide) in paragraph at lines 6112--6116
+\T1/ptm/m/n/10 match the at-las), that hemi-sphere is re-turned as all []\T1/zi
+4/m/n/10 NA []\T1/ptm/m/n/10 and a warn-ing re-ports the rea-son; []\T1/zi4/m/n
+/10 plot_brain()
+[109] [110] [111] [112] [113] [114]
+Overfull \hbox (23.89674pt too wide) in paragraph at lines 6472--6475
+[]\T1/ptm/m/n/10 Averages (or oth-er-wise sum-marises) a 4D im-age within each 
+at-las par-cel, re-turn-ing a [][][]\T1/zi4/m/n/10 ClusteredNeuroVec[][][]
+[115] [116]
+Overfull \hbox (41.90819pt too wide) in paragraph at lines 6589--6591
+[]\T1/ptm/m/n/10 Numeric. Ra-dius for smooth-ing neigh-bor-hood in vox-els. If 
+NULL, uses max(spacing)+0.5.
+[117] [118]
+Overfull \hbox (4.7877pt too wide) in paragraph at lines 6707--6709
+[]\T1/ptm/m/n/10 Character vec-tor of nu-meric or cat-e-gor-i-cal columns that 
+will be em-bed-ded (passed
+[119]
+Overfull \hbox (2.63692pt too wide) in paragraph at lines 6789--6792
+[]\T1/ptm/m/n/10 Optional col-umn iden-ti-fy-ing ho-mol-o-gous L/R ROI pairs. W
+hen sup-plied, colours
+[120]
+Overfull \hbox (7.0767pt too wide) in paragraph at lines 6802--6804
+[]\T1/ptm/m/n/10 Soft-min tem-per-a-ture; smaller em-pha-sises hard min-i-mum d
+is-tance, larger smooths
+[121]
+Overfull \hbox (7.0767pt too wide) in paragraph at lines 6899--6901
+[]\T1/ptm/m/n/10 Soft-min tem-per-a-ture; smaller em-pha-sises hard min-i-mum d
+is-tance, larger smooths
+[122] [123] [124]
+Overfull \hbox (23.09758pt too wide) in paragraph at lines 7087--7091
+[]\T1/ptm/m/n/10 Load the Schae-fer2018 cor-ti-cal par-cel-la-tion as a sur-fac
+e at-las, re-turn-ing neu-ro-surf []\T1/zi4/m/n/10 LabeledNeuroSurface
+[125]
+Overfull \hbox (1.46924pt too wide) in paragraph at lines 7113--7117
+\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "fsaverage5"[]\T1/ptm/m/n/10 . Cur-rently on
+ly []\T1/zi4/m/n/10 "fsaverage6" []\T1/ptm/m/n/10 uses pack-aged ge-om-e-try; o
+ther
+[126]
+Overfull \hbox (57.20941pt too wide) in paragraph at lines 7176--7178
+[]\T1/zi4/m/n/10 template_id[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 tf_resolution[]
+\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 tf_density[]\T1/ptm/m/n/10 : Tem-plate-Flow i
+den-ti-fiers used by []\T1/zi4/m/n/10 get_surface_template()[]\T1/ptm/m/n/10 . 
+
+[127] [128]
+Overfull \hbox (58.97797pt too wide) in paragraph at lines 7298--7302
+\T1/ptm/m/n/10 or-di-nates. If []\T1/zi4/m/n/10 NULL []\T1/ptm/m/n/10 (de-fault
+), sphere co-or-di-nates are fetched via [][][]\T1/zi4/m/n/10 load_surface_temp
+late[][][](...,
+[129] [130]
+Overfull \hbox (10.3663pt too wide) in paragraph at lines 7446--7451
+\T1/ptm/m/n/10 re-source (HCP tha-la-mus, MDTB10 cere-bel-lum, CIT168 sub-cor-t
+ex, and HCP hip-pocam-pus/amygdala).
+[131] [132] [133] [134] [135] [136]
+Overfull \hbox (80.07643pt too wide) in paragraph at lines 7735--7737
+[]\T1/ptm/m/n/10 [get_surface_coordinate_space()] for the surface-only ver-sion
+, [needs_coord_transform()] and [needs_template_warp()]
+
+Overfull \hbox (94.0269pt too wide) in paragraph at lines 7764--7766
+[]\T1/ptm/m/n/10 Character string. The Tem-plate-Flow iden-ti-fier for the tem-
+plate space (e.g., "MNI152NLin2009cAsym"). 
+[137] [138] [139] [140] [141] [142] [143] (./Rd2.ind [144]
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 29.
+
+
+Overfull \hbox (35.8567pt too wide) in paragraph at lines 113--115
+[]\T1/zi4/m/it/10 get_harvard_oxford_cortical_subcortical_atlas 
+[145] [146] [147]) (./Rd2.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)
+pdfTeX warning (dest): name{Rfn.ClusteredNeuroVol} has been referenced but does
+ not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.sub.Rul.clusters} has been referenced but does 
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.nn} has been referenced but does not exist, rep
+laced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.cor} has been referenced but does not exist, re
+placed by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.ClusteredNeuroVec} has been referenced but does
+ not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.coord.Rul.to.Rul.grid} has been referenced but 
+does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.NeuroVol} has been referenced but does not exis
+t, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.geom.Rul.segment} has been referenced but does 
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.geom.Rul.path} has been referenced but does not
+ exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.ROISurface} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.get.Rul.template.Rul.brainmask} has been refere
+nced but does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.tibble} has been referenced but does not exist,
+ replaced by a fixed one
+
+</usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr
+8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (147 pages, 399526 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.17 [TeX Live 2023] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (321 entries accepted, 0 rejected).
+Sorting entries.....done (2887 comparisons).
+Generating output file Rd2.ind....done (374 lines written, 4 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/usr/share/texlive/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex)))))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./Rd2.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (./Rd2.out) (./Rd2.out)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (./Rd2.toc
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
+onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
+s/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-
+0.enc}] [2] [3])
+
+Package hyperref Warning: Glyph not defined in PU encoding,
+(hyperref)                removing `\Rpercent' on input line 16.
+
+
+Package hyperref Warning: Glyph not defined in PU encoding,
+(hyperref)                removing `\Rpercent' on input line 16.
+
+[4]
+Overfull \hbox (0.52841pt too wide) in paragraph at lines 89--93
+\T1/ptm/m/n/10 col-umn, for ex-am-ple `c(id = "roi_index")`. Com-pos-ite keys a
+re sup-ported. When
+
+Overfull \hbox (6.58908pt too wide) in paragraph at lines 118--125
+\T1/ptm/m/n/10 se-lect []\T1/zi4/m/n/10 source$parcels[c("label_full", "value")
+] []\T1/ptm/m/n/10 from a []\T1/zi4/m/n/10 parcel_data []\T1/ptm/m/n/10 ob-ject
+. Representation-
+[5] [6]
+Overfull \hbox (4.1874pt too wide) in paragraph at lines 191--194
+[]\T1/ptm/m/n/10 `"aggregate"` votes by to-tal weight per key; ties se-lect the
+ small-est key. `"largest"`
+[7] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [8{/usr/sha
+re/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}] [9] [10]
+Overfull \hbox (4.60672pt too wide) in paragraph at lines 454--456
+[]\T1/ptm/m/n/10 Optional ci-ta-tion role(s), such as `"at-las"`, `"dis-tri-bu-
+tion"`, `"tem-plate"`, or `"soft-
+[11]
+Overfull \hbox (24.22807pt too wide) in paragraph at lines 500--503
+[]\T1/ptm/m/n/10 Character string spec-i-fy-ing the cor-re-la-tion method: []\T
+1/zi4/m/n/10 "pearson" []\T1/ptm/m/n/10 (de-fault), []\T1/zi4/m/n/10 "spearman"
+[]\T1/ptm/m/n/10 ,
+[12] [13] [14]
+Overfull \hbox (19.70792pt too wide) in paragraph at lines 671--673
+[]\T1/ptm/m/n/10 Character vec-tor of hi-er-ar-chy level names, from finest to 
+coars-est (e.g., []\T1/zi4/m/n/10 c("parcel", "network",
+[15]
+Overfull \hbox (2.40729pt too wide) in paragraph at lines 760--762
+[]\T1/ptm/m/n/10 An at-las, or a tem-plate re-turned by [get_template()] or [lo
+ad_surface_template()].
+[16]
+Overfull \hbox (5.48578pt too wide) in paragraph at lines 786--791
+[]\T1/ptm/m/n/10 The older [at-las_ref()], [at-las_artifacts()] and [at-las_his
+tory()] ac-ces-sors read this au-thor-i-ta-tive record.
+
+Overfull \hbox (33.86563pt too wide) in paragraph at lines 794--798
+[]\T1/ptm/m/n/10 `atlas_metadata()` and `tem-plate_metadata()` re-turn a `Neu-r
+oRe-sourceMeta-data` list with `schema_version`,
+[17] [18] [19]
+Overfull \hbox (23.13042pt too wide) in paragraph at lines 980--983
+[]\T1/ptm/m/n/10 One of []\T1/zi4/m/n/10 "rule_hcl" []\T1/ptm/m/n/10 (de-fault)
+, []\T1/zi4/m/n/10 "network_harmony"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "maximi
+n_view"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "embedding"[]\T1/ptm/m/n/10 ,
+[20]
+Overfull \hbox (26.0963pt too wide) in paragraph at lines 1054--1059
+\T1/ptm/m/n/10 routes. For `scope = "space"` this is the space trans-form reg-i
+stry re-turned by [space_transform_manifest()]. 
+[21] [22] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [23]
+Overfull \hbox (48.49823pt too wide) in paragraph at lines 1222--1224
+[]\T1/ptm/m/n/10 Downloads (if needed) and re-turns the Brain-netome 246-region
+ la-bel ta-ble used by [][][]\T1/zi4/m/n/10 get_brainnetome_atlas[][][]()[]\T1/
+ptm/m/n/10 . 
+[24] [25]
+Overfull \hbox (8.51714pt too wide) in paragraph at lines 1342--1346
+[]\T1/ptm/m/n/10 di-men-sions dif-fer, the at-las is au-to-mat-i-cally re-sam-p
+led to []\T1/zi4/m/n/10 stat_map []\T1/ptm/m/n/10 space (nearest-
+[26] [27] [28]
+Overfull \hbox (2.40909pt too wide) in paragraph at lines 1520--1522
+[]\T1/ptm/m/n/10 Character vec-tor of views to in-clude. Any com-bi-na-tion of 
+[]\T1/zi4/m/n/10 "lateral"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "medial"[]\T1/ptm
+/m/n/10 ,
+[29] [30]
+Overfull \hbox (5.127pt too wide) in paragraph at lines 1641--1644
+\T1/ptm/m/n/10 plots. Clus-ters are formed vol-u-met-ri-cally from []\T1/zi4/m/
+n/10 stat_map[]\T1/ptm/m/n/10 ; vi-su-al-iza-tion is parcel-level on []\T1/zi4/
+m/n/10 surfatlas[]\T1/ptm/m/n/10 . 
+[31]
+Overfull \hbox (8.51714pt too wide) in paragraph at lines 1689--1693
+[]\T1/ptm/m/n/10 di-men-sions dif-fer, the at-las is au-to-mat-i-cally re-sam-p
+led to []\T1/zi4/m/n/10 stat_map []\T1/ptm/m/n/10 space (nearest-
+[32]
+Overfull \hbox (12.56885pt too wide) in paragraph at lines 1762--1764
+[]\T1/ptm/m/n/10 How to com-bine mul-ti-ple spheres: []\T1/zi4/m/n/10 "separate
+" []\T1/ptm/m/n/10 (one re-gion per sphere) or []\T1/zi4/m/n/10 "union"[]\T1/pt
+m/m/n/10 . 
+[33] [34]
+Overfull \hbox (4.13872pt too wide) in paragraph at lines 1850--1852
+[]\T1/ptm/m/n/10 FreeSurfer Co-or-di-nateSys-tems doc-u-men-ta-tion: [][]$\T1/z
+i4/m/n/10 https : / / surfer . nmr . mgh . harvard . edu / fswiki /
+[35] [36] [37]
+Overfull \hbox (0.29767pt too wide) in paragraph at lines 2028--2031
+[][][]\T1/zi4/m/n/10 roi_metadata[][][] []\T1/ptm/m/n/10 for view-ing avail-abl
+e fil-ter columns, [][][]\T1/zi4/m/n/10 roi_attributes[][][] []\T1/ptm/m/n/10 f
+or list-ing avail-able at-tributes,
+[38] [39] [40] [41]
+Overfull \hbox (71.4573pt too wide) in paragraph at lines 2276--2279
+\T1/ptm/m/n/10 vard_oxford_cortical"`, `"har-vard_oxford_subcortical"`, `"har-v
+ard_oxford_cortical_subcortical"`,
+
+Overfull \hbox (40.47617pt too wide) in paragraph at lines 2280--2283
+[]\T1/ptm/m/n/10 FSL in-stal-la-tion di-rec-tory. De-faults to `Sys.getenv("FSL
+DIR")`. `get_julich_brain_atlas()`
+[42]
+Overfull \hbox (20.88887pt too wide) in paragraph at lines 2309--2313
+[]\T1/ptm/m/n/10 This func-tion has been dep-re-cated in favour of the na-tive 
+[][][]\T1/zi4/m/n/10 plot_brain[][][]() []\T1/ptm/m/n/10 ren-derer. Use []\T1/z
+i4/m/n/10 schaefer_surf()
+[43]
+Overfull \hbox (2.79953pt too wide) in paragraph at lines 2374--2377
+[]\T1/zi4/m/n/10 "mni2009c"[]\T1/ptm/m/n/10 : MNI152NLin2009cAsym-provenance vo
+l-ume file ([]\T1/zi4/m/n/10 MMP_in_MNI_corr.nii.gz[]\T1/ptm/m/n/10 ).
+
+Overfull \hbox (7.9378pt too wide) in paragraph at lines 2381--2385
+[]\T1/ptm/m/n/10 If []\T1/zi4/m/n/10 source = "mni2009c" []\T1/ptm/m/n/10 is un
+-avail-able at run-time, the loader au-to-mat-i-cally falls back to []\T1/zi4/m
+/n/10 "xcpengine"
+
+Overfull \hbox (20.53732pt too wide) in paragraph at lines 2389--2397
+[]\T1/ptm/m/n/10 Parcel IDs are representation-specific: vol-ume IDs 1--180 re-
+fer to the right hemi-sphere ([]\T1/zi4/m/n/10 "hcp_R_first"[]\T1/ptm/m/n/10 ),
+
+
+Overfull \hbox (8.18024pt too wide) in paragraph at lines 2389--2397
+\T1/ptm/m/n/10 bles, join on []\T1/zi4/m/n/10 roi_metadata(atlas)$label_full []
+\T1/ptm/m/n/10 ([]\T1/zi4/m/n/10 "L_V1_ROI"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 
+"R_V1_ROI"[]\T1/ptm/m/n/10 , etc.), or on []\T1/zi4/m/n/10 c("area",
+[44] [45]
+Overfull \hbox (0.66841pt too wide) in paragraph at lines 2493--2495
+[]\T1/ptm/m/n/10 Arguments passed by the con-ve-nience wrap-pers to `get_harvar
+d_oxford_atlas()`. 
+[46] [47] [48]
+Overfull \hbox (27.47577pt too wide) in paragraph at lines 2645--2648
+\T1/ptm/m/n/10 This re-quires a lo-cal FSL-style at-las di-rec-tory and uses th
+e XML/image files un-der `$FSLDIR/data/atlases`. 
+
+Overfull \hbox (40.47617pt too wide) in paragraph at lines 2658--2661
+[]\T1/ptm/m/n/10 FSL in-stal-la-tion di-rec-tory. De-faults to `Sys.getenv("FSL
+DIR")`. `get_julich_brain_atlas()`
+[49] [50]
+Overfull \hbox (6.25902pt too wide) in paragraph at lines 2764--2769
+[]\T1/zi4/m/n/10 get_roi() []\T1/ptm/m/n/10 method for sur-face at-lases (class
+ []\T1/zi4/m/n/10 surfatlas[]\T1/ptm/m/n/10 , e.g. from [][][]\T1/zi4/m/n/10 ge
+t_wang_atlas[][][][]\T1/ptm/m/n/10 , [][][]\T1/zi4/m/n/10 glasser_surf[][][][]\
+T1/ptm/m/n/10 ,
+
+Overfull \hbox (8.06992pt too wide) in paragraph at lines 2834--2834
+ []  \T1/zi4/m/n/10 parcels = c("100", "200", "300", "400", "500", "600", "700"
+, "800", "900", "1000"),[] 
+[51] [52]
+Underfull \vbox (badness 10000) has occurred while \output is active [53]
+Underfull \vbox (badness 10000) has occurred while \output is active [54]
+Underfull \vbox (badness 10000) has occurred while \output is active [55]
+Overfull \hbox (2.81758pt too wide) in paragraph at lines 3038--3040
+[]\T1/ptm/m/n/10 Logical. Whether to smooth par-cel bound-aries af-ter re-sam-p
+ling. De-fault: FALSE 
+
+Overfull \hbox (7.96828pt too wide) in paragraph at lines 3043--3047
+\T1/ptm/m/n/10 tion, and fi-nally the plat-form cache di-rec-tory. Ig-nored whe
+n `use_cache = FALSE`,
+[56]
+Overfull \hbox (13.24922pt too wide) in paragraph at lines 3088--3089
+[]\T1/zi4/m/n/10 get_schaefer_atlas []\T1/ptm/m/n/10 with the []\T1/zi4/m/n/10 
+parcels []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 networks []\T1/ptm/m/n/10 ar-gu-m
+ents pre-set. They all ac-cept []\T1/zi4/m/n/10 resolution
+[57] [58] [59] [60]
+Overfull \hbox (46.4596pt too wide) in paragraph at lines 3302--3305
+[]\T1/ptm/m/n/10 TemplateFlow space to down-load (e.g., []\T1/zi4/m/n/10 "MNI15
+2NLin6Asym" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "MNI152NLin2009cAsym"[]\T1/ptm
+/m/n/10 ).
+[61]
+Overfull \hbox (9.96935pt too wide) in paragraph at lines 3341--3344
+[]\T1/ptm/m/n/10 When []\T1/zi4/m/n/10 path_only=TRUE[]\T1/ptm/m/n/10 , a list 
+with class []\T1/zi4/m/n/10 c("subcortical_paths","list") []\T1/ptm/m/n/10 con-
+tain-ing []\T1/zi4/m/n/10 atlas_path[]\T1/ptm/m/n/10 ,
+[62] [63] [64]
+Overfull \hbox (1.22827pt too wide) in paragraph at lines 3523--3525
+[]\T1/ptm/m/n/10 Logical. If []\T1/zi4/m/n/10 TRUE[]\T1/ptm/m/n/10 , re-turns t
+he file path as a string in-stead of load-ing as a []\T1/zi4/m/n/10 NeuroVol[]\
+T1/ptm/m/n/10 .
+[65] [66] [67] [68]
+Overfull \hbox (63.93866pt too wide) in paragraph at lines 3748--3750
+[]\T1/ptm/m/n/10 Optional Julich-Brain res-o-lu-tion (e.g. []\T1/zi4/m/n/10 "1m
+m" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "2mm"[]\T1/ptm/m/n/10 ); passed to [][]
+[]\T1/zi4/m/n/10 get_julich_brain_atlas[][][]()[]\T1/ptm/m/n/10 . 
+[69]
+Overfull \hbox (56.40855pt too wide) in paragraph at lines 3856--3860
+[]\T1/ptm/m/n/10 A list with classes []\T1/zi4/m/n/10 c("wang", "surfatlas", "a
+tlas") []\T1/ptm/m/n/10 con-tain-ing []\T1/zi4/m/n/10 lh_atlas[]\T1/ptm/m/n/10 
+/[]\T1/zi4/m/n/10 rh_atlas []\T1/ptm/m/n/10 ([]\T1/zi4/m/n/10 LabeledNeuroSurfa
+ce
+[70]
+Overfull \hbox (71.07831pt too wide) in paragraph at lines 3898--3906
+\T1/ptm/m/n/10 for each of the 25 to-po-graphic ar-eas there is a con-tin-u-ous
+ prob-a-bil-ity map ([]\T1/zi4/m/n/10 perc_VTPM_vol_roi<n>_<hemi>.nii.gz[]\T1/p
+tm/m/n/10 )
+[71]
+Overfull \hbox (43.31808pt too wide) in paragraph at lines 3955--3963
+\T1/ptm/m/n/10 Prince-ton Pro-bAt-las_v4 dis-tri-bu-tion (Wang et al. 2015), wh
+ose orig-i-nal host ([]\T1/zi4/m/n/10 napl.scholar.princeton.edu[]\T1/ptm/m/n/1
+0 )
+
+Overfull \hbox (4.5586pt too wide) in paragraph at lines 3984--3990
+[]\T1/ptm/m/n/10 When []\T1/zi4/m/n/10 path_only = TRUE[]\T1/ptm/m/n/10 , an ob
+-ject of class []\T1/zi4/m/n/10 wang_prob_paths[]\T1/ptm/m/n/10 : a list with t
+he re-quested []\T1/zi4/m/n/10 image[]\T1/ptm/m/n/10 /[]\T1/zi4/m/n/10 hemi[]\T
+1/ptm/m/n/10 ,
+[72]
+Overfull \hbox (21.16943pt too wide) in paragraph at lines 4030--4033
+[]\T1/ptm/m/n/10 This func-tion has been dep-re-cated in favour of [][][]\T1/zi
+4/m/n/10 plot_brain[][][]()[]\T1/ptm/m/n/10 . Use []\T1/zi4/m/n/10 plot_brain(s
+chaefer_surf(...))
+[73] [74]
+Overfull \hbox (40.9284pt too wide) in paragraph at lines 4121--4123
+[]\T1/ptm/m/n/10 fsaverage []\T1/zi4/m/n/10 .annot []\T1/ptm/m/n/10 files from 
+the Mills Figshare dis-tri-bu-tion ([]\T1/zi4/m/n/10 lh.HCP-MMP1.annot[]\T1/ptm
+/m/n/10 , []\T1/zi4/m/n/10 rh.HCP-MMP1.annot[]\T1/ptm/m/n/10 ) 
+[75]
+Overfull \hbox (0.45692pt too wide) in paragraph at lines 4194--4196
+[]\T1/ptm/m/n/10 **DEPRECATED:** Tem-plate-Flow is now ac-cessed via the pure R
+ `tem-plate-flow` pack-age. Python
+[76] [77]
+Overfull \hbox (23.33865pt too wide) in paragraph at lines 4333--4336
+[]\T1/ptm/m/n/10 A []\T1/zi4/m/n/10 neurosurf::SurfaceGeometry []\T1/ptm/m/n/10
+ ob-ject when []\T1/zi4/m/n/10 hemi []\T1/ptm/m/n/10 is "L" or "R"; a named lis
+t of two []\T1/zi4/m/n/10 SurfaceGeometry
+[78] [79] [80] [81]
+Overfull \hbox (141.79854pt too wide) in paragraph at lines 4554--4556
+[]\T1/ptm/m/n/10 This ma-trix is de-rived from FreeSurfer's []\T1/zi4/m/n/10 mn
+i152.register.dat []\T1/ptm/m/n/10 file, lo-cated at []\T1/zi4/m/n/10 $FREESURF
+ER_HOME/average/mni152.register.dat[]\T1/ptm/m/n/10 . 
+[82]
+Overfull \hbox (141.79854pt too wide) in paragraph at lines 4598--4600
+[]\T1/ptm/m/n/10 This ma-trix is de-rived from FreeSurfer's []\T1/zi4/m/n/10 mn
+i152.register.dat []\T1/ptm/m/n/10 file, lo-cated at []\T1/zi4/m/n/10 $FREESURF
+ER_HOME/average/mni152.register.dat[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (66.20093pt too wide) in paragraph at lines 4614--4616
+[][][]$\T1/zi4/m/n/10 https : / / surfer . nmr . mgh . harvard . edu / fswiki /
+ CoordinateSystems$[][] [][][]MNI152_to_MNI305[][][][]\T1/ptm/m/n/10 , [][][]\T
+1/zi4/m/n/10 transform_coords[][][] 
+[83] [84] [85]
+Overfull \hbox (13.27757pt too wide) in paragraph at lines 4742--4744
+[]\T1/ptm/m/n/10 Character string iden-ti-fy-ing the vol-u-met-ric data's co-or
+-di-nate space (e.g., "MNI152",
+[86] [87] [88] [89] [90] [91] [92]
+Overfull \hbox (4.82843pt too wide) in paragraph at lines 5162--5165
+[]\T1/ptm/m/n/10 Optional pre-computed colour spec-i-fi-ca-tion: a tib-ble from
+ [][][]\T1/zi4/m/n/10 atlas_roi_colors[][][]()[]\T1/ptm/m/n/10 ,
+
+Overfull \hbox (52.9796pt too wide) in paragraph at lines 5179--5181
+[]\T1/ptm/m/n/10 Additional ar-gu-ments passed to []\T1/zi4/m/n/10 neuroim2::pl
+ot_montage() []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 neuroim2::plot_ortho()[]\T1/p
+tm/m/n/10 . 
+
+Overfull \hbox (16.48041pt too wide) in paragraph at lines 5194--5197
+[]\T1/zi4/m/n/10 "lateral"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "medial"[]\T1/ptm
+/m/n/10 , []\T1/zi4/m/n/10 "dorsal"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "ventral
+"[]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 c("lateral", "medial")[]\T1/ptm/
+m/n/10 . 
+[93] [94]
+Underfull \vbox (badness 10000) has occurred while \output is active [95]
+Overfull \hbox (5.89818pt too wide) in paragraph at lines 5369--5372
+[]\T1/ptm/m/n/10 Logical. If []\T1/zi4/m/n/10 TRUE []\T1/ptm/m/n/10 (de-fault),
+ re-turns a []\T1/zi4/m/n/10 ggiraph::girafe []\T1/ptm/m/n/10 wid-get with hove
+r tooltips.
+[96]
+Overfull \hbox (9.77805pt too wide) in paragraph at lines 5395--5403
+\T1/ptm/m/n/10 cleaner pub-li-ca-tion style and, un-less ex-plic-itly over-rid-
+den, switches []\T1/zi4/m/n/10 panel_layout
+
+Overfull \hbox (1.93875pt too wide) in paragraph at lines 5408--5411
+[]\T1/ptm/m/n/10 Boundary ren-der-ing method. []\T1/zi4/m/n/10 "path" []\T1/ptm
+/m/n/10 (de-fault) chains bound-ary edges into longer
+[97]
+Overfull \hbox (1.54048pt too wide) in paragraph at lines 5502--5507
+[]\T1/zi4/m/n/10 overlay_threshold []\T1/ptm/m/n/10 over which []\T1/zi4/m/n/10
+ overlay_alpha_mode = "threshold" []\T1/ptm/m/n/10 reaches
+[98]
+Overfull \hbox (17.17899pt too wide) in paragraph at lines 5528--5532
+[]\T1/ptm/m/n/10 Character: sam-pling strat-egy passed to []\T1/zi4/m/n/10 neur
+osurf::vol_to_surf() []\T1/ptm/m/n/10 when []\T1/zi4/m/n/10 overlay
+
+Overfull \hbox (15.7997pt too wide) in paragraph at lines 5533--5536
+[]\T1/ptm/m/n/10 Voxel in-ter-po-la-tion passed to []\T1/zi4/m/n/10 neurosurf::
+vol_to_surf()[]\T1/ptm/m/n/10 : []\T1/zi4/m/n/10 "legacy"[]\T1/ptm/m/n/10 , []\
+T1/zi4/m/n/10 "nearest"[]\T1/ptm/m/n/10 ,
+
+Overfull \hbox (15.18866pt too wide) in paragraph at lines 5537--5539
+[]\T1/ptm/m/n/10 Optional ex-plicit ag-gre-ga-tion across depth sam-ples: []\T1
+/zi4/m/n/10 "mean"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "mode"[]\T1/ptm/m/n/10 , 
+or []\T1/zi4/m/n/10 "closest"[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (6.09859pt too wide) in paragraph at lines 5554--5558
+[]\T1/ptm/m/n/10 Which mapped quan-tity sup-plies the static col-or-bar: []\T1/
+zi4/m/n/10 "auto"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "base"[]\T1/ptm/m/n/10 , [
+]\T1/zi4/m/n/10 "overlay"[]\T1/ptm/m/n/10 ,
+[99]
+Overfull \hbox (4.75928pt too wide) in paragraph at lines 5607--5609
+[]\T1/ptm/m/n/10 Fill colour for the cor-tex back-drop when []\T1/zi4/m/n/10 ba
+ckground = TRUE[]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 "grey80"[]\T1/ptm/
+m/n/10 . 
+
+Overfull \hbox (0.47833pt too wide) in paragraph at lines 5637--5641
+[]\T1/ptm/m/n/10 Optional non-negative mag-ni-tude for the CPU par-cel ren-dere
+r ([]\T1/zi4/m/n/10 static_backend
+[100]
+Overfull \hbox (10.13786pt too wide) in paragraph at lines 5650--5654
+[]\T1/ptm/m/n/10 A []\T1/zi4/m/n/10 ggplot2 []\T1/ptm/m/n/10 ob-ject (when []\T
+1/zi4/m/n/10 interactive = FALSE []\T1/ptm/m/n/10 and no stan-dalone col-or-bar
+ is re-quested), a []\T1/zi4/m/n/10 patchwork
+[101]
+Overfull \hbox (7.4074pt too wide) in paragraph at lines 5702--5705
+[]\T1/ptm/m/n/10 Arranges mul-ti-ple brain sur-face plots into a grid lay-out u
+s-ing \T1/ptm/b/n/10 patch-work\T1/ptm/m/n/10 . Each el-e-ment of []\T1/zi4/m/n
+/10 vals_list
+
+Overfull \hbox (23.87903pt too wide) in paragraph at lines 5743--5745
+[]\T1/ptm/m/n/10 Character vec-tor of views passed to [][][]\T1/zi4/m/n/10 plot
+_brain[][][][]\T1/ptm/m/n/10 . De-fault: []\T1/zi4/m/n/10 c("lateral", "medial"
+)[]\T1/ptm/m/n/10 . 
+[102] [103] [104] [105] [106] [107]
+Overfull \hbox (22.65852pt too wide) in paragraph at lines 6089--6091
+[]\T1/ptm/m/n/10 Sampling strat-egy be-tween the white and pial sur-faces: []\T
+1/zi4/m/n/10 "midpoint"[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 "normal_line"[]\T1/p
+tm/m/n/10 ,
+[108]
+Overfull \hbox (6.15665pt too wide) in paragraph at lines 6112--6116
+\T1/ptm/m/n/10 match the at-las), that hemi-sphere is re-turned as all []\T1/zi
+4/m/n/10 NA []\T1/ptm/m/n/10 and a warn-ing re-ports the rea-son; []\T1/zi4/m/n
+/10 plot_brain()
+[109] [110] [111] [112] [113] [114]
+Overfull \hbox (23.89674pt too wide) in paragraph at lines 6472--6475
+[]\T1/ptm/m/n/10 Averages (or oth-er-wise sum-marises) a 4D im-age within each 
+at-las par-cel, re-turn-ing a [][][]\T1/zi4/m/n/10 ClusteredNeuroVec[][][]
+[115] [116]
+Overfull \hbox (41.90819pt too wide) in paragraph at lines 6589--6591
+[]\T1/ptm/m/n/10 Numeric. Ra-dius for smooth-ing neigh-bor-hood in vox-els. If 
+NULL, uses max(spacing)+0.5.
+[117] [118]
+Overfull \hbox (4.7877pt too wide) in paragraph at lines 6707--6709
+[]\T1/ptm/m/n/10 Character vec-tor of nu-meric or cat-e-gor-i-cal columns that 
+will be em-bed-ded (passed
+[119]
+Overfull \hbox (2.63692pt too wide) in paragraph at lines 6789--6792
+[]\T1/ptm/m/n/10 Optional col-umn iden-ti-fy-ing ho-mol-o-gous L/R ROI pairs. W
+hen sup-plied, colours
+[120]
+Overfull \hbox (7.0767pt too wide) in paragraph at lines 6802--6804
+[]\T1/ptm/m/n/10 Soft-min tem-per-a-ture; smaller em-pha-sises hard min-i-mum d
+is-tance, larger smooths
+[121]
+Overfull \hbox (7.0767pt too wide) in paragraph at lines 6899--6901
+[]\T1/ptm/m/n/10 Soft-min tem-per-a-ture; smaller em-pha-sises hard min-i-mum d
+is-tance, larger smooths
+[122] [123] [124]
+Overfull \hbox (23.09758pt too wide) in paragraph at lines 7087--7091
+[]\T1/ptm/m/n/10 Load the Schae-fer2018 cor-ti-cal par-cel-la-tion as a sur-fac
+e at-las, re-turn-ing neu-ro-surf []\T1/zi4/m/n/10 LabeledNeuroSurface
+[125]
+Overfull \hbox (1.46924pt too wide) in paragraph at lines 7113--7117
+\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "fsaverage5"[]\T1/ptm/m/n/10 . Cur-rently on
+ly []\T1/zi4/m/n/10 "fsaverage6" []\T1/ptm/m/n/10 uses pack-aged ge-om-e-try; o
+ther
+[126]
+Overfull \hbox (57.20941pt too wide) in paragraph at lines 7176--7178
+[]\T1/zi4/m/n/10 template_id[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 tf_resolution[]
+\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 tf_density[]\T1/ptm/m/n/10 : Tem-plate-Flow i
+den-ti-fiers used by []\T1/zi4/m/n/10 get_surface_template()[]\T1/ptm/m/n/10 . 
+
+[127] [128]
+Overfull \hbox (58.97797pt too wide) in paragraph at lines 7298--7302
+\T1/ptm/m/n/10 or-di-nates. If []\T1/zi4/m/n/10 NULL []\T1/ptm/m/n/10 (de-fault
+), sphere co-or-di-nates are fetched via [][][]\T1/zi4/m/n/10 load_surface_temp
+late[][][](...,
+[129] [130]
+Overfull \hbox (10.3663pt too wide) in paragraph at lines 7446--7451
+\T1/ptm/m/n/10 re-source (HCP tha-la-mus, MDTB10 cere-bel-lum, CIT168 sub-cor-t
+ex, and HCP hip-pocam-pus/amygdala).
+[131] [132] [133] [134] [135] [136]
+Overfull \hbox (80.07643pt too wide) in paragraph at lines 7735--7737
+[]\T1/ptm/m/n/10 [get_surface_coordinate_space()] for the surface-only ver-sion
+, [needs_coord_transform()] and [needs_template_warp()]
+
+Overfull \hbox (94.0269pt too wide) in paragraph at lines 7764--7766
+[]\T1/ptm/m/n/10 Character string. The Tem-plate-Flow iden-ti-fier for the tem-
+plate space (e.g., "MNI152NLin2009cAsym"). 
+[137] [138] [139] [140] [141] [142] [143] (./Rd2.ind [144]
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 29.
+
+
+Overfull \hbox (35.8567pt too wide) in paragraph at lines 113--115
+[]\T1/zi4/m/it/10 get_harvard_oxford_cortical_subcortical_atlas 
+[145] [146] [147]) (./Rd2.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information)
+pdfTeX warning (dest): name{Rfn.ClusteredNeuroVol} has been referenced but does
+ not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.sub.Rul.clusters} has been referenced but does 
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.nn} has been referenced but does not exist, rep
+laced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.cor} has been referenced but does not exist, re
+placed by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.ClusteredNeuroVec} has been referenced but does
+ not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.coord.Rul.to.Rul.grid} has been referenced but 
+does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.NeuroVol} has been referenced but does not exis
+t, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.geom.Rul.segment} has been referenced but does 
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.geom.Rul.path} has been referenced but does not
+ exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.ROISurface} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.get.Rul.template.Rul.brainmask} has been refere
+nced but does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.tibble} has been referenced but does not exist,
+ replaced by a fixed one
+
+</usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr
+8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (147 pages, 399649 bytes).
+Transcript written on Rd2.log.
+Saving output to ‘data-raw/surface-transforms-v1/work/neuroatlas-baseline.pdf’ ...
+Done

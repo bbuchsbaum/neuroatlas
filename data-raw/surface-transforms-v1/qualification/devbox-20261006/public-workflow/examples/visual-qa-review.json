@@ -1,0 +1,33 @@
+{
+  "status": "AI visual sanity check completed",
+  "human_review": "not performed",
+  "anatomical_accuracy": "not established by these dependent population overlays",
+  "geometry_redistribution": "local QA only; upstream licenses apply",
+  "public_examples_receipt_sha256": "de23c86fb2c6f26dac88e858687634766c54211d714ff6fac976486337897536",
+  "plot_driver_sha256": "58029a69c11e56cdbf29379196587fc8bd86c03396fd8bdcee8206013af81b24",
+  "matplotlib_version": "3.11.2",
+  "source_images": [
+    {
+      "frame": "MNI152NLin6Asym",
+      "sha256": "d61f82b5b17ff0fffb19ddc1566da398cbc7dd335d97e7410f09e9caa0f7b0af"
+    },
+    {
+      "frame": "MNI152NLin2009cAsym",
+      "sha256": "7b168153a9508f5f116ac37d33835fa44dd168ba7a9ae31a3b33e6f63bd23292"
+    }
+  ],
+  "figures": {
+    "labels-fsaverage-midthickness.png": "edb6f574528861525d04f5469399a4fa3362bdffa6fb38e18e61ad931199c5c4",
+    "labels-fsLR-midthickness.png": "72168fb8ff255f3abbe0e6de274ceac60e10505d317824a582560180735d029f",
+    "labels-fsLR-inflated.png": "90d947250f9782c2b60aa5888a21f79e5f253d89fc83033323daf61097cb1ba4",
+    "sampling-MNI152NLin6Asym.png": "f18e9abe382cd261532234231d606beedfe129ea8e23fe5eda4d1fc6e572a6ae",
+    "sampling-MNI152NLin2009cAsym.png": "6e9d973a76601c1502148449d91ef517e4f0b3878cc27e488089d8d37109d8f1"
+  },
+  "reviewer": "Codex; AI review",
+  "review_date": "2026-10-06",
+  "observations": [
+    "Both hemispheres retain coherent cortical label boundaries and explicit medial-wall exclusion on midthickness and inflated views.",
+    "Population sampling points follow cortical folds on the exact MNI6 and MNI2009c 2 mm T1w images; no gross hemisphere swap or displacement is visible.",
+    "The label and template overlays are dependent population references; they do not establish held-out anatomical or subject-registration accuracy."
+  ]
+}

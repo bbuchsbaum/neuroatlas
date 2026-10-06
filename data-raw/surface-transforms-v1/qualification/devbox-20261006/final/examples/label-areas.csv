@@ -1,0 +1,197 @@
+"template","hemisphere","key","name","vertices","area_mm2"
+"fsaverage","L",0,"background",11598,5680.48367007077
+"fsaverage","L",1,"Frontal Pole",9123,8177.93860507011
+"fsaverage","L",2,"Insular Cortex",3864,1599.49771021307
+"fsaverage","L",3,"Superior Frontal Gyrus",4958,3376.289432019
+"fsaverage","L",4,"Middle Frontal Gyrus",4469,3464.23973309994
+"fsaverage","L",5,"Inferior Frontal Gyrus, pars triangularis",1257,1060.90567010641
+"fsaverage","L",6,"Inferior Frontal Gyrus, pars opercularis",1360,871.399941802025
+"fsaverage","L",7,"Precentral Gyrus",10626,5058.23382639885
+"fsaverage","L",8,"Temporal Pole",3174,2535.96780577302
+"fsaverage","L",9,"Superior Temporal Gyrus, anterior division",657,417.032484710217
+"fsaverage","L",10,"Superior Temporal Gyrus, posterior division",1989,1097.30244487524
+"fsaverage","L",11,"Middle Temporal Gyrus, anterior division",604,571.473191738129
+"fsaverage","L",12,"Middle Temporal Gyrus, posterior division",2233,1591.59830838442
+"fsaverage","L",13,"Middle Temporal Gyrus, temporooccipital part",1892,1288.62245953083
+"fsaverage","L",14,"Inferior Temporal Gyrus, anterior division",340,338.770284354687
+"fsaverage","L",15,"Inferior Temporal Gyrus, posterior division",1557,1282.73432344198
+"fsaverage","L",16,"Inferior Temporal Gyrus, temporooccipital part",1068,898.219516992569
+"fsaverage","L",17,"Postcentral Gyrus",10394,4772.38876459002
+"fsaverage","L",18,"Superior Parietal Lobule",3875,1976.14932987094
+"fsaverage","L",19,"Supramarginal Gyrus, anterior division",2729,1345.33072993159
+"fsaverage","L",20,"Supramarginal Gyrus, posterior division",3051,1559.45350116491
+"fsaverage","L",21,"Angular Gyrus",2592,1442.05133545399
+"fsaverage","L",22,"Lateral Occipital Cortex, superior division",9604,6080.5775873363
+"fsaverage","L",23,"Lateral Occipital Cortex, inferior division",3575,2571.94064417481
+"fsaverage","L",24,"Intracalcarine Cortex",2010,1458.6647669971
+"fsaverage","L",25,"Frontal Medial Cortex",897,672.817148596048
+"fsaverage","L",26,"Juxtapositional Lobule Cortex (formerly Supplementary Motor Cortex)",1929,965.349487394094
+"fsaverage","L",27,"Subcallosal Cortex",1419,786.244184970856
+"fsaverage","L",28,"Paracingulate Gyrus",2920,1996.36803871393
+"fsaverage","L",29,"Cingulate Gyrus, anterior division",3463,1678.13469642401
+"fsaverage","L",30,"Cingulate Gyrus, posterior division",4151,1670.84600104392
+"fsaverage","L",31,"Precuneous Cortex",6567,3714.22288122773
+"fsaverage","L",32,"Cuneal Cortex",1227,1086.91170522571
+"fsaverage","L",33,"Frontal Orbital Cortex",3727,2256.23663149774
+"fsaverage","L",34,"Parahippocampal Gyrus, anterior division",1225,735.325077563524
+"fsaverage","L",35,"Parahippocampal Gyrus, posterior division",1198,553.779743134975
+"fsaverage","L",36,"Lingual Gyrus",3447,2497.40549337864
+"fsaverage","L",37,"Temporal Fusiform Cortex, anterior division",524,462.076406300068
+"fsaverage","L",38,"Temporal Fusiform Cortex, posterior division",1811,1212.69460070133
+"fsaverage","L",39,"Temporal Occipital Fusiform Cortex",1188,896.794433444738
+"fsaverage","L",40,"Occipital Fusiform Gyrus",1833,1635.82303112745
+"fsaverage","L",41,"Frontal Operculum Cortex",1054,449.251097872853
+"fsaverage","L",42,"Central Opercular Cortex",2999,1250.49662034214
+"fsaverage","L",43,"Parietal Operculum Cortex",1648,711.342615410686
+"fsaverage","L",44,"Planum Polare",1242,547.841043889523
+"fsaverage","L",45,"Heschl's Gyrus (includes H1 and H2)",1080,529.637416988611
+"fsaverage","L",46,"Planum Temporale",1820,812.919430941343
+"fsaverage","L",47,"Supracalcarine Cortex",423,366.2244579494
+"fsaverage","L",48,"Occipital Pole",3564,2995.01164144278
+"fsLR","L",0,"background",2157,5480.97625106573
+"fsLR","L",1,"Frontal Pole",1912,7910.07817578316
+"fsLR","L",2,"Insular Cortex",766,1551.00109273195
+"fsLR","L",3,"Superior Frontal Gyrus",1034,3321.75486063957
+"fsLR","L",4,"Middle Frontal Gyrus",936,3371.27587389946
+"fsLR","L",5,"Inferior Frontal Gyrus, pars triangularis",297,1046.30836367607
+"fsLR","L",6,"Inferior Frontal Gyrus, pars opercularis",268,843.768584012985
+"fsLR","L",7,"Precentral Gyrus",1956,4972.36534118652
+"fsLR","L",8,"Temporal Pole",621,2468.56633377075
+"fsLR","L",9,"Superior Temporal Gyrus, anterior division",130,412.679473161697
+"fsLR","L",10,"Superior Temporal Gyrus, posterior division",385,1068.73108816147
+"fsLR","L",11,"Middle Temporal Gyrus, anterior division",133,564.030792236328
+"fsLR","L",12,"Middle Temporal Gyrus, posterior division",423,1543.19322633743
+"fsLR","L",13,"Middle Temporal Gyrus, temporooccipital part",390,1255.8436524868
+"fsLR","L",14,"Inferior Temporal Gyrus, anterior division",70,324.288347482681
+"fsLR","L",15,"Inferior Temporal Gyrus, posterior division",299,1267.38536334038
+"fsLR","L",16,"Inferior Temporal Gyrus, temporooccipital part",220,884.147537469864
+"fsLR","L",17,"Postcentral Gyrus",2032,4702.14426338673
+"fsLR","L",18,"Superior Parietal Lobule",807,1952.58467972279
+"fsLR","L",19,"Supramarginal Gyrus, anterior division",522,1313.95075249672
+"fsLR","L",20,"Supramarginal Gyrus, posterior division",611,1523.8833514452
+"fsLR","L",21,"Angular Gyrus",547,1412.06066250801
+"fsLR","L",22,"Lateral Occipital Cortex, superior division",1955,5950.94279718399
+"fsLR","L",23,"Lateral Occipital Cortex, inferior division",711,2530.66743135452
+"fsLR","L",24,"Intracalcarine Cortex",386,1399.14785313606
+"fsLR","L",25,"Frontal Medial Cortex",169,647.557679653168
+"fsLR","L",26,"Juxtapositional Lobule Cortex (formerly Supplementary Motor Cortex)",383,961.217574834824
+"fsLR","L",27,"Subcallosal Cortex",215,652.917997837067
+"fsLR","L",28,"Paracingulate Gyrus",631,1950.39287054539
+"fsLR","L",29,"Cingulate Gyrus, anterior division",559,1371.63802134991
+"fsLR","L",30,"Cingulate Gyrus, posterior division",740,1516.04130381346
+"fsLR","L",31,"Precuneous Cortex",1314,3625.90928065777
+"fsLR","L",32,"Cuneal Cortex",268,1059.80224609375
+"fsLR","L",33,"Frontal Orbital Cortex",683,2223.95302975178
+"fsLR","L",34,"Parahippocampal Gyrus, anterior division",202,698.321391105652
+"fsLR","L",35,"Parahippocampal Gyrus, posterior division",237,541.789044499397
+"fsLR","L",36,"Lingual Gyrus",701,2427.88740086555
+"fsLR","L",37,"Temporal Fusiform Cortex, anterior division",97,437.461006164551
+"fsLR","L",38,"Temporal Fusiform Cortex, posterior division",338,1181.06109941006
+"fsLR","L",39,"Temporal Occipital Fusiform Cortex",216,854.816246986389
+"fsLR","L",40,"Occipital Fusiform Gyrus",381,1603.78505516052
+"fsLR","L",41,"Frontal Operculum Cortex",184,438.187862038612
+"fsLR","L",42,"Central Opercular Cortex",587,1234.05295598507
+"fsLR","L",43,"Parietal Operculum Cortex",346,699.636924028397
+"fsLR","L",44,"Planum Polare",226,540.102492570877
+"fsLR","L",45,"Heschl's Gyrus (includes H1 and H2)",205,513.124139904976
+"fsLR","L",46,"Planum Temporale",352,801.736216068268
+"fsLR","L",47,"Supracalcarine Cortex",89,362.923501968384
+"fsLR","L",48,"Occipital Pole",654,2873.40615415573
+"fsaverage","R",0,"background",10654,5309.48973160982
+"fsaverage","R",1,"Frontal Pole",10960,9693.76917508245
+"fsaverage","R",2,"Insular Cortex",4055,1641.85372616351
+"fsaverage","R",3,"Superior Frontal Gyrus",4800,3084.43600255251
+"fsaverage","R",4,"Middle Frontal Gyrus",4820,3432.43112206459
+"fsaverage","R",5,"Inferior Frontal Gyrus, pars triangularis",1157,863.233278006315
+"fsaverage","R",6,"Inferior Frontal Gyrus, pars opercularis",1190,851.438304632902
+"fsaverage","R",7,"Precentral Gyrus",10620,5139.66991060972
+"fsaverage","R",8,"Temporal Pole",3272,2401.03492692113
+"fsaverage","R",9,"Superior Temporal Gyrus, anterior division",556,382.349617302418
+"fsaverage","R",10,"Superior Temporal Gyrus, posterior division",2604,1392.40535199642
+"fsaverage","R",11,"Middle Temporal Gyrus, anterior division",466,462.142359972
+"fsaverage","R",12,"Middle Temporal Gyrus, posterior division",2260,1631.0989164114
+"fsaverage","R",13,"Middle Temporal Gyrus, temporooccipital part",2870,1895.69060066342
+"fsaverage","R",14,"Inferior Temporal Gyrus, anterior division",353,347.814229905605
+"fsaverage","R",15,"Inferior Temporal Gyrus, posterior division",1449,1153.64595636725
+"fsaverage","R",16,"Inferior Temporal Gyrus, temporooccipital part",1120,963.373828053474
+"fsaverage","R",17,"Postcentral Gyrus",10285,4684.55204406381
+"fsaverage","R",18,"Superior Parietal Lobule",3833,1916.71810027957
+"fsaverage","R",19,"Supramarginal Gyrus, anterior division",2378,1187.83512079716
+"fsaverage","R",20,"Supramarginal Gyrus, posterior division",3446,1805.6783733964
+"fsaverage","R",21,"Angular Gyrus",3808,2131.96163207293
+"fsaverage","R",22,"Lateral Occipital Cortex, superior division",8928,6012.02660602331
+"fsaverage","R",23,"Lateral Occipital Cortex, inferior division",2965,2401.10316479206
+"fsaverage","R",24,"Intracalcarine Cortex",1775,1492.62910440564
+"fsaverage","R",25,"Frontal Medial Cortex",1085,824.472572535276
+"fsaverage","R",26,"Juxtapositional Lobule Cortex (formerly Supplementary Motor Cortex)",1636,902.819319665432
+"fsaverage","R",27,"Subcallosal Cortex",1316,708.72501718998
+"fsaverage","R",28,"Paracingulate Gyrus",2865,1843.80138903856
+"fsaverage","R",29,"Cingulate Gyrus, anterior division",3798,1882.75882363319
+"fsaverage","R",30,"Cingulate Gyrus, posterior division",3979,1641.4506727159
+"fsaverage","R",31,"Precuneous Cortex",6999,3784.22086042166
+"fsaverage","R",32,"Cuneal Cortex",1185,1076.78621548414
+"fsaverage","R",33,"Frontal Orbital Cortex",3066,1758.20846791565
+"fsaverage","R",34,"Parahippocampal Gyrus, anterior division",1218,723.347725301981
+"fsaverage","R",35,"Parahippocampal Gyrus, posterior division",836,413.814241081476
+"fsaverage","R",36,"Lingual Gyrus",3345,2609.08071951568
+"fsaverage","R",37,"Temporal Fusiform Cortex, anterior division",531,446.370258927345
+"fsaverage","R",38,"Temporal Fusiform Cortex, posterior division",1407,942.654818326235
+"fsaverage","R",39,"Temporal Occipital Fusiform Cortex",1505,1086.69548895955
+"fsaverage","R",40,"Occipital Fusiform Gyrus",1890,1651.29729348421
+"fsaverage","R",41,"Frontal Operculum Cortex",744,334.800021529198
+"fsaverage","R",42,"Central Opercular Cortex",2892,1253.47580358386
+"fsaverage","R",43,"Parietal Operculum Cortex",1956,761.130242094398
+"fsaverage","R",44,"Planum Polare",1223,549.630121439695
+"fsaverage","R",45,"Heschl's Gyrus (includes H1 and H2)",1017,485.265202432871
+"fsaverage","R",46,"Planum Temporale",1218,639.455086991191
+"fsaverage","R",47,"Supracalcarine Cortex",376,354.770567715168
+"fsaverage","R",48,"Occipital Pole",3215,2581.94615763426
+"fsLR","R",0,"background",1976,5146.29269903898
+"fsLR","R",1,"Frontal Pole",2190,9370.50807023048
+"fsLR","R",2,"Insular Cortex",804,1573.16364973783
+"fsLR","R",3,"Superior Frontal Gyrus",920,3016.52837371826
+"fsLR","R",4,"Middle Frontal Gyrus",967,3360.8332452774
+"fsLR","R",5,"Inferior Frontal Gyrus, pars triangularis",231,832.794074773788
+"fsLR","R",6,"Inferior Frontal Gyrus, pars opercularis",264,826.756487607956
+"fsLR","R",7,"Precentral Gyrus",2062,5048.69581639767
+"fsLR","R",8,"Temporal Pole",637,2353.38446891308
+"fsLR","R",9,"Superior Temporal Gyrus, anterior division",113,373.377830266953
+"fsLR","R",10,"Superior Temporal Gyrus, posterior division",478,1356.03045415878
+"fsLR","R",11,"Middle Temporal Gyrus, anterior division",101,443.754964351654
+"fsLR","R",12,"Middle Temporal Gyrus, posterior division",436,1593.86635327339
+"fsLR","R",13,"Middle Temporal Gyrus, temporooccipital part",549,1854.46616435051
+"fsLR","R",14,"Inferior Temporal Gyrus, anterior division",71,317.305818319321
+"fsLR","R",15,"Inferior Temporal Gyrus, posterior division",285,1130.46115446091
+"fsLR","R",16,"Inferior Temporal Gyrus, temporooccipital part",234,954.790301799774
+"fsLR","R",17,"Postcentral Gyrus",2093,4640.03449356556
+"fsLR","R",18,"Superior Parietal Lobule",788,1879.7598811388
+"fsLR","R",19,"Supramarginal Gyrus, anterior division",511,1166.9035820961
+"fsLR","R",20,"Supramarginal Gyrus, posterior division",745,1796.80895757675
+"fsLR","R",21,"Angular Gyrus",735,2067.67214393616
+"fsLR","R",22,"Lateral Occipital Cortex, superior division",1774,5870.97983312607
+"fsLR","R",23,"Lateral Occipital Cortex, inferior division",560,2331.44586443901
+"fsLR","R",24,"Intracalcarine Cortex",372,1455.52665901184
+"fsLR","R",25,"Frontal Medial Cortex",206,811.923280477524
+"fsLR","R",26,"Juxtapositional Lobule Cortex (formerly Supplementary Motor Cortex)",349,871.268982052803
+"fsLR","R",27,"Subcallosal Cortex",212,630.504550814629
+"fsLR","R",28,"Paracingulate Gyrus",565,1816.40367507935
+"fsLR","R",29,"Cingulate Gyrus, anterior division",612,1606.15049934387
+"fsLR","R",30,"Cingulate Gyrus, posterior division",731,1470.96415740252
+"fsLR","R",31,"Precuneous Cortex",1336,3679.04342126846
+"fsLR","R",32,"Cuneal Cortex",237,1036.62673544884
+"fsLR","R",33,"Frontal Orbital Cortex",555,1733.9140329361
+"fsLR","R",34,"Parahippocampal Gyrus, anterior division",238,699.786336541176
+"fsLR","R",35,"Parahippocampal Gyrus, posterior division",196,414.005100727081
+"fsLR","R",36,"Lingual Gyrus",726,2510.6977648735
+"fsLR","R",37,"Temporal Fusiform Cortex, anterior division",120,457.634544849396
+"fsLR","R",38,"Temporal Fusiform Cortex, posterior division",285,912.458078384399
+"fsLR","R",39,"Temporal Occipital Fusiform Cortex",286,1062.96634614468
+"fsLR","R",40,"Occipital Fusiform Gyrus",369,1599.29650998116
+"fsLR","R",41,"Frontal Operculum Cortex",136,328.769361972809
+"fsLR","R",42,"Central Opercular Cortex",561,1225.58553874493
+"fsLR","R",43,"Parietal Operculum Cortex",406,748.679111361504
+"fsLR","R",44,"Planum Polare",231,543.262341976166
+"fsLR","R",45,"Heschl's Gyrus (includes H1 and H2)",195,478.237680673599
+"fsLR","R",46,"Planum Temporale",273,626.909987449646
+"fsLR","R",47,"Supracalcarine Cortex",79,338.410930395126
+"fsLR","R",48,"Occipital Pole",526,2495.27223587036

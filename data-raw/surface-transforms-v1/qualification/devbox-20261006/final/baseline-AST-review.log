@@ -1,0 +1,426 @@
+
+FILE R/aseg_subcort.R 
+old[[1]][11:17] vs new[[1]][11:17]
+  `        "Brainstem", "Hippocampus", "Amygdala", "Accumbens", `
+  `        "VentralDC", "Thalamus", "Caudate", "Putamen", "Pallidum", `
+  `        "Hippocampus", "Amygdala", "Accumbens", "VentralDC")`
+- `    hemi = c(rep("left", 4), NA, rep("left", 3), NA, rep("right", `
++ `    hemi <- c(rep("left", 4), NA, rep("left", 3), NA, rep("right", `
+  `        8))`
+  `    cmap <- tibble::tribble(~red, ~green, ~blue, 0, 118, 14, `
+  `        122, 186, 220, 236, 13, 176, 12, 48, 255, 119, 159, 176, `
+
+FILE R/atlas_methods.R 
+old[[2]][55:61] vs new[[2]][55:60]
+  `        p`
+  `    }`
+  `    if (view == "montage") {`
+- `        zdim <- dim(vol)[3]`
+  `        arr <- if (methods::is(vol, "ClusteredNeuroVol")) {`
+  `            a <- array(0L, dim = dim(vol))`
+  `            a[which(vol@mask)] <- vol@clusters`
+
+FILE R/coordinate_spaces.R 
+old[[6]][26:32] vs new[[6]][26:31]
+  `    }`
+  `    else if (ncol(coords) != 3) `
+  `        stop("With coords_as_cols=FALSE, coords must have 3 columns")`
+- `    n_points <- nrow(coords)`
+  `    coords_h <- cbind(coords, 1)`
+  `    result_h <- coords_h %*% t(transform)`
+  `    result <- result_h[, 1:3, drop = FALSE]`
+
+FILE R/glasser.R 
+old[[1]][42:48] vs new[[1]][42:48]
+  `        1))`
+  `    region <- sapply(strsplit(labels[, 1], "_"), "[[", 2)`
+  `    orig_labels <- labels[, 1]`
+- `    cids <- 1:nrow(labels)`
++ `    cids <- seq_len(nrow(labels))`
+  `    label_map <- as.list(cids)`
+  `    names(label_map) <- region`
+  `    vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters = vol[vol != `
+
+FILE R/olsen_mtl.R 
+old[[3]][1:5] vs new[[3]][1:4]
+  `get_hipp_atlas <- function(outspace = NULL, apsections = 1) {`
+- `    olsen_mtl <- NULL`
+  `    x <- get_olsen_mtl(outspace = outspace)`
+  `    processing <- attr(x$atlas, "neuroatlas_processing")`
+  `    template_space <- .template_space_from_outspace(outspace, `
+
+FILE R/query_point.R 
+old[[1]][13:19] vs new[[1]][13:18]
+  `    coords <- as.matrix(coords)`
+  `    if (ncol(coords) != 3L) `
+  `        stop("'coords' must have exactly 3 columns (x, y, z)")`
+- `    n_points <- nrow(coords)`
+  `    if (inherits(atlas, "atlas")) `
+  `        atlas_list <- stats::setNames(list(atlas), atlas$name %||% `
+  `            "atlas")`
+
+old[[4]][1:6] vs new[[4]][1:5]
+  `.query_one_atlas <- function(coords, atlas_obj, atlas_name, radius, `
+  `    from_space, nearest = FALSE) {`
+- `    n_points <- nrow(coords)`
+  `    vol <- .get_atlas_volume(atlas_obj)`
+  `    query_coords <- coords`
+  `    if (.query_needs_transform(atlas_obj, atlas_name, from_space)) `
+
+FILE R/schaefer.R 
+old[[5]][33:39] vs new[[5]][33:39]
+  `            radius <- max(ds) + 0.5`
+  `        sl <- neuroim2::searchlight_coords(mask, radius = radius, `
+  `            nonzero = TRUE)`
+- `        for (i in 1:length(sl)) {`
++ `        for (i in seq_along(sl)) {`
+  `            cds <- sl[[i]]`
+  `            if (nrow(cds) >= min_neighbors) {`
+  `                labels <- vol[cds]`
+
+old[[9]][74:80] vs new[[9]][74:79]
+  `    vol <- neuroim2::ClusteredNeuroVol(as.logical(vol), clusters = vol[vol != `
+  `        0], label_map = label_map)`
+  `    cmap_df <- labels[, 3:5]`
+- `    n <- nrow(labels)`
+  `    ref <- new_atlas_ref(family = "schaefer", model = "Schaefer2018", `
+  `        representation = "volume", template_space = template_space, `
+  `        coord_space = "MNI152", resolution = paste0(resolution, `
+
+FILE R/surface_transform.R 
+old[[3]][9:18] vs new[[3]][9:23]
+  `        stop("Surface transforms require matching hemispheres.")`
+  `    if (!identical(from$domain$registration, to$domain$registration)) `
+  `        stop("Surface transforms require the same declared correspondence frame.")`
+  `    engine <- .require_surface_engine()`
++ `    route <- .qualified_surface_route(from$domain, to$domain)`
++ `    qualified <- nrow(route) == 1L && .surface_engine_revision_verified(route$engine_revision[[1L]])`
+  `    specification <- list(schema = "neuroatlas.surface-transform.v1", `
+  `        from = from$domain, to = to$domain, method = "native_closest_barycentric", `
+  `        radius = 100, mask_policy = "source_then_row_normalize_then_target", `
+- `        engine = engine, qualification = "unqualified", reversible = FALSE)`
++ `        engine = engine, qualification = if (qualified) "passed" else "unqualified", `
++ `        qualification_scope = if (qualified) route$qualification_scope[[1L]] else NULL, `
+and 5 more ...
+
+old[[6]] vs new[[6]]
+- `.surface_data_id <- function(x) .surface_hash(list(x$domain$id, `
+- `    x$values, x$data_type, x$label_table, x$file))`
++ `.qualified_surface_route <- function(from, to) {`
++ `    reg <- .space_transform_registry()`
++ `    keep <- reg$status == "available" & reg$backend == "neurotransform_native" & `
++ `        !is.na(reg$qualification) & reg$qualification == "passed" & `
++ `        !is.na(reg$from_domain_id) & reg$from_domain_id == from$id & `
++ `        !is.na(reg$to_domain_id) & reg$to_domain_id == to$id`
++ `    reg[keep, , drop = FALSE]`
++ `}`
+
+old[[7]] vs new[[7]]
+- `.surface_file_identity <- function(path) list(path = normalizePath(path, `
+- `    mustWork = TRUE), sha256 = digest::digest(file = path, algo = "sha256"))`
++ `.surface_engine_revision_verified <- function(revision) {`
++ `    if (!identical(as.character(utils::packageVersion("neurotransform")), `
++ `        "0.2.0")) `
++ `        return(FALSE)`
++ `    if (identical(.neurotransform_source_sha(), revision)) `
++ `        return(TRUE)`
++ `    path <- Sys.getenv("NEUROATLAS_ENGINE_BINDING")`
++ `    if (!nzchar(path) || !file.exists(path) || !requireNamespace("jsonlite", `
++ `        quietly = TRUE)) `
++ `        return(FALSE)`
+and 14 more ...
+
+old[[8]] vs new[[8]]
+- `.surface_read_gifti <- function(path, domain) {`
+- `    assertthat::assert_that(is.character(path), length(path) == `
+- `        1L, !is.na(path), file.exists(path))`
+- `    if (!requireNamespace("gifti", quietly = TRUE)) `
+- `        stop("GIFTI input requires the optional 'gifti' package.")`
+- `    g <- gifti::readgii(path)`
+- `    structure <- g$file_meta["AnatomicalStructurePrimary"]`
+- `    expected <- if (domain$hemisphere == "L") `
+- `        "CortexLeft"`
+- `    else "CortexRight"`
++ `.surface_data_id <- function(x) .surface_hash(list(x$domain$id, `
++ `    x$values, x$data_type, x$label_table, x$file))`
+and 5 more ...
+
+old[[9]] vs new[[9]]
+- `.validate_surface_geometry <- function(x) {`
+- `    if (!inherits(x, "SurfaceGeometry")) `
+- `        stop("Expected a SurfaceGeometry object.")`
+- `    checked <- surface_geometry(x$domain, x$sphere, x$triangles, `
+- `        x$cortex)`
+- `    checked$files <- x$files`
+- `    checked`
+- `}`
++ `.surface_file_identity <- function(path) list(path = normalizePath(path, `
++ `    mustWork = TRUE), sha256 = digest::digest(file = path, algo = "sha256"))`
+
+old[[10]] vs new[[10]]
+- `.surface_transform_digest <- function(x) .surface_hash(list(x$specification, `
+- `    x$key, x$plan))`
++ `.surface_read_gifti <- function(path, domain) {`
++ `    assertthat::assert_that(is.character(path), length(path) == `
++ `        1L, !is.na(path), file.exists(path))`
++ `    if (!requireNamespace("gifti", quietly = TRUE)) `
++ `        stop("GIFTI input requires the optional 'gifti' package.")`
++ `    g <- gifti::readgii(path)`
++ `    structure <- g$file_meta["AnatomicalStructurePrimary"]`
++ `    expected <- if (domain$hemisphere == "L") `
++ `        "CortexLeft"`
++ `    else "CortexRight"`
+and 5 more ...
+
+old[[11]] vs new[[11]]
+- `.validate_surface_transform <- function(x) {`
+- `    if (!inherits(x, "SurfaceTransform") || !identical(x$integrity, `
+- `        .surface_transform_digest(x)) || !identical(x$key, .surface_hash(x$specification))) `
+- `        stop("Surface operator failed its integrity check.")`
+- `    s <- x$specification`
+- `    .validate_surface_domain(s$from)`
+- `    .validate_surface_domain(s$to)`
+- `    p <- x$plan`
+- `    if (!inherits(p, "SurfaceResamplingPlan") || !identical(p$n_moving, `
+- `        s$from$n_vertices) || !identical(p$n_reference, s$to$n_vertices) || `
++ `.validate_surface_geometry <- function(x) {`
++ `    if (!inherits(x, "SurfaceGeometry")) `
++ `        stop("Expected a SurfaceGeometry object.")`
++ `    checked <- surface_geometry(x$domain, x$sphere, x$triangles, `
++ `        x$cortex)`
++ `    checked$files <- x$files`
++ `    checked`
+and 15 more ...
+
+old[[12]] vs new[[12]]
+- `.surface_engine_checked <- new.env(parent = emptyenv())`
++ `.surface_transform_digest <- function(x) .surface_hash(list(x$specification, `
++ `    x$key, x$plan))`
+
+old[[13]] vs new[[13]]
+- `.require_surface_engine <- function() {`
++ `.validate_surface_transform <- function(x) {`
+- `    if (!requireNamespace("neurotransform", quietly = TRUE) || `
++ `    if (!inherits(x, "SurfaceTransform") || !identical(x$integrity, `
+- `        utils::packageVersion("neurotransform") < "0.2.0") `
++ `        .surface_transform_digest(x)) || !identical(x$key, .surface_hash(x$specification))) `
+- `        stop("Surface application requires neurotransform >= 0.2.0; install the pinned revision.")`
++ `        stop("Surface operator failed its integrity check.")`
+- `    required <- c("surface_mesh", "validate_surface_mesh", "surface_resampling_plan", `
++ `    s <- x$specification`
+- `        "apply_surface_resampling", "apply_surface_adjoint")`
++ `    .validate_surface_domain(s$from)`
+- `    if (!all(required %in% getNamespaceExports("neurotransform"))) `
++ `    .validate_surface_domain(s$to)`
+- `        stop("Installed neurotransform lacks the required surface contract.")`
++ `    p <- x$plan`
+- `    dll <- getLoadedDLLs()[["neurotransform"]][["path"]]`
++ `    if (!inherits(p, "SurfaceResamplingPlan") || !identical(p$n_moving, `
+- `    fingerprint <- digest::digest(file = dll, algo = "sha256")`
++ `        s$from$n_vertices) || !identical(p$n_reference, s$to$n_vertices) || `
+and 26 more ...
+
+old[[14]] vs new[[14]]
+- `.surface_cached_operator <- function(key, specification, cache_dir, `
+- `    offline, build) {`
+- `    root <- .transform_cache_root(cache_dir)`
+- `    folder <- file.path(root, "surface-operators-v1")`
+- `    if (.transform_cache_is_symlink(folder)) `
+- `        stop("Unsafe surface cache symbolic link.")`
+- `    path <- file.path(folder, paste0(key, ".rds"))`
+- `    if (offline && !file.exists(path)) `
+- `        stop("Surface operator is unavailable in the offline cache.")`
+- `    dir.create(folder, recursive = TRUE, showWarnings = FALSE)`
++ `.surface_engine_checked <- new.env(parent = emptyenv())`
+and 36 more ...
+
+And 2 more differences ...
+
+FILE R/template_transform.R 
+old[[1]][7:12] vs new[[1]][7:42]
+  `    for (flag in list(download, verify, offline)) assertthat::assert_that(is.logical(flag), `
+  `        length(flag) == 1L, !is.na(flag))`
+  `    if (!verify) `
+  `        stop("Transform integrity verification cannot be disabled.")`
++ `    if (is.character(from) && inherits(to, "SurfaceGeometry")) {`
++ `        if (provider != "auto" && provider != "neuroatlas") `
++ `            stop("No cortical projection registered for this provider.")`
++ `        return(get_surface_projection(from, to, cache_dir, download, `
++ `            offline))`
++ `    }`
++ `    if (inherits(from, "SurfaceGeometry") || inherits(to, "SurfaceGeometry")) {`
+and 26 more ...
+
+old[[6]][1:6] vs new[[6]][1:37]
+- `apply_template_transform <- function(x, transform, target, data_type = c("auto", `
+- `    "continuous", "label", "probability"), interpolation = NULL) {`
++ `apply_template_transform <- function(x, transform, target = NULL, `
++ `    data_type = c("auto", "continuous", "label", "probability"), `
++ `    interpolation = NULL) {`
+  `    data_type <- match.arg(data_type)`
++ `    if (inherits(transform, "SurfaceProjection")) {`
++ `        if (!is.null(target)) {`
++ `            domain <- if (inherits(target, "SurfaceGeometry")) `
++ `                target$domain`
++ `            else target`
++ `            .validate_surface_domain(domain)`
+and 27 more ...
+
+old[[10]][3:8] vs new[[10]][3:25]
+  `    provider = "auto", ...) {`
+  `    if (!inherits(x, "atlas") || inherits(x, "surfatlas")) `
+  `        stop("'x' must be a volumetric atlas.")`
+  `    from <- atlas_metadata(x)$spatial$template_space`
++ `    geometry <- if (inherits(to_space, "SurfaceGeometry")) `
++ `        to_space`
++ `    else if (inherits(target, "SurfaceGeometry")) `
++ `        target`
++ `    else NULL`
++ `    if (!is.null(geometry)) {`
++ `        if (is.character(to_space) && .normalize_space_id(to_space) != `
+and 13 more ...
+
+FILE R/transform_cache.R 
+old[[3]][19:25] vs new[[3]][19:25]
+  `            stop("Cannot clear transform cache while an artifact lock is active.", `
+  `                call. = FALSE)`
+  `        artifacts <- entries[vapply(entries, function(path) !dir.exists(path) && `
+- `            !.transform_cache_is_symlink(path) && (grepl("^[A-Za-z0-9][A-Za-z0-9._-]*\\\\.h5$", `
++ `            !.transform_cache_is_symlink(path) && (grepl("^[A-Za-z0-9][A-Za-z0-9._-]*\\\\.(h5|gii|tar\\\\.gz|mat)$", `
+  `            basename(path)) || version == "surface-operators-v1" && `
+  `            grepl("^[0-9a-f]{64}\\\\.rds$", basename(path))) && `
+  `            .transform_cache_owned(path), logical(1))]`
+
+old[[5]][7:13] vs new[[5]][7:15]
+  `    root <- .transform_cache_root(cache_dir)`
+  `    version <- as.character(artifact$artifact_version[[1L]])`
+  `    artifact_id <- as.character(artifact$artifact_id[[1L]])`
+- `    target <- file.path(root, version, paste0(artifact_id, ".h5"))`
++ `    extension <- c(ants_h5 = ".h5", surface_gifti = ".gii", surface_tar = ".tar.gz", `
++ `        cbig_mat5 = ".mat")`
++ `    target <- file.path(root, version, paste0(artifact_id, extension[[artifact$format[[1L]]]]))`
+  `    if (.transform_cache_is_symlink(dirname(target))) `
+  `        stop("Unsafe symbolic link at transform cache version directory.", `
+  `            call. = FALSE)`
+
+old[[6]][17:22] vs new[[6]][17:26]
+  `    .transform_cache_segment(artifact$artifact_id[[1L]], "artifact_id")`
+  `    .transform_cache_segment(artifact$artifact_version[[1L]], `
+  `        "artifact_version")`
+  `    qualification <- as.character(artifact$qualification[[1L]])`
++ `    input <- artifact$format[[1L]] %in% c("surface_gifti", "surface_tar", `
++ `        "cbig_mat5") && qualification == "checksum_locked" && `
++ `        "qualification_scope" %in% names(artifact) && artifact$qualification_scope[[1L]] == `
++ `        "pinned_surface_input"`
+  `    qualified <- identical(qualification, "passed") || identical(qualification, `
+  `        "runtime_verified") && identical(as.character(artifact$provider[[1L]]), `
+  `        "templateflow") && "qualification_scope" %in% names(artifact) && `
+
+old[[6]][23:32] vs new[[6]][27:36]
+  `        identical(as.character(artifact$qualification_scope[[1L]]), `
+  `            "upstream_transform_application")`
+  `    if (!identical(as.character(artifact$status[[1L]]), "available") || `
+- `        !qualified || !identical(as.character(artifact$format[[1L]]), `
++ `        !(input || qualified && identical(as.character(artifact$format[[1L]]), `
+- `        "ants_h5")) `
++ `            "ants_h5"))) `
+- `        stop("Transform artifact is not an available, qualified ANTs H5 release.", `
++ `        stop("Transform artifact is not an available, qualified ANTs H5 release ", `
+- `            call. = FALSE)`
++ `            "or checksum-locked surface input.", call. = FALSE)`
+  `    url <- as.character(artifact$url[[1L]])`
+  `    if (!grepl("^https://[^/?#]+/[^?#]+$", url) || grepl("(^|[/_-])latest([/_-]|$)", `
+  `        url, ignore.case = TRUE)) `
+
+FILE R/transform_registry.R 
+old[[2]][7:25] vs new[[2]][7:31]
+  `    assertthat::assert_that(is.logical(available_only), length(available_only) == `
+  `        1L, !is.na(available_only))`
+  `    from_domain <- to_domain <- NULL`
+- `    typed <- inherits(from_space, "SurfaceDomain") || inherits(to_space, `
+- `        "SurfaceDomain")`
+- `    if (typed) {`
++ `    from_surface <- inherits(from_space, "SurfaceDomain")`
++ `    to_surface <- inherits(to_space, "SurfaceDomain")`
++ `    typed <- from_surface || to_surface`
++ `    if (from_surface) {`
+  `        .validate_surface_domain(from_space)`
++ `        from_domain <- from_space`
++ `        from_space <- .surface_domain_space(from_domain)`
+and 19 more ...
+
+old[[2]][37:43] vs new[[2]][43:50]
+  `        grepl("^(fsaverage[0-9]*|fsLR([_-]?[0-9]+k)?)$", from_space, `
+  `            ignore.case = TRUE) || data_type == "vertex"`
+  `    identity <- identical(from_space, to_space) && (!surface_identity || `
+- `        typed && identical(from_domain$id, to_domain$id))`
++ `        from_surface && to_surface && identical(from_domain$id, `
++ `            to_domain$id))`
+  `    if (identical(from_space, to_space) && !identity) {`
+  `        message <- paste0("Surface identity requires identical exact surface domains; ", `
+  `            "a template name or vertex count is insufficient.")`
+
+old[[2]][63:69] vs new[[2]][70:87]
+  `    else c("available", "candidate", "planned"), , drop = FALSE]`
+  `    if (available_only) `
+  `        reg <- reg[reg$executable, , drop = FALSE]`
+- `    if (data_type %in% c("voxel", "vertex") || typed) {`
++ `    exact <- !is.na(reg$from_domain_id) | !is.na(reg$to_domain_id)`
++ `    matches <- exact & reg$from_space == from_space & reg$to_space == `
++ `        to_space`
++ `    matches <- matches & if (from_surface) `
++ `        !is.na(reg$from_domain_id) & reg$from_domain_id == from_domain$id`
++ `    else is.na(reg$from_domain_id)`
++ `    matches <- matches & if (to_surface) `
+and 8 more ...
+
+old[[2]][80:86] vs new[[2]][98:105]
+  `            data_type)`
+  `        plan$from_domain <- from_domain`
+  `        plan$to_domain <- to_domain`
+- `        if (typed) `
++ `        if (typed && !all(!is.na(route$qualification) & route$qualification == `
++ `            "passed")) `
+  `            plan$warnings <- c(plan$warnings, "Named route is advisory; exact domains and method are not qualified.")`
+  `        return(structure(plan, class = c("atlas_transform_plan", `
+  `            "list")))`
+
+old[[4]][10:16] vs new[[4]][10:18]
+  `    reg$status <- tolower(reg$status)`
+  `    fields <- c("artifact_id", "artifact_version", "provider", `
+  `        "url", "sha256", "format", "qualification", "qualification_scope", `
+- `        "qa_url", "license", "convention")`
++ `        "qa_url", "license", "convention", "from_domain_id", `
++ `        "to_domain_id", "method", "engine_revision", "input_lock_sha256", `
++ `        "hemisphere")`
+  `    for (field in setdiff(fields, names(reg))) reg[[field]] <- NA_character_`
+  `    if (!"size_bytes" %in% names(reg)) `
+  `        reg$size_bytes <- NA_real_`
+
+old[[5]][1:4] vs new[[5]][1:7]
+  `.space_route_capabilities <- function(reg) {`
++ `    for (field in c("from_domain_id", "to_domain_id", "qualification", `
++ `        "method")) if (!field %in% names(reg)) `
++ `        reg[[field]] <- NA_character_`
+  `    reg$source_representation <- ifelse(reg$transform_type %in% `
+  `        c("sphere_resample", "surf2vol"), "surface", "volume")`
+  `    reg$target_representation <- ifelse(reg$transform_type %in% `
+
+old[[5]][8:15] vs new[[5]][11:27]
+  `        qualified_h5 <- !is.na(reg$format) & reg$format == "ants_h5" & `
+  `            !is.na(reg$qualification) & reg$qualification == `
+  `            "passed"`
+- `    reg$executable <- reg$status == "available" & reg$source_representation == `
++ `    volume <- reg$status == "available" & reg$source_representation == `
+  `        "volume" & reg$target_representation == "volume" & (reg$backend %in% `
+  `        c("identity", "internal_affine") | qualified_h5)`
++ `    native <- reg$backend == "neurotransform_native" & !is.na(reg$from_domain_id) & `
++ `        !is.na(reg$to_domain_id) & !is.na(reg$qualification) & `
++ `        reg$qualification == "passed" & !is.na(reg$method) & `
++ `        reg$method == "native_closest_barycentric"`
+and 7 more ...
+Warning messages:
+1: In system2("git", c("show", paste0("HEAD:", f)), stdout = TRUE,  :
+  running command ''git' show HEAD:R/surface_assets.R 2>/dev/null' had status 128
+2: In system2("git", c("show", paste0("HEAD:", f)), stdout = TRUE,  :
+  running command ''git' show HEAD:R/surface_projection.R 2>/dev/null' had status 128

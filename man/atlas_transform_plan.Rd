@@ -17,7 +17,8 @@ atlas_transform_plan(
 \item{from_space}{Source space identifier or a [surface_domain()] descriptor.}
 
 \item{to_space}{Target space identifier or a [surface_domain()] descriptor.
-Supply descriptors for both endpoints when using typed surface domains.
+Supply descriptors for both endpoints for native surface resampling, or an
+exact volume-template identifier and target descriptor for projection.
 Only identical domain descriptors establish surface identity. Named surface
 routes remain advisory: template names do not bind exact meshes or methods.}
 
@@ -33,7 +34,8 @@ steps are not automatically composed with other routes.}
 shows planned routes for diagnostic compatibility. Execution always uses
 available, executable edges only; retired edges are never selected.}
 
-\item{provider}{Provider filter, `"auto"`, `"neuroatlas"`, or `"templateflow"`.}
+\item{provider}{Provider filter, `"auto"`, `"neuroatlas"`, or
+`"templateflow"`.}
 }
 \value{
 A list of class `"atlas_transform_plan"` with fields:

@@ -1,0 +1,222 @@
+ℹ Testing neuroatlas
+alignment-registry: .............................<atlas_alignment>
+  compatible: TRUE 
+  relation: identical 
+  method: identity 
+  confidence: exact 
+  status: available 
+  requires_transform: FALSE 
+.
+atlas-colors: ..............W.....................
+atlas-connectivity: ................
+atlas-constructor: .......................W.W......
+atlas-graph: .....................
+atlas-hierarchy: ..................................
+atlas-integrity: downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_100Parcels_7Networks_order.txt
+..........................W..
+atlas-operators: ......
+atlas-overlap: ..........................
+atlas-plot-ortho: ......................i `zlevels` are read as voxel indices; panels are labelled in mm.
+  Pass `unit = "mm"` to give positions in world coordinates.
+This message is displayed once every 8 hours.
+..
+atlas-provenance: ...............
+atlas-ref: .............................[templateflow] Updating TEMPLATEFLOW_HOME at /work/code/neuroatlas/data-raw/surface-transforms-v1/work/cache/templateflow
+[templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-164k_pial.surf.gii
+[templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-164k_pial.surf.gii
+...
+batch-reduce: ......
+brainnetome: ............................
+ce-server: Loading required package: shiny
+WWWW........WWWW........WWWW...WWWW..WWWW.WWWW...WWWW....WWWW.
+cluster-explorer: .......................................................................
+coordinate-spaces: .........................................................................W..
+data-integrity: ...............................................................
+dilation: .....................
+fsl-atlas: ............[templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz
+....
+ggschaefer: .........................
+glasser-parcel-identity: ........................................................
+glasser: .......
+hcpex: ........................................................S
+merge-atlases: W
+merge_atlases: .................................
+parcel-data: ......................................................
+plot-brain-cpu-parcels: .................................
+plot-brain-data: ...............
+plot-brain-grid: .................
+plot-brain-layout: .......................................................................................................................................
+plot-brain: ........................................................................................................................................................downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_200Parcels_7Networks_order.txt
+.......
+project-cluster-overlay: ................................
+query-point-coord-space: ..........................
+query-point: ..............................................................................................................................................................................................
+reduce-atlas-vec: .......W....................
+reduce-atlas: .....................
+resource-metadata: ...............................................................................................................................................
+roi-colors: ...............
+roi-metadata: .........................................................
+roi-operations: .......................................................
+schaefer-cache-transform: downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_400Parcels_17Networks_order.txt
+......downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_400Parcels_17Networks_order.txt
+.................Attempting to resolve 'outspace' argument via TemplateFlow...
+...Attempting to resolve 'outspace' argument via TemplateFlow...
+....
+space-transforms: S.............
+spin-test: ..................
+sub-atlas: ........W......W...W.........W..............W...
+subcortical-atlases: .....
+surface-anatomy: ......................
+surface-atlases: ................................................................................downloading: https://raw.githubusercontent.com/ThomasYeoLab/CBIG/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI//freeview_lut/Schaefer2018_200Parcels_17Networks_order.txt
+..........................................................
+surface-domain: ......................................
+surface-orientation-labels: ..........................
+surface-transform: .......................................................
+template-transform: ............................................
+templateflow-advanced: ............................................[templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-brain_T1w.nii.gz
+......[templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-brain_mask.nii.gz
+......................................................................<atlas metadata> Glasser360
+  Description:   Glasser multi-modal parcellation of the cerebral cortex.
+  Version:       not recorded
+  Content:       labels, volume
+  Regions:       360
+  Template:      MNI152_unspecified
+  Coord. space:  MNI152
+  Space basis:   inferred
+  Voxel size:    2 x 2 x 2 mm
+  Source:        xcpengine
+  License:       not recorded
+  Citation:      [atlas] Matthew F. Glasser et al. (2016); doi:10.1038/nature18933
+  Modifications: none recorded
+.
+templateflow-surface-geometry: ....
+transform-artifacts-v1: .................................................................
+transform-cache: .......................................
+transform-live-verification: ........
+transform-measurement: ..............................
+transform-plan: .......................................<atlas_transform_plan>
+  from_space: MNI305 
+  to_space: MNI152 
+  n_steps: 1 
+  status: available 
+  confidence: exact 
+..................................
+transform-qualification-gates: ..................
+transform-release-assembly: ..........................
+visfatlas: .....................
+visual-atlas: ............
+wang: ......................................../bin/tar: Ignoring unknown extended header keyword 'LIBARCHIVE.xattr.com.apple.quarantine'
+............[templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-164k_midthickness.surf.gii
+[templateflow] Downloading https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-164k_midthickness.surf.gii
+......................
+
+══ Skipped ═════════════════════════════════════════════════════════════════════
+1. upstream HCPex assets load at both native resolutions ('test-hcpex.R:173:3') - Reason: Set NEUROATLAS_TEST_HCPEX_NETWORK=true for upstream integration
+
+2. atlas resampling to TemplateFlow spaces maintains integrity ('test-space-transforms.R:4:3') - Reason: TemplateFlow integration tests are opt-in
+
+══ Warnings ════════════════════════════════════════════════════════════════════
+1. atlas_roi_colors embedding dispatches correctly ('test-atlas-colors.R:102:3') - Initial embedding standard deviation > 10.0, this can lead to poor optimization
+
+2. .neuroatlas_download throws neuroatlas_error_download on failure ('test-atlas-constructor.R:107:3') - URL 'http://127.0.0.1:0/definitely-not-here.bin': status was 'Couldn't connect to server'
+
+3. .neuroatlas_try_download captures error instead of swallowing it ('test-atlas-constructor.R:123:3') - URL 'http://127.0.0.1:0/definitely-not-here.bin': status was 'Couldn't connect to server'
+
+4. merge_atlases handles ID conflicts and maintains referential integrity ('test-atlas-integrity.R:129:3') - clustered volume only contains 1 partition
+
+5. computed() fires and returns valid structure ('test-ce-server.R:94:5') - clustered volume only contains 1 partition
+
+6. computed() fires and returns valid structure ('test-ce-server.R:94:5') - clustered volume only contains 1 partition
+
+7. computed() fires and returns valid structure ('test-ce-server.R:95:5') - clustered volume only contains 1 partition
+
+8. computed() fires and returns valid structure ('test-ce-server.R:95:5') - clustered volume only contains 1 partition
+
+9. cluster table contains expected columns ('test-ce-server.R:118:5') - clustered volume only contains 1 partition
+
+10. cluster table contains expected columns ('test-ce-server.R:118:5') - clustered volume only contains 1 partition
+
+11. cluster table contains expected columns ('test-ce-server.R:119:5') - clustered volume only contains 1 partition
+
+12. cluster table contains expected columns ('test-ce-server.R:119:5') - clustered volume only contains 1 partition
+
+13. table row selection updates sel_state ('test-ce-server.R:143:5') - clustered volume only contains 1 partition
+
+14. table row selection updates sel_state ('test-ce-server.R:143:5') - clustered volume only contains 1 partition
+
+15. table row selection updates sel_state ('test-ce-server.R:144:5') - clustered volume only contains 1 partition
+
+16. table row selection updates sel_state ('test-ce-server.R:144:5') - clustered volume only contains 1 partition
+
+17. selected_cluster_ids() defaults to first cluster ('test-ce-server.R:166:5') - clustered volume only contains 1 partition
+
+18. selected_cluster_ids() defaults to first cluster ('test-ce-server.R:166:5') - clustered volume only contains 1 partition
+
+19. selected_cluster_ids() defaults to first cluster ('test-ce-server.R:167:5') - clustered volume only contains 1 partition
+
+20. selected_cluster_ids() defaults to first cluster ('test-ce-server.R:167:5') - clustered volume only contains 1 partition
+
+21. prefetch status text reflects state ('test-ce-server.R:187:5') - clustered volume only contains 1 partition
+
+22. prefetch status text reflects state ('test-ce-server.R:187:5') - clustered volume only contains 1 partition
+
+23. prefetch status text reflects state ('test-ce-server.R:188:5') - clustered volume only contains 1 partition
+
+24. prefetch status text reflects state ('test-ce-server.R:188:5') - clustered volume only contains 1 partition
+
+25. analysis plugin apply updates analysis_state ('test-ce-server.R:202:5') - clustered volume only contains 1 partition
+
+26. analysis plugin apply updates analysis_state ('test-ce-server.R:202:5') - clustered volume only contains 1 partition
+
+27. analysis plugin apply updates analysis_state ('test-ce-server.R:203:5') - clustered volume only contains 1 partition
+
+28. analysis plugin apply updates analysis_state ('test-ce-server.R:203:5') - clustered volume only contains 1 partition
+
+29. cluster table is available for CSV download ('test-ce-server.R:223:5') - clustered volume only contains 1 partition
+
+30. cluster table is available for CSV download ('test-ce-server.R:223:5') - clustered volume only contains 1 partition
+
+31. cluster table is available for CSV download ('test-ce-server.R:224:5') - clustered volume only contains 1 partition
+
+32. cluster table is available for CSV download ('test-ce-server.R:224:5') - clustered volume only contains 1 partition
+
+33. reset button fires without error ('test-ce-server.R:250:5') - clustered volume only contains 1 partition
+
+34. reset button fires without error ('test-ce-server.R:250:5') - clustered volume only contains 1 partition
+
+35. reset button fires without error ('test-ce-server.R:251:5') - clustered volume only contains 1 partition
+
+36. reset button fires without error ('test-ce-server.R:251:5') - clustered volume only contains 1 partition
+
+37. needs_template_warp returns NA for unknown templates ('test-coordinate-spaces.R:233:3') - Unknown template 'unknown'. Returning 'Unknown' coordinate space.
+
+38. (code run outside of `test_that()`) ('test-merge-atlases.R:1:1') - `context()` was deprecated in the 3rd edition.
+
+39. reduce_atlas_vec masks out clusters not in mask ('test-reduce-atlas-vec.R:70:3') - clustered volume only contains 1 partition
+
+40. sub_atlas by labels returns correct regions ('test-sub-atlas.R:73:3') - clustered volume only contains 1 partition
+
+41. sub_atlas intersects ids and hemi ('test-sub-atlas.R:92:3') - clustered volume only contains 1 partition
+
+42. sub_atlas preserves class ('test-sub-atlas.R:107:3') - clustered volume only contains 1 partition
+
+43. sub_atlas volume has correct voxels (ClusteredNeuroVol) ('test-sub-atlas.R:146:3') - clustered volume only contains 1 partition
+
+44. sub_atlas can be applied iteratively ('test-sub-atlas.R:203:3') - clustered volume only contains 1 partition
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+$passed
+[1] 2686
+
+$failed
+[1] 0
+
+$errors
+[1] 0
+
+$warnings
+[1] 43
+
+$skipped
+[1] 2
+

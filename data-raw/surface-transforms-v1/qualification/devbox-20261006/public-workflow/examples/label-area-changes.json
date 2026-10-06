@@ -1,0 +1,789 @@
+{
+  "scope": "descriptive: separate pinned vertex-area metrics; no area-conservation requirement",
+  "labels": [
+    {
+      "hemisphere": "L",
+      "key": 0,
+      "name": "background",
+      "source_area_mm2": 5680.48367007077,
+      "target_area_mm2": 5480.97625106573,
+      "change_percent": -3.5121554887341913
+    },
+    {
+      "hemisphere": "L",
+      "key": 1,
+      "name": "Frontal Pole",
+      "source_area_mm2": 8177.93860507011,
+      "target_area_mm2": 7910.07817578316,
+      "change_percent": -3.275402790635809
+    },
+    {
+      "hemisphere": "L",
+      "key": 2,
+      "name": "Insular Cortex",
+      "source_area_mm2": 1599.49771021307,
+      "target_area_mm2": 1551.00109273195,
+      "change_percent": -3.0319904287115063
+    },
+    {
+      "hemisphere": "L",
+      "key": 3,
+      "name": "Superior Frontal Gyrus",
+      "source_area_mm2": 3376.289432019,
+      "target_area_mm2": 3321.75486063957,
+      "change_percent": -1.615222050048554
+    },
+    {
+      "hemisphere": "L",
+      "key": 4,
+      "name": "Middle Frontal Gyrus",
+      "source_area_mm2": 3464.23973309994,
+      "target_area_mm2": 3371.27587389946,
+      "change_percent": -2.6835284611579855
+    },
+    {
+      "hemisphere": "L",
+      "key": 5,
+      "name": "Inferior Frontal Gyrus, pars triangularis",
+      "source_area_mm2": 1060.90567010641,
+      "target_area_mm2": 1046.30836367607,
+      "change_percent": -1.3759287787457968
+    },
+    {
+      "hemisphere": "L",
+      "key": 6,
+      "name": "Inferior Frontal Gyrus, pars opercularis",
+      "source_area_mm2": 871.399941802025,
+      "target_area_mm2": 843.768584012985,
+      "change_percent": -3.170915725780204
+    },
+    {
+      "hemisphere": "L",
+      "key": 7,
+      "name": "Precentral Gyrus",
+      "source_area_mm2": 5058.23382639885,
+      "target_area_mm2": 4972.36534118652,
+      "change_percent": -1.6975981767427237
+    },
+    {
+      "hemisphere": "L",
+      "key": 8,
+      "name": "Temporal Pole",
+      "source_area_mm2": 2535.96780577302,
+      "target_area_mm2": 2468.56633377075,
+      "change_percent": -2.6578204916021866
+    },
+    {
+      "hemisphere": "L",
+      "key": 9,
+      "name": "Superior Temporal Gyrus, anterior division",
+      "source_area_mm2": 417.032484710217,
+      "target_area_mm2": 412.679473161697,
+      "change_percent": -1.0438063479742496
+    },
+    {
+      "hemisphere": "L",
+      "key": 10,
+      "name": "Superior Temporal Gyrus, posterior division",
+      "source_area_mm2": 1097.30244487524,
+      "target_area_mm2": 1068.73108816147,
+      "change_percent": -2.6037813774322243
+    },
+    {
+      "hemisphere": "L",
+      "key": 11,
+      "name": "Middle Temporal Gyrus, anterior division",
+      "source_area_mm2": 571.473191738129,
+      "target_area_mm2": 564.030792236328,
+      "change_percent": -1.3023182205914194
+    },
+    {
+      "hemisphere": "L",
+      "key": 12,
+      "name": "Middle Temporal Gyrus, posterior division",
+      "source_area_mm2": 1591.59830838442,
+      "target_area_mm2": 1543.19322633743,
+      "change_percent": -3.0412876032850655
+    },
+    {
+      "hemisphere": "L",
+      "key": 13,
+      "name": "Middle Temporal Gyrus, temporooccipital part",
+      "source_area_mm2": 1288.62245953083,
+      "target_area_mm2": 1255.8436524868,
+      "change_percent": -2.543709121441531
+    },
+    {
+      "hemisphere": "L",
+      "key": 14,
+      "name": "Inferior Temporal Gyrus, anterior division",
+      "source_area_mm2": 338.770284354687,
+      "target_area_mm2": 324.288347482681,
+      "change_percent": -4.274854537372492
+    },
+    {
+      "hemisphere": "L",
+      "key": 15,
+      "name": "Inferior Temporal Gyrus, posterior division",
+      "source_area_mm2": 1282.73432344198,
+      "target_area_mm2": 1267.38536334038,
+      "change_percent": -1.1965813825277414
+    },
+    {
+      "hemisphere": "L",
+      "key": 16,
+      "name": "Inferior Temporal Gyrus, temporooccipital part",
+      "source_area_mm2": 898.219516992569,
+      "target_area_mm2": 884.147537469864,
+      "change_percent": -1.5666526118048472
+    },
+    {
+      "hemisphere": "L",
+      "key": 17,
+      "name": "Postcentral Gyrus",
+      "source_area_mm2": 4772.38876459002,
+      "target_area_mm2": 4702.14426338673,
+      "change_percent": -1.4718939438565384
+    },
+    {
+      "hemisphere": "L",
+      "key": 18,
+      "name": "Superior Parietal Lobule",
+      "source_area_mm2": 1976.14932987094,
+      "target_area_mm2": 1952.58467972279,
+      "change_percent": -1.1924529078826687
+    },
+    {
+      "hemisphere": "L",
+      "key": 19,
+      "name": "Supramarginal Gyrus, anterior division",
+      "source_area_mm2": 1345.33072993159,
+      "target_area_mm2": 1313.95075249672,
+      "change_percent": -2.332510269535404
+    },
+    {
+      "hemisphere": "L",
+      "key": 20,
+      "name": "Supramarginal Gyrus, posterior division",
+      "source_area_mm2": 1559.45350116491,
+      "target_area_mm2": 1523.8833514452,
+      "change_percent": -2.280936859812686
+    },
+    {
+      "hemisphere": "L",
+      "key": 21,
+      "name": "Angular Gyrus",
+      "source_area_mm2": 1442.05133545399,
+      "target_area_mm2": 1412.06066250801,
+      "change_percent": -2.079722975780081
+    },
+    {
+      "hemisphere": "L",
+      "key": 22,
+      "name": "Lateral Occipital Cortex, superior division",
+      "source_area_mm2": 6080.5775873363,
+      "target_area_mm2": 5950.94279718399,
+      "change_percent": -2.131948623142216
+    },
+    {
+      "hemisphere": "L",
+      "key": 23,
+      "name": "Lateral Occipital Cortex, inferior division",
+      "source_area_mm2": 2571.94064417481,
+      "target_area_mm2": 2530.66743135452,
+      "change_percent": -1.6047498185376041
+    },
+    {
+      "hemisphere": "L",
+      "key": 24,
+      "name": "Intracalcarine Cortex",
+      "source_area_mm2": 1458.6647669971,
+      "target_area_mm2": 1399.14785313606,
+      "change_percent": -4.080232498078737
+    },
+    {
+      "hemisphere": "L",
+      "key": 25,
+      "name": "Frontal Medial Cortex",
+      "source_area_mm2": 672.817148596048,
+      "target_area_mm2": 647.557679653168,
+      "change_percent": -3.754284354313562
+    },
+    {
+      "hemisphere": "L",
+      "key": 26,
+      "name": "Juxtapositional Lobule Cortex (formerly Supplementary Motor Cortex)",
+      "source_area_mm2": 965.349487394094,
+      "target_area_mm2": 961.217574834824,
+      "change_percent": -0.4280224533421492
+    },
+    {
+      "hemisphere": "L",
+      "key": 27,
+      "name": "Subcallosal Cortex",
+      "source_area_mm2": 786.244184970856,
+      "target_area_mm2": 652.917997837067,
+      "change_percent": -16.957351123522916
+    },
+    {
+      "hemisphere": "L",
+      "key": 28,
+      "name": "Paracingulate Gyrus",
+      "source_area_mm2": 1996.36803871393,
+      "target_area_mm2": 1950.39287054539,
+      "change_percent": -2.302940503803969
+    },
+    {
+      "hemisphere": "L",
+      "key": 29,
+      "name": "Cingulate Gyrus, anterior division",
+      "source_area_mm2": 1678.13469642401,
+      "target_area_mm2": 1371.63802134991,
+      "change_percent": -18.264128363904472
+    },
+    {
+      "hemisphere": "L",
+      "key": 30,
+      "name": "Cingulate Gyrus, posterior division",
+      "source_area_mm2": 1670.84600104392,
+      "target_area_mm2": 1516.04130381346,
+      "change_percent": -9.26504879167442
+    },
+    {
+      "hemisphere": "L",
+      "key": 31,
+      "name": "Precuneous Cortex",
+      "source_area_mm2": 3714.22288122773,
+      "target_area_mm2": 3625.90928065777,
+      "change_percent": -2.3777140843192455
+    },
+    {
+      "hemisphere": "L",
+      "key": 32,
+      "name": "Cuneal Cortex",
+      "source_area_mm2": 1086.91170522571,
+      "target_area_mm2": 1059.80224609375,
+      "change_percent": -2.494173077870237
+    },
+    {
+      "hemisphere": "L",
+      "key": 33,
+      "name": "Frontal Orbital Cortex",
+      "source_area_mm2": 2256.23663149774,
+      "target_area_mm2": 2223.95302975178,
+      "change_percent": -1.4308606329350013
+    },
+    {
+      "hemisphere": "L",
+      "key": 34,
+      "name": "Parahippocampal Gyrus, anterior division",
+      "source_area_mm2": 735.325077563524,
+      "target_area_mm2": 698.321391105652,
+      "change_percent": -5.032289471274742
+    },
+    {
+      "hemisphere": "L",
+      "key": 35,
+      "name": "Parahippocampal Gyrus, posterior division",
+      "source_area_mm2": 553.779743134975,
+      "target_area_mm2": 541.789044499397,
+      "change_percent": -2.1652468845642456
+    },
+    {
+      "hemisphere": "L",
+      "key": 36,
+      "name": "Lingual Gyrus",
+      "source_area_mm2": 2497.40549337864,
+      "target_area_mm2": 2427.88740086555,
+      "change_percent": -2.783612540991174
+    },
+    {
+      "hemisphere": "L",
+      "key": 37,
+      "name": "Temporal Fusiform Cortex, anterior division",
+      "source_area_mm2": 462.076406300068,
+      "target_area_mm2": 437.461006164551,
+      "change_percent": -5.327127678432471
+    },
+    {
+      "hemisphere": "L",
+      "key": 38,
+      "name": "Temporal Fusiform Cortex, posterior division",
+      "source_area_mm2": 1212.69460070133,
+      "target_area_mm2": 1181.06109941006,
+      "change_percent": -2.6085299029925273
+    },
+    {
+      "hemisphere": "L",
+      "key": 39,
+      "name": "Temporal Occipital Fusiform Cortex",
+      "source_area_mm2": 896.794433444738,
+      "target_area_mm2": 854.816246986389,
+      "change_percent": -4.680915145414511
+    },
+    {
+      "hemisphere": "L",
+      "key": 40,
+      "name": "Occipital Fusiform Gyrus",
+      "source_area_mm2": 1635.82303112745,
+      "target_area_mm2": 1603.78505516052,
+      "change_percent": -1.9585233461866938
+    },
+    {
+      "hemisphere": "L",
+      "key": 41,
+      "name": "Frontal Operculum Cortex",
+      "source_area_mm2": 449.251097872853,
+      "target_area_mm2": 438.187862038612,
+      "change_percent": -2.462595169299305
+    },
+    {
+      "hemisphere": "L",
+      "key": 42,
+      "name": "Central Opercular Cortex",
+      "source_area_mm2": 1250.49662034214,
+      "target_area_mm2": 1234.05295598507,
+      "change_percent": -1.3149707156002532
+    },
+    {
+      "hemisphere": "L",
+      "key": 43,
+      "name": "Parietal Operculum Cortex",
+      "source_area_mm2": 711.342615410686,
+      "target_area_mm2": 699.636924028397,
+      "change_percent": -1.645577128193127
+    },
+    {
+      "hemisphere": "L",
+      "key": 44,
+      "name": "Planum Polare",
+      "source_area_mm2": 547.841043889523,
+      "target_area_mm2": 540.102492570877,
+      "change_percent": -1.4125541349922284
+    },
+    {
+      "hemisphere": "L",
+      "key": 45,
+      "name": "Heschl's Gyrus (includes H1 and H2)",
+      "source_area_mm2": 529.637416988611,
+      "target_area_mm2": 513.124139904976,
+      "change_percent": -3.117845634382376
+    },
+    {
+      "hemisphere": "L",
+      "key": 46,
+      "name": "Planum Temporale",
+      "source_area_mm2": 812.919430941343,
+      "target_area_mm2": 801.736216068268,
+      "change_percent": -1.3756855165984898
+    },
+    {
+      "hemisphere": "L",
+      "key": 47,
+      "name": "Supracalcarine Cortex",
+      "source_area_mm2": 366.2244579494,
+      "target_area_mm2": 362.923501968384,
+      "change_percent": -0.901347768933573
+    },
+    {
+      "hemisphere": "L",
+      "key": 48,
+      "name": "Occipital Pole",
+      "source_area_mm2": 2995.01164144278,
+      "target_area_mm2": 2873.40615415573,
+      "change_percent": -4.060267599776983
+    },
+    {
+      "hemisphere": "R",
+      "key": 0,
+      "name": "background",
+      "source_area_mm2": 5309.48973160982,
+      "target_area_mm2": 5146.29269903898,
+      "change_percent": -3.073685812014179
+    },
+    {
+      "hemisphere": "R",
+      "key": 1,
+      "name": "Frontal Pole",
+      "source_area_mm2": 9693.76917508245,
+      "target_area_mm2": 9370.50807023048,
+      "change_percent": -3.3347307844187526
+    },
+    {
+      "hemisphere": "R",
+      "key": 2,
+      "name": "Insular Cortex",
+      "source_area_mm2": 1641.85372616351,
+      "target_area_mm2": 1573.16364973783,
+      "change_percent": -4.1836903818580025
+    },
+    {
+      "hemisphere": "R",
+      "key": 3,
+      "name": "Superior Frontal Gyrus",
+      "source_area_mm2": 3084.43600255251,
+      "target_area_mm2": 3016.52837371826,
+      "change_percent": -2.20162223427731
+    },
+    {
+      "hemisphere": "R",
+      "key": 4,
+      "name": "Middle Frontal Gyrus",
+      "source_area_mm2": 3432.43112206459,
+      "target_area_mm2": 3360.8332452774,
+      "change_percent": -2.08592319091095
+    },
+    {
+      "hemisphere": "R",
+      "key": 5,
+      "name": "Inferior Frontal Gyrus, pars triangularis",
+      "source_area_mm2": 863.233278006315,
+      "target_area_mm2": 832.794074773788,
+      "change_percent": -3.526185100605485
+    },
+    {
+      "hemisphere": "R",
+      "key": 6,
+      "name": "Inferior Frontal Gyrus, pars opercularis",
+      "source_area_mm2": 851.438304632902,
+      "target_area_mm2": 826.756487607956,
+      "change_percent": -2.898837988688747
+    },
+    {
+      "hemisphere": "R",
+      "key": 7,
+      "name": "Precentral Gyrus",
+      "source_area_mm2": 5139.66991060972,
+      "target_area_mm2": 5048.69581639767,
+      "change_percent": -1.7700376832421594
+    },
+    {
+      "hemisphere": "R",
+      "key": 8,
+      "name": "Temporal Pole",
+      "source_area_mm2": 2401.03492692113,
+      "target_area_mm2": 2353.38446891308,
+      "change_percent": -1.984579960656909
+    },
+    {
+      "hemisphere": "R",
+      "key": 9,
+      "name": "Superior Temporal Gyrus, anterior division",
+      "source_area_mm2": 382.349617302418,
+      "target_area_mm2": 373.377830266953,
+      "change_percent": -2.346487777015023
+    },
+    {
+      "hemisphere": "R",
+      "key": 10,
+      "name": "Superior Temporal Gyrus, posterior division",
+      "source_area_mm2": 1392.40535199642,
+      "target_area_mm2": 1356.03045415878,
+      "change_percent": -2.61237848486333
+    },
+    {
+      "hemisphere": "R",
+      "key": 11,
+      "name": "Middle Temporal Gyrus, anterior division",
+      "source_area_mm2": 462.142359972,
+      "target_area_mm2": 443.754964351654,
+      "change_percent": -3.978729762287979
+    },
+    {
+      "hemisphere": "R",
+      "key": 12,
+      "name": "Middle Temporal Gyrus, posterior division",
+      "source_area_mm2": 1631.0989164114,
+      "target_area_mm2": 1593.86635327339,
+      "change_percent": -2.282667394564026
+    },
+    {
+      "hemisphere": "R",
+      "key": 13,
+      "name": "Middle Temporal Gyrus, temporooccipital part",
+      "source_area_mm2": 1895.69060066342,
+      "target_area_mm2": 1854.46616435051,
+      "change_percent": -2.1746394848654527
+    },
+    {
+      "hemisphere": "R",
+      "key": 14,
+      "name": "Inferior Temporal Gyrus, anterior division",
+      "source_area_mm2": 347.814229905605,
+      "target_area_mm2": 317.305818319321,
+      "change_percent": -8.771467341794436
+    },
+    {
+      "hemisphere": "R",
+      "key": 15,
+      "name": "Inferior Temporal Gyrus, posterior division",
+      "source_area_mm2": 1153.64595636725,
+      "target_area_mm2": 1130.46115446091,
+      "change_percent": -2.009698190192363
+    },
+    {
+      "hemisphere": "R",
+      "key": 16,
+      "name": "Inferior Temporal Gyrus, temporooccipital part",
+      "source_area_mm2": 963.373828053474,
+      "target_area_mm2": 954.790301799774,
+      "change_percent": -0.8909860330172339
+    },
+    {
+      "hemisphere": "R",
+      "key": 17,
+      "name": "Postcentral Gyrus",
+      "source_area_mm2": 4684.55204406381,
+      "target_area_mm2": 4640.03449356556,
+      "change_percent": -0.9503053884236766
+    },
+    {
+      "hemisphere": "R",
+      "key": 18,
+      "name": "Superior Parietal Lobule",
+      "source_area_mm2": 1916.71810027957,
+      "target_area_mm2": 1879.7598811388,
+      "change_percent": -1.9282031684982481
+    },
+    {
+      "hemisphere": "R",
+      "key": 19,
+      "name": "Supramarginal Gyrus, anterior division",
+      "source_area_mm2": 1187.83512079716,
+      "target_area_mm2": 1166.9035820961,
+      "change_percent": -1.7621585971471116
+    },
+    {
+      "hemisphere": "R",
+      "key": 20,
+      "name": "Supramarginal Gyrus, posterior division",
+      "source_area_mm2": 1805.6783733964,
+      "target_area_mm2": 1796.80895757675,
+      "change_percent": -0.4911957716460426
+    },
+    {
+      "hemisphere": "R",
+      "key": 21,
+      "name": "Angular Gyrus",
+      "source_area_mm2": 2131.96163207293,
+      "target_area_mm2": 2067.67214393616,
+      "change_percent": -3.0155086831586537
+    },
+    {
+      "hemisphere": "R",
+      "key": 22,
+      "name": "Lateral Occipital Cortex, superior division",
+      "source_area_mm2": 6012.02660602331,
+      "target_area_mm2": 5870.97983312607,
+      "change_percent": -2.346076991008795
+    },
+    {
+      "hemisphere": "R",
+      "key": 23,
+      "name": "Lateral Occipital Cortex, inferior division",
+      "source_area_mm2": 2401.10316479206,
+      "target_area_mm2": 2331.44586443901,
+      "change_percent": -2.9010540394286735
+    },
+    {
+      "hemisphere": "R",
+      "key": 24,
+      "name": "Intracalcarine Cortex",
+      "source_area_mm2": 1492.62910440564,
+      "target_area_mm2": 1455.52665901184,
+      "change_percent": -2.4857109702797953
+    },
+    {
+      "hemisphere": "R",
+      "key": 25,
+      "name": "Frontal Medial Cortex",
+      "source_area_mm2": 824.472572535276,
+      "target_area_mm2": 811.923280477524,
+      "change_percent": -1.5220993973350148
+    },
+    {
+      "hemisphere": "R",
+      "key": 26,
+      "name": "Juxtapositional Lobule Cortex (formerly Supplementary Motor Cortex)",
+      "source_area_mm2": 902.819319665432,
+      "target_area_mm2": 871.268982052803,
+      "change_percent": -3.4946458195335146
+    },
+    {
+      "hemisphere": "R",
+      "key": 27,
+      "name": "Subcallosal Cortex",
+      "source_area_mm2": 708.72501718998,
+      "target_area_mm2": 630.504550814629,
+      "change_percent": -11.036786409133242
+    },
+    {
+      "hemisphere": "R",
+      "key": 28,
+      "name": "Paracingulate Gyrus",
+      "source_area_mm2": 1843.80138903856,
+      "target_area_mm2": 1816.40367507935,
+      "change_percent": -1.485936290214881
+    },
+    {
+      "hemisphere": "R",
+      "key": 29,
+      "name": "Cingulate Gyrus, anterior division",
+      "source_area_mm2": 1882.75882363319,
+      "target_area_mm2": 1606.15049934387,
+      "change_percent": -14.691649340171171
+    },
+    {
+      "hemisphere": "R",
+      "key": 30,
+      "name": "Cingulate Gyrus, posterior division",
+      "source_area_mm2": 1641.4506727159,
+      "target_area_mm2": 1470.96415740252,
+      "change_percent": -10.386331928652945
+    },
+    {
+      "hemisphere": "R",
+      "key": 31,
+      "name": "Precuneous Cortex",
+      "source_area_mm2": 3784.22086042166,
+      "target_area_mm2": 3679.04342126846,
+      "change_percent": -2.7793684098417133
+    },
+    {
+      "hemisphere": "R",
+      "key": 32,
+      "name": "Cuneal Cortex",
+      "source_area_mm2": 1076.78621548414,
+      "target_area_mm2": 1036.62673544884,
+      "change_percent": -3.729568549244818
+    },
+    {
+      "hemisphere": "R",
+      "key": 33,
+      "name": "Frontal Orbital Cortex",
+      "source_area_mm2": 1758.20846791565,
+      "target_area_mm2": 1733.9140329361,
+      "change_percent": -1.3817721517603085
+    },
+    {
+      "hemisphere": "R",
+      "key": 34,
+      "name": "Parahippocampal Gyrus, anterior division",
+      "source_area_mm2": 723.347725301981,
+      "target_area_mm2": 699.786336541176,
+      "change_percent": -3.257270042698853
+    },
+    {
+      "hemisphere": "R",
+      "key": 35,
+      "name": "Parahippocampal Gyrus, posterior division",
+      "source_area_mm2": 413.814241081476,
+      "target_area_mm2": 414.005100727081,
+      "change_percent": 0.04612205831926699
+    },
+    {
+      "hemisphere": "R",
+      "key": 36,
+      "name": "Lingual Gyrus",
+      "source_area_mm2": 2609.08071951568,
+      "target_area_mm2": 2510.6977648735,
+      "change_percent": -3.7707899915201746
+    },
+    {
+      "hemisphere": "R",
+      "key": 37,
+      "name": "Temporal Fusiform Cortex, anterior division",
+      "source_area_mm2": 446.370258927345,
+      "target_area_mm2": 457.634544849396,
+      "change_percent": 2.523529669991848
+    },
+    {
+      "hemisphere": "R",
+      "key": 38,
+      "name": "Temporal Fusiform Cortex, posterior division",
+      "source_area_mm2": 942.654818326235,
+      "target_area_mm2": 912.458078384399,
+      "change_percent": -3.2033719400546854
+    },
+    {
+      "hemisphere": "R",
+      "key": 39,
+      "name": "Temporal Occipital Fusiform Cortex",
+      "source_area_mm2": 1086.69548895955,
+      "target_area_mm2": 1062.96634614468,
+      "change_percent": -2.183605532179875
+    },
+    {
+      "hemisphere": "R",
+      "key": 40,
+      "name": "Occipital Fusiform Gyrus",
+      "source_area_mm2": 1651.29729348421,
+      "target_area_mm2": 1599.29650998116,
+      "change_percent": -3.149086703420274
+    },
+    {
+      "hemisphere": "R",
+      "key": 41,
+      "name": "Frontal Operculum Cortex",
+      "source_area_mm2": 334.800021529198,
+      "target_area_mm2": 328.769361972809,
+      "change_percent": -1.801272153103202
+    },
+    {
+      "hemisphere": "R",
+      "key": 42,
+      "name": "Central Opercular Cortex",
+      "source_area_mm2": 1253.47580358386,
+      "target_area_mm2": 1225.58553874493,
+      "change_percent": -2.225034161743509
+    },
+    {
+      "hemisphere": "R",
+      "key": 43,
+      "name": "Parietal Operculum Cortex",
+      "source_area_mm2": 761.130242094398,
+      "target_area_mm2": 748.679111361504,
+      "change_percent": -1.635873868134872
+    },
+    {
+      "hemisphere": "R",
+      "key": 44,
+      "name": "Planum Polare",
+      "source_area_mm2": 549.630121439695,
+      "target_area_mm2": 543.262341976166,
+      "change_percent": -1.1585572215091355
+    },
+    {
+      "hemisphere": "R",
+      "key": 45,
+      "name": "Heschl's Gyrus (includes H1 and H2)",
+      "source_area_mm2": 485.265202432871,
+      "target_area_mm2": 478.237680673599,
+      "change_percent": -1.448181679634058
+    },
+    {
+      "hemisphere": "R",
+      "key": 46,
+      "name": "Planum Temporale",
+      "source_area_mm2": 639.455086991191,
+      "target_area_mm2": 626.909987449646,
+      "change_percent": -1.9618421679266187
+    },
+    {
+      "hemisphere": "R",
+      "key": 47,
+      "name": "Supracalcarine Cortex",
+      "source_area_mm2": 354.770567715168,
+      "target_area_mm2": 338.410930395126,
+      "change_percent": -4.611328787898927
+    },
+    {
+      "hemisphere": "R",
+      "key": 48,
+      "name": "Occipital Pole",
+      "source_area_mm2": 2581.94615763426,
+      "target_area_mm2": 2495.27223587036,
+      "change_percent": -3.3569221227802895
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# neuroatlas <img src="man/figures/logo.png" align="right" height="139" alt="" />
+# neuroatlas <img src="man/figures/logo-en.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/check_on_different_r_os.yml/badge.svg)](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/check_on_different_r_os.yml)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
@@ -146,7 +146,7 @@ revision used for qualification:
 
 ``` r
 pak::pak(c("hdf5r",
-  "bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e"))
+  "bbuchsbaum/neurotransform@933edddda462593941e167726e8aaa7168ff103a"))
 ```
 
 ``` r
@@ -174,6 +174,46 @@ An image-space transform does not establish correspondence between
 different parcellations. Use `atlas_overlap()` after alignment to
 compare their regions. See [Verified template
 transforms](vignettes/template-transforms.Rmd).
+
+### Map exact cortical domains
+
+The pinned fsaverage 164k and fsLR 32k domains support directed native
+surface resampling in both hemispheres. Exact geometry identifies vertex
+ordering, registration, cortical masks and method; a broad name such as
+`"fsaverage"` does not admit a route. Install the pinned engine above
+and optional `gifti`.
+
+``` r
+source <- get_surface_geometry("fsaverage", "164k", "L")
+target <- get_surface_geometry("fsLR", "32k", "L")
+operator <- get_template_transform(source, target)
+metric <- surface_data(rep(0.25, source$domain$n_vertices), source$domain)
+mapped <- apply_template_transform(metric, operator)
+mapped$coverage$available
+
+# Population cortical projection preserves atlas region IDs and names.
+atlas <- get_harvard_oxford_atlas("cortical", threshold = 25, resolution = "02")
+cortex <- transform_atlas(atlas, target)
+cortex$label_table
+```
+
+Population projection supports exact MNI152NLin6Asym and
+MNI152NLin2009cAsym sources. Numerical qualification covers their locked
+1 mm and 2 mm grids. Labels use nearest voxel sampling and categorical
+surface votes; continuous and probability maps use trilinear sampling.
+Unsupported cortical values remain `NA`; supported zero is valid.
+Outputs record coverage, lost labels, input hashes and directed
+provenance. Verified inputs and operators can be replayed with
+`offline = TRUE`.
+
+`ribbon_projection()` separately declares ordered white/pial coordinates
+aligned with a source volume. The caller supplies that alignment; this
+function does not fit registration. Population projection and numerical
+agreement do not establish subject registration, anatomical accuracy,
+area conservation or a lossless inverse. The native surface method has
+separate qualification from Workbench’s area-aware resampling. Input
+assets retain their [upstream
+licenses](data-raw/surface-transforms-v1/LICENSES.md).
 
 ## Palette demos
 
@@ -226,20 +266,20 @@ plot_brain(
 
 ## Available Atlases
 
-| Atlas | Function | Description |
-|----|----|----|
-| Schaefer | `get_schaefer_atlas()` | Cortical parcellations (100-1000 regions, 7 or 17 networks); surface via `get_schaefer_surfatlas()` |
-| Brainnetome | `get_brainnetome_atlas()` | 246-region connectional atlas with Yeo network and cytoarchitectonic metadata |
-| Glasser | `get_glasser_atlas()` | 360-region multi-modal cortical parcellation (surface via `glasser_surf()`) |
-| HCPex | `get_hcpex_atlas()` | 360 cortical and 66 subcortical regions, native 1/2 mm volumes in MNI152NLin2009cAsym |
-| Harvard-Oxford | `get_harvard_oxford_atlas()` | Cortical/subcortical structural atlases via TemplateFlow or FSL |
-| Julich-Brain | `get_julich_brain_atlas()` | FSL Julich-Brain cytoarchitectonic atlas |
-| ASEG | `get_aseg_atlas()` | FreeSurfer subcortical segmentation |
-| Subcortical | `get_subcortical_atlas()` | Harmonized thalamus, cerebellum, and subcortex atlases (AtlasPack/TemplateFlow) |
-| Olsen MTL | `get_olsen_mtl()` | Medial temporal lobe atlas with hippocampal subfields |
-| Wang (2015) | `get_wang_atlas()` | Probabilistic visual topography on `fsaverage` (25 areas/hemi); probability volumes via `get_wang_prob_atlas()` |
-| visfAtlas | `get_visfatlas()` | Probabilistic functional atlas of occipito-temporal visual cortex (33 regions) |
-| Visual V1-V5 | `get_visual_atlas()` | Cytoarchitectonic early visual areas extracted from Julich-Brain |
+| Atlas          | Function                     | Description                                                                                                     |
+|----------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| Schaefer       | `get_schaefer_atlas()`       | Cortical parcellations (100-1000 regions, 7 or 17 networks); surface via `get_schaefer_surfatlas()`             |
+| Brainnetome    | `get_brainnetome_atlas()`    | 246-region connectional atlas with Yeo network and cytoarchitectonic metadata                                   |
+| Glasser        | `get_glasser_atlas()`        | 360-region multi-modal cortical parcellation (surface via `glasser_surf()`)                                     |
+| HCPex          | `get_hcpex_atlas()`          | 360 cortical and 66 subcortical regions, native 1/2 mm volumes in MNI152NLin2009cAsym                           |
+| Harvard-Oxford | `get_harvard_oxford_atlas()` | Cortical/subcortical structural atlases via TemplateFlow or FSL                                                 |
+| Julich-Brain   | `get_julich_brain_atlas()`   | FSL Julich-Brain cytoarchitectonic atlas                                                                        |
+| ASEG           | `get_aseg_atlas()`           | FreeSurfer subcortical segmentation                                                                             |
+| Subcortical    | `get_subcortical_atlas()`    | Harmonized thalamus, cerebellum, and subcortex atlases (AtlasPack/TemplateFlow)                                 |
+| Olsen MTL      | `get_olsen_mtl()`            | Medial temporal lobe atlas with hippocampal subfields                                                           |
+| Wang (2015)    | `get_wang_atlas()`           | Probabilistic visual topography on `fsaverage` (25 areas/hemi); probability volumes via `get_wang_prob_atlas()` |
+| visfAtlas      | `get_visfatlas()`            | Probabilistic functional atlas of occipito-temporal visual cortex (33 regions)                                  |
+| Visual V1-V5   | `get_visual_atlas()`         | Cytoarchitectonic early visual areas extracted from Julich-Brain                                                |
 
 ## Documentation
 

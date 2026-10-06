@@ -1,4 +1,30 @@
-# Native ordinary surface integration, 2026-09-27
+# Native ordinary surface integration
+
+## Current release slice
+
+Version 0.2.0 admits the four exact, pinned fsaverage 164k / fsLR 32k domain
+pairs through `get_template_transform()` and `apply_template_transform()`.
+`get_surface_geometry()` fetches original provider assets under their byte locks.
+Broad surface names remain planned. Admission requires the pinned engine revision
+and exact ordered geometry, hemisphere, masks, areas and method identity.
+Equal domains additionally require a proven diagonal operator with unit weights;
+an arbitrary cached operator cannot inherit identity qualification.
+
+Population cortical projection and caller-aligned ribbon sampling have a separate
+[protocol](projection-v1/README.md). The devbox refresh, current source bindings,
+engineering checks and review boundaries are indexed in
+[the release evidence](qualification/devbox-20261006/final/index.md).
+Inputs are downloaded from their original providers; this slice does not bundle
+the pinned input set. Review [the per-asset license audit](LICENSES.md).
+
+The September report below is historical. Its source hashes, engineering counts,
+then-current admission status and dependency environment describe that snapshot.
+Its failed strict Workbench comparisons and numerical thresholds remain retained.
+For fresh builds without a sibling checkout, set `NEUROATLAS_ENGINE_BINDING` to
+the receipt produced by `setup-engine.R`; see
+[the machine handoff](../../plans/resume-neuroatlas.md).
+
+## Historical qualification: 2026-09-27
 
 The explicit-domain surface API is implemented and the numerical gates in
 `native-contract-v1.json` pass for the four pinned fsaverage 164k / registered

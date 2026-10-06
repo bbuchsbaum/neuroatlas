@@ -6,19 +6,19 @@
 #' MNI152 (common fMRI template space).
 #'
 #' @details
-#' FreeSurfer's fsaverage surfaces are defined in MNI305 (Talairach-like) space,
-#' while most modern fMRI pipelines output data in MNI152 space. The difference
-#' is approximately 4mm, which matters for accurate volume-to-surface projections.
+#' These legacy helpers classify broad coordinate families and apply a fixed
+#' FreeSurfer affine. They do not establish template-specific registration or
+#' cortical correspondence. Use exact MNI template identifiers and qualified
+#' transforms for image resampling or population cortical projection.
 #'
 #' @section Coordinate Spaces:
 #' \describe{
 #'   \item{MNI305}{FreeSurfer/Talairach space. Native space for fsaverage,
 #'     fsaverage5, and fsaverage6 surfaces. Based on 305 subjects with linear
 #'     registration to approximate Talairach space.}
-#'   \item{MNI152}{ICBM 2009c space. The de facto standard for volumetric fMRI
-
-#'     analysis. Used by FSL, SPM, fMRIPrep, and TemplateFlow's
-#'     MNI152NLin2009cAsym template.}
+#'   \item{MNI152}{A broad coordinate-family label. MNI152NLin6Asym and
+#'     MNI152NLin2009cAsym are distinct templates; this shorthand does not
+#'     identify either variant or a registration between them.}
 #' }
 #'
 #' @references
@@ -29,6 +29,13 @@
 #' FreeSurfer surface coordinate systems. Human Brain Mapping, 39(9), 3793-3808.
 #' \doi{10.1002/hbm.24213}
 #'
+#' @return This documentation topic describes legacy coordinate-family constants
+#'   and affine helpers. Use exact template identifiers for qualified
+#' registration.
+#' @examples
+#' transform_coords(matrix(c(0, 0, 0), nrow = 1),
+#'   from = "MNI305", to = "MNI152"
+#' )
 #' @name coordinate_spaces
 NULL
 
@@ -42,7 +49,7 @@ NULL
 #' @format A named list with the following elements:
 #' \describe{
 #'   \item{MNI305}{FreeSurfer/Talairach space (fsaverage native)}
-#'   \item{MNI152}{ICBM 2009c space (common fMRI template)}
+#'   \item{MNI152}{Broad MNI152 coordinate family, without template identity}
 #'   \item{SCANNER}{Native scanner space (subject-specific)}
 #'   \item{UNKNOWN}{Unknown or unspecified space}
 #' }
@@ -53,11 +60,10 @@ NULL
 #'
 #' @export
 coord_spaces <- list(
-
-MNI305 = "MNI305",
-MNI152 = "MNI152",
-SCANNER = "Scanner",
-UNKNOWN = "Unknown"
+  MNI305 = "MNI305",
+  MNI152 = "MNI152",
+  SCANNER = "Scanner",
+  UNKNOWN = "Unknown"
 )
 
 
@@ -65,16 +71,16 @@ UNKNOWN = "Unknown"
 
 #' MNI305 to MNI152 Affine Transform Matrix
 #'
-#' The canonical 4x4 affine transformation matrix for converting RAS coordinates
-#' from MNI305 (fsaverage) space to MNI152 space.
+#' A legacy 4x4 FreeSurfer affine for approximate coordinate conversion from
+#' MNI305 to the broad MNI152 family. It does not encode an exact MNI variant.
 #'
 #' @details
 #' This matrix is derived from FreeSurfer's \code{mni152.register.dat} file,
 #' located at \code{$FREESURFER_HOME/average/mni152.register.dat}.
 #'
-#' The transform accounts for the approximately 4mm difference between MNI305
-#' and MNI152 coordinate systems. It includes small rotation, scaling, and
-#' translation components.
+#' It includes rotation, scaling and translation components. Anatomical error
+#' depends on position and the source/target registrations; it is not a uniform
+#' displacement or a qualified volume-to-cortex mapping.
 #'
 #' To apply: for a point \code{p = c(R, A, S)}, compute
 #' \code{MNI305_to_MNI152 \%*\% c(p, 1)} and take the first 3 elements.
@@ -90,15 +96,31 @@ UNKNOWN = "Unknown"
 #' # Transform a single point from MNI305 to MNI152
 #' point_305 <- c(10, -20, 35)
 #' point_152 <- (MNI305_to_MNI152 %*% c(point_305, 1))[1:3]
-#' print(point_152)  # approximately c(10.695, -18.409, 36.137)
+#' print(point_152) # approximately c(10.695, -18.409, 36.137)
 #'
 #' @export
-MNI305_to_MNI152 <- matrix(c(
-   0.9975,  0.0146, -0.0130, 0,
-  -0.0073,  1.0009, -0.0093, 0,
-   0.0176, -0.0024,  0.9971, 0,
-  -0.0429,  1.5496,  1.1840, 1
-), nrow = 4, byrow = FALSE)  # R uses column-major order
+MNI305_to_MNI152 <- matrix(
+  c(
+    0.9975,
+    0.0146,
+    -0.0130,
+    0,
+    -0.0073,
+    1.0009,
+    -0.0093,
+    0,
+    0.0176,
+    -0.0024,
+    0.9971,
+    0,
+    -0.0429,
+    1.5496,
+    1.1840,
+    1
+  ),
+  nrow = 4,
+  byrow = FALSE
+) # R uses column-major order
 
 
 #' MNI152 to MNI305 Affine Transform Matrix
@@ -115,7 +137,7 @@ MNI305_to_MNI152 <- matrix(c(
 #' # Transform a point from MNI152 to MNI305
 #' point_152 <- c(10.695, -18.409, 36.137)
 #' point_305 <- (MNI152_to_MNI305 %*% c(point_152, 1))[1:3]
-#' print(point_305)  # approximately c(10, -20, 35)
+#' print(point_305) # approximately c(10, -20, 35)
 #'
 #' @export
 MNI152_to_MNI305 <- solve(MNI305_to_MNI152)
@@ -161,17 +183,27 @@ get_space_transform <- function(from, to) {
 
   # Normalize case for flexibility
 
-from <- toupper(from)
-to <- toupper(to)
+  from <- toupper(from)
+  to <- toupper(to)
 
   if (!from %in% valid_spaces) {
-    warning("Unknown source space '", from, "'. ",
-            "Known spaces: ", paste(valid_spaces, collapse = ", "))
+    warning(
+      "Unknown source space '",
+      from,
+      "'. ",
+      "Known spaces: ",
+      paste(valid_spaces, collapse = ", ")
+    )
     return(NULL)
   }
   if (!to %in% valid_spaces) {
-    warning("Unknown target space '", to, "'. ",
-            "Known spaces: ", paste(valid_spaces, collapse = ", "))
+    warning(
+      "Unknown target space '",
+      to,
+      "'. ",
+      "Known spaces: ",
+      paste(valid_spaces, collapse = ", ")
+    )
     return(NULL)
   }
 
@@ -248,8 +280,13 @@ to <- toupper(to)
 #' all.equal(p305, p_roundtrip, tolerance = 1e-10)
 #'
 #' @export
-transform_coords <- function(coords, from = NULL, to = NULL,
-                             transform = NULL, coords_as_cols = FALSE) {
+transform_coords <- function(
+  coords,
+  from = NULL,
+  to = NULL,
+  transform = NULL,
+  coords_as_cols = FALSE
+) {
   # Get transform matrix
   if (is.null(transform)) {
     if (is.null(from) || is.null(to)) {
@@ -291,7 +328,6 @@ transform_coords <- function(coords, from = NULL, to = NULL,
     }
   }
 
-  n_points <- nrow(coords)
 
   # Add homogeneous coordinate
   coords_h <- cbind(coords, 1)
@@ -328,7 +364,8 @@ transform_coords <- function(coords, from = NULL, to = NULL,
 #'
 #' @return Character string indicating the coordinate space:
 #'   \itemize{
-#'     \item \code{"MNI305"} for fsaverage variants (fsaverage, fsaverage5, fsaverage6)
+#'     \item \code{"MNI305"} for fsaverage variants (fsaverage, fsaverage5,
+#' fsaverage6)
 #'     \item \code{"MNI152"} for fsLR (HCP template)
 #'     \item \code{"Unknown"} for unrecognized templates
 #'   }
@@ -344,9 +381,9 @@ transform_coords <- function(coords, from = NULL, to = NULL,
 #' @seealso \code{\link{transform_coords}}, \code{\link{get_space_transform}}
 #'
 #' @examples
-#' get_surface_coordinate_space("fsaverage")   # "MNI305"
-#' get_surface_coordinate_space("fsaverage6")  # "MNI305"
-#' get_surface_coordinate_space("fsLR")        # "MNI152"
+#' get_surface_coordinate_space("fsaverage") # "MNI305"
+#' get_surface_coordinate_space("fsaverage6") # "MNI305"
+#' get_surface_coordinate_space("fsLR") # "MNI152"
 #'
 #' @export
 get_surface_coordinate_space <- function(template_id) {
@@ -373,8 +410,11 @@ get_surface_coordinate_space <- function(template_id) {
   }
 
   # Unknown template
-  warning("Unknown surface template '", template_id,
-          "'. Returning 'Unknown' coordinate space.")
+  warning(
+    "Unknown surface template '",
+    template_id,
+    "'. Returning 'Unknown' coordinate space."
+  )
   coord_spaces$UNKNOWN
 }
 
@@ -404,10 +444,10 @@ get_surface_coordinate_space <- function(template_id) {
 #'   [needs_coord_transform()] and [needs_template_warp()] for transform checks.
 #'
 #' @examples
-#' template_to_coord_space("fsaverage")            # "MNI305"
-#' template_to_coord_space("MNI152NLin6Asym")      # "MNI152"
-#' template_to_coord_space("MNI152NLin2009cAsym")   # "MNI152"
-#' template_to_coord_space("fsLR_32k")              # "MNI152"
+#' template_to_coord_space("fsaverage") # "MNI305"
+#' template_to_coord_space("MNI152NLin6Asym") # "MNI152"
+#' template_to_coord_space("MNI152NLin2009cAsym") # "MNI152"
+#' template_to_coord_space("fsLR_32k") # "MNI152"
 #'
 #' @export
 template_to_coord_space <- function(template_id) {
@@ -418,8 +458,12 @@ template_to_coord_space <- function(template_id) {
   normalized <- .normalize_space_id(template_id)
 
   mni305_templates <- c("fsaverage", "fsaverage5", "fsaverage6", "MNI305")
-  mni152_templates <- c("fsLR_32k", "MNI152", "MNI152NLin6Asym",
-                         "MNI152NLin2009cAsym")
+  mni152_templates <- c(
+    "fsLR_32k",
+    "MNI152",
+    "MNI152NLin6Asym",
+    "MNI152NLin2009cAsym"
+  )
 
   if (normalized %in% mni305_templates) {
     return(coord_spaces$MNI305)
@@ -428,8 +472,11 @@ template_to_coord_space <- function(template_id) {
     return(coord_spaces$MNI152)
   }
 
-  warning("Unknown template '", template_id,
-          "'. Returning 'Unknown' coordinate space.")
+  warning(
+    "Unknown template '",
+    template_id,
+    "'. Returning 'Unknown' coordinate space."
+  )
   coord_spaces$UNKNOWN
 }
 
@@ -455,9 +502,9 @@ template_to_coord_space <- function(template_id) {
 #'   [template_to_coord_space()] for the underlying lookup.
 #'
 #' @examples
-#' needs_coord_transform("fsaverage", "MNI152NLin6Asym")  # TRUE
-#' needs_coord_transform("fsaverage", "MNI305")            # FALSE
-#' needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # FALSE
+#' needs_coord_transform("fsaverage", "MNI152NLin6Asym") # TRUE
+#' needs_coord_transform("fsaverage", "MNI305") # FALSE
+#' needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym") # FALSE
 #'
 #' @export
 needs_coord_transform <- function(from, to) {
@@ -495,10 +542,10 @@ needs_coord_transform <- function(from, to) {
 #'   [atlas_transform_plan()] for planning multi-step transforms.
 #'
 #' @examples
-#' needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # TRUE
-#' needs_template_warp("fsaverage", "fsaverage6")                   # TRUE
-#' needs_template_warp("fsaverage", "MNI152")                       # FALSE (different coord spaces)
-#' needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym")       # FALSE (identical)
+#' needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym") # TRUE
+#' needs_template_warp("fsaverage", "fsaverage6") # TRUE
+#' needs_template_warp("fsaverage", "MNI152") # FALSE (different coord spaces)
+#' needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym") # FALSE (identical)
 #'
 #' @export
 needs_template_warp <- function(from, to) {
@@ -537,13 +584,13 @@ needs_template_warp <- function(from, to) {
 #'
 #' @examples
 #' # fsaverage + MNI152 volume: transform needed
-#' needs_transform("fsaverage", "MNI152")  # TRUE
+#' needs_transform("fsaverage", "MNI152") # TRUE
 #'
 #' # fsLR + MNI152 volume: no transform needed
-#' needs_transform("fsLR", "MNI152")  # FALSE
+#' needs_transform("fsLR", "MNI152") # FALSE
 #'
 #' # fsaverage + MNI305 volume: no transform needed
-#' needs_transform("fsaverage", "MNI305")  # FALSE
+#' needs_transform("fsaverage", "MNI305") # FALSE
 #'
 #' @export
 needs_transform <- function(surface_template, volume_space) {
@@ -579,7 +626,8 @@ needs_transform <- function(surface_template, volume_space) {
 #' This is a convenience wrapper around \code{\link{transform_coords}} that
 #' automatically determines the source space from the surface template.
 #'
-#' @seealso \code{\link{transform_coords}}, \code{\link{get_surface_coordinate_space}}
+#' @seealso \code{\link{transform_coords}},
+#'   \code{\link{get_surface_coordinate_space}}
 #'
 #' @examples
 #' \dontrun{
@@ -592,14 +640,20 @@ needs_transform <- function(surface_template, volume_space) {
 #' }
 #'
 #' @export
-transform_vertices_to_volume <- function(vertices, surface_template,
-                                         target_space = "MNI152") {
+transform_vertices_to_volume <- function(
+  vertices,
+  surface_template,
+  target_space = "MNI152"
+) {
   # Get source space from template
   source_space <- get_surface_coordinate_space(surface_template)
 
   if (source_space == coord_spaces$UNKNOWN) {
-    warning("Unknown surface template '", surface_template,
-            "'. Returning vertices unchanged.")
+    warning(
+      "Unknown surface template '",
+      surface_template,
+      "'. Returning vertices unchanged."
+    )
     return(vertices)
   }
 

@@ -1,11 +1,17 @@
 #' Resolve and Load a Verified Template Transform
 #'
-#' Resolves an available image-space route and loads its verified artifacts.
+#' Resolves an available image or exact-domain surface route and loads its
+#' verified artifacts. Two `SurfaceGeometry` endpoints select an admitted native
+#' surface operator. An exact MNI identifier and a pinned surface target select
+#' a directed population cortical projection. Equal domains require a
+#' verified diagonal operator with unit weights before admission as an identity.
 #' Planning and fitting are separate: this function never estimates a
 #' registration. Nonlinear routes must have a published checksum and a passing
 #' qualification record in [space_transform_manifest()].
 #'
-#' @param from,to Exact source and target template identifiers.
+#' @param from,to Exact template identifiers or verified `SurfaceGeometry`
+#'   objects. Surface routes require exact geometries; broad names cannot
+#'   establish vertex ordering or admit execution.
 #' @param provider Artifact provider, or `"auto"` for registry selection.
 #' @param download Allow missing artifacts to be downloaded.
 #' @param verify Must be `TRUE`; artifact integrity cannot be disabled.
@@ -14,21 +20,87 @@
 #' @return A `template_transform` containing the plan, files, pullback morphism,
 #'   and artifact provenance. Its direction describes image movement; its
 #'   morphism maps target coordinates into source coordinates for sampling.
+#'   Surface routes return the operator from [get_surface_transform()] or the
+#'   `SurfaceProjection` from [get_surface_projection()].
 #' @seealso [apply_template_transform()], [transform_atlas()]
+#' @examples
+#' if (requireNamespace("neurotransform", quietly = TRUE) &&
+#'   requireNamespace("hdf5r", quietly = TRUE)) {
+#'   get_template_transform("MNI152NLin6Asym", "MNI152NLin6Asym")
+#' }
 #' @export
-get_template_transform <- function(from, to,
-                                   provider = c("auto", "neuroatlas", "templateflow"),
-                                   download = TRUE, verify = TRUE,
-                                   cache_dir = transform_cache_path(),
-                                   offline = FALSE) {
+get_template_transform <- function(
+  from,
+  to,
+  provider = c("auto", "neuroatlas", "templateflow"),
+  download = TRUE,
+  verify = TRUE,
+  cache_dir = transform_cache_path(),
+  offline = FALSE
+) {
   provider <- match.arg(provider)
   cache_dir <- .transform_cache_root(cache_dir)
   for (flag in list(download, verify, offline)) {
     assertthat::assert_that(is.logical(flag), length(flag) == 1L, !is.na(flag))
   }
   if (!verify) stop("Transform integrity verification cannot be disabled.")
-  plan <- atlas_transform_plan(from, to, data_type = "voxel", mode = "strict",
-                               available_only = TRUE, provider = provider)
+  if (is.character(from) && inherits(to, "SurfaceGeometry")) {
+    if (provider != "auto" && provider != "neuroatlas") {
+      stop("No cortical projection registered for this provider.")
+    }
+    return(get_surface_projection(from, to, cache_dir, download, offline))
+  }
+  if (inherits(from, "SurfaceGeometry") || inherits(to, "SurfaceGeometry")) {
+    if (!inherits(from, "SurfaceGeometry") || !inherits(to, "SurfaceGeometry")) {
+      stop("Supply verified surface geometry for both surface endpoints.")
+    }
+    atlas_transform_plan(
+      from$domain,
+      to$domain,
+      data_type = "vertex",
+      mode = "strict",
+      available_only = TRUE,
+      provider = provider
+    )
+    result <- get_surface_transform(
+      from,
+      to,
+      cache_dir,
+      offline = offline || !download
+    )
+    if (
+      identical(from$domain$id, to$domain$id) &&
+        .surface_engine_revision_verified(
+          "933edddda462593941e167726e8aaa7168ff103a"
+        )
+    ) {
+      p <- result$plan
+      if (
+        length(p$vals) != from$domain$n_vertices ||
+          any(p$rows != p$cols) || any(p$vals != 1)
+      ) {
+        stop("Surface operator does not establish exact index identity.")
+      }
+      result$specification$qualification <- "passed"
+      result$specification$qualification_scope <- "verified exact index identity"
+      result$specification$route_id <- "exact_index_identity"
+      result$key <- .surface_hash(result$specification)
+      result$integrity <- .surface_transform_digest(result)
+      .validate_surface_transform(result)
+    }
+    if (result$specification$qualification != "passed") {
+      stop("Exact surface route requires the qualified pinned engine build.")
+    }
+    return(result)
+  }
+  plan <- atlas_transform_plan(
+    from,
+    to,
+    data_type = "voxel",
+    mode = "strict",
+    available_only = TRUE,
+    provider = provider
+  )
   .require_neurotransform()
   steps <- plan$steps
   supported <- steps$backend %in% c("identity", "internal_affine")
@@ -47,30 +119,51 @@ get_template_transform <- function(from, to,
     } else if (step$backend == "internal_affine") {
       # Coordinate transforms are forward maps; image sampling needs pullback.
       matrix <- solve(get_space_transform(step$from_space, step$to_space))
-      neurotransform::Affine3DMorphism(step$from_space, step$to_space,
-                                       matrix = matrix)
+      neurotransform::Affine3DMorphism(
+        step$from_space,
+        step$to_space,
+        matrix = matrix
+      )
     } else {
       if (!identical(step$convention, "ants_image_pullback_ras")) {
         stop("Artifact lacks a qualified ANTs image pullback convention.")
       }
       loaded <- .fetch_transform_artifact(
-        step, cache_dir, download = download, offline = offline, verify = verify,
-        .use = function(path) list(path = path,
-          morphism = neurotransform::ants_h5_morphism(
-            path, source = step$from_space, target = step$to_space))
+        step,
+        cache_dir,
+        download = download,
+        offline = offline,
+        verify = verify,
+        .use = function(path) {
+          list(
+            path = path,
+            morphism = neurotransform::ants_h5_morphism(
+              path,
+              source = step$from_space,
+              target = step$to_space
+            )
+          )
+        }
       )
       files[[i]] <- loaded$path
       loaded$morphism
     }
   }
   morphism <- Reduce(neurotransform::compose, morphisms)
-  structure(list(
-    from_space = plan$from_space, to_space = plan$to_space,
-    plan = plan, files = files, morphism = morphism, cache_dir = cache_dir,
-    engine_version = as.character(utils::packageVersion("neurotransform")),
-    engine_source_sha = .neurotransform_source_sha(),
-    engine_compatibility = "simpleitk-h5-conventions-v1"
-  ), class = c("template_transform", "list"))
+  structure(
+    list(
+      from_space = plan$from_space,
+      to_space = plan$to_space,
+      plan = plan,
+      files = files,
+      morphism = morphism,
+      cache_dir = cache_dir,
+      engine_version = as.character(utils::packageVersion("neurotransform")),
+      engine_source_sha = .neurotransform_source_sha(),
+      engine_compatibility = "simpleitk-h5-conventions-v1"
+    ),
+    class = c("template_transform", "list")
+  )
 }
 
 .require_neurotransform <- function() {
@@ -78,11 +171,18 @@ get_template_transform <- function(from, to,
     stop("Template application requires the optional 'neurotransform' package.")
   }
   if (!requireNamespace("hdf5r", quietly = TRUE)) {
-    stop("Template transforms require the optional 'hdf5r' package. ",
-         "Install it with install.packages('hdf5r').")
+    stop(
+      "Template transforms require the optional 'hdf5r' package. ",
+      "Install it with install.packages('hdf5r')."
+    )
   }
-  required <- c("ants_h5_morphism", "make_resampling_plan",
-                "apply_resampling_plan", "grid_spec", "compose")
+  required <- c(
+    "ants_h5_morphism",
+    "make_resampling_plan",
+    "apply_resampling_plan",
+    "grid_spec",
+    "compose"
+  )
   if (!all(required %in% getNamespaceExports("neurotransform"))) {
     stop("Installed neurotransform lacks the required template apply API.")
   }
@@ -103,84 +203,173 @@ get_template_transform <- function(from, to,
   root <- system.file("extdata", "transform-engine-probe", package = "neuroatlas")
   if (!nzchar(root)) stop("Missing bundled transform-engine compatibility probe.")
   expected <- utils::read.csv(file.path(root, "points.csv"))
-  compatible <- tryCatch({
-    all(vapply(unique(expected$transform), function(name) {
-      rows <- expected[expected$transform == name, ]
-      morphism <- neurotransform::ants_h5_morphism(file.path(root, name))
-      actual <- as.matrix(neurotransform::transform(morphism,
-        as.matrix(rows[, c("x", "y", "z")])))
-      reference <- as.matrix(rows[, c("expected_x", "expected_y", "expected_z")])
-      identical(dim(actual), dim(reference)) && all(is.finite(actual)) &&
-        max(abs(actual - reference)) < 1e-7
-    }, logical(1)))
-  }, error = function(e) FALSE)
+  compatible <- tryCatch(
+    {
+      all(
+        vapply(
+          unique(expected$transform),
+          function(name) {
+            rows <- expected[expected$transform == name, ]
+            morphism <- neurotransform::ants_h5_morphism(file.path(root, name))
+            actual <- as.matrix(
+              neurotransform::transform(
+                morphism,
+                as.matrix(rows[, c("x", "y", "z")])
+              )
+            )
+            reference <- as.matrix(rows[, c("expected_x", "expected_y", "expected_z")])
+            identical(dim(actual), dim(reference)) && all(is.finite(actual)) &&
+              max(abs(actual - reference)) < 1e-7
+          },
+          logical(1)
+        )
+      )
+    },
+    error = function(e) FALSE
+  )
   if (!compatible) {
-    stop("Installed neurotransform fails the independent H5 convention probe. ",
-         "Install the revision pinned in neuroatlas's Remotes field.")
+    stop(
+      "Installed neurotransform fails the independent H5 convention probe. ",
+      "Install the revision pinned in neuroatlas's Remotes field."
+    )
   }
   invisible(TRUE)
 }
 
-#' Apply a Template Transform on an Explicit Grid
+#' Apply a Verified Template or Surface Transform
 #'
 #' Composes the complete route in physical coordinates and samples each input
 #' channel once. Labels use nearest neighbour; scalar and probability values
-#' use linear interpolation. Out-of-field samples are zero. Probability channels
-#' are interpolated independently, without clipping or renormalisation.
+#' use linear interpolation. For image-to-image transforms, out-of-field samples
+#' are zero and probability channels are interpolated independently. Surface
+#' transforms dispatch to [apply_surface_transform()] or
+#' [apply_surface_projection()], whose unsupported samples are `NA` and whose
+#' coverage and missingness semantics are documented separately.
 #'
-#' @param x A volumetric atlas, `NeuroVol`, or `NeuroVec` (channels in dimension 4).
+#' @param x A volumetric atlas, `NeuroVol`, or `NeuroVec` (channels in dimension
+#'   4),
+#'   or `SurfaceData` for a native surface operator.
 #' @param transform A verified [get_template_transform()] result.
 #' @param target Target atlas, `NeuroVol`, or explicit `NeuroSpace`. A bare grid
 #'   is an assertion by the caller that it is in the transform's target space.
 #'   Attached source/target metadata must agree with the route.
-#' @param data_type `"auto"` uses declared metadata, or label semantics for atlas
+#'   Surface operators already bind their exact target domain: `NULL` uses that
+#'   domain, or supply the matching `SurfaceGeometry` or `SurfaceDomain`.
+#' @param data_type `"auto"` uses declared metadata, or label semantics for
+#'   atlas
 #'   objects. Unannotated volumes require an explicit type; integer-valued
 #'   samples alone do not imply labels.
-#' @param interpolation `NULL` selects the type-specific method. Only `"nearest"`
+#' @param interpolation `NULL` selects the type-specific method. Only
+#'   `"nearest"`
 #'   for labels and `"linear"` for continuous/probability data are supported.
 #' @return The transformed atlas or volume. The `neuroatlas_transform` attribute
 #'   records the route, artifact hashes, interpolation, grids and lost labels.
 #'   Atlas objects retain semantic IDs, labels and source provenance, including
 #'   regions that disappear on the target grid.
+#'   A surface destination returns `SurfaceData` with exact domain, availability
+#'   and projection provenance.
+#' @examples
+#' if (requireNamespace("neurotransform", quietly = TRUE) &&
+#'   requireNamespace("hdf5r", quietly = TRUE)) {
+#'   grid <- neuroim2::NeuroSpace(c(2, 2, 2))
+#'   volume <- neuroim2::NeuroVol(array(0.25, c(2, 2, 2)), grid)
+#'   transform <- get_template_transform("MNI152NLin6Asym", "MNI152NLin6Asym")
+#'   apply_template_transform(volume, transform, grid, data_type = "continuous")
+#' }
 #' @export
-apply_template_transform <- function(x, transform, target,
-                                     data_type = c("auto", "continuous", "label", "probability"),
-                                     interpolation = NULL) {
+apply_template_transform <- function(
+  x,
+  transform,
+  target = NULL,
+  data_type = c("auto", "continuous", "label", "probability"),
+  interpolation = NULL
+) {
   data_type <- match.arg(data_type)
+  if (inherits(transform, "SurfaceProjection")) {
+    if (!is.null(target)) {
+      domain <- if (inherits(target, "SurfaceGeometry")) target$domain else target
+      .validate_surface_domain(domain)
+      if (!identical(domain$id, transform$specification$target$id)) {
+        stop("Target domain does not match the cortical projection.")
+      }
+    }
+    if (!is.null(interpolation)) stop("Projection interpolation follows its data type.")
+    return(
+      apply_surface_projection(
+        x,
+        transform,
+        source_space = transform$specification$from_space,
+        data_type = data_type
+      )
+    )
+  }
+  if (inherits(transform, "SurfaceTransform")) {
+    if (!is.null(target)) {
+      domain <- if (inherits(target, "SurfaceGeometry")) target$domain else target
+      .validate_surface_domain(domain)
+      if (!identical(domain$id, transform$specification$to$id)) {
+        stop("Target domain does not match the surface transform.")
+      }
+    }
+    if (
+      !inherits(x, "SurfaceData") ||
+        (data_type != "auto" && data_type != x$data_type)
+    ) {
+      stop("Surface application requires matching domain-bound SurfaceData.")
+    }
+    if (!is.null(interpolation)) {
+      stop("Surface interpolation is fixed by its qualified operator.")
+    }
+    return(apply_surface_transform(x, transform))
+  }
   .require_neurotransform()
-  if (!inherits(transform, "template_transform") ||
+  if (
+    !inherits(transform, "template_transform") ||
       !identical(transform$plan$status, "available") ||
       !identical(transform$from_space, transform$plan$from_space) ||
-      !identical(transform$to_space, transform$plan$to_space)) {
+      !identical(transform$to_space, transform$plan$to_space)
+  ) {
     stop("'transform' must be a verified available template_transform.")
   }
   if (inherits(x, "surfatlas") || inherits(target, "surfatlas")) {
     stop("Template transforms currently support volumetric data only.")
   }
   is_atlas <- inherits(x, "atlas")
-  source_meta <- if (is_atlas) atlas_metadata(x) else {
+  source_meta <- if (is_atlas) {
+    atlas_metadata(x)
+  } else {
     attr(x, "neuroatlas_metadata", exact = TRUE)
   }
   previous <- attr(x, "neuroatlas_transform", exact = TRUE)
-  if (!is.null(previous) &&
-      !identical(previous$to_space, transform$from_space)) {
+  if (
+    !is.null(previous) &&
+      !identical(previous$to_space, transform$from_space)
+  ) {
     stop("Recorded source template does not match the requested transform.")
   }
-  target_meta <- if (inherits(target, "atlas")) atlas_metadata(target) else {
+  target_meta <- if (inherits(target, "atlas")) {
+    atlas_metadata(target)
+  } else {
     attr(target, "neuroatlas_metadata", exact = TRUE)
   }
   .check_transform_space(source_meta, transform$from_space, "source")
   .check_transform_space(target_meta, transform$to_space, "target")
   declared_type <- if (is_atlas) "labels" else source_meta$content$value_type
-  inferred <- c(labels = "label", mask = "label", intensity = "continuous",
-                probability = "probability")[declared_type]
+  inferred <- c(
+    labels = "label",
+    mask = "label",
+    intensity = "continuous",
+    probability = "probability"
+  )[declared_type]
   if (data_type == "auto") {
     if (length(inferred) != 1L || is.na(inferred)) {
       stop("Unannotated data require an explicit 'data_type'.")
     }
     data_type <- unname(inferred)
-  } else if (length(inferred) == 1L && !is.na(inferred) &&
-             data_type != unname(inferred)) {
+  } else if (
+    length(inferred) == 1L && !is.na(inferred) &&
+      data_type != unname(inferred)
+  ) {
     stop("'data_type' conflicts with declared source metadata.")
   }
   method <- if (data_type == "label") "nearest" else "linear"
@@ -188,13 +377,17 @@ apply_template_transform <- function(x, transform, target,
     stop("Interpolation for ", data_type, " data must be '", method, "'.")
   }
   moving <- if (is_atlas) .get_atlas_volume(x) else x
-  if (!methods::is(moving, "NeuroVol") &&
+  if (
+    !methods::is(moving, "NeuroVol") &&
       !methods::is(moving, "NeuroVec") &&
-      !methods::is(moving, "ClusteredNeuroVol")) {
+      !methods::is(moving, "ClusteredNeuroVol")
+  ) {
     stop("'x' must contain a NeuroVol or NeuroVec.")
   }
   if (inherits(target, "atlas")) target <- .get_atlas_volume(target)
-  target_space <- if (methods::is(target, "NeuroSpace")) target else {
+  target_space <- if (methods::is(target, "NeuroSpace")) {
+    target
+  } else {
     if (!methods::is(target, "NeuroVol")) {
       stop("'target' must be a NeuroSpace, NeuroVol, or volumetric atlas.")
     }
@@ -203,10 +396,14 @@ apply_template_transform <- function(x, transform, target,
   if (length(dim(target_space)) != 3L) stop("Target grid must be three-dimensional.")
   values <- if (methods::is(moving, "ClusteredNeuroVol")) {
     methods::as(moving, "array")
-  } else as.array(moving)
-  if ((!is.numeric(values) && !is.logical(values)) ||
+  } else {
+    as.array(moving)
+  }
+  if (
+    (!is.numeric(values) && !is.logical(values)) ||
       !length(dim(values)) %in% c(3L, 4L) ||
-      any(!is.finite(values))) {
+      any(!is.finite(values))
+  ) {
     stop("Input must have finite numeric values on a 3D or 4D grid.")
   }
   if (data_type == "label" && any(values != round(values))) {
@@ -217,60 +414,108 @@ apply_template_transform <- function(x, transform, target,
   }
   storage.mode(values) <- "double"
   if (is.null(source_meta)) {
-    source_meta <- .transform_input_metadata(moving, transform$from_space, data_type)
+    source_meta <- .transform_input_metadata(
+      moving,
+      transform$from_space,
+      data_type
+    )
   }
-  source_grid <- neurotransform::grid_spec(dim(values)[1:3],
-                                          neuroim2::trans(moving))
-  target_grid <- neurotransform::grid_spec(dim(target_space),
-                                          neuroim2::trans(target_space))
+  source_grid <- neurotransform::grid_spec(
+    dim(values)[1:3],
+    neuroim2::trans(moving)
+  )
+  target_grid <- neurotransform::grid_spec(
+    dim(target_space),
+    neuroim2::trans(target_space)
+  )
   build_plan <- function() {
     # Hold cache exclusion until all lazy H5 reads have become resident sampling
     # weights. Applying this compiled plan no longer needs the cache files.
     for (i in which(!is.na(transform$files))) {
       path <- .fetch_transform_artifact_unlocked(
-        transform$plan$steps[i, , drop = FALSE], transform$cache_dir,
-        download = FALSE, offline = TRUE, verify = TRUE)
+        transform$plan$steps[i, , drop = FALSE],
+        transform$cache_dir,
+        download = FALSE,
+        offline = TRUE,
+        verify = TRUE
+      )
       if (!identical(path, transform$files[[i]])) stop("Transform cache path changed.")
     }
     neurotransform::make_resampling_plan(
-      transform$morphism, source_grid, target_grid, interpolation = method,
-      reuse_count = 2L, cache = FALSE)
+      transform$morphism,
+      source_grid,
+      target_grid,
+      interpolation = method,
+      reuse_count = 2L,
+      cache = FALSE
+    )
   }
   sampling <- if (any(!is.na(transform$files))) {
     .with_transform_cache_lock(
-      file.path(transform$cache_dir, ".neuroatlas-cache.lock"), NULL, NULL,
-      build_plan)
-  } else build_plan()
+      file.path(transform$cache_dir, ".neuroatlas-cache.lock"),
+      NULL,
+      NULL,
+      build_plan
+    )
+  } else {
+    build_plan()
+  }
   result_values <- neurotransform::apply_resampling_plan(
-    sampling, values, outside = 0, modulate = "none"
+    sampling,
+    values,
+    outside = 0,
+    modulate = "none"
   )
   if (any(!is.finite(result_values))) stop("Transform produced non-finite values.")
   lost <- numeric()
   if (data_type == "label") {
     source_ids <- unique(as.numeric(values))
     result_ids <- unique(as.numeric(result_values))
-    if (any(result_values != round(result_values)) ||
-        !all(result_ids %in% c(0, source_ids))) {
+    if (
+      any(result_values != round(result_values)) ||
+        !all(result_ids %in% c(0, source_ids))
+    ) {
       stop("Transform violated label integrity.")
     }
     lost <- setdiff(source_ids[source_ids != 0], result_ids)
   }
-  if (data_type == "probability" &&
-      any(result_values < -1e-6 | result_values > 1 + 1e-6)) {
+  if (
+    data_type == "probability" &&
+      any(result_values < -1e-6 | result_values > 1 + 1e-6)
+  ) {
     stop("Transform violated probability bounds.")
   }
   result <- if (length(dim(result_values)) == 4L) {
-    sp <- neuroim2::NeuroSpace(dim(result_values),
-                              trans = neuroim2::trans(target_space))
+    sp <- neuroim2::NeuroSpace(
+      dim(result_values),
+      trans = neuroim2::trans(target_space)
+    )
     neuroim2::DenseNeuroVec(result_values, sp)
-  } else neuroim2::DenseNeuroVol(result_values, target_space)
+  } else {
+    neuroim2::DenseNeuroVol(result_values, target_space)
+  }
   receipt <- list(
-    from_space = transform$from_space, to_space = transform$to_space,
-    artifacts = transform$plan$steps, files = transform$files,
-    source_grid = list(dim = dim(values)[1:3], affine = neuroim2::trans(moving)),
-    target_grid = list(dim = dim(target_space), affine = neuroim2::trans(target_space)),
-    data_type = data_type, interpolation = method, outside = 0,
-    renormalized = FALSE, lost_label_ids = lost,
+    from_space = transform$from_space,
+    to_space = transform$to_space,
+    artifacts = transform$plan$steps,
+    files = transform$files,
+    source_grid = list(
+      dim = dim(values)[1:3],
+      affine = neuroim2::trans(
+        moving
+      )
+    ),
+    target_grid = list(
+      dim = dim(target_space),
+      affine = neuroim2::trans(
+        target_space
+      )
+    ),
+    data_type = data_type,
+    interpolation = method,
+    outside = 0,
+    renormalized = FALSE,
+    lost_label_ids = lost,
     neurotransform_version = transform$engine_version,
     neurotransform_source_sha = .neurotransform_source_sha(),
     engine_compatibility = "simpleitk-h5-conventions-v1",
@@ -278,7 +523,12 @@ apply_template_transform <- function(x, transform, target,
   )
   attr(result, "neuroatlas_transform") <- receipt
   if (!is.null(source_meta)) {
-    meta <- .transformed_resource_metadata(source_meta, result, transform, receipt)
+    meta <- .transformed_resource_metadata(
+      source_meta,
+      result,
+      transform,
+      receipt
+    )
     attr(result, "neuroatlas_metadata") <- meta
   }
   if (is_atlas) {
@@ -293,13 +543,24 @@ apply_template_transform <- function(x, transform, target,
 }
 
 .check_transform_space <- function(metadata, expected, role) {
-  if (is.null(metadata)) return(invisible(NULL))
+  if (is.null(metadata)) {
+    return(invisible(NULL))
+  }
   validate_resource_metadata(metadata)
   declared <- metadata$spatial$template_space
-  if (is.na(declared) || !nzchar(declared) ||
-      !identical(.normalize_space_id(declared), expected)) {
-    stop("Declared ", role, " template does not match transform: expected ", expected,
-         ", found ", declared, ".")
+  if (
+    is.na(declared) || !nzchar(declared) ||
+      !identical(.normalize_space_id(declared), expected)
+  ) {
+    stop(
+      "Declared ",
+      role,
+      " template does not match transform: expected ",
+      expected,
+      ", found ",
+      declared,
+      "."
+    )
   }
 }
 
@@ -311,20 +572,47 @@ apply_template_transform <- function(x, transform, target,
   geometry$units <- "mm"
   .new_resource_metadata(
     kind = "template",
-    identity = list(id = from, name = "User-supplied volume", family = "template",
-      model = from, version = NA_character_, description = NA_character_,
-      species = NA_character_, coverage = NA_character_),
-    content = list(representation = "volume", value_type = switch(data_type,
-      continuous = "intensity", label = "labels", probability = "probability"),
-      parameters = list(), regions = NA_integer_, derived = FALSE),
-    spatial = c(list(template_space = from,
-      coord_space = suppressWarnings(template_to_coord_space(from)),
-      resolution = paste0(paste(geometry$voxel_size, collapse = "x"), "mm"),
-      density = NA_character_, basis = "user_supplied"), geometry),
-    provenance = list(source = "user_supplied", url = NA_character_,
+    identity = list(
+      id = from,
+      name = "User-supplied volume",
+      family = "template",
+      model = from,
+      version = NA_character_,
+      description = NA_character_,
+      species = NA_character_,
+      coverage = NA_character_
+    ),
+    content = list(
+      representation = "volume",
+      value_type = switch(data_type,
+        continuous = "intensity",
+        label = "labels",
+        probability = "probability"
+      ),
+      parameters = list(),
+      regions = NA_integer_,
+      derived = FALSE
+    ),
+    spatial = c(
+      list(
+        template_space = from,
+        coord_space = suppressWarnings(template_to_coord_space(from)),
+        resolution = paste0(paste(geometry$voxel_size, collapse = "x"), "mm"),
+        density = NA_character_,
+        basis = "user_supplied"
+      ),
+      geometry
+    ),
+    provenance = list(
+      source = "user_supplied",
+      url = NA_character_,
       lineage = "Input template identity asserted by the transform caller.",
-      confidence = "uncertain", notes = NA_character_, issues = character()),
-    citations = .empty_resource_citations(), artifacts = .empty_atlas_artifacts(),
+      confidence = "uncertain",
+      notes = NA_character_,
+      issues = character()
+    ),
+    citations = .empty_resource_citations(),
+    artifacts = .empty_atlas_artifacts(),
     history = .empty_atlas_history()
   )
 }
@@ -340,32 +628,51 @@ apply_template_transform <- function(x, transform, target,
   }
   for (nm in names(geometry)) meta$spatial[[nm]] <- geometry[[nm]]
   meta$spatial$template_space <- transform$to_space
-  meta$spatial$coord_space <- suppressWarnings(template_to_coord_space(transform$to_space))
-  meta$spatial$resolution <- paste0(paste(geometry$voxel_size, collapse = "x"), "mm")
+  meta$spatial$coord_space <- suppressWarnings(
+    template_to_coord_space(
+      transform$to_space
+    )
+  )
+  meta$spatial$resolution <- paste0(
+    paste(geometry$voxel_size, collapse = "x"),
+    "mm"
+  )
   meta$spatial$basis <- parent$spatial$basis
   meta$spatial$sampling_reference <- transform$to_space
   meta$content$derived <- TRUE
   meta$parents <- list(source = parent)
-  meta$history <- dplyr::bind_rows(meta$history, .new_atlas_history(
-    "template_transform", "volume", from_template_space = transform$from_space,
-    to_template_space = transform$to_space,
-    from_coord_space = parent$spatial$coord_space,
-    to_coord_space = meta$spatial$coord_space,
-    confidence = transform$plan$confidence,
-    details = "Applied a verified template route with one sampling operation.",
-    parameters = receipt
-  ))
+  meta$history <- dplyr::bind_rows(
+    meta$history,
+    .new_atlas_history(
+      "template_transform",
+      "volume",
+      from_template_space = transform$from_space,
+      to_template_space = transform$to_space,
+      from_coord_space = parent$spatial$coord_space,
+      to_coord_space = meta$spatial$coord_space,
+      confidence = transform$plan$confidence,
+      details = "Applied a verified template route with one sampling operation.",
+      parameters = receipt
+    )
+  )
   meta$history$step <- seq_len(nrow(meta$history))
   steps <- transform$plan$steps
   for (i in which(!is.na(transform$files))) {
     step <- steps[i, , drop = FALSE]
     artifact <- .new_atlas_artifact(
-      role = "template_transform", family = "template", model = step$artifact_id,
-      source_name = step$provider, source_url = step$url,
-      source_ref = step$artifact_id, source_version = step$artifact_version,
-      license = step$license, file_name = basename(transform$files[[i]]),
-      local_path = transform$files[[i]], sha256 = step$sha256,
-      template_space = step$to_space, confidence = step$confidence
+      role = "template_transform",
+      family = "template",
+      model = step$artifact_id,
+      source_name = step$provider,
+      source_url = step$url,
+      source_ref = step$artifact_id,
+      source_version = step$artifact_version,
+      license = step$license,
+      file_name = basename(transform$files[[i]]),
+      local_path = transform$files[[i]],
+      sha256 = step$sha256,
+      template_space = step$to_space,
+      confidence = step$confidence
     )
     artifact$checksum <- step$sha256
     artifact$checksum_algorithm <- "sha256"
@@ -376,28 +683,78 @@ apply_template_transform <- function(x, transform, target,
   meta
 }
 
-#' Transform a Volumetric Atlas to Another Template
+#' Transform a Volumetric Atlas to a Template or Cortical Surface
 #'
 #' Uses atlas metadata to resolve the source space, then applies a verified
 #' template transform on the requested target grid. Region identities and source
 #' receipts are retained. This changes spatial coordinates, not the atlas's
-#' parcellation scheme; use [atlas_overlap()] after alignment to compare parcels.
+#' parcellation scheme; use [atlas_overlap()] after alignment to compare
+#' parcels.
 #'
 #' @param x A volumetric atlas with a declared template identity.
-#' @param to_space Exact target template identifier.
+#' @param to_space Exact target template identifier or verified
+#'   `SurfaceGeometry`.
 #' @param target Explicit target atlas, volume or grid. If `NULL`, load the
-#'   requested template through [get_template()].
+#'   requested template through [get_template()]. A `SurfaceGeometry` supplies
+#'   an exact cortical destination, matching `to_space` when both are supplied.
 #' @param resolution Template resolution, required when `target` is `NULL`.
 #' @param provider Artifact provider.
 #' @param ... Download/cache options passed to [get_template_transform()].
-#' @return A transformed atlas with updated spatial metadata and history.
+#' @return For a volume destination, a transformed atlas with updated spatial
+#'   metadata and history. For a cortical destination, `SurfaceData` with the
+#'   original region IDs and names, source atlas reference, coverage and
+#'   lost-label reporting. Population projection does not establish subject
+#'   registration.
+#' @examples
+#' \dontrun{
+#' atlas <- get_harvard_oxford_atlas("cortical", resolution = "02")
+#' transformed <- transform_atlas(atlas, "MNI152NLin2009cAsym", resolution = 2)
+#' }
 #' @export
-transform_atlas <- function(x, to_space, target = NULL, resolution = NULL,
-                            provider = "auto", ...) {
+transform_atlas <- function(
+  x,
+  to_space,
+  target = NULL,
+  resolution = NULL,
+  provider = "auto",
+  ...
+) {
   if (!inherits(x, "atlas") || inherits(x, "surfatlas")) {
     stop("'x' must be a volumetric atlas.")
   }
   from <- atlas_metadata(x)$spatial$template_space
+  geometry <- if (inherits(to_space, "SurfaceGeometry")) {
+    to_space
+  } else {
+    if (inherits(target, "SurfaceGeometry")) {
+      target
+    } else {
+      NULL
+    }
+  }
+  if (!is.null(geometry)) {
+    if (
+      is.character(to_space) &&
+        .normalize_space_id(to_space) != .surface_domain_space(
+          geometry$domain
+        )
+    ) {
+      stop("Target space identifier does not match the exact surface geometry.")
+    }
+    if (
+      inherits(target, "SurfaceGeometry") &&
+        !identical(target$domain$id, geometry$domain$id)
+    ) {
+      stop("Target surface geometries disagree.")
+    }
+    transform <- get_template_transform(
+      from,
+      geometry,
+      provider = provider,
+      ...
+    )
+    return(apply_template_transform(x, transform, geometry, data_type = "label"))
+  }
   transform <- get_template_transform(from, to_space, provider = provider, ...)
   if (is.null(target)) {
     if (is.null(resolution)) stop("Supply 'target' or an explicit 'resolution'.")

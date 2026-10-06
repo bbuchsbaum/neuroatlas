@@ -48,7 +48,9 @@ stopifnot(neuroatlas:::.require_surface_engine()$dll_sha256==installed_binding$d
 binding_paths <- c(binding_path, source_binding_path, installed_binding_path)
 }
 stopifnot(all(file.copy(binding_paths, out)))
-consumer_sources <- c('DESCRIPTION','NAMESPACE',list.files('R',full.names=TRUE,pattern='[.]R$'))
+consumer_sources <- c('DESCRIPTION','NAMESPACE',list.files('R',full.names=TRUE,pattern='[.]R$'),
+  file.path('inst/extdata', c('transform_registry.csv', 'surface-inputs-v1.json',
+    'surface-domains-v1.json', 'projection-inputs-v1.json')))
 consumer_hashes <- as.list(setNames(vapply(consumer_sources,sha,character(1)),consumer_sources))
 lock <- jsonlite::read_json(file.path(base, 'inputs.lock.json'))
 input <- Sys.getenv('NEUROATLAS_SURFACE_INPUTS', file.path(base, 'work/inputs'))
@@ -171,8 +173,10 @@ for (hemi in c('L','R')) for (down in c(TRUE,FALSE)) {
   src <- geometries[[names[1]]]; dst <- geometries[[names[2]]]
   name <- paste(names,collapse='_to_')
   cat('Building',name,'\n')
-  op <- get_surface_transform(src,dst,file.path(out,'cache'))
-  stopifnot(identical(op,get_surface_transform(src,dst,file.path(out,'cache'),TRUE)))
+  op <- get_template_transform(src, dst, cache_dir = file.path(out, 'cache'))
+  stopifnot(op$specification$qualification == 'passed',
+    identical(op, get_template_transform(src, dst,
+      cache_dir = file.path(out, 'cache'), offline = TRUE)))
   cases[[length(cases)+1L]] <- export_case(name,src,dst,op)
   unit <- src$sphere/sqrt(rowSums(src$sphere^2))
   values <- cbind(constant=rep(if(hemi=='L')0.25 else 0.75,nrow(unit)),

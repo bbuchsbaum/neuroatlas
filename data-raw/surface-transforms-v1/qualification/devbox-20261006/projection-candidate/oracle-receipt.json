@@ -1,0 +1,981 @@
+{
+  "status": "PASS",
+  "contract_sha256": "fa352ef22bcad2a7ad23c3cc9fd1fc1245594c61775f639c2fb04e66800c0de4",
+  "consumer_receipt_sha256": "816079ab1e2db4b7150ec1cfe53af3f738436efc0db57f21528df26fd0f352de",
+  "oracle_sha256": "0590db228c8656abc94bcc5cd90cf749a142c13f7a10bdba025cc4f720c0bf65",
+  "numpy_version": "2.4.3",
+  "cases": [
+    {
+      "name": "synthetic-continuous-FALSE-2-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.842170943040401e-14,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-2-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.842170943040401e-14,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-2-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.842170943040401e-14,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-3-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-3-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-3-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-5-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-5-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-5-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-9-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 1.4210854715202004e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-9-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 1.4210854715202004e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-FALSE-9-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 1.4210854715202004e-14,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-2-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-2-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-2-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-3-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-3-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-3-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-5-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-5-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-5-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-9-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-9-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-FALSE-9-error",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-2-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-2-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-2-error",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-3-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-3-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-3-error",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-5-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-5-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-5-error",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-9-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-9-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-FALSE-9-error",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-2-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.842170943040401e-14,
+      "maximum_mass_error": 1.3322676295501878e-15,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-2-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.842170943040401e-14,
+      "maximum_mass_error": 1.3322676295501878e-15,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-3-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 8.881784197001252e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-3-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 8.881784197001252e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-5-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 5.551115123125783e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-5-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 2.1316282072803006e-14,
+      "maximum_mass_error": 5.551115123125783e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-9-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 1.4210854715202004e-14,
+      "maximum_mass_error": 7.771561172376096e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-continuous-TRUE-9-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 1.4210854715202004e-14,
+      "maximum_mass_error": 7.771561172376096e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-2-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-2-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-3-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-3-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-5-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-5-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-9-propagate",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-label-TRUE-9-omit",
+      "vertices": 1032,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-2-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 1.3322676295501878e-15,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-2-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 1.3322676295501878e-15,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-3-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 8.881784197001252e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-3-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 8.881784197001252e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-5-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 5.551115123125783e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-5-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 5.551115123125783e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-9-propagate",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 7.771561172376096e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "synthetic-probability-TRUE-9-omit",
+      "vertices": 1032,
+      "maps": 2,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 7.771561172376096e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-L-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsLR-L-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-R-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsLR-R-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-L-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsLR-L-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-R-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsLR-R-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-L-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsLR-L-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-R-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsLR-R-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-L-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsLR-L-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-R-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsLR-R-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-L-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsLR-L-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-R-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsLR-R-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-L-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsLR-L-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-R-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsLR-R-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-L-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsLR-L-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-R-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsLR-R-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-L-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsLR-L-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-R-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsLR-R-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-L-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsLR-L-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-R-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsLR-R-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-L-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsLR-L-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-R-continuous",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsLR-R-continuous",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-L-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsLR-L-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-R-label",
+      "vertices": 163842,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsLR-R-label",
+      "vertices": 32492,
+      "maps": 1,
+      "maximum_error": 0.0,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-L-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 2.7755575615628914e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsLR-L-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-R-probability",
+      "vertices": 163842,
+      "maps": 2,
+      "maximum_error": 3.3306690738754696e-16,
+      "maximum_mass_error": 4.440892098500626e-16,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsLR-R-probability",
+      "vertices": 32492,
+      "maps": 2,
+      "maximum_error": 2.220446049250313e-16,
+      "maximum_mass_error": 0.0,
+      "label_mismatches": 0,
+      "availability_mismatches": 0
+    }
+  ]
+}

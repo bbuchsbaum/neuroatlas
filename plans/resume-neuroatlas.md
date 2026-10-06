@@ -1,15 +1,9 @@
 # Resume neuroatlas on another machine
 
 Updated 2026-10-06. Working branch: `feat/native-surface-transforms`.
-Mainline integrated through `f29dcc54911ac76548fe82b52b63b65afe865eb5`.
-Mote is authoritative; its shared format and append-only operations are tracked.
-Actor identity, leases, temporary files, input downloads and operator caches are
-local. A clean Git checkout does not imply the scientific release is complete.
-
-Verified code checkpoint: `05871cbb145424e29daefed3380814f0b2a0016e`, pushed
-to this branch and rechecked against GitHub on 2026-10-06. Later handoff-only
-commits update plans/Mote history; the engineering results below are bound to
-this code checkpoint. The surface slice is not merged into master or released.
+Release candidate: **0.2.0**. This handoff records local validation; consult Mote
+and GitHub for subsequent hosted checks, merge and publication status.
+The broader transform Mote remains open for later coverage.
 
 ## Start from GitHub
 
@@ -22,21 +16,45 @@ git log -1 --oneline
 mkdir -p .mote/local .mote/tmp
 mote actor set your-machine-actor
 mote doctor
+mote fsck
 mote board
 mote show bd-01M3CCBG9346NRV3WEVH5YNBCQ
 ```
 
-Install the Mote CLI separately if absent; do not initialize a second store.
-Choose a distinct actor on the new machine. Use `mote begin` with the exact paths
-of the next bounded task. Do not reuse another machine's active reservations.
+Install the Mote CLI separately if absent. Do not run `mote init`: the shared
+format and append-only operations are already Git-tracked. Set a distinct actor
+for each machine. Actor identity, sessions, caches, downloads and temporary files
+are local. Commit and push Mote changes with the code; no export/import step is
+needed to reconstruct the board.
 
-## Rebuild the development environment
+On this Google Cloud devbox, `/work` is a persistent disk. The Mote binary is
+`/work/.local/bin/mote`, linked through `~/.local/bin/mote`. Home and Codex
+configuration are on the persistent boot disk. Persistence across sessions does
+not substitute for pushing shared code and operations to GitHub.
 
-Use R >= 4.1 and an R-compatible C++ toolchain; validation here used R 4.5.1.
-The package's DESCRIPTION is the dependency manifest. The surface engine is
-pinned to `933edddda462593941e167726e8aaa7168ff103a`; the setup script additionally
-checks the downloaded source archive SHA-256 and records the new build's hashes.
-Binary hashes are machine-specific and must not be borrowed from old receipts.
+## Implemented release scope
+
+The first coherent slice contains representation-safe planning, four exact
+fsaverage 164k / fsLR 32k native directed routes, MNI6/MNI2009c population cortical
+projection, and separately declared aligned white/pial ribbon sampling.
+Broad surface aliases remain planned. Equal verified domains require a proven
+diagonal unit-weight operator for exact index identity admission.
+
+Read [the coverage plan](template-transform-coverage.md),
+[release evidence](../data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md)
+and [per-asset license audit](../data-raw/surface-transforms-v1/LICENSES.md).
+Raw pinned inputs are fetched from their original providers and are not bundled
+by this slice. Population interpolation does not establish anatomical accuracy,
+subject registration, area conservation or an inverse. Historical strict
+Workbench failures and their thresholds remain retained.
+
+## Rebuild the environment
+
+Use R >= 4.1, an R-compatible C++ toolchain and dependencies in DESCRIPTION.
+The devbox validated core code on Ubuntu 24.04 / R 4.3.3, neuroim2 0.19.1,
+neurosurf 0.1.0.9004 and neurotransform 0.2.0. The engine is pinned to
+`933edddda462593941e167726e8aaa7168ff103a`. Roxygen2 is pinned to 7.3.3 for
+reproducible generated documentation. Do not copy another machine's binary hashes.
 
 ```sh
 export NEUROATLAS_DEV_LIBRARY="$PWD/data-raw/surface-transforms-v1/work/library"
@@ -44,7 +62,9 @@ mkdir -p "$NEUROATLAS_DEV_LIBRARY"
 export R_LIBS="$NEUROATLAS_DEV_LIBRARY"
 export RGL_USE_NULL=true
 export R_USER_CACHE_DIR="$PWD/data-raw/surface-transforms-v1/work/cache"
-# Select an installed UTF-8 locale, e.g. en_US.UTF-8 on macOS.
+export LC_ALL=C.UTF-8  # choose an installed UTF-8 locale on your machine
+export OPENBLAS_NUM_THREADS=1
+export OMP_NUM_THREADS=1
 Rscript -e 'install.packages(c("remotes", "devtools"), repos="https://cloud.r-project.org")'
 Rscript -e 'remotes::install_deps(".", dependencies=TRUE, upgrade="never")'
 Rscript data-raw/surface-transforms-v1/setup-engine.R "$NEUROATLAS_DEV_LIBRARY"
@@ -52,111 +72,79 @@ export NEUROATLAS_ENGINE_BINDING="$NEUROATLAS_DEV_LIBRARY/engine-build.json"
 python3 data-raw/surface-transforms-v1/test-engine-binding.py \
   "$NEUROATLAS_ENGINE_BINDING"
 Rscript -e 'devtools::test(stop_on_failure=TRUE)'
-Rscript -e 'devtools::check()'
-python3 data-raw/surface-transforms-v1/test-preparation.py
+Rscript -e 'devtools::check(manual=TRUE)'
 ```
 
-Optional packages, downloads, graphics, manual and vignette checks have separate
-requirements. Report skips and warnings; do not count them as passes.
+The engine setup verifies the published source archive SHA-256 and records the
+fresh installation's artifacts. Optional packages, downloads, graphics, LaTeX
+and qpdf have separate requirements. Report warnings and skips explicitly.
 
-## Reproduce the scoped numerical qualification
+The local devbox environment is retained in the ignored
+`data-raw/surface-transforms-v1/work/devbox-env.sh`. Its absolute paths and Mote
+session belong to this machine; create your own environment elsewhere.
 
-The retained September evidence is a historical snapshot, including then-current
-source hashes and failed Workbench comparisons. It is not a receipt for today's
-entire package. `qualification/resume-20261006/` holds the refresh evidence.
-The portable binding mode verifies a fresh engine build without requiring an
-old sibling checkout or identical binaries. The original binding mode remains
-available for replaying the historical environment.
+## Reproduce scientific qualification
 
-Use Python with NumPy; the prior oracle used NumPy 2.4.3. Every destination below
-must be new. Inputs are fetched from the checksum lock, not redistributed here.
+Follow [native qualification](../data-raw/surface-transforms-v1/native-qualification.md)
+and [the projection protocol](../data-raw/surface-transforms-v1/projection-v1/README.md).
+Use a fresh output directory for every attempt and serialize jobs sharing a
+cache. Do not edit sources, registry or manifests while a consumer driver runs.
 
 ```sh
-python3 -m venv data-raw/surface-transforms-v1/work/python
-data-raw/surface-transforms-v1/work/python/bin/pip install numpy==2.4.3
 python3 data-raw/surface-transforms-v1/fetch-inputs.py \
   data-raw/surface-transforms-v1/work/inputs
 export NEUROATLAS_SURFACE_INPUTS="$PWD/data-raw/surface-transforms-v1/work/inputs"
 export NEUROATLAS_SURFACE_FIXTURES="$PWD/data-raw/surface-transforms-v1/work/fixtures-new"
 Rscript data-raw/surface-transforms-v1/prepare-fixtures.R \
   "$NEUROATLAS_SURFACE_INPUTS" "$NEUROATLAS_SURFACE_FIXTURES"
+python3 data-raw/surface-transforms-v1/test-preparation.py
 Rscript data-raw/surface-transforms-v1/qualify-native.R \
   data-raw/surface-transforms-v1/work/native-new
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
-  data-raw/surface-transforms-v1/work/python/bin/python \
-  data-raw/surface-transforms-v1/qualify-native-oracle.py \
+python3 data-raw/surface-transforms-v1/qualify-native-oracle.py \
   data-raw/surface-transforms-v1/work/native-new
 Rscript data-raw/surface-transforms-v1/qualify-native-policies.R \
   data-raw/surface-transforms-v1/work/native-new
-data-raw/surface-transforms-v1/work/python/bin/python \
-  data-raw/surface-transforms-v1/test-native-evidence.py \
+python3 data-raw/surface-transforms-v1/test-native-evidence.py \
   data-raw/surface-transforms-v1/work/native-new
 ```
 
-## Work remaining
+Independent references use Python NumPy 2.4.3, SciPy 1.18.1, nibabel 5.4.2 and
+SimpleITK 2.5.3, plus Workbench 1.5.0. Matplotlib 3.11.2 is for local QA figures.
+Python is not required by the public R API. The projection protocol describes
+additional checksum-locked reference inputs and all reproduction commands.
 
-Read [the coverage plan](template-transform-coverage.md) and
-[native qualification](../data-raw/surface-transforms-v1/native-qualification.md).
-The broader surface/projection Mote remains open. Review exact-domain route
-admission and per-asset redistribution licenses next; keep broad aliases planned.
-Registration fusion, aligned ribbon sampling, CIFTI and directed backprojection
-remain separate implementation/qualification work. Preserve the failed strict
-Workbench gates; native correctness does not establish anatomical accuracy,
-Workbench equivalence, reversibility or area conservation.
+## Current engineering and review status
 
-## GitHub verification boundaries
+Full development tests: **2,770 passes, zero failures, 44 warnings and two opt-in
+skips**. Full R CMD check with PDF manual: **zero errors, zero warnings, three
+notes**. Installed tests, examples and vignette rebuilds pass. Notes concern
+installed size, time verification and unavailable optional HTML validation.
+A documentation-only follow-up verifies the slow cache example's `donttest`
+annotation; all executable R expressions match the full-check snapshot.
+The website build and project lint gate pass. Workflow syntax and seven offline
+release-guard tests pass. Exact-SHA hosted verification remains a separate step.
 
-Remaining quality-workflow Mote: `bd-01M47HZ11AWSD23BCAB6NXNXGY`.
+The owner selected neuroatlas conventions for `.lintr`, with complexity reviewed
+[separately](complexity-review.md). Mandatory project CI checks documentation,
+lint, package behavior, website building and coverage measurement. rOpenSci
+reports remain visible and advisory. Eco-atlas is unused and manual-only; its
+old API-key failure is not a current package gate.
 
-Current local verification: 2,674 development assertions pass, zero failures,
-45 warnings and five optional/opt-in skips. R CMD check with `--as-cran
---no-manual` and `_R_CHECK_FORCE_SUGGESTS_=false` returns zero errors, one warning
-and zero notes; examples, installed tests and vignette rebuilds pass. The warning
-is CRAN incoming feasibility (development version/Remotes, non-CRAN dependencies,
-two Princeton URLs returning 403 and tarball size). PDF manual generation is
-unverified. Seven optional suggested packages were unavailable. The previous
-sandbox-cache failure is retained separately and is not a code regression.
+The release workflow can publish only approved version 0.2.0 from the current
+default-branch commit after exact-SHA project, OS and website checks pass. It
+rejects fork/PR/old/pending/failed checks and never replaces an existing tag.
 
-The portable native rerun passes the frozen geometric gates: 1,362 independent
-oracle queries, maximum weight error `3.4083846855992306e-14`, and zero sampled
-categorical/availability mismatches. Preparation has six passing offline tests.
-Do not extend this exact-input/method evidence to the unfinished release scope.
+Numerical gates pass on the final source bindings: 1,362 native oracle queries,
+maximum weight discrepancy `3.397282455352979e-14`; 108 projection cases, maximum
+scalar discrepancy `2.842170943040401e-14`; zero label/availability mismatches.
+Five AI-inspected local figures have hashed inputs; all 20 binary plotting inputs
+match the current public examples. Human review and held-out anatomical accuracy
+are not established.
 
-The latest mainline R-CMD-check-OS run passes. Existing other mainline jobs fail:
+## Work remaining beyond this slice
 
-- Checklist crashes in its external linter organisation lookup, and previously
-  reported undeclared `png` in CPU plot tests. `png` is now declared in Suggests.
-- Pkgcheck reports missing contributing guidance, examples/return docs, reference
-  grouping, unexpected files and its default-branch naming policy.
-- Eco-atlas receives HTTP 401 from its configured OpenAI API secret. The owner
-  must replace that GitHub Actions secret before that workflow can pass.
-
-The feature branch now triggers the existing OS matrix as well as its existing
-checklist workflow. Do not describe the whole repository as green while these
-failures remain. Preserve hosted run URLs and exact SHAs in the Mote handoff.
-
-At code checkpoint `05871cbb145424e29daefed3380814f0b2a0016e`, the final
-[R-CMD-check-OS run 37410069997](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37410069997)
-completed successfully: macOS release, Windows release, Ubuntu devel and Ubuntu
-oldrel all passed. This resolves the earlier `915b8e1` Windows test failure:
-Windows rejected an unsafe cache receipt, but its test demanded the POSIX
-symlink diagnostic. The corrected regression accepts either documented cache
-rejection and checks that neither the operator nor target is written and the
-receipt remains present. Cache implementation and scientific methods are
-unchanged.
-
-The same exact code checkpoint's
-[checklist run 37410070017](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37410070017)
-failed in the external organisation lookup. The separate pkgcheck gaps and
-eco-atlas secret blocker above remain open. The two open Motes now contain this
-final code/CI checkpoint as well as scope, limitations and next actions; they
-supersede earlier handoff notes that recorded pending runs or the Windows failure.
-
-On the remote workstation, rebuild dependencies and machine-specific engine
-receipts and run the checks above before starting implementation. The GitHub
-clone/history has been verified locally; this is not a claim that the destination
-workstation has already been configured or tested. Inspect later runs separately:
-
-```sh
-gh run list --repo bbuchsbaum/neuroatlas --branch feat/native-surface-transforms
-```
+CIFTI with preserved subcortex, directed surface-to-volume rasterization, other
+surface densities, CIVET, specialist templates and further anatomical validation
+remain separate work under `bd-01M3CCBG9346NRV3WEVH5YNBCQ`. The quality-workflow
+Mote is `bd-01M47HZ11AWSD23BCAB6NXNXGY`; consult its latest state and hosted run
+links. Do not reuse active leases from another machine.
