@@ -11,8 +11,11 @@ map_atlas.atlas <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
   if (!is.null(thresh)) {
     stopifnot(is.numeric(thresh), length(thresh) == 2)
     fun <- if (pos) identity else abs
-    statistic <- ifelse(fun(vals) <= thresh[1] | fun(vals) > thresh[2],
-                        NA, vals)
+    statistic <- ifelse(
+      fun(vals) <= thresh[1] | fun(vals) > thresh[2],
+      NA,
+      vals
+    )
   }
 
   result <- tibble::tibble(
@@ -51,9 +54,17 @@ map_atlas.atlas <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
 #'   drawn when \code{legend = TRUE}. Default \code{30}.
 #' @importFrom ggplot2 scale_fill_manual
 #' @export
-plot.atlas <- function(x, y, view = c("montage", "ortho"),
-                       method = "rule_hcl", colors = NULL,
-                       nslices = 12L, legend = FALSE, legend_max = 30L, ...) {
+plot.atlas <- function(
+  x,
+  y,
+  view = c("montage", "ortho"),
+  method = "rule_hcl",
+  colors = NULL,
+  nslices = 12L,
+  legend = FALSE,
+  legend_max = 30L,
+  ...
+) {
   view <- match.arg(view)
   if (!is.logical(legend) || length(legend) != 1L || is.na(legend)) {
     stop("'legend' must be TRUE or FALSE.", call. = FALSE)
@@ -64,10 +75,12 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
   n_reg <- length(x$ids)
   show_legend <- isTRUE(legend) && n_reg <= legend_max
   if (isTRUE(legend) && n_reg > legend_max) {
-    cli::cli_warn(c(
-      "Not drawing a legend for {n_reg} regions (> {.arg legend_max} = {legend_max}).",
-      "i" = "Raise {.arg legend_max} to force it."
-    ))
+    cli::cli_warn(
+      c(
+        "Not drawing a legend for {n_reg} regions (> {.arg legend_max} = {legend_max}).",
+        "i" = "Raise {.arg legend_max} to force it."
+      )
+    )
   }
   # Each orthographic plane shows a different subset of regions, so a per-panel
   # legend cannot be reconciled into one. The legend is drawn for the montage
@@ -79,7 +92,7 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
     show_legend <- FALSE
   }
 
- # --- Resolve colours ---
+  # --- Resolve colours ---
   if (is.null(colors)) {
     color_tbl <- atlas_roi_colors(x, method = method)
   } else if (is.data.frame(colors)) {
@@ -87,7 +100,10 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
   } else if (is.character(colors)) {
     # Named vector of hex colours
     if (!is.null(names(colors))) {
-      color_tbl <- tibble::tibble(id = as.integer(names(colors)), color = unname(colors))
+      color_tbl <- tibble::tibble(
+        id = as.integer(names(colors)),
+        color = unname(colors)
+      )
     } else {
       color_tbl <- tibble::tibble(id = x$ids, color = colors)
     }
@@ -120,12 +136,16 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
   .apply_atlas_scale <- function(p) {
     # Convert the continuous 'value' column to factor for discrete scale
     if (!is.data.frame(p$data) || !"value" %in% names(p$data)) {
-      stop("Cannot recolour the neuroim2 slice plot: its data has no ",
-           "'value' column (unsupported neuroim2 plot structure).",
-           call. = FALSE)
+      stop(
+        "Cannot recolour the neuroim2 slice plot: its data has no ",
+        "'value' column (unsupported neuroim2 plot structure).",
+        call. = FALSE
+      )
     }
-    p$data$value <- factor(.atlas_value_ids(p$data$value),
-                           levels = names(color_map))
+    p$data$value <- factor(
+      .atlas_value_ids(p$data$value),
+      levels = names(color_map)
+    )
     # Suppress "Scale for fill is already present" message from replacing
     # the continuous scale that plot_montage/plot_ortho sets
     suppressMessages(
@@ -135,8 +155,9 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
         labels = leg_labels,
         na.value = "transparent",
         name = NULL,
-        drop = FALSE,        # keep all regions so the legend is complete and
-                             # identical across ortho panels (collectable)
+        drop = FALSE,
+        # keep all regions so the legend is complete and
+        # identical across ortho panels (collectable)
         guide = fill_guide
       ) + neuroim2::theme_neuro()
     )
@@ -157,14 +178,13 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
 
   if (view == "montage") {
     # Select evenly-spaced slices through the volume
-    zdim <- dim(vol)[3]
     # Find slices that contain parcel voxels
     arr <- if (methods::is(vol, "ClusteredNeuroVol")) {
       a <- array(0L, dim = dim(vol))
       a[which(vol@mask)] <- vol@clusters
       a
     } else {
-      vol[,,]
+      vol[, , ]
     }
     nonempty <- which(apply(arr, 3, function(sl) any(sl != 0)))
     if (length(nonempty) == 0) {
@@ -174,7 +194,8 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
     idx <- nonempty[round(seq(1, length(nonempty), length.out = n_use))]
 
     p <- .call_neuroim2_plot(
-      neuroim2::plot_montage, vol,
+      neuroim2::plot_montage,
+      vol,
       args = list(zlevels = idx, ncol = min(6L, n_use)),
       optional = list(interpolate = FALSE),
       dots = list(...)
@@ -188,13 +209,17 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
     # ask for the per-plane ggplots (assemble = FALSE) so each can be
     # recoloured. Older versions return the list directly.
     plots <- .call_neuroim2_plot(
-      neuroim2::plot_ortho, vol,
+      neuroim2::plot_ortho,
+      vol,
       optional = list(assemble = FALSE, interpolate = FALSE, crop = FALSE),
       dots = list(...)
     )
     if (inherits(plots, "ggplot")) {
-      stop("neuroim2::plot_ortho() returned a single assembled figure; ",
-           "cannot recolour its panels.", call. = FALSE)
+      stop(
+        "neuroim2::plot_ortho() returned a single assembled figure; ",
+        "cannot recolour its panels.",
+        call. = FALSE
+      )
     }
     plane_order <- c("sagittal", "coronal", "axial")
     if (all(plane_order %in% names(plots))) {
@@ -204,7 +229,8 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
     if (requireNamespace("patchwork", quietly = TRUE)) {
       # Collect the three identical panel legends into one shared legend.
       combined <- patchwork::wrap_plots(
-        plots, ncol = 3,
+        plots,
+        ncol = 3,
         guides = if (show_legend) "collect" else "keep"
       )
       print(combined)
@@ -228,9 +254,13 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
 #' @noRd
 .atlas_value_ids <- function(value) {
   if (is.list(value)) {
-    value <- vapply(value, function(v) {
-      if (length(v) == 1L) as.character(v) else NA_character_
-    }, character(1))
+    value <- vapply(
+      value,
+      function(v) {
+        if (length(v) == 1L) as.character(v) else NA_character_
+      },
+      character(1)
+    )
   }
   if (is.factor(value)) value <- as.character(value)
   if (!is.numeric(value)) {
@@ -249,8 +279,13 @@ plot.atlas <- function(x, y, view = c("montage", "ortho"),
 #' arguments in `dots` take precedence over both.
 #' @keywords internal
 #' @noRd
-.call_neuroim2_plot <- function(fun, vol, args = list(), optional = list(),
-                                dots = list()) {
+.call_neuroim2_plot <- function(
+  fun,
+  vol,
+  args = list(),
+  optional = list(),
+  dots = list()
+) {
   optional <- optional[names(optional) %in% names(formals(fun))]
   args <- utils::modifyList(utils::modifyList(args, optional), dots)
   do.call(fun, c(list(vol), args))

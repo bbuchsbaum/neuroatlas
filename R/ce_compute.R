@@ -51,26 +51,56 @@ utils::globalVariables(c("signal", "cluster_id"))
 #'   \item{\code{prefetch_info}}{List describing whether eager signal prefetch
 #'     was requested/applied and the effective guard thresholds.}
 #' }
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' samples <- array(rep(c(0.2, 0.7), 3), c(2, 1, 1, 3))
+#' data_source <- neuroim2::NeuroVec(
+#'   samples, neuroim2::NeuroSpace(dim(samples))
+#' )
+#' stat_map <- neuroim2::NeuroVol(array(c(4, 5), c(2, 1, 1)), grid)
+#' clusters <- build_cluster_explorer_data(data_source, atlas, stat_map,
+#'   threshold = 3, min_cluster_size = 1, tail = "positive"
+#' )
+#' clusters$cluster_table
 #' @export
-build_cluster_explorer_data <- function(data_source,
-                                        atlas,
-                                        stat_map,
-                                        sample_table = NULL,
-                                        threshold = 3,
-                                        min_cluster_size = 20,
-                                        connectivity = c("26-connect",
-                                                         "18-connect",
-                                                         "6-connect"),
-                                        tail = c("two_sided",
-                                                 "positive",
-                                                 "negative"),
-                                        signal_fun = mean,
-                                        signal_fun_args = list(na.rm = TRUE),
-                                        series_fun = NULL,
-                                        prefetch = TRUE,
-                                        prefetch_max_clusters = Inf,
-                                        prefetch_max_voxels = Inf,
-                                        series_cache_env = NULL) {
+build_cluster_explorer_data <- function(
+  data_source,
+  atlas,
+  stat_map,
+  sample_table = NULL,
+  threshold = 3,
+  min_cluster_size = 20,
+  connectivity = c(
+    "26-connect",
+    "18-connect",
+    "6-connect"
+  ),
+  tail = c(
+    "two_sided",
+    "positive",
+    "negative"
+  ),
+  signal_fun = mean,
+  signal_fun_args = list(na.rm = TRUE),
+  series_fun = NULL,
+  prefetch = TRUE,
+  prefetch_max_clusters = Inf,
+  prefetch_max_voxels = Inf,
+  series_cache_env = NULL
+) {
   connectivity <- match.arg(connectivity)
   tail <- match.arg(tail)
 
@@ -208,8 +238,11 @@ build_cluster_explorer_data <- function(data_source,
   assertthat::assert_that(
     nrow(design) == n_samples,
     msg = paste0(
-      "nrow(design) (", nrow(design),
-      ") must equal number of samples (", n_samples, ")."
+      "nrow(design) (",
+      nrow(design),
+      ") must equal number of samples (",
+      n_samples,
+      ")."
     )
   )
 
@@ -223,16 +256,22 @@ build_cluster_explorer_data <- function(data_source,
 
   # Keep sample index from sample_table as the canonical join row order.
   design_table$.sample_index <- sample_table$.sample_index
-  dplyr::left_join(sample_table, design_table, by = ".sample_index",
-                   suffix = c("", ".design"))
+  dplyr::left_join(
+    sample_table,
+    design_table,
+    by = ".sample_index",
+    suffix = c("", ".design")
+  )
 }
 
-.validate_cluster_explorer_inputs <- function(data_source,
-                                              atlas,
-                                              stat_map,
-                                              sample_table = NULL,
-                                              n_samples,
-                                              series_fun = NULL) {
+.validate_cluster_explorer_inputs <- function(
+  data_source,
+  atlas,
+  stat_map,
+  sample_table = NULL,
+  n_samples,
+  series_fun = NULL
+) {
   assertthat::assert_that(
     inherits(atlas, "atlas"),
     msg = "'atlas' must inherit from class 'atlas'."
@@ -283,8 +322,11 @@ build_cluster_explorer_data <- function(data_source,
     assertthat::assert_that(
       nrow(sample_table) == n_samples,
       msg = paste0(
-        "nrow(sample_table) (", nrow(sample_table),
-        ") must equal number of samples (", n_samples, ")."
+        "nrow(sample_table) (",
+        nrow(sample_table),
+        ") must equal number of samples (",
+        n_samples,
+        ")."
       )
     )
   }
@@ -299,11 +341,13 @@ build_cluster_explorer_data <- function(data_source,
   invisible(TRUE)
 }
 
-.extract_stat_clusters <- function(stat_map,
-                                   threshold,
-                                   min_cluster_size,
-                                   connectivity,
-                                   tail) {
+.extract_stat_clusters <- function(
+  stat_map,
+  threshold,
+  min_cluster_size,
+  connectivity,
+  tail
+) {
   stat_arr <- as.array(stat_map)
   if (length(dim(stat_arr)) != 3) {
     stop("'stat_map' must be a 3D NeuroVol.")
@@ -314,8 +358,7 @@ build_cluster_explorer_data <- function(data_source,
   cluster_arr <- array(0L, dim = dim(stat_arr))
   global_id <- 0L
 
-  tails <- switch(
-    tail,
+  tails <- switch(tail,
     positive = "positive",
     negative = "negative",
     two_sided = c("positive", "negative")
@@ -363,9 +406,11 @@ build_cluster_explorer_data <- function(data_source,
       }
 
       vox_mat <- as.matrix(vox[, c("x", "y", "z"), drop = FALSE])
-      peak_xyz <- c(as.integer(ct$x[i]),
-                    as.integer(ct$y[i]),
-                    as.integer(ct$z[i]))
+      peak_xyz <- c(
+        as.integer(ct$x[i]),
+        as.integer(ct$y[i]),
+        as.integer(ct$z[i])
+      )
       peak_stat <- stat_arr[matrix(peak_xyz, nrow = 1)]
 
       global_id <- global_id + 1L
@@ -384,8 +429,15 @@ build_cluster_explorer_data <- function(data_source,
         peak_y = peak_xyz[2],
         peak_z = peak_xyz[3],
         max_stat = as.numeric(peak_stat),
-        peak_coord = paste0("(", peak_xyz[1], ", ", peak_xyz[2], ", ",
-                            peak_xyz[3], ")")
+        peak_coord = paste0(
+          "(",
+          peak_xyz[1],
+          ", ",
+          peak_xyz[2],
+          ", ",
+          peak_xyz[3],
+          ")"
+        )
       )
     }
   }
@@ -409,32 +461,41 @@ build_cluster_explorer_data <- function(data_source,
   list(
     cluster_table = cluster_tbl,
     cluster_voxels = cluster_voxels,
-    cluster_index = neuroim2::NeuroVol(cluster_arr, space = neuroim2::space(stat_map))
+    cluster_index = neuroim2::NeuroVol(
+      cluster_arr,
+      space = neuroim2::space(
+        stat_map
+      )
+    )
   )
 }
 
-.annotate_clusters_with_atlas <- function(cluster_table,
-                                          cluster_voxels,
-                                          atlas,
-                                          stat_map) {
+.annotate_clusters_with_atlas <- function(
+  cluster_table,
+  cluster_voxels,
+  atlas,
+  stat_map
+) {
   if (nrow(cluster_table) == 0 || length(cluster_voxels) == 0) {
     cluster_table$atlas_label_primary <- character(0)
     cluster_table$n_parcels <- integer(0)
     cluster_table$parcel_overlap <- numeric(0)
-    return(list(
-      cluster_table = cluster_table,
-      cluster_parcels = tibble::tibble(
-        cluster_id = character(0),
-        sign = character(0),
-        parcel_id = integer(0),
-        parcel_label = character(0),
-        n_voxels = integer(0),
-        frac = numeric(0),
-        peak_stat = numeric(0),
-        max_pos = numeric(0),
-        min_neg = numeric(0)
+    return(
+      list(
+        cluster_table = cluster_table,
+        cluster_parcels = tibble::tibble(
+          cluster_id = character(0),
+          sign = character(0),
+          parcel_id = integer(0),
+          parcel_label = character(0),
+          n_voxels = integer(0),
+          frac = numeric(0),
+          peak_stat = numeric(0),
+          max_pos = numeric(0),
+          min_neg = numeric(0)
+        )
       )
-    ))
+    )
   }
 
   atlas_arr <- .atlas_volume_array(.get_atlas_volume(atlas))
@@ -532,13 +593,15 @@ build_cluster_explorer_data <- function(data_source,
   list(cluster_table = tbl, cluster_parcels = cluster_parcels)
 }
 
-.compute_cluster_timeseries <- function(data_source,
-                                        cluster_voxels,
-                                        sample_table,
-                                        series_fun = NULL,
-                                        signal_fun = mean,
-                                        signal_fun_args = list(na.rm = TRUE),
-                                        series_cache_env = NULL) {
+.compute_cluster_timeseries <- function(
+  data_source,
+  cluster_voxels,
+  sample_table,
+  series_fun = NULL,
+  signal_fun = mean,
+  signal_fun_args = list(na.rm = TRUE),
+  series_cache_env = NULL
+) {
   if (length(cluster_voxels) == 0) {
     return(tibble::tibble())
   }
@@ -561,10 +624,14 @@ build_cluster_explorer_data <- function(data_source,
       cache_key = cid
     )
 
-    sig <- vapply(seq_len(n_samples), function(t) {
-      vals <- series_mat[t, , drop = TRUE]
-      do.call(signal_fun, c(list(vals), signal_fun_args))
-    }, numeric(1))
+    sig <- vapply(
+      seq_len(n_samples),
+      function(t) {
+        vals <- series_mat[t, , drop = TRUE]
+        do.call(signal_fun, c(list(vals), signal_fun_args))
+      },
+      numeric(1)
+    )
 
     out[[k]] <- tibble::tibble(
       .sample_index = seq_len(n_samples),
@@ -577,14 +644,18 @@ build_cluster_explorer_data <- function(data_source,
   dplyr::left_join(ret, sample_table, by = ".sample_index")
 }
 
-.extract_series_matrix <- function(data_source,
-                                   voxel_coords,
-                                   n_samples,
-                                   series_fun = NULL,
-                                   cache_env = NULL,
-                                   cache_key = NULL) {
-  if (!is.null(cache_env) && !is.null(cache_key) &&
-      exists(cache_key, envir = cache_env, inherits = FALSE)) {
+.extract_series_matrix <- function(
+  data_source,
+  voxel_coords,
+  n_samples,
+  series_fun = NULL,
+  cache_env = NULL,
+  cache_key = NULL
+) {
+  if (
+    !is.null(cache_env) && !is.null(cache_key) &&
+      exists(cache_key, envir = cache_env, inherits = FALSE)
+  ) {
     cached <- get(cache_key, envir = cache_env, inherits = FALSE)
     return(.coerce_series_matrix(cached, n_samples = n_samples))
   }
@@ -604,7 +675,8 @@ build_cluster_explorer_data <- function(data_source,
         "Failed to extract sample series from data_source. ",
         "Ensure neuroim2::series(data_source, voxel_coords) works, ",
         "or supply a compatible series_fun(data_source, voxel_coords). ",
-        "Original error: ", conditionMessage(e),
+        "Original error: ",
+        conditionMessage(e),
         call. = FALSE
       )
     }
@@ -639,27 +711,40 @@ build_cluster_explorer_data <- function(data_source,
   }
 
   stop(
-    "Extracted series has incompatible shape. Expected ", n_samples,
-    " sample rows, got matrix ", nrow(x), "x", ncol(x), ".",
+    "Extracted series has incompatible shape. Expected ",
+    n_samples,
+    " sample rows, got matrix ",
+    nrow(x),
+    "x",
+    ncol(x),
+    ".",
     call. = FALSE
   )
 }
 
-.resolve_cluster_ts <- function(dat,
-                                selected_cluster_ids,
-                                data_source,
-                                series_fun,
-                                signal_fun,
-                                signal_fun_args,
-                                series_cache_env,
-                                ts_cache_env) {
+.resolve_cluster_ts <- function(
+  dat,
+  selected_cluster_ids,
+  data_source,
+  series_fun,
+  signal_fun,
+  signal_fun_args,
+  series_cache_env,
+  ts_cache_env
+) {
   ids <- unique(as.character(selected_cluster_ids))
   ids <- ids[nzchar(ids)]
-  if (length(ids) == 0) return(tibble::tibble())
+  if (length(ids) == 0) {
+    return(tibble::tibble())
+  }
 
-  cached_ids <- ids[vapply(ids, function(cid) {
-    exists(cid, envir = ts_cache_env, inherits = FALSE)
-  }, logical(1))]
+  cached_ids <- ids[vapply(
+    ids,
+    function(cid) {
+      exists(cid, envir = ts_cache_env, inherits = FALSE)
+    },
+    logical(1)
+  )]
   missing_ids <- setdiff(ids, cached_ids)
 
   if (length(missing_ids) > 0) {
@@ -684,22 +769,29 @@ build_cluster_explorer_data <- function(data_source,
           )
         }
         for (cid in unique(ts_new$cluster_id)) {
-          assign(cid,
-                 ts_new[ts_new$cluster_id == cid, , drop = FALSE],
-                 envir = ts_cache_env)
+          assign(
+            cid,
+            ts_new[ts_new$cluster_id == cid, , drop = FALSE],
+            envir = ts_cache_env
+          )
         }
       }
     }
   }
 
-  out <- lapply(ids, function(cid) {
-    if (exists(cid, envir = ts_cache_env, inherits = FALSE)) {
-      get(cid, envir = ts_cache_env, inherits = FALSE)
-    } else {
-      NULL
+  out <- lapply(
+    ids,
+    function(cid) {
+      if (exists(cid, envir = ts_cache_env, inherits = FALSE)) {
+        get(cid, envir = ts_cache_env, inherits = FALSE)
+      } else {
+        NULL
+      }
     }
-  })
+  )
   out <- out[!vapply(out, is.null, logical(1))]
-  if (length(out) == 0) return(tibble::tibble())
+  if (length(out) == 0) {
+    return(tibble::tibble())
+  }
   dplyr::bind_rows(out)
 }

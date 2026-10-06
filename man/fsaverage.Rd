@@ -12,7 +12,8 @@ A named list with elements \code{lh} and \code{rh}, each containing
 data(fsaverage)
 }
 \description{
-A list including left and right hemispheres for the orig, white, inflated, and pial surfaces.
+A list including left and right hemispheres for the orig, white, inflated,
+and pial surfaces.
 }
 \examples{
 \donttest{

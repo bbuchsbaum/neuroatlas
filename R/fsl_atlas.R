@@ -12,7 +12,8 @@
 #' @param name Atlas identifier, FSL XML path, or known alias. Known aliases
 #'   include `"harvard_oxford_cortical"`, `"harvard_oxford_subcortical"`,
 #'   `"harvard_oxford_cortical_subcortical"`, and `"julich"`.
-#' @param fsl_dir FSL installation directory. Defaults to `Sys.getenv("FSLDIR")`.
+#' @param fsl_dir FSL installation directory. Defaults to
+#'   `Sys.getenv("FSLDIR")`.
 #'   `get_julich_brain_atlas()` downloads an FSL-style Julich-Brain cache when
 #'   this is empty and `download = TRUE`.
 #' @param resolution Preferred image resolution, e.g. `"1mm"` or `"2mm"`.
@@ -27,13 +28,21 @@
 #'   loading image data.
 #'
 #' @return An `atlas` object, or a path/metadata list when `path_only = TRUE`.
+#' @examples
+#' \dontrun{
+#' # Requires an FSL installation configured through FSLDIR.
+#' atlas <- get_fsl_atlas("harvard_oxford_cortical", resolution = 2)
+#' atlas_ref(atlas)
+#' }
 #' @export
-get_fsl_atlas <- function(name,
-                          fsl_dir = Sys.getenv("FSLDIR"),
-                          resolution = NULL,
-                          image = c("summary", "probability"),
-                          outspace = NULL,
-                          path_only = FALSE) {
+get_fsl_atlas <- function(
+  name,
+  fsl_dir = Sys.getenv("FSLDIR"),
+  resolution = NULL,
+  image = c("summary", "probability"),
+  outspace = NULL,
+  path_only = FALSE
+) {
   image <- match.arg(image)
   spec <- .match_fsl_atlas_spec(name)
   xml_path <- .resolve_fsl_xml(name, spec = spec, fsl_dir = fsl_dir)
@@ -119,8 +128,10 @@ get_fsl_atlas <- function(name,
     source = "fsl",
     lineage = paste0("Loaded FSL XML atlas ", basename(xml_path), "."),
     confidence = if (is.null(outspace)) "high" else "approximate",
-    notes = if (identical(meta$type, "probabilistic") &&
-                identical(image, "summary")) {
+    notes = if (
+      identical(meta$type, "probabilistic") &&
+        identical(image, "summary")
+    ) {
       "Loaded maximum-probability summary image; XML label indices were shifted by one."
     } else {
       NA_character_
@@ -193,8 +204,10 @@ get_fsl_atlas <- function(name,
     ref = ref,
     artifacts = artifacts,
     history = history,
-    metadata = list(processing = processing,
-                     parameters = list(image = image, source_type = meta$type))
+    metadata = list(
+      processing = processing,
+      parameters = list(image = image, source_type = meta$type)
+    )
   )
 }
 
@@ -221,41 +234,58 @@ get_fsl_atlas <- function(name,
 #'   `get_harvard_oxford_atlas()`.
 #'
 #' @return An `atlas` object, or path metadata when `path_only = TRUE`.
+#' @examples
+#' \dontrun{
+#' atlas <- get_harvard_oxford_atlas("cortical", threshold = 25)
+#' atlas_ref(atlas)
+#' }
 #' @export
-get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
-                                              "cortical_subcortical"),
-                                     threshold = c(25, 0, 50),
-                                     template_space = "MNI152NLin6Asym",
-                                     resolution = "01",
-                                     source = c("templateflow", "fsl"),
-                                     outspace = NULL,
-                                     use_cache = TRUE,
-                                     path_only = FALSE) {
+get_harvard_oxford_atlas <- function(
+  type = c(
+    "cortical",
+    "subcortical",
+    "cortical_subcortical"
+  ),
+  threshold = c(25, 0, 50),
+  template_space = "MNI152NLin6Asym",
+  resolution = "01",
+  source = c("templateflow", "fsl"),
+  outspace = NULL,
+  use_cache = TRUE,
+  path_only = FALSE
+) {
   type <- match.arg(type)
-  threshold <- as.integer(match.arg(as.character(threshold),
-                                    choices = c("25", "0", "50")))
+  threshold <- as.integer(
+    match.arg(
+      as.character(threshold),
+      choices = c("25", "0", "50")
+    )
+  )
   source <- match.arg(source)
 
   if (identical(source, "fsl")) {
-    fsl_resolution <- if (identical(resolution, "01") ||
-                          identical(resolution, "1")) {
+    fsl_resolution <- if (
+      identical(resolution, "01") ||
+        identical(resolution, "1")
+    ) {
       "1mm"
     } else if (identical(resolution, "02") || identical(resolution, "2")) {
       "2mm"
     } else {
       resolution
     }
-    return(get_fsl_atlas(
-      name = paste0("harvard_oxford_", type),
-      resolution = fsl_resolution,
-      image = "summary",
-      outspace = outspace,
-      path_only = path_only
-    ))
+    return(
+      get_fsl_atlas(
+        name = paste0("harvard_oxford_", type),
+        resolution = fsl_resolution,
+        image = "summary",
+        outspace = outspace,
+        path_only = path_only
+      )
+    )
   }
 
-  atlas_id <- switch(
-    type,
+  atlas_id <- switch(type,
     cortical = "HOCPA",
     subcortical = "HOSPA",
     cortical_subcortical = "HOCPAL"
@@ -294,8 +324,10 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
   )
 
   if (path_only) {
-    atlas_path <- do.call(get_template,
-                          c(tf_query, list(path_only = TRUE)))
+    atlas_path <- do.call(
+      get_template,
+      c(tf_query, list(path_only = TRUE))
+    )
     ret <- list(
       name = paste("Harvard-Oxford", gsub("_", " ", type)),
       atlas_path = atlas_path,
@@ -330,14 +362,12 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
   )
 
   family <- "harvard_oxford"
-  model <- switch(
-    type,
+  model <- switch(type,
     cortical = "HarvardOxfordCortical",
     subcortical = "HarvardOxfordSubcortical",
     cortical_subcortical = "HarvardOxfordCorticalSubcortical"
   )
-  atlas_name <- switch(
-    type,
+  atlas_name <- switch(type,
     cortical = "Harvard-Oxford cortical structural atlas",
     subcortical = "Harvard-Oxford subcortical structural atlas",
     cortical_subcortical = "Harvard-Oxford cortical/subcortical structural atlas"
@@ -352,8 +382,13 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
     resolution = paste0(as.integer(resolution), "mm"),
     provenance = "TemplateFlow Harvard-Oxford atlas",
     source = "templateflow",
-    lineage = paste0("TemplateFlow atlas=", atlas_id,
-                     ", desc=", desc, "."),
+    lineage = paste0(
+      "TemplateFlow atlas=",
+      atlas_id,
+      ", desc=",
+      desc,
+      "."
+    ),
     confidence = if (is.null(outspace)) "high" else "approximate",
     notes = "Maximum-probability Harvard-Oxford dseg image."
   )
@@ -403,8 +438,13 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
     to_coord_space = "MNI152",
     status = "available",
     confidence = if (is.null(outspace)) "high" else "approximate",
-    details = paste0("Loaded TemplateFlow Harvard-Oxford atlas ", atlas_id,
-                     " at threshold ", threshold, ".")
+    details = paste0(
+      "Loaded TemplateFlow Harvard-Oxford atlas ",
+      atlas_id,
+      " at threshold ",
+      threshold,
+      "."
+    )
   )
 
   new_atlas(
@@ -424,9 +464,15 @@ get_harvard_oxford_atlas <- function(type = c("cortical", "subcortical",
     ref = ref,
     artifacts = artifacts,
     history = history,
-    metadata = list(source = source_metadata, processing = processing,
-                     parameters = list(type = type, threshold = threshold,
-                                        resolution_key = resolution))
+    metadata = list(
+      source = source_metadata,
+      processing = processing,
+      parameters = list(
+        type = type,
+        threshold = threshold,
+        resolution_key = resolution
+      )
+    )
   )
 }
 
@@ -461,10 +507,17 @@ get_harvard_oxford_cortical_subcortical_atlas <- function(...) {
 #' @param ... Additional arguments passed to `get_fsl_atlas()`.
 #'
 #' @return An `atlas` object, or path metadata when `path_only = TRUE`.
+#' @examples
+#' \dontrun{
+#' atlas <- get_julich_brain_atlas()
+#' atlas_ref(atlas)
+#' }
 #' @export
-get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
-                                   download = TRUE,
-                                   ...) {
+get_julich_brain_atlas <- function(
+  fsl_dir = Sys.getenv("FSLDIR"),
+  download = TRUE,
+  ...
+) {
   if (!nzchar(fsl_dir) && isTRUE(download)) {
     fsl_dir <- .ensure_julich_brain_fsl_cache()
   }
@@ -499,10 +552,18 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
     ),
     shortname = c("HOCPA", "HOSPA", "HOCPAL", "Juelich"),
     aliases = list(
-      c("ho_cortical", "harvard_oxford_cort", "harvard-oxford-cortical",
-        "hocpa"),
-      c("ho_subcortical", "harvard_oxford_sub", "harvard-oxford-subcortical",
-        "hospa"),
+      c(
+        "ho_cortical",
+        "harvard_oxford_cort",
+        "harvard-oxford-cortical",
+        "hocpa"
+      ),
+      c(
+        "ho_subcortical",
+        "harvard_oxford_sub",
+        "harvard-oxford-subcortical",
+        "hospa"
+      ),
       c("ho", "harvard_oxford", "harvard-oxford", "hocpal"),
       c("juelich", "julich_brain", "julichbrain", "brodmann")
     )
@@ -514,10 +575,19 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
 .match_fsl_atlas_spec <- function(name) {
   specs <- .fsl_atlas_specs()
   target <- .clean_fsl_id(name)
-  idx <- vapply(seq_len(nrow(specs)), function(i) {
-    target %in% .clean_fsl_id(c(specs$id[i], specs$shortname[i],
-                                specs$aliases[[i]]))
-  }, logical(1))
+  idx <- vapply(
+    seq_len(nrow(specs)),
+    function(i) {
+      target %in% .clean_fsl_id(
+        c(
+          specs$id[i],
+          specs$shortname[i],
+          specs$aliases[[i]]
+        )
+      )
+    },
+    logical(1)
+  )
   if (any(idx)) {
     return(specs[which(idx)[1], ])
   }
@@ -548,8 +618,10 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
     )
   }
 
-  if (!is.null(spec$xml_file) && !is.na(spec$xml_file) &&
-      nzchar(spec$xml_file)) {
+  if (
+    !is.null(spec$xml_file) && !is.na(spec$xml_file) &&
+      nzchar(spec$xml_file)
+  ) {
     direct <- file.path(atlas_dir, spec$xml_file)
     if (file.exists(direct)) {
       return(normalizePath(direct))
@@ -559,8 +631,10 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
   xmls <- list.files(atlas_dir, pattern = "\\.xml$", full.names = TRUE)
   target <- .clean_fsl_id(c(name, spec$shortname %||% character()))
   for (xml in xmls) {
-    meta <- tryCatch(.parse_fsl_atlas_xml(xml, labels = FALSE),
-                     error = function(e) NULL)
+    meta <- tryCatch(
+      .parse_fsl_atlas_xml(xml, labels = FALSE),
+      error = function(e) NULL
+    )
     if (is.null(meta)) next
     candidates <- .clean_fsl_id(c(basename(xml), meta$name, meta$shortname))
     if (any(target %in% candidates)) {
@@ -586,7 +660,11 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
   images <- .parse_fsl_images(txt, atlas_dir)
   label_tbl <- if (labels) .parse_fsl_labels(txt) else tibble::tibble()
   list(
-    name = .xml_first_tag(txt, "name") %||% tools::file_path_sans_ext(basename(xml_path)),
+    name = .xml_first_tag(txt, "name") %||% tools::file_path_sans_ext(
+      basename(
+        xml_path
+      )
+    ),
     shortname = .xml_first_tag(txt, "shortname") %||%
       tools::file_path_sans_ext(basename(xml_path)),
     type = type,
@@ -606,14 +684,26 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
     )
   }
   tibble::tibble(
-    imagefile = unname(vapply(blocks, function(x) {
-      .resolve_fsl_image_path(.xml_first_tag(x, "imagefile"), atlas_dir)
-    }, character(1))),
-    summaryimagefile = unname(vapply(blocks, function(x) {
-      path <- .xml_first_tag(x, "summaryimagefile")
-      if (is.null(path)) path <- .xml_first_tag(x, "imagefile")
-      .resolve_fsl_image_path(path, atlas_dir)
-    }, character(1))),
+    imagefile = unname(
+      vapply(
+        blocks,
+        function(x) {
+          .resolve_fsl_image_path(.xml_first_tag(x, "imagefile"), atlas_dir)
+        },
+        character(1)
+      )
+    ),
+    summaryimagefile = unname(
+      vapply(
+        blocks,
+        function(x) {
+          path <- .xml_first_tag(x, "summaryimagefile")
+          if (is.null(path)) path <- .xml_first_tag(x, "imagefile")
+          .resolve_fsl_image_path(path, atlas_dir)
+        },
+        character(1)
+      )
+    ),
     resolution = unname(vapply(blocks, .infer_fsl_resolution, character(1)))
   )
 }
@@ -623,26 +713,31 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
 .parse_fsl_labels <- function(txt) {
   matches <- .regex_matches(txt, "<label\\b[^>]*>[\\s\\S]*?</label>")
   if (length(matches) == 0L) {
-    return(tibble::tibble(
-      index = integer(),
-      name = character(),
-      x = numeric(),
-      y = numeric(),
-      z = numeric()
-    ))
+    return(
+      tibble::tibble(
+        index = integer(),
+        name = character(),
+        x = numeric(),
+        y = numeric(),
+        z = numeric()
+      )
+    )
   }
 
-  rows <- lapply(matches, function(x) {
-    attrs <- .parse_xml_attrs(sub("^<label\\b([^>]*)>.*$", "\\1", x))
-    body <- sub("^<label\\b[^>]*>(.*?)</label>$", "\\1", x, perl = TRUE)
-    tibble::tibble(
-      index = as.integer(.xml_attr(attrs, "index")),
-      name = .xml_unescape(body),
-      x = as.numeric(.xml_attr(attrs, "x")),
-      y = as.numeric(.xml_attr(attrs, "y")),
-      z = as.numeric(.xml_attr(attrs, "z"))
-    )
-  })
+  rows <- lapply(
+    matches,
+    function(x) {
+      attrs <- .parse_xml_attrs(sub("^<label\\b([^>]*)>.*$", "\\1", x))
+      body <- sub("^<label\\b[^>]*>(.*?)</label>$", "\\1", x, perl = TRUE)
+      tibble::tibble(
+        index = as.integer(.xml_attr(attrs, "index")),
+        name = .xml_unescape(body),
+        x = as.numeric(.xml_attr(attrs, "x")),
+        y = as.numeric(.xml_attr(attrs, "y")),
+        z = as.numeric(.xml_attr(attrs, "z"))
+      )
+    }
+  )
   dplyr::bind_rows(rows)
 }
 
@@ -670,8 +765,10 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
 #' @noRd
 .labels_for_fsl_values <- function(label_tbl, values, type, image) {
   ids <- label_tbl$index
-  if (identical(tolower(type), "probabilistic") &&
-      identical(image, "summary")) {
+  if (
+    identical(tolower(type), "probabilistic") &&
+      identical(image, "summary")
+  ) {
     ids <- ids + 1L
   }
 
@@ -773,9 +870,13 @@ get_julich_brain_atlas <- function(fsl_dir = Sys.getenv("FSLDIR"),
 #' @keywords internal
 #' @noRd
 .infer_fsl_resolution <- function(block) {
-  path <- paste(c(.xml_first_tag(block, "imagefile"),
-                  .xml_first_tag(block, "summaryimagefile")),
-                collapse = " ")
+  path <- paste(
+    c(
+      .xml_first_tag(block, "imagefile"),
+      .xml_first_tag(block, "summaryimagefile")
+    ),
+    collapse = " "
+  )
   res <- regmatches(path, regexpr("[0-9]+mm", path, perl = TRUE))
   if (length(res) == 0L || !nzchar(res)) {
     return(NA_character_)

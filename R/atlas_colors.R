@@ -20,7 +20,7 @@
     grid <- neuroim2::index_to_grid(vol, mask_idx)
     vox_ids <- vol@clusters
   } else {
-    arr <- vol[,,]
+    arr <- vol[, , ]
     mask_idx <- which(arr != 0)
     grid <- neuroim2::index_to_grid(vol, mask_idx)
     vox_ids <- arr[mask_idx]
@@ -30,18 +30,24 @@
   world <- neuroim2::grid_to_coord(sp, grid)
 
   # Compute centroids per ROI
-  centroids <- do.call(rbind, lapply(ids, function(rid) {
-    sel <- which(vox_ids == rid)
-    if (length(sel) == 0) {
-      return(data.frame(id = rid, x = NA_real_, y = NA_real_, z = NA_real_))
-    }
-    data.frame(
-      id = rid,
-      x = mean(world[sel, 1]),
-      y = mean(world[sel, 2]),
-      z = mean(world[sel, 3])
+  centroids <- do.call(
+    rbind,
+    lapply(
+      ids,
+      function(rid) {
+        sel <- which(vox_ids == rid)
+        if (length(sel) == 0) {
+          return(data.frame(id = rid, x = NA_real_, y = NA_real_, z = NA_real_))
+        }
+        data.frame(
+          id = rid,
+          x = mean(world[sel, 1]),
+          y = mean(world[sel, 2]),
+          z = mean(world[sel, 3])
+        )
+      }
     )
-  }))
+  )
 
   centroids
 }
@@ -89,8 +95,15 @@ atlas_roi_colors <- function(atlas, method = "rule_hcl", ...) {
     return(tibble::tibble(id = atlas$ids, color = unname(cols)))
   }
 
-  method <- match.arg(method, c("rule_hcl", "network_harmony",
-                                 "maximin_view", "embedding"))
+  method <- match.arg(
+    method,
+    c(
+      "rule_hcl",
+      "network_harmony",
+      "maximin_view",
+      "embedding"
+    )
+  )
 
   # Build the rois tibble expected by roi_colors_*()
   centroids <- .atlas_centroids(atlas)
@@ -118,34 +131,73 @@ atlas_roi_colors <- function(atlas, method = "rule_hcl", ...) {
   dots <- list(...)
 
   if (method == "rule_hcl") {
-    pal <- do.call(roi_colors_rule_hcl, c(
-      list(rois = rois, id_col = "roi", xyz_cols = c("x", "y", "z"),
-           network_col = network_arg, hemi_col = hemi_arg),
-      dots
-    ))
+    pal <- do.call(
+      roi_colors_rule_hcl,
+      c(
+        list(
+          rois = rois,
+          id_col = "roi",
+          xyz_cols = c("x", "y", "z"),
+          network_col = network_arg,
+          hemi_col = hemi_arg
+        ),
+        dots
+      )
+    )
   } else if (method == "network_harmony") {
     if (!has_network) {
       stop("method 'network_harmony' requires atlas$network to be non-NULL")
     }
-    pal <- do.call(roi_colors_network_harmony, c(
-      list(rois = rois, id_col = "roi", xyz_cols = c("x", "y", "z"),
-           network_col = "network", hemi_col = hemi_arg),
-      dots
-    ))
+    pal <- do.call(
+      roi_colors_network_harmony,
+      c(
+        list(
+          rois = rois,
+          id_col = "roi",
+          xyz_cols = c("x", "y", "z"),
+          network_col = "network",
+          hemi_col = hemi_arg
+        ),
+        dots
+      )
+    )
   } else if (method == "maximin_view") {
-    pal <- do.call(roi_colors_maximin_view, c(
-      list(rois = rois, id_col = "roi", xyz_cols = c("x", "y", "z"),
-           hemi_col = hemi_arg, network_col = network_arg),
-      dots
-    ))
+    pal <- do.call(
+      roi_colors_maximin_view,
+      c(
+        list(
+          rois = rois,
+          id_col = "roi",
+          xyz_cols = c("x", "y", "z"),
+          hemi_col = hemi_arg,
+          network_col = network_arg
+        ),
+        dots
+      )
+    )
   } else if (method == "embedding") {
-    feature_cols <- if (!is.null(dots$feature_cols)) dots$feature_cols else c("x", "y", "z")
+    feature_cols <- if (!is.null(dots$feature_cols)) {
+      dots$feature_cols
+    } else {
+      c(
+        "x",
+        "y",
+        "z"
+      )
+    }
     dots$feature_cols <- NULL
-    pal <- do.call(roi_colors_embedding, c(
-      list(rois = rois, id_col = "roi", feature_cols = feature_cols,
-           hemi_col = hemi_arg),
-      dots
-    ))
+    pal <- do.call(
+      roi_colors_embedding,
+      c(
+        list(
+          rois = rois,
+          id_col = "roi",
+          feature_cols = feature_cols,
+          hemi_col = hemi_arg
+        ),
+        dots
+      )
+    )
   }
 
   # Rename 'roi' column to 'id' for consistency

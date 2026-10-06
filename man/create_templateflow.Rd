@@ -23,6 +23,6 @@ and [tflow_files()] directly.
 }
 \examples{
 \dontrun{
-  # Deprecated. Use get_template(), tflow_spaces(), etc. directly.
+# Deprecated. Use get_template(), tflow_spaces(), etc. directly.
 }
 }

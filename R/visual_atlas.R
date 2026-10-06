@@ -48,11 +48,13 @@
 #'
 #' @importFrom neuroim2 read_vol ClusteredNeuroVol NeuroVol space
 #' @export
-get_visual_atlas <- function(outspace = NULL,
-                             smooth = FALSE,
-                             resolution = NULL,
-                             fsl_dir = Sys.getenv("FSLDIR"),
-                             download = TRUE) {
+get_visual_atlas <- function(
+  outspace = NULL,
+  smooth = FALSE,
+  resolution = NULL,
+  fsl_dir = Sys.getenv("FSLDIR"),
+  download = TRUE
+) {
   jul <- get_julich_brain_atlas(
     fsl_dir = fsl_dir,
     download = download,
@@ -107,8 +109,11 @@ get_visual_atlas <- function(outspace = NULL,
   vis_area <- vis_area[keep2]
   vis_hemi <- vis_hemi[keep2]
 
-  hemi_abbr <- ifelse(vis_hemi == "left", "L",
-                      ifelse(vis_hemi == "right", "R", "NA"))
+  hemi_abbr <- ifelse(
+    vis_hemi == "left",
+    "L",
+    ifelse(vis_hemi == "right", "R", "NA")
+  )
   label_map <- as.list(actual_ids)
   names(label_map) <- paste0(vis_area, "_", hemi_abbr)
   vol <- neuroim2::ClusteredNeuroVol(
@@ -171,8 +176,10 @@ get_visual_atlas <- function(outspace = NULL,
     ref = ref,
     artifacts = artifacts,
     history = history,
-    metadata = list(processing = processing,
-                     parents = list(julich = atlas_metadata(jul)))
+    metadata = list(
+      processing = processing,
+      parents = list(julich = atlas_metadata(jul))
+    )
   )
 }
 
@@ -197,8 +204,11 @@ get_visual_atlas <- function(outspace = NULL,
 #' @keywords internal
 #' @noRd
 .julich_label_hemi <- function(labels, fallback = NULL) {
-  hemi <- ifelse(grepl("\\bL$", labels), "left",
-                 ifelse(grepl("\\bR$", labels), "right", NA_character_))
+  hemi <- ifelse(
+    grepl("\\bL$", labels),
+    "left",
+    ifelse(grepl("\\bR$", labels), "right", NA_character_)
+  )
   if (!is.null(fallback)) {
     hemi[is.na(hemi)] <- fallback[is.na(hemi)]
   }

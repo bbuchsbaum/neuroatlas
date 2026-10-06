@@ -11,17 +11,20 @@ get_template_csf(
 )
 }
 \arguments{
-\item{name}{Character string specifying template name. Default: "MNI152NLin2009cAsym"}
+\item{name}{Character string specifying template name. Default:
+"MNI152NLin2009cAsym"}
 
 \item{resolution}{Numeric resolution in mm. Default: 1}
 
-\item{extension}{Character string specifying file extension. Default: ".nii.gz"}
+\item{extension}{Character string specifying file extension. Default:
+".nii.gz"}
 }
 \value{
 A NeuroVol object containing the CSF probability map
 }
 \description{
-\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "probseg",
+label = "CSF", ...)} instead.
 
 Convenience function to get CSF probability map.
 }

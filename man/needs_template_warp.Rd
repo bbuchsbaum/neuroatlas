@@ -27,10 +27,10 @@ nonlinear registration targets, so voxel grids don't align exactly
 (~2mm difference).
 }
 \examples{
-needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # TRUE
-needs_template_warp("fsaverage", "fsaverage6")                   # TRUE
-needs_template_warp("fsaverage", "MNI152")                       # FALSE (different coord spaces)
-needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym")       # FALSE (identical)
+needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym") # TRUE
+needs_template_warp("fsaverage", "fsaverage6") # TRUE
+needs_template_warp("fsaverage", "MNI152") # FALSE (different coord spaces)
+needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym") # FALSE (identical)
 
 }
 \seealso{

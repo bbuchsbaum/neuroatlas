@@ -45,3 +45,9 @@ pattern used by Workbench and pycortex. When the proxy cannot be computed
 (for example on a white display surface) curvature is used instead and the
 provenance records that.
 }
+\examples{
+\dontrun{
+atlas <- get_schaefer_surfatlas(100)
+anatomy <- surface_anatomy(atlas, hemi = "lh")
+}
+}

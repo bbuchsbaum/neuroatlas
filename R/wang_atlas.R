@@ -23,7 +23,8 @@
 #' (maximum-probability and per-area probability maps in MNI space) are served
 #' by \code{\link{get_wang_prob_atlas}}.
 #'
-#' TemplateFlow does not currently distribute an \emph{inflated} \code{fsaverage}
+#' TemplateFlow does not currently distribute an \emph{inflated}
+#' \code{fsaverage}
 #' mesh, so the available surfaces are \code{"midthickness"} (default),
 #' \code{"pial"}, and \code{"white"}.
 #'
@@ -66,9 +67,11 @@
 #' @importFrom methods new
 #' @importFrom grDevices rainbow col2rgb
 #' @export
-get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
-                           space = "fsaverage",
-                           use_cache = TRUE) {
+get_wang_atlas <- function(
+  surf = c("midthickness", "pial", "white"),
+  space = "fsaverage",
+  use_cache = TRUE
+) {
   surf <- match.arg(surf)
   space <- match.arg(space, "fsaverage")
 
@@ -191,10 +194,31 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
   tibble::tibble(
     id = 1:25,
     label = c(
-      "V1v", "V1d", "V2v", "V2d", "V3v", "V3d", "hV4",
-      "VO1", "VO2", "PHC1", "PHC2", "TO2", "TO1", "LO2", "LO1",
-      "V3B", "V3A", "IPS0", "IPS1", "IPS2", "IPS3", "IPS4", "IPS5",
-      "SPL1", "FEF"
+      "V1v",
+      "V1d",
+      "V2v",
+      "V2d",
+      "V3v",
+      "V3d",
+      "hV4",
+      "VO1",
+      "VO2",
+      "PHC1",
+      "PHC2",
+      "TO2",
+      "TO1",
+      "LO2",
+      "LO1",
+      "V3B",
+      "V3A",
+      "IPS0",
+      "IPS1",
+      "IPS2",
+      "IPS3",
+      "IPS4",
+      "IPS5",
+      "SPL1",
+      "FEF"
     )
   )
 }
@@ -228,7 +252,8 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
 
   url <- paste0(
     "https://raw.githubusercontent.com/noahbenson/neuropythy/master/",
-    "neuropythy/lib/data/fsaverage/surf/", fname
+    "neuropythy/lib/data/fsaverage/surf/",
+    fname
   )
 
   tmp <- tempfile(fileext = ".mgz")
@@ -255,9 +280,11 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
 #'
 #' @keywords internal
 #' @noRd
-.wang_surface_hemi <- function(hemi,
-                               surf = c("midthickness", "pial", "white"),
-                               use_cache = TRUE) {
+.wang_surface_hemi <- function(
+  hemi,
+  surf = c("midthickness", "pial", "white"),
+  use_cache = TRUE
+) {
   hemi <- match.arg(hemi, c("lh", "rh"))
   surf <- match.arg(surf)
 
@@ -284,13 +311,18 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
       error = function(e) NULL
     )
     if (is.null(geom) && requireNamespace("gifti", quietly = TRUE)) {
-      geom <- tryCatch({
-        gii <- gifti::readgii(surf_path)
-        hemi_label <- if (hemi == "lh") "left" else "right"
-        neurosurf::SurfaceGeometry(
-          vert = gii$data[[1]], faces = gii$data[[2]], hemi = hemi_label
-        )
-      }, error = function(e) NULL)
+      geom <- tryCatch(
+        {
+          gii <- gifti::readgii(surf_path)
+          hemi_label <- if (hemi == "lh") "left" else "right"
+          neurosurf::SurfaceGeometry(
+            vert = gii$data[[1]],
+            faces = gii$data[[2]],
+            hemi = hemi_label
+          )
+        },
+        error = function(e) NULL
+      )
     }
   }
 
@@ -340,7 +372,9 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
     cols = as.character(cols)
   )
   geom <- .attach_template_metadata(
-    geom, surf_path, "fsaverage",
+    geom,
+    surf_path,
+    "fsaverage",
     list(suffix = surf, hemi = hemi_tf, density = "164k"),
     representation = "surface"
   )
@@ -379,8 +413,7 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
   # Data begins at byte offset 284; 7 ints (28 bytes) already consumed.
   invisible(readBin(con, "raw", n = 284L - 28L))
 
-  dat <- switch(
-    as.character(type),
+  dat <- switch(as.character(type),
     "0" = readBin(con, "integer", n = n, size = 1L, signed = FALSE, endian = "big"),
     "1" = readBin(con, "integer", n = n, size = 4L, endian = "big"),
     "3" = readBin(con, "double", n = n, size = 4L, endian = "big"),
@@ -484,12 +517,14 @@ get_wang_atlas <- function(surf = c("midthickness", "pial", "white"),
 #'
 #' @importFrom neuroim2 read_vol
 #' @export
-get_wang_prob_atlas <- function(prob_dir = NULL,
-                                image = c("probability", "maxprob"),
-                                hemi = c("both", "lh", "rh"),
-                                rois = NULL,
-                                path_only = TRUE,
-                                use_cache = TRUE) {
+get_wang_prob_atlas <- function(
+  prob_dir = NULL,
+  image = c("probability", "maxprob"),
+  hemi = c("both", "lh", "rh"),
+  rois = NULL,
+  path_only = TRUE,
+  use_cache = TRUE
+) {
   image <- match.arg(image)
   hemi <- match.arg(hemi)
 
@@ -519,13 +554,19 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
   # (used alone). Otherwise read from the cache; on an actual load, download
   # the volumes into the cache when they are not already present.
   resolve_paths <- function(dirs) {
-    vapply(files$member, function(m) {
-      for (d in dirs) {
-        p <- .wang_prob_resolve_file(d, m)
-        if (!is.na(p)) return(p)
-      }
-      NA_character_
-    }, character(1))
+    vapply(
+      files$member,
+      function(m) {
+        for (d in dirs) {
+          p <- .wang_prob_resolve_file(d, m)
+          if (!is.na(p)) {
+            return(p)
+          }
+        }
+        NA_character_
+      },
+      character(1)
+    )
   }
 
   if (!is.null(user_subj_vol_all)) {
@@ -547,7 +588,13 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
 
   # On a load (not a manifest) without an explicit prob_dir, fetch the volumes
   # from the neuroatlas GitHub release into the cache if any are missing.
-  if (!isTRUE(path_only) && is.null(user_subj_vol_all) && any(is.na(files$path))) {
+  if (
+    !isTRUE(path_only) && is.null(user_subj_vol_all) && any(
+      is.na(
+        files$path
+      )
+    )
+  ) {
     dl <- .wang_prob_download(use_cache = use_cache)
     if (!is.null(dl)) {
       missing <- is.na(files$path)
@@ -585,8 +632,11 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
   }
 
   if (is.null(subj_vol_all) || any(!files$exists)) {
-    missing_members <- files$member[!files$exists]
-    rel_url <- .wang_prob_release_url()
+    # cli interpolates these values in the diagnostic below.
+    missing_members <- files$member[ # nolint: object_usage_linter.
+      !files$exists
+    ]
+    rel_url <- .wang_prob_release_url() # nolint: object_usage_linter.
     cli::cli_abort(
       c(
         "Could not resolve Wang probability volumes for {.code path_only = FALSE}.",
@@ -641,72 +691,124 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
     volumes = vols
   )
   class(ret) <- c("wang_prob_volumes", "list")
-  .attach_wang_volume_metadata(ret, user_supplied = !is.null(prob_dir),
-                               downloaded = downloaded)
+  .attach_wang_volume_metadata(
+    ret,
+    user_supplied = !is.null(prob_dir),
+    downloaded = downloaded
+  )
 }
 
 .attach_wang_volume_metadata <- function(x, user_supplied, downloaded) {
-  parents <- lapply(seq_along(x$volumes), function(i) {
-    vol <- x$volumes[[i]]
-    discrete <- identical(x$image, "maxprob")
-    ids <- if (discrete) {
-      values <- sort(unique(as.integer(as.vector(vol))))
-      values[values != 0L]
-    } else x$files$id[[i]]
-    reference <- new_atlas_ref(
-      "wang", "Wang2015", "volume", template_space = "MNI152_unspecified",
-      coord_space = "MNI152", source = if (user_supplied) "local_files" else {
-        if (downloaded[[i]]) "neuroatlas_release" else "cache"
-      }, provenance = .wang_prob_release_url(), confidence = "uncertain",
-      notes = "ProbAtlas_v4 volumes; precise MNI template identity unverified.")
-    item <- list(name = names(x$volumes)[[i]], ids = ids, atlas = vol,
-                  atlas_ref = reference,
-                  atlas_artifacts = .new_atlas_artifact(
-                    if (discrete) "summary_label_volume" else "probability_volume",
-                    "wang", "Wang2015", source_name = reference$source,
-                    source_url = reference$provenance,
-                    source_ref = x$files$member[[i]],
-                    file_name = basename(x$files$path[[i]]),
-                    local_path = x$files$path[[i]],
-                    source_version = if (downloaded[[i]]) "ProbAtlas_v4" else NA_character_,
-                    template_space = "MNI152_unspecified", hemi = x$files$hemi[[i]]),
-                  atlas_history = .new_atlas_history(
-                    "load", "volume", parameters = list(image = x$image,
-                      member = x$files$member[[i]], hemi = x$files$hemi[[i]])))
-    meta <- .build_atlas_metadata(item)
-    if (!downloaded[[i]]) {
-      meta$provenance$issues <- c(meta$provenance$issues,
-        "Local or cached files: original acquisition and release unrecorded.")
+  parents <- lapply(
+    seq_along(x$volumes),
+    function(i) {
+      vol <- x$volumes[[i]]
+      discrete <- identical(x$image, "maxprob")
+      ids <- if (discrete) {
+        values <- sort(unique(as.integer(as.vector(vol))))
+        values[values != 0L]
+      } else {
+        x$files$id[[i]]
+      }
+      reference <- new_atlas_ref(
+        "wang",
+        "Wang2015",
+        "volume",
+        template_space = "MNI152_unspecified",
+        coord_space = "MNI152",
+        source = if (user_supplied) {
+          "local_files"
+        } else {
+          if (downloaded[[i]]) "neuroatlas_release" else "cache"
+        },
+        provenance = .wang_prob_release_url(),
+        confidence = "uncertain",
+        notes = "ProbAtlas_v4 volumes; precise MNI template identity unverified."
+      )
+      item <- list(
+        name = names(x$volumes)[[i]],
+        ids = ids,
+        atlas = vol,
+        atlas_ref = reference,
+        atlas_artifacts = .new_atlas_artifact(
+          if (discrete) "summary_label_volume" else "probability_volume",
+          "wang",
+          "Wang2015",
+          source_name = reference$source,
+          source_url = reference$provenance,
+          source_ref = x$files$member[[i]],
+          file_name = basename(x$files$path[[i]]),
+          local_path = x$files$path[[i]],
+          source_version = if (downloaded[[i]]) "ProbAtlas_v4" else NA_character_,
+          template_space = "MNI152_unspecified",
+          hemi = x$files$hemi[[i]]
+        ),
+        atlas_history = .new_atlas_history(
+          "load",
+          "volume",
+          parameters = list(
+            image = x$image,
+            member = x$files$member[[i]],
+            hemi = x$files$hemi[[i]]
+          )
+        )
+      )
+      meta <- .build_atlas_metadata(item)
+      if (!downloaded[[i]]) {
+        meta$provenance$issues <- c(
+          meta$provenance$issues,
+          "Local or cached files: original acquisition and release unrecorded."
+        )
+      }
+      meta$content$value_type <- if (discrete) "labels" else "probability"
+      meta$identity$description <- if (discrete) {
+        "Wang ProbAtlas_v4 maximum-probability labels."
+      } else {
+        "Wang ProbAtlas_v4 per-area probability map."
+      }
+      meta
     }
-    meta$content$value_type <- if (discrete) "labels" else "probability"
-    meta$identity$description <- if (discrete) {
-      "Wang ProbAtlas_v4 maximum-probability labels."
-    } else "Wang ProbAtlas_v4 per-area probability map."
-    meta
-  })
+  )
   names(parents) <- names(x$volumes)
   meta <- parents[[1]]
   meta$identity$name <- x$dataset
-  meta$content$regions <- sum(vapply(parents, function(p) p$content$regions,
-                                    integer(1)))
-  meta$content$parameters <- list(image = x$image, hemi = x$hemi,
-                                  members = x$files$member)
+  meta$content$regions <- sum(
+    vapply(
+      parents,
+      function(p) p$content$regions,
+      integer(1)
+    )
+  )
+  meta$content$parameters <- list(
+    image = x$image,
+    hemi = x$hemi,
+    members = x$files$member
+  )
   meta$artifacts <- dplyr::bind_rows(lapply(parents, `[[`, "artifacts"))
   meta$parents <- parents
-  grids_match <- vapply(parents, function(p) {
-    identical(p$spatial$dimensions, meta$spatial$dimensions) &&
-      identical(p$spatial$affine, meta$spatial$affine)
-  }, logical(1))
+  grids_match <- vapply(
+    parents,
+    function(p) {
+      identical(p$spatial$dimensions, meta$spatial$dimensions) &&
+        identical(p$spatial$affine, meta$spatial$affine)
+    },
+    logical(1)
+  )
   if (!all(grids_match)) {
     meta$spatial$dimensions <- integer()
     meta$spatial$voxel_size <- numeric()
     meta$spatial$affine <- NULL
     meta$spatial$resolution <- NA_character_
-    meta$provenance$issues <- c(meta$provenance$issues,
-      "Collection contains different grids; inspect the individual parent records.")
+    meta$provenance$issues <- c(
+      meta$provenance$issues,
+      "Collection contains different grids; inspect the individual parent records."
+    )
   }
   meta$history <- .new_atlas_history(
-    "load", "volume", parameters = meta$content$parameters)
+    "load",
+    "volume",
+    parameters = meta$content$parameters
+  )
   meta$history$step <- 1L
   validate_resource_metadata(meta)
   x$metadata <- meta
@@ -752,13 +854,18 @@ get_wang_prob_atlas <- function(prob_dir = NULL,
       id = NA_integer_,
       label = "maxprob",
       hemi = hemis,
-      member = file.path("subj_vol_all",
-                         paste0("maxprob_vol_", hemis, ".nii.gz")),
+      member = file.path(
+        "subj_vol_all",
+        paste0("maxprob_vol_", hemis, ".nii.gz")
+      ),
       stringsAsFactors = FALSE
     )
   } else {
-    grid <- expand.grid(row = seq_len(nrow(labs)), hemi = hemis,
-                        stringsAsFactors = FALSE)
+    grid <- expand.grid(
+      row = seq_len(nrow(labs)),
+      hemi = hemis,
+      stringsAsFactors = FALSE
+    )
     data.frame(
       id = labs$id[grid$row],
       label = labs$label[grid$row],
@@ -935,8 +1042,14 @@ print.wang_prob_paths <- function(x, ...) {
   cat("  dataset:  ", x$dataset, "\n", sep = "")
   cat("  image:    ", x$image, " | hemi: ", x$hemi, "\n", sep = "")
   n_present <- sum(x$files$exists)
-  cat("  files:    ", nrow(x$files), " (", n_present, " present locally)\n",
-      sep = "")
+  cat(
+    "  files:    ",
+    nrow(x$files),
+    " (",
+    n_present,
+    " present locally)\n",
+    sep = ""
+  )
   if (is.na(x$subj_vol_all)) {
     cat("  subj_vol_all: <not cached> -- downloaded on load from:\n")
     cat("            ", x$download_url %||% x$resources_url %||% "", "\n", sep = "")

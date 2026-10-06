@@ -24,11 +24,18 @@ from \code{\link{get_wang_atlas}}, \code{\link{glasser_surf}}, or
 matched region, carrying the mesh vertices of that area on the appropriate
 hemisphere.
 
-Because a surface atlas stores each hemisphere on its own mesh, a \code{label}
+Because a surface atlas stores each hemisphere on its own mesh, a
+\code{label}
 present in both hemispheres yields one ROI per hemisphere, named
 \code{"<label>_left"} / \code{"<label>_right"}; pass \code{hemi} to restrict.
 When selecting by \code{id}, results are named by id (ids are unique across
 hemispheres: 1..K left, K+1..2K right).
+}
+\examples{
+\dontrun{
+atlas <- get_schaefer_surfatlas(100)
+roi <- get_roi(atlas, id = atlas$ids[1])
+}
 }
 \seealso{
 \code{\link{get_roi}}

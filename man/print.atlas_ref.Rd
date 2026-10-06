@@ -17,3 +17,9 @@ Invisibly returns `x`.
 \description{
 Print Method for Atlas References
 }
+\examples{
+ref <- new_atlas_ref("toy", "two-regions",
+  template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+)
+print(ref)
+}

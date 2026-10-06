@@ -7,8 +7,11 @@
     .register_builtin_atlases(),
     error = function(e) {
       # Registry population should never abort package load.
-      warning("neuroatlas: failed to register built-in atlases: ",
-              conditionMessage(e), call. = FALSE)
+      warning(
+        "neuroatlas: failed to register built-in atlases: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
     }
   )
 }
@@ -45,10 +48,15 @@
 #' # remotes::install_github("bbuchsbaum/templateflow")
 #' }
 #' @export
-install_templateflow <- function(method = "auto", conda = "auto",
-                               envname = NULL, force_reinstall = FALSE) {
+install_templateflow <- function(
+  method = "auto",
+  conda = "auto",
+  envname = NULL,
+  force_reinstall = FALSE
+) {
   lifecycle::deprecate_warn(
-    "0.2.0", "install_templateflow()",
+    "0.2.0",
+    "install_templateflow()",
     details = paste(
       "Python is no longer required for TemplateFlow access.",
       "Install the pure R package instead:",
@@ -57,8 +65,10 @@ install_templateflow <- function(method = "auto", conda = "auto",
   )
 
   if (!requireNamespace("templateflow", quietly = TRUE)) {
-    message("The 'templateflow' R package is not installed.\n",
-            'Install it with: remotes::install_github("bbuchsbaum/templateflow")')
+    message(
+      "The 'templateflow' R package is not installed.\n",
+      'Install it with: remotes::install_github("bbuchsbaum/templateflow")'
+    )
   } else {
     message("The 'templateflow' R package is already installed. No action needed.")
   }
@@ -84,33 +94,42 @@ check_templateflow <- function() {
     cat("templateflow R package: INSTALLED\n")
 
     # Try to get version
-    tryCatch({
-      pkg_ver <- utils::packageVersion("templateflow")
-      cat("  Version:", as.character(pkg_ver), "\n")
-    }, error = function(e) {
-      # Ignore version errors
-    })
+    tryCatch(
+      {
+        pkg_ver <- utils::packageVersion("templateflow")
+        cat("  Version:", as.character(pkg_ver), "\n")
+      },
+      error = function(e) {
+        # Ignore version errors
+      }
+    )
 
     # Check cache
-    tryCatch({
-      cache_path <- getOption("templateflow.home", NA_character_)
-      cat("  Cache path:", cache_path, "\n")
-      if (dir.exists(cache_path)) {
-        stats <- templateflow::tf_cache_stats()
-        cat("  Cache size:", stats$cache_size_human, "\n")
-        cat("  Cache files:", stats$cache_files, "\n")
+    tryCatch(
+      {
+        cache_path <- getOption("templateflow.home", NA_character_)
+        cat("  Cache path:", cache_path, "\n")
+        if (dir.exists(cache_path)) {
+          stats <- templateflow::tf_cache_stats()
+          cat("  Cache size:", stats$cache_size_human, "\n")
+          cat("  Cache files:", stats$cache_files, "\n")
+        }
+      },
+      error = function(e) {
+        cat("  Cache info: unavailable (", e$message, ")\n")
       }
-    }, error = function(e) {
-      cat("  Cache info: unavailable (", e$message, ")\n")
-    })
+    )
 
     # Check connectivity
-    tryCatch({
-      spaces <- templateflow::tf_templates()
-      cat("\n  Templates available:", length(spaces), "\n")
-    }, error = function(e) {
-      cat("\n  Templates: Error listing (", e$message, ")\n")
-    })
+    tryCatch(
+      {
+        spaces <- templateflow::tf_templates()
+        cat("\n  Templates available:", length(spaces), "\n")
+      },
+      error = function(e) {
+        cat("\n  Templates: Error listing (", e$message, ")\n")
+      }
+    )
 
     cat("\n=== Status: Ready ===\n")
     cat("TemplateFlow is properly installed and ready to use.\n")

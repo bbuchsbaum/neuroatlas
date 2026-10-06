@@ -1,32 +1,40 @@
-.compute_selection_data <- function(selection_engine = c("cluster",
-                                                       "parcel",
-                                                       "sphere",
-                                                       "custom"),
-                                   selection_provider = NULL,
-                                   data_source,
-                                   atlas,
-                                   stat_map,
-                                   sample_table = NULL,
-                                   threshold = 3,
-                                   min_cluster_size = 20,
-                                   connectivity = c("26-connect",
-                                                    "18-connect",
-                                                    "6-connect"),
-                                   tail = c("two_sided",
-                                            "positive",
-                                            "negative"),
-                                   signal_fun = mean,
-                                   signal_fun_args = list(na.rm = TRUE),
-                                   series_fun = NULL,
-                                   prefetch = TRUE,
-                                   prefetch_max_clusters = Inf,
-                                   prefetch_max_voxels = Inf,
-                                   series_cache_env = NULL,
-                                   parcel_ids = NULL,
-                                   sphere_centers = NULL,
-                                   sphere_radius = 6,
-                                   sphere_units = c("mm", "voxels"),
-                                   sphere_combine = c("separate", "union")) {
+.compute_selection_data <- function(
+  selection_engine = c(
+    "cluster",
+    "parcel",
+    "sphere",
+    "custom"
+  ),
+  selection_provider = NULL,
+  data_source,
+  atlas,
+  stat_map,
+  sample_table = NULL,
+  threshold = 3,
+  min_cluster_size = 20,
+  connectivity = c(
+    "26-connect",
+    "18-connect",
+    "6-connect"
+  ),
+  tail = c(
+    "two_sided",
+    "positive",
+    "negative"
+  ),
+  signal_fun = mean,
+  signal_fun_args = list(na.rm = TRUE),
+  series_fun = NULL,
+  prefetch = TRUE,
+  prefetch_max_clusters = Inf,
+  prefetch_max_voxels = Inf,
+  series_cache_env = NULL,
+  parcel_ids = NULL,
+  sphere_centers = NULL,
+  sphere_radius = 6,
+  sphere_units = c("mm", "voxels"),
+  sphere_combine = c("separate", "union")
+) {
   selection_engine <- match.arg(selection_engine)
   connectivity <- match.arg(connectivity)
   tail <- match.arg(tail)
@@ -45,66 +53,72 @@
   }
 
   if (identical(selection_engine, "cluster")) {
-    return(build_cluster_explorer_data(
-      data_source = data_source,
-      atlas = atlas,
-      stat_map = stat_map,
-      sample_table = sample_table,
-      threshold = threshold,
-      min_cluster_size = min_cluster_size,
-      connectivity = connectivity,
-      tail = tail,
-      signal_fun = signal_fun,
-      signal_fun_args = signal_fun_args,
-      series_fun = series_fun,
-      prefetch = prefetch,
-      prefetch_max_clusters = prefetch_max_clusters,
-      prefetch_max_voxels = prefetch_max_voxels,
-      series_cache_env = series_cache_env
-    ))
+    return(
+      build_cluster_explorer_data(
+        data_source = data_source,
+        atlas = atlas,
+        stat_map = stat_map,
+        sample_table = sample_table,
+        threshold = threshold,
+        min_cluster_size = min_cluster_size,
+        connectivity = connectivity,
+        tail = tail,
+        signal_fun = signal_fun,
+        signal_fun_args = signal_fun_args,
+        series_fun = series_fun,
+        prefetch = prefetch,
+        prefetch_max_clusters = prefetch_max_clusters,
+        prefetch_max_voxels = prefetch_max_voxels,
+        series_cache_env = series_cache_env
+      )
+    )
   }
 
   if (identical(selection_engine, "parcel")) {
-    return(.build_parcel_selection_data(
-      data_source = data_source,
-      atlas = atlas,
-      stat_map = stat_map,
-      sample_table = sample_table,
-      parcel_ids = parcel_ids,
-      threshold = threshold,
-      min_cluster_size = min_cluster_size,
-      tail = tail,
-      signal_fun = signal_fun,
-      signal_fun_args = signal_fun_args,
-      series_fun = series_fun,
-      prefetch = prefetch,
-      prefetch_max_clusters = prefetch_max_clusters,
-      prefetch_max_voxels = prefetch_max_voxels,
-      series_cache_env = series_cache_env
-    ))
+    return(
+      .build_parcel_selection_data(
+        data_source = data_source,
+        atlas = atlas,
+        stat_map = stat_map,
+        sample_table = sample_table,
+        parcel_ids = parcel_ids,
+        threshold = threshold,
+        min_cluster_size = min_cluster_size,
+        tail = tail,
+        signal_fun = signal_fun,
+        signal_fun_args = signal_fun_args,
+        series_fun = series_fun,
+        prefetch = prefetch,
+        prefetch_max_clusters = prefetch_max_clusters,
+        prefetch_max_voxels = prefetch_max_voxels,
+        series_cache_env = series_cache_env
+      )
+    )
   }
 
   if (identical(selection_engine, "sphere")) {
-    return(.build_sphere_selection_data(
-      data_source = data_source,
-      atlas = atlas,
-      stat_map = stat_map,
-      sample_table = sample_table,
-      sphere_centers = sphere_centers,
-      sphere_radius = sphere_radius,
-      sphere_units = sphere_units,
-      sphere_combine = sphere_combine,
-      threshold = threshold,
-      min_cluster_size = min_cluster_size,
-      tail = tail,
-      signal_fun = signal_fun,
-      signal_fun_args = signal_fun_args,
-      series_fun = series_fun,
-      prefetch = prefetch,
-      prefetch_max_clusters = prefetch_max_clusters,
-      prefetch_max_voxels = prefetch_max_voxels,
-      series_cache_env = series_cache_env
-    ))
+    return(
+      .build_sphere_selection_data(
+        data_source = data_source,
+        atlas = atlas,
+        stat_map = stat_map,
+        sample_table = sample_table,
+        sphere_centers = sphere_centers,
+        sphere_radius = sphere_radius,
+        sphere_units = sphere_units,
+        sphere_combine = sphere_combine,
+        threshold = threshold,
+        min_cluster_size = min_cluster_size,
+        tail = tail,
+        signal_fun = signal_fun,
+        signal_fun_args = signal_fun_args,
+        series_fun = series_fun,
+        prefetch = prefetch,
+        prefetch_max_clusters = prefetch_max_clusters,
+        prefetch_max_voxels = prefetch_max_voxels,
+        series_cache_env = series_cache_env
+      )
+    )
   }
 
   if (!is.function(selection_provider)) {
@@ -137,8 +151,13 @@
     sphere_combine = sphere_combine
   )
   required <- c(
-    "cluster_table", "cluster_parcels", "cluster_ts", "cluster_voxels",
-    "cluster_index", "sample_table", "prefetch_info"
+    "cluster_table",
+    "cluster_parcels",
+    "cluster_ts",
+    "cluster_voxels",
+    "cluster_index",
+    "sample_table",
+    "prefetch_info"
   )
   miss <- setdiff(required, names(out))
   if (length(miss) > 0) {
@@ -151,23 +170,27 @@
   out
 }
 
-.build_parcel_selection_data <- function(data_source,
-                                         atlas,
-                                         stat_map,
-                                         sample_table = NULL,
-                                         parcel_ids = NULL,
-                                         threshold = 3,
-                                         min_cluster_size = 20,
-                                         tail = c("two_sided",
-                                                  "positive",
-                                                  "negative"),
-                                         signal_fun = mean,
-                                         signal_fun_args = list(na.rm = TRUE),
-                                         series_fun = NULL,
-                                         prefetch = TRUE,
-                                         prefetch_max_clusters = Inf,
-                                         prefetch_max_voxels = Inf,
-                                         series_cache_env = NULL) {
+.build_parcel_selection_data <- function(
+  data_source,
+  atlas,
+  stat_map,
+  sample_table = NULL,
+  parcel_ids = NULL,
+  threshold = 3,
+  min_cluster_size = 20,
+  tail = c(
+    "two_sided",
+    "positive",
+    "negative"
+  ),
+  signal_fun = mean,
+  signal_fun_args = list(na.rm = TRUE),
+  series_fun = NULL,
+  prefetch = TRUE,
+  prefetch_max_clusters = Inf,
+  prefetch_max_voxels = Inf,
+  series_cache_env = NULL
+) {
   tail <- match.arg(tail)
   atlas_arr <- .atlas_volume_array(.get_atlas_volume(atlas))
   stat_arr <- as.array(stat_map)
@@ -190,7 +213,13 @@
 
     svals <- as.numeric(stat_arr[idx])
     peak <- svals[which.max(abs(svals))]
-    if (!.keep_peak_for_tail(peak_stat = peak, threshold = threshold, tail = tail)) {
+    if (
+      !.keep_peak_for_tail(
+        peak_stat = peak,
+        threshold = threshold,
+        tail = tail
+      )
+    ) {
       next
     }
 
@@ -216,26 +245,30 @@
   )
 }
 
-.build_sphere_selection_data <- function(data_source,
-                                         atlas,
-                                         stat_map,
-                                         sample_table = NULL,
-                                         sphere_centers = NULL,
-                                         sphere_radius = 6,
-                                         sphere_units = c("mm", "voxels"),
-                                         sphere_combine = c("separate", "union"),
-                                         threshold = 3,
-                                         min_cluster_size = 20,
-                                         tail = c("two_sided",
-                                                  "positive",
-                                                  "negative"),
-                                         signal_fun = mean,
-                                         signal_fun_args = list(na.rm = TRUE),
-                                         series_fun = NULL,
-                                         prefetch = TRUE,
-                                         prefetch_max_clusters = Inf,
-                                         prefetch_max_voxels = Inf,
-                                         series_cache_env = NULL) {
+.build_sphere_selection_data <- function(
+  data_source,
+  atlas,
+  stat_map,
+  sample_table = NULL,
+  sphere_centers = NULL,
+  sphere_radius = 6,
+  sphere_units = c("mm", "voxels"),
+  sphere_combine = c("separate", "union"),
+  threshold = 3,
+  min_cluster_size = 20,
+  tail = c(
+    "two_sided",
+    "positive",
+    "negative"
+  ),
+  signal_fun = mean,
+  signal_fun_args = list(na.rm = TRUE),
+  series_fun = NULL,
+  prefetch = TRUE,
+  prefetch_max_clusters = Inf,
+  prefetch_max_voxels = Inf,
+  series_cache_env = NULL
+) {
   tail <- match.arg(tail)
   sphere_units <- match.arg(sphere_units)
   sphere_combine <- match.arg(sphere_combine)
@@ -273,8 +306,16 @@
   if (identical(sphere_combine, "union")) {
     keep <- rep(FALSE, nrow(coord_all))
     for (i in seq_len(nrow(centers))) {
-      d2 <- rowSums((coord_all - matrix(centers[i, ], nrow(coord_all), 3,
-                                        byrow = TRUE))^2)
+      d2 <- rowSums(
+        (
+          coord_all - matrix(
+            centers[i, ],
+            nrow(coord_all),
+            3,
+            byrow = TRUE
+          )
+        )^2
+      )
       keep <- keep | (d2 <= sphere_radius^2)
     }
     idx <- which(keep)
@@ -282,16 +323,30 @@
       vox <- grid_all[idx, , drop = FALSE]
       svals <- as.numeric(stat_arr[idx])
       peak <- svals[which.max(abs(svals))]
-      if (nrow(vox) >= min_cluster_size &&
-          .keep_peak_for_tail(peak_stat = peak, threshold = threshold, tail = tail)) {
+      if (
+        nrow(vox) >= min_cluster_size &&
+          .keep_peak_for_tail(
+            peak_stat = peak,
+            threshold = threshold,
+            tail = tail
+          )
+      ) {
         cluster_voxels[["S1"]] <- vox
         cluster_sign[["S1"]] <- .sign_label_from_peak(peak)
       }
     }
   } else {
     for (i in seq_len(nrow(centers))) {
-      d2 <- rowSums((coord_all - matrix(centers[i, ], nrow(coord_all), 3,
-                                        byrow = TRUE))^2)
+      d2 <- rowSums(
+        (
+          coord_all - matrix(
+            centers[i, ],
+            nrow(coord_all),
+            3,
+            byrow = TRUE
+          )
+        )^2
+      )
       idx <- which(d2 <= sphere_radius^2)
       if (length(idx) == 0) next
       vox <- grid_all[idx, , drop = FALSE]
@@ -299,7 +354,13 @@
 
       svals <- as.numeric(stat_arr[idx])
       peak <- svals[which.max(abs(svals))]
-      if (!.keep_peak_for_tail(peak_stat = peak, threshold = threshold, tail = tail)) {
+      if (
+        !.keep_peak_for_tail(
+          peak_stat = peak,
+          threshold = threshold,
+          tail = tail
+        )
+      ) {
         next
       }
       cid <- paste0("S", i)
@@ -325,19 +386,23 @@
   )
 }
 
-.build_selection_data_from_voxels <- function(data_source,
-                                              atlas,
-                                              stat_map,
-                                              sample_table = NULL,
-                                              cluster_voxels,
-                                              cluster_sign = character(0),
-                                              signal_fun = mean,
-                                              signal_fun_args = list(na.rm = TRUE),
-                                              series_fun = NULL,
-                                              prefetch = TRUE,
-                                              prefetch_max_clusters = Inf,
-                                              prefetch_max_voxels = Inf,
-                                              series_cache_env = NULL) {
+.build_selection_data_from_voxels <- function(
+  data_source,
+  atlas,
+  stat_map,
+  sample_table = NULL,
+  cluster_voxels,
+  cluster_sign = character(0),
+  signal_fun = mean,
+  signal_fun_args = list(
+    na.rm = TRUE
+  ),
+  series_fun = NULL,
+  prefetch = TRUE,
+  prefetch_max_clusters = Inf,
+  prefetch_max_voxels = Inf,
+  series_cache_env = NULL
+) {
   n_samples <- .infer_n_samples(
     data_source = data_source,
     sample_table = sample_table,
@@ -351,8 +416,10 @@
     n_samples = n_samples,
     series_fun = series_fun
   )
-  sample_tbl <- .normalize_sample_table(sample_table = sample_table,
-                                        n_samples = n_samples)
+  sample_tbl <- .normalize_sample_table(
+    sample_table = sample_table,
+    n_samples = n_samples
+  )
 
   stat_arr <- as.array(stat_map)
   dims3 <- dim(stat_arr)[1:3]
@@ -373,8 +440,8 @@
     vox <- vox[
       vox[, 1] >= 1 & vox[, 1] <= dims3[1] &
         vox[, 2] >= 1 & vox[, 2] <= dims3[2] &
-        vox[, 3] >= 1 & vox[, 3] <= dims3[3],
-      , drop = FALSE
+        vox[, 3] >= 1 & vox[, 3] <= dims3[3], ,
+      drop = FALSE
     ]
     if (nrow(vox) == 0) next
     vox <- unique(vox)
@@ -391,8 +458,10 @@
     index_arr[idx] <- k
 
     sign_val <- cluster_sign[[cid]]
-    if (is.null(sign_val) || !is.character(sign_val) ||
-        length(sign_val) == 0 || is.na(sign_val) || !nzchar(sign_val[1])) {
+    if (
+      is.null(sign_val) || !is.character(sign_val) ||
+        length(sign_val) == 0 || is.na(sign_val) || !nzchar(sign_val[1])
+    ) {
       sign_val <- .sign_label_from_peak(peak_stat)
     }
 
@@ -465,7 +534,12 @@
     cluster_parcels = ann$cluster_parcels,
     cluster_ts = ts_tbl,
     cluster_voxels = clean_vox,
-    cluster_index = neuroim2::NeuroVol(index_arr, space = neuroim2::space(stat_map)),
+    cluster_index = neuroim2::NeuroVol(
+      index_arr,
+      space = neuroim2::space(
+        stat_map
+      )
+    ),
     sample_table = sample_tbl,
     prefetch_info = list(
       requested = isTRUE(prefetch),
@@ -479,7 +553,9 @@
 }
 
 .normalize_sphere_centers <- function(sphere_centers) {
-  if (is.null(sphere_centers)) return(NULL)
+  if (is.null(sphere_centers)) {
+    return(NULL)
+  }
   if (is.numeric(sphere_centers) && length(sphere_centers) == 3) {
     return(matrix(as.numeric(sphere_centers), nrow = 1))
   }
@@ -498,7 +574,9 @@
 }
 
 .keep_peak_for_tail <- function(peak_stat, threshold, tail) {
-  if (!is.finite(peak_stat)) return(FALSE)
+  if (!is.finite(peak_stat)) {
+    return(FALSE)
+  }
   if (identical(tail, "positive")) {
     return(peak_stat > threshold)
   }
@@ -509,6 +587,8 @@
 }
 
 .sign_label_from_peak <- function(peak_stat) {
-  if (!is.finite(peak_stat) || peak_stat == 0) return("unsigned")
+  if (!is.finite(peak_stat) || peak_stat == 0) {
+    return("unsigned")
+  }
   if (peak_stat > 0) "positive" else "negative"
 }

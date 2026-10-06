@@ -18,7 +18,8 @@ get_fsl_atlas(
 include `"harvard_oxford_cortical"`, `"harvard_oxford_subcortical"`,
 `"harvard_oxford_cortical_subcortical"`, and `"julich"`.}
 
-\item{fsl_dir}{FSL installation directory. Defaults to `Sys.getenv("FSLDIR")`.
+\item{fsl_dir}{FSL installation directory. Defaults to
+`Sys.getenv("FSLDIR")`.
 `get_julich_brain_atlas()` downloads an FSL-style Julich-Brain cache when
 this is empty and `download = TRUE`.}
 
@@ -47,4 +48,11 @@ probability image and a 3D maximum-probability summary image. The summary
 image labels are offset by one relative to XML/probability-volume indices,
 so `get_fsl_atlas()` applies that correction when loading max-probability
 summaries.
+}
+\examples{
+\dontrun{
+# Requires an FSL installation configured through FSLDIR.
+atlas <- get_fsl_atlas("harvard_oxford_cortical", resolution = 2)
+atlas_ref(atlas)
+}
 }

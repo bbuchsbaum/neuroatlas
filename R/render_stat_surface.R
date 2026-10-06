@@ -1,13 +1,21 @@
 .surface_anatomy_cache <- new.env(parent = emptyenv())
 
 .surface_hemi_value <- function(x, hemi) {
-  if (is.null(x)) return(NULL)
-  if (!is.list(x)) return(x)
+  if (is.null(x)) {
+    return(NULL)
+  }
+  if (!is.list(x)) {
+    return(x)
+  }
   x[[hemi]] %||% x[[if (hemi == "lh") "left" else "right"]]
 }
 
-.resolve_surface_domain <- function(surfatlas, hemi, override = NULL,
-                                    source = NULL) {
+.resolve_surface_domain <- function(
+  surfatlas,
+  hemi,
+  override = NULL,
+  source = NULL
+) {
   atlas_hemi <- surfatlas[[paste0(hemi, "_atlas")]]
   n <- length(atlas_hemi@data)
   mask <- .surface_hemi_value(override, hemi) %||%
@@ -19,25 +27,35 @@
     source <- source %||% surfatlas$cortex_mask_source %||% "explicit"
   }
   if (!is.logical(mask) || length(mask) != n || anyNA(mask)) {
-    stop("Cortex mask for ", hemi, " must be one non-missing logical value per vertex.",
-         call. = FALSE)
+    stop(
+      "Cortex mask for ",
+      hemi,
+      " must be one non-missing logical value per vertex.",
+      call. = FALSE
+    )
   }
-  list(mask = mask, provenance = list(
-    source = source,
-    surface_space = surfatlas$surface_space %||% NA_character_,
-    density = surfatlas$density %||% NA_character_,
-    hemi = hemi,
-    surface_type = surfatlas$surf_type %||% NA_character_,
-    n_cortex = sum(mask),
-    n_medial_wall = sum(!mask)
-  ))
+  list(
+    mask = mask,
+    provenance = list(
+      source = source,
+      surface_space = surfatlas$surface_space %||% NA_character_,
+      density = surfatlas$density %||% NA_character_,
+      hemi = hemi,
+      surface_type = surfatlas$surf_type %||% NA_character_,
+      n_cortex = sum(mask),
+      n_medial_wall = sum(!mask)
+    )
+  )
 }
 
 .compute_surface_curvature_cached <- function(geometry, cache_key) {
   if (exists(cache_key, envir = .surface_anatomy_cache, inherits = FALSE)) {
     return(get(cache_key, envir = .surface_anatomy_cache, inherits = FALSE))
   }
-  metric <- tryCatch(neurosurf::anatomical_curvature(geometry), error = function(e) NULL)
+  metric <- tryCatch(
+    neurosurf::anatomical_curvature(geometry),
+    error = function(e) NULL
+  )
   assign(cache_key, metric, envir = .surface_anatomy_cache)
   metric
 }
@@ -57,8 +75,12 @@
     identical(unname(x_faces), unname(y_faces))
 }
 
-.resolve_surface_anatomy <- function(surfatlas, hemi, override = NULL,
-                                     source = NULL) {
+.resolve_surface_anatomy <- function(
+  surfatlas,
+  hemi,
+  override = NULL,
+  source = NULL
+) {
   atlas_hemi <- surfatlas[[paste0(hemi, "_atlas")]]
   display_geometry <- atlas_hemi@geometry
   n <- length(atlas_hemi@data)
@@ -66,8 +88,12 @@
     .surface_hemi_value(surfatlas$anatomy_metric, hemi)
   if (!is.null(metric)) {
     if (!is.numeric(metric) || length(metric) != n || any(!is.finite(metric))) {
-      stop("Anatomy metric for ", hemi, " must contain one finite value per vertex.",
-           call. = FALSE)
+      stop(
+        "Anatomy metric for ",
+        hemi,
+        " must contain one finite value per vertex.",
+        call. = FALSE
+      )
     }
     metric_source <- source %||% surfatlas$anatomy_metric_source %||%
       "explicit_sulcal_or_curvature_metric"
@@ -81,36 +107,62 @@
       # Only override density when it departs from the space default, so the
       # packaged fsaverage6 white mesh stays reachable without TemplateFlow.
       density <- surfatlas$density %||% NULL
-      if (identical(density, .surface_template_defaults(surface_space)$density)) {
+      if (
+        identical(
+          density,
+          .surface_template_defaults(
+            surface_space
+          )$density
+        )
+      ) {
         density <- NULL
       }
-      .repair_legacy_surface_geometry(.load_overlay_surface_geometry(
-        surface_space = surface_space,
-        surface_type = "white", hemi = hemi,
-        density_override = density
-      ))
+      .repair_legacy_surface_geometry(
+        .load_overlay_surface_geometry(
+          surface_space = surface_space,
+          surface_type = "white",
+          hemi = hemi,
+          density_override = density
+        )
+      )
     }
     if (is.null(source_geometry)) {
-      return(list(metric = rep(0, n), provenance = list(
-        source = "neutral_fallback", source_surface = NA_character_,
-        display_surface = surfatlas$surf_type %||% NA_character_,
-        topology_verified = FALSE, hemi = hemi,
-        reason = "matching_white_geometry_unavailable"
-      )))
+      return(
+        list(
+          metric = rep(0, n),
+          provenance = list(
+            source = "neutral_fallback",
+            source_surface = NA_character_,
+            display_surface = surfatlas$surf_type %||% NA_character_,
+            topology_verified = FALSE,
+            hemi = hemi,
+            reason = "matching_white_geometry_unavailable"
+          )
+        )
+      )
     }
-    mesh_identity <- rlang::hash(list(
-      source_geometry@mesh$vb[1:3, , drop = FALSE],
-      source_geometry@mesh$it
-    ))
-    cache_key <- rlang::hash(list(
-      surfatlas$surface_space %||% NA_character_,
-      surfatlas$density %||% NA_character_,
-      hemi,
-      "white",
-      "mean_curvature",
-      mesh_identity
-    ))
-    metric <- if (.surface_geometry_topology_equal(source_geometry, display_geometry)) {
+    mesh_identity <- rlang::hash(
+      list(
+        source_geometry@mesh$vb[1:3, , drop = FALSE],
+        source_geometry@mesh$it
+      )
+    )
+    cache_key <- rlang::hash(
+      list(
+        surfatlas$surface_space %||% NA_character_,
+        surfatlas$density %||% NA_character_,
+        hemi,
+        "white",
+        "mean_curvature",
+        mesh_identity
+      )
+    )
+    metric <- if (
+      .surface_geometry_topology_equal(
+        source_geometry,
+        display_geometry
+      )
+    ) {
       .compute_surface_curvature_cached(source_geometry, cache_key)
     } else {
       NULL
@@ -122,27 +174,34 @@
       display_geometry
     )
   }
-  if (is.null(metric) || !is.numeric(metric) || length(metric) != n ||
-      any(!is.finite(metric))) {
+  if (
+    is.null(metric) || !is.numeric(metric) || length(metric) != n ||
+      any(!is.finite(metric))
+  ) {
     metric <- rep(0, n)
     metric_source <- "neutral_fallback"
     source_surface <- NA_character_
     topology_verified <- FALSE
   }
-  list(metric = as.numeric(metric), provenance = list(
-    source = metric_source,
-    source_surface = source_surface,
-    smoothing_iterations = if (metric_source == "computed_mean_curvature") 5L else 0L,
-    display_surface = surfatlas$surf_type %||% NA_character_,
-    topology_verified = topology_verified && length(metric) == n,
-    surface_space = surfatlas$surface_space %||% NA_character_,
-    density = surfatlas$density %||% NA_character_,
-    hemi = hemi,
-    mesh_identity = rlang::hash(list(
-      display_geometry@mesh$vb[1:3, , drop = FALSE],
-      display_geometry@mesh$it
-    ))
-  ))
+  list(
+    metric = as.numeric(metric),
+    provenance = list(
+      source = metric_source,
+      source_surface = source_surface,
+      smoothing_iterations = if (metric_source == "computed_mean_curvature") 5L else 0L,
+      display_surface = surfatlas$surf_type %||% NA_character_,
+      topology_verified = topology_verified && length(metric) == n,
+      surface_space = surfatlas$surface_space %||% NA_character_,
+      density = surfatlas$density %||% NA_character_,
+      hemi = hemi,
+      mesh_identity = rlang::hash(
+        list(
+          display_geometry@mesh$vb[1:3, , drop = FALSE],
+          display_geometry@mesh$it
+        )
+      )
+    )
+  )
 }
 
 .surface_rgba_raster <- function(x) {
@@ -169,13 +228,16 @@
     stop("Unsupported surface view: ", view, call. = FALSE)
   )
   up <- switch(view,
-    lateral = , medial = c(0, 0, 1),
+    lateral = ,
+    medial = c(0, 0, 1),
     dorsal = c(0, 1, 0),
     ventral = c(0, -1, 0)
   )
-  right <- c(up[2] * toward[3] - up[3] * toward[2],
-             up[3] * toward[1] - up[1] * toward[3],
-             up[1] * toward[2] - up[2] * toward[1])
+  right <- c(
+    up[2] * toward[3] - up[3] * toward[2],
+    up[3] * toward[1] - up[1] * toward[3],
+    up[1] * toward[2] - up[2] * toward[1]
+  )
   c(x = sign(right[2]), y = sign(up[2]))
 }
 
@@ -183,59 +245,67 @@
   anterior <- .surface_anterior_screen_direction(hemi, view)
   if (anterior[["x"]] != 0) {
     anterior_x <- if (anterior[["x"]] > 0) 0.97 else 0.03
-    return(data.frame(
-      x = c(anterior_x, 1 - anterior_x), y = c(0.04, 0.04),
-      label = c("A", "P")
-    ))
+    return(
+      data.frame(
+        x = c(anterior_x, 1 - anterior_x),
+        y = c(0.04, 0.04),
+        label = c("A", "P")
+      )
+    )
   }
   anterior_y <- if (anterior[["y"]] > 0) 0.96 else 0.04
   data.frame(
-    x = c(0.03, 0.03), y = c(anterior_y, 1 - anterior_y),
+    x = c(0.03, 0.03),
+    y = c(anterior_y, 1 - anterior_y),
     label = c("A", "P")
   )
 }
 
-.plot_brain_cpu <- function(surfatlas,
-                            overlay,
-                            views,
-                            hemis,
-                            overlay_threshold,
-                            overlay_alpha,
-                            overlay_alpha_ramp,
-                            overlay_palette,
-                            overlay_lim,
-                            overlay_fun,
-                            overlay_sampling,
-                            overlay_interpolation,
-                            overlay_aggregate,
-                            overlay_n_samples,
-                            overlay_depth,
-                            overlay_surface_smooth_fwhm,
-                            colorbar_position,
-                            colorbar_source,
-                            overlay_title,
-                            title,
-                            subtitle,
-                            caption,
-                            panel_labels,
-                            bg,
-                            cortex_mask,
-                            cortex_mask_source,
-                            anatomy_metric,
-                            anatomy_metric_source,
-                            medial_wall,
-                            camera,
-                            orientation_labels,
-                            render_width,
-                            render_height,
-                            render_antialias,
-                            anatomy_style = "publication",
-                            anatomy_midpoint = NULL,
-                            anatomy_invert = FALSE,
-                            anatomy_range = c(0.72, 0.90)) {
+.plot_brain_cpu <- function(
+  surfatlas,
+  overlay,
+  views,
+  hemis,
+  overlay_threshold,
+  overlay_alpha,
+  overlay_alpha_ramp,
+  overlay_palette,
+  overlay_lim,
+  overlay_fun,
+  overlay_sampling,
+  overlay_interpolation,
+  overlay_aggregate,
+  overlay_n_samples,
+  overlay_depth,
+  overlay_surface_smooth_fwhm,
+  colorbar_position,
+  colorbar_source,
+  overlay_title,
+  title,
+  subtitle,
+  caption,
+  panel_labels,
+  bg,
+  cortex_mask,
+  cortex_mask_source,
+  anatomy_metric,
+  anatomy_metric_source,
+  medial_wall,
+  camera,
+  orientation_labels,
+  render_width,
+  render_height,
+  render_antialias,
+  anatomy_style = "publication",
+  anatomy_midpoint = NULL,
+  anatomy_invert = FALSE,
+  anatomy_range = c(0.72, 0.90)
+) {
   if (is.null(overlay)) {
-    stop("static_backend = 'cpu' currently requires a continuous overlay.",
-         call. = FALSE)
+    stop(
+      "static_backend = 'cpu' currently requires a continuous overlay.",
+      call. = FALSE
+    )
   }
   projection_meta <- NULL
   if (inherits(overlay, "NeuroVol")) {
@@ -254,8 +324,10 @@
     projection_meta <- projected$meta
   }
   if (!is.list(overlay)) {
-    stop("CPU overlay must be a NeuroVol or lh/rh vertex-value list.",
-         call. = FALSE)
+    stop(
+      "CPU overlay must be a NeuroVol or lh/rh vertex-value list.",
+      call. = FALSE
+    )
   }
   finite <- unlist(overlay, use.names = FALSE)
   finite <- finite[is.finite(finite)]
@@ -269,120 +341,179 @@
     0.25 * abs(overlay_threshold %||% 0),
     0.06 * max(abs(overlay_lim))
   )
-  palette <- if (length(overlay_palette) > 1L) overlay_palette else
+  palette <- if (length(overlay_palette) > 1L) {
+    overlay_palette
+  } else {
     scico::scico(256, palette = overlay_palette)
+  }
   panels <- list()
-  provenance <- list(mask = list(), anatomy = list(), camera = list(),
-                     projection = projection_meta)
+  provenance <- list(
+    mask = list(),
+    anatomy = list(),
+    camera = list(),
+    projection = projection_meta
+  )
   panel_levels <- character()
 
-  for (view in views) for (hemi in hemis) {
-    hk <- if (hemi == "left") "lh" else "rh"
-    atlas_hemi <- surfatlas[[paste0(hk, "_atlas")]]
-    values <- overlay[[hk]] %||% overlay[[hemi]]
-    if (is.null(values) || length(values) != length(atlas_hemi@data)) {
-      stop("Overlay values for ", hk, " must match its surface vertices.",
-           call. = FALSE)
-    }
-    domain <- .resolve_surface_domain(
-      surfatlas, hk, override = cortex_mask, source = cortex_mask_source
-    )
-    anatomy <- .resolve_surface_anatomy(
-      surfatlas, hk, override = anatomy_metric, source = anatomy_metric_source
-    )
-    rendered <- neurosurf::render_surface_rgba(
-      geometry = atlas_hemi@geometry,
-      vertex_values = values,
-      anatomy_metric = anatomy$metric,
-      anatomy_style = anatomy_style,
-      anatomy_midpoint = anatomy_midpoint,
-      anatomy_invert = anatomy_invert,
-      anatomy_range = anatomy_range,
-      cortex_mask = domain$mask,
-      camera = view,
-      camera_mode = camera,
-      width = render_width,
-      height = render_height,
-      threshold = overlay_threshold %||% 0,
-      palette = palette,
-      limits = overlay_lim,
-      overlay_alpha = overlay_alpha,
-      alpha_ramp = alpha_ramp,
-      antialias = render_antialias,
-      medial_wall = medial_wall,
-      background = bg,
-      outer_contour = TRUE
-    )
-    default_label <- paste0(tools::toTitleCase(hemi), " ",
-                            tools::toTitleCase(view))
-    panel_levels <- c(panel_levels, default_label)
-    display_label <- .resolve_plot_brain_panel_labels(
-      default_label, panel_labels = panel_labels
-    )
-    p <- ggplot2::ggplot() +
-      ggplot2::annotation_raster(.surface_rgba_raster(rendered),
-                                 xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
-      ggplot2::coord_fixed(
-        ratio = render_height / render_width,
-        xlim = c(0, 1), ylim = c(0, 1), expand = FALSE
-      ) +
-      ggplot2::theme_void() +
-      ggplot2::ggtitle(display_label) +
-      ggplot2::theme(
-        plot.title = ggplot2::element_text(hjust = 0.5, size = 10,
-                                           face = "bold"),
-        plot.background = ggplot2::element_rect(fill = bg, colour = NA)
+  for (view in views) {
+    for (hemi in hemis) {
+      hk <- if (hemi == "left") "lh" else "rh"
+      atlas_hemi <- surfatlas[[paste0(hk, "_atlas")]]
+      values <- overlay[[hk]] %||% overlay[[hemi]]
+      if (is.null(values) || length(values) != length(atlas_hemi@data)) {
+        stop(
+          "Overlay values for ",
+          hk,
+          " must match its surface vertices.",
+          call. = FALSE
+        )
+      }
+      domain <- .resolve_surface_domain(
+        surfatlas,
+        hk,
+        override = cortex_mask,
+        source = cortex_mask_source
       )
-    if (isTRUE(orientation_labels)) {
-      orient <- .surface_orientation_annotations(hemi, view)
-      p <- p + ggplot2::geom_text(
-        data = orient,
-        ggplot2::aes(x = x, y = y, label = label),
-        inherit.aes = FALSE, size = 2.5, colour = "grey30",
-        fontface = "bold"
+      anatomy <- .resolve_surface_anatomy(
+        surfatlas,
+        hk,
+        override = anatomy_metric,
+        source = anatomy_metric_source
       )
+      rendered <- neurosurf::render_surface_rgba(
+        geometry = atlas_hemi@geometry,
+        vertex_values = values,
+        anatomy_metric = anatomy$metric,
+        anatomy_style = anatomy_style,
+        anatomy_midpoint = anatomy_midpoint,
+        anatomy_invert = anatomy_invert,
+        anatomy_range = anatomy_range,
+        cortex_mask = domain$mask,
+        camera = view,
+        camera_mode = camera,
+        width = render_width,
+        height = render_height,
+        threshold = overlay_threshold %||% 0,
+        palette = palette,
+        limits = overlay_lim,
+        overlay_alpha = overlay_alpha,
+        alpha_ramp = alpha_ramp,
+        antialias = render_antialias,
+        medial_wall = medial_wall,
+        background = bg,
+        outer_contour = TRUE
+      )
+      default_label <- paste0(
+        tools::toTitleCase(hemi),
+        " ",
+        tools::toTitleCase(view)
+      )
+      panel_levels <- c(panel_levels, default_label)
+      display_label <- .resolve_plot_brain_panel_labels(
+        default_label,
+        panel_labels = panel_labels
+      )
+      p <- ggplot2::ggplot() +
+        ggplot2::annotation_raster(
+          .surface_rgba_raster(rendered),
+          xmin = 0,
+          xmax = 1,
+          ymin = 0,
+          ymax = 1
+        ) +
+        ggplot2::coord_fixed(
+          ratio = render_height / render_width,
+          xlim = c(0, 1),
+          ylim = c(0, 1),
+          expand = FALSE
+        ) +
+        ggplot2::theme_void() +
+        ggplot2::ggtitle(display_label) +
+        ggplot2::theme(
+          plot.title = ggplot2::element_text(
+            hjust = 0.5,
+            size = 10,
+            face = "bold"
+          ),
+          plot.background = ggplot2::element_rect(fill = bg, colour = NA)
+        )
+      if (isTRUE(orientation_labels)) {
+        orient <- .surface_orientation_annotations(hemi, view)
+        p <- p + ggplot2::geom_text(
+          data = orient,
+          ggplot2::aes(x = x, y = y, label = label),
+          inherit.aes = FALSE,
+          size = 2.5,
+          colour = "grey30",
+          fontface = "bold"
+        )
+      }
+      panels[[length(panels) + 1L]] <- p
+      provenance$mask[[hk]] <- domain$provenance
+      provenance$anatomy[[hk]] <- c(
+        anatomy$provenance,
+        list(
+          style = anatomy_style,
+          midpoint = anatomy_midpoint,
+          invert = anatomy_invert,
+          gray_range = anatomy_range
+        )
+      )
+      provenance$camera[[default_label]] <- rendered$camera
     }
-    panels[[length(panels) + 1L]] <- p
-    provenance$mask[[hk]] <- domain$provenance
-    provenance$anatomy[[hk]] <- c(anatomy$provenance, list(
-      style = anatomy_style,
-      midpoint = anatomy_midpoint,
-      invert = anatomy_invert,
-      gray_range = anatomy_range
-    ))
-    provenance$camera[[default_label]] <- rendered$camera
   }
   if (!requireNamespace("patchwork", quietly = TRUE)) {
-    stop("The 'patchwork' package is required for CPU static composition.",
-         call. = FALSE)
+    stop(
+      "The 'patchwork' package is required for CPU static composition.",
+      call. = FALSE
+    )
   }
   main <- patchwork::wrap_plots(panels, ncol = min(2L, length(panels)))
   resolved_source <- .resolve_colorbar_source(
-    colorbar_source, overlay_values = finite, overlay_present = TRUE
+    colorbar_source,
+    overlay_values = finite,
+    overlay_present = TRUE
   )
   cb <- NULL
   colorbar_meta <- list(source = resolved_source)
-  if (!identical(colorbar_position, "none") &&
-      identical(resolved_source, "overlay")) {
+  if (
+    !identical(colorbar_position, "none") &&
+      identical(resolved_source, "overlay")
+  ) {
     breaks <- .colorbar_break_values(overlay_lim, overlay_threshold)
     cb <- .make_colorbar_panel(
-      palette = overlay_palette, lim = overlay_lim, title = overlay_title,
-      position = colorbar_position, bg = bg, breaks = breaks
-    )
-    colorbar_meta <- c(colorbar_meta, list(
-      palette = overlay_palette, lim = overlay_lim, title = overlay_title,
+      palette = overlay_palette,
+      lim = overlay_lim,
+      title = overlay_title,
+      position = colorbar_position,
+      bg = bg,
       breaks = breaks
-    ))
+    )
+    colorbar_meta <- c(
+      colorbar_meta,
+      list(
+        palette = overlay_palette,
+        lim = overlay_lim,
+        title = overlay_title,
+        breaks = breaks
+      )
+    )
   }
   out <- .compose_plot_brain_figure(
-    main_plot = main, colorbar_plot = cb,
+    main_plot = main,
+    colorbar_plot = cb,
     colorbar_position = colorbar_position,
-    title = title, subtitle = subtitle, caption = caption, bg = bg
+    title = title,
+    subtitle = subtitle,
+    caption = caption,
+    bg = bg
   )
   attr(out, "plot_brain_colorbar") <- colorbar_meta
   attr(out, "plot_brain_projection") <- list(
-    interpolation = overlay_interpolation, sampling = overlay_sampling,
-    aggregate = overlay_aggregate, n_samples = overlay_n_samples,
+    interpolation = overlay_interpolation,
+    sampling = overlay_sampling,
+    aggregate = overlay_aggregate,
+    n_samples = overlay_n_samples,
     depth = overlay_depth,
     surface_smooth_fwhm = overlay_surface_smooth_fwhm
   )
@@ -415,24 +546,43 @@
 #'   one: `"curvature"` (default) or `"sulcal_depth"`.
 #' @return A list with metric and provenance. Unavailable computed anatomy is
 #'   neutral, with source recorded as neutral_fallback.
+#' @examples
+#' \dontrun{
+#' atlas <- get_schaefer_surfatlas(100)
+#' anatomy <- surface_anatomy(atlas, hemi = "lh")
+#' }
 #' @export
-surface_anatomy <- function(surfatlas, hemi = "lh",
-                            metric = NULL, source = NULL,
-                            type = c("curvature", "sulcal_depth")) {
+surface_anatomy <- function(
+  surfatlas,
+  hemi = "lh",
+  metric = NULL,
+  source = NULL,
+  type = c("curvature", "sulcal_depth")
+) {
   hemi <- match.arg(hemi, c("lh", "rh", "left", "right"))
-  hemi <- switch(hemi, left = "lh", right = "rh", hemi)
+  hemi <- switch(hemi,
+    left = "lh",
+    right = "rh",
+    hemi
+  )
   type <- match.arg(type)
   if (!inherits(surfatlas, "surfatlas")) stop("Expected a surface atlas.")
-  if (identical(type, "sulcal_depth") && is.null(metric) &&
-      is.null(.surface_hemi_value(surfatlas$anatomy_metric, hemi))) {
+  if (
+    identical(type, "sulcal_depth") && is.null(metric) &&
+      is.null(.surface_hemi_value(surfatlas$anatomy_metric, hemi))
+  ) {
     depth <- .resolve_sulcal_depth_anatomy(surfatlas, hemi)
-    if (!is.null(depth)) return(depth)
+    if (!is.null(depth)) {
+      return(depth)
+    }
   }
   .resolve_surface_anatomy(surfatlas, hemi, override = metric, source = source)
 }
 
 .resolve_sulcal_depth_anatomy <- function(surfatlas, hemi) {
-  if (identical(surfatlas$surf_type %||% "inflated", "white")) return(NULL)
+  if (identical(surfatlas$surf_type %||% "inflated", "white")) {
+    return(NULL)
+  }
   display <- surfatlas[[paste0(hemi, "_atlas")]]@geometry
   white <- tryCatch(
     .resolve_overlay_surface_pair(surfatlas, hemi = hemi)$white,
@@ -441,24 +591,38 @@ surface_anatomy <- function(surfatlas, hemi = "lh",
   if (is.null(white) || !.surface_geometry_topology_equal(white, display)) {
     return(NULL)
   }
-  metric <- tryCatch(neurosurf::surface_sulcal_proxy(white, display),
-                     error = function(e) NULL)
-  if (is.null(metric) || length(metric) != length(surfatlas[[paste0(hemi, "_atlas")]]@data) ||
-      any(!is.finite(metric))) {
+  metric <- tryCatch(
+    neurosurf::surface_sulcal_proxy(white, display),
+    error = function(e) NULL
+  )
+  if (
+    is.null(metric) || length(metric) != length(
+      surfatlas[[paste0(
+        hemi,
+        "_atlas"
+      )]]@data
+    ) ||
+      any(!is.finite(metric))
+  ) {
     return(NULL)
   }
-  list(metric = as.numeric(metric), provenance = list(
-    source = "computed_sulcal_depth_proxy",
-    source_surface = "white",
-    smoothing_iterations = 4L,
-    display_surface = surfatlas$surf_type %||% NA_character_,
-    topology_verified = TRUE,
-    surface_space = surfatlas$surface_space %||% NA_character_,
-    density = surfatlas$density %||% NA_character_,
-    hemi = hemi,
-    mesh_identity = rlang::hash(list(
-      display@mesh$vb[1:3, , drop = FALSE],
-      display@mesh$it
-    ))
-  ))
+  list(
+    metric = as.numeric(metric),
+    provenance = list(
+      source = "computed_sulcal_depth_proxy",
+      source_surface = "white",
+      smoothing_iterations = 4L,
+      display_surface = surfatlas$surf_type %||% NA_character_,
+      topology_verified = TRUE,
+      surface_space = surfatlas$surface_space %||% NA_character_,
+      density = surfatlas$density %||% NA_character_,
+      hemi = hemi,
+      mesh_identity = rlang::hash(
+        list(
+          display@mesh$vb[1:3, , drop = FALSE],
+          display@mesh$it
+        )
+      )
+    )
+  )
 }

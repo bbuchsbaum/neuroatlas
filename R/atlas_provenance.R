@@ -20,6 +20,22 @@ NULL
 #'     \item{history}{A tibble describing processing steps applied in
 #'       \code{neuroatlas}.}
 #'   }
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' atlas_provenance(atlas)
 #' @export
 atlas_provenance <- function(x, ...) {
   UseMethod("atlas_provenance")
@@ -41,8 +57,10 @@ atlas_provenance.atlas <- function(x, ...) {
 #' @rdname atlas_provenance
 #' @export
 atlas_provenance.default <- function(x, ...) {
-  stop("No atlas_provenance() method for objects of class: ",
-       paste(class(x), collapse = ", "))
+  stop(
+    "No atlas_provenance() method for objects of class: ",
+    paste(class(x), collapse = ", ")
+  )
 }
 
 
@@ -53,6 +71,22 @@ atlas_provenance.default <- function(x, ...) {
 #'
 #' @return A tibble with one row per upstream artifact used to construct the
 #'   atlas.
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' atlas_artifacts(atlas)
 #' @export
 atlas_artifacts <- function(x, ...) {
   UseMethod("atlas_artifacts")
@@ -61,7 +95,9 @@ atlas_artifacts <- function(x, ...) {
 #' @rdname atlas_provenance
 #' @export
 atlas_artifacts.atlas <- function(x, ...) {
-  if (!is.null(x$metadata)) return(atlas_metadata(x)$artifacts)
+  if (!is.null(x$metadata)) {
+    return(atlas_metadata(x)$artifacts)
+  }
   if (is.null(x$atlas_artifacts)) {
     return(.empty_atlas_artifacts())
   }
@@ -71,8 +107,10 @@ atlas_artifacts.atlas <- function(x, ...) {
 #' @rdname atlas_provenance
 #' @export
 atlas_artifacts.default <- function(x, ...) {
-  stop("No atlas_artifacts() method for objects of class: ",
-       paste(class(x), collapse = ", "))
+  stop(
+    "No atlas_artifacts() method for objects of class: ",
+    paste(class(x), collapse = ", ")
+  )
 }
 
 
@@ -83,6 +121,22 @@ atlas_artifacts.default <- function(x, ...) {
 #'
 #' @return A tibble with one row per processing step tracked by
 #'   \code{neuroatlas}.
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' atlas_history(atlas)
 #' @export
 atlas_history <- function(x, ...) {
   UseMethod("atlas_history")
@@ -91,7 +145,9 @@ atlas_history <- function(x, ...) {
 #' @rdname atlas_provenance
 #' @export
 atlas_history.atlas <- function(x, ...) {
-  if (!is.null(x$metadata)) return(atlas_metadata(x)$history)
+  if (!is.null(x$metadata)) {
+    return(atlas_metadata(x)$history)
+  }
   if (is.null(x$atlas_history)) {
     return(.empty_atlas_history())
   }
@@ -101,8 +157,10 @@ atlas_history.atlas <- function(x, ...) {
 #' @rdname atlas_provenance
 #' @export
 atlas_history.default <- function(x, ...) {
-  stop("No atlas_history() method for objects of class: ",
-       paste(class(x), collapse = ", "))
+  stop(
+    "No atlas_history() method for objects of class: ",
+    paste(class(x), collapse = ", ")
+  )
 }
 
 
@@ -201,8 +259,12 @@ print.atlas_provenance <- function(x, ...) {
 
   for (nm in names(template)) {
     if (!nm %in% names(out)) {
-      out[[nm]] <- if (nm == "step") integer(nrow(out)) else {
-        if (nm == "parameters") rep(list(list()), nrow(out)) else {
+      out[[nm]] <- if (nm == "step") {
+        integer(nrow(out))
+      } else {
+        if (nm == "parameters") {
+          rep(list(list()), nrow(out))
+        } else {
           rep(NA_character_, nrow(out))
         }
       }
@@ -220,30 +282,32 @@ print.atlas_provenance <- function(x, ...) {
 
 #' @keywords internal
 #' @noRd
-.new_atlas_artifact <- function(role,
-                                family,
-                                model,
-                                variant = NA_character_,
-                                source_name = NA_character_,
-                                source_url = NA_character_,
-                                source_ref = NA_character_,
-                                source_version = NA_character_,
-                                citation_doi = NA_character_,
-                                license = NA_character_,
-                                license_url = NA_character_,
-                                file_name = NA_character_,
-                                local_path = NA_character_,
-                                sha256 = NA_character_,
-                                template_space = NA_character_,
-                                coord_space = NA_character_,
-                                resolution = NA_character_,
-                                density = NA_character_,
-                                parcels = NA_character_,
-                                networks = NA_character_,
-                                hemi = NA_character_,
-                                lineage = NA_character_,
-                                confidence = NA_character_,
-                                notes = NA_character_) {
+.new_atlas_artifact <- function(
+  role,
+  family,
+  model,
+  variant = NA_character_,
+  source_name = NA_character_,
+  source_url = NA_character_,
+  source_ref = NA_character_,
+  source_version = NA_character_,
+  citation_doi = NA_character_,
+  license = NA_character_,
+  license_url = NA_character_,
+  file_name = NA_character_,
+  local_path = NA_character_,
+  sha256 = NA_character_,
+  template_space = NA_character_,
+  coord_space = NA_character_,
+  resolution = NA_character_,
+  density = NA_character_,
+  parcels = NA_character_,
+  networks = NA_character_,
+  hemi = NA_character_,
+  lineage = NA_character_,
+  confidence = NA_character_,
+  notes = NA_character_
+) {
   terms <- .artifact_license(source_name, family)
   if (is.na(license)) license <- terms[["license"]]
   if (is.na(license_url)) license_url <- terms[["license_url"]]
@@ -287,16 +351,18 @@ print.atlas_provenance <- function(x, ...) {
 
 #' @keywords internal
 #' @noRd
-.new_atlas_history <- function(action,
-                               representation,
-                               from_template_space = NA_character_,
-                               to_template_space = NA_character_,
-                               from_coord_space = NA_character_,
-                               to_coord_space = NA_character_,
-                               status = "available",
-                               confidence = NA_character_,
-                               details = NA_character_,
-                               parameters = list()) {
+.new_atlas_history <- function(
+  action,
+  representation,
+  from_template_space = NA_character_,
+  to_template_space = NA_character_,
+  from_coord_space = NA_character_,
+  to_coord_space = NA_character_,
+  status = "available",
+  confidence = NA_character_,
+  details = NA_character_,
+  parameters = list()
+) {
   tibble::tibble(
     step = NA_integer_,
     action = as.character(action),
@@ -316,8 +382,12 @@ print.atlas_provenance <- function(x, ...) {
 
 #' @keywords internal
 #' @noRd
-.attach_atlas_provenance <- function(x, artifacts = NULL, history = NULL,
-                                    metadata_inputs = list()) {
+.attach_atlas_provenance <- function(
+  x,
+  artifacts = NULL,
+  history = NULL,
+  metadata_inputs = list()
+) {
   x$atlas_artifacts <- if (is.null(artifacts)) {
     .empty_atlas_artifacts()
   } else {
@@ -339,17 +409,19 @@ print.atlas_provenance <- function(x, ...) {
 
 #' @keywords internal
 #' @noRd
-.append_atlas_history <- function(x,
-                                  action,
-                                  representation = NULL,
-                                  from_template_space = NA_character_,
-                                  to_template_space = NA_character_,
-                                  from_coord_space = NA_character_,
-                                  to_coord_space = NA_character_,
-                                  status = "available",
-                                  confidence = NA_character_,
-                                  details = NA_character_,
-                                  parameters = list()) {
+.append_atlas_history <- function(
+  x,
+  action,
+  representation = NULL,
+  from_template_space = NA_character_,
+  to_template_space = NA_character_,
+  from_coord_space = NA_character_,
+  to_coord_space = NA_character_,
+  status = "available",
+  confidence = NA_character_,
+  details = NA_character_,
+  parameters = list()
+) {
   if (is.null(representation)) {
     representation <- if (inherits(x, "surfatlas")) "surface" else "volume"
   }
@@ -378,11 +450,19 @@ print.atlas_provenance <- function(x, ...) {
 # Hash the exact bytes read, at load time. R versions without tools::sha256sum
 # retain an explicitly labelled MD5 receipt; no new dependency is required.
 .file_receipt <- function(path) {
-  ret <- list(local_path = NA_character_, sha256 = NA_character_,
-              checksum = NA_character_, checksum_algorithm = NA_character_,
-              checksum_basis = NA_character_)
-  if (length(path) != 1L || is.na(path) || !file.exists(path) ||
-      dir.exists(path)) return(ret)
+  ret <- list(
+    local_path = NA_character_,
+    sha256 = NA_character_,
+    checksum = NA_character_,
+    checksum_algorithm = NA_character_,
+    checksum_basis = NA_character_
+  )
+  if (
+    length(path) != 1L || is.na(path) || !file.exists(path) ||
+      dir.exists(path)
+  ) {
+    return(ret)
+  }
   ret$local_path <- normalizePath(path, winslash = "/", mustWork = TRUE)
   sha <- "sha256sum" %in% getNamespaceExports("tools")
   hash <- if (sha) getExportedValue("tools", "sha256sum") else tools::md5sum
@@ -395,10 +475,19 @@ print.atlas_provenance <- function(x, ...) {
 
 .bundled_file_receipt <- function(file_name) {
   path <- system.file("extdata", "resource_checksums.csv", package = "neuroatlas")
-  if (!nzchar(path) || is.na(file_name)) return(NULL)
+  if (!nzchar(path) || is.na(file_name)) {
+    return(NULL)
+  }
   manifest <- utils::read.csv(path, stringsAsFactors = FALSE)
   row <- manifest[basename(manifest$resource) == file_name, , drop = FALSE]
-  if (nrow(row) != 1L) return(NULL)
-  list(local_path = NA_character_, sha256 = row$sha256, checksum = row$sha256,
-        checksum_algorithm = "sha256", checksum_basis = "source_manifest")
+  if (nrow(row) != 1L) {
+    return(NULL)
+  }
+  list(
+    local_path = NA_character_,
+    sha256 = row$sha256,
+    checksum = row$sha256,
+    checksum_algorithm = "sha256",
+    checksum_basis = "source_manifest"
+  )
 }

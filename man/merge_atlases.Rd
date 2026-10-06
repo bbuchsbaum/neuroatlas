@@ -32,7 +32,8 @@ report them for the regions that had them.
 }
 \description{
 Combines two brain atlases into a single unified atlas object, preserving all
-region information and adjusting region IDs to prevent conflicts. This is useful
+region information and adjusting region IDs to prevent conflicts. This is
+useful
 for creating composite atlases that combine different parcellation schemes.
 }
 \details{

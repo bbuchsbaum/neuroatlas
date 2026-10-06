@@ -54,7 +54,8 @@ required (mirroring \code{\link{glasser_surf}}). The volumetric counterparts
 (maximum-probability and per-area probability maps in MNI space) are served
 by \code{\link{get_wang_prob_atlas}}.
 
-TemplateFlow does not currently distribute an \emph{inflated} \code{fsaverage}
+TemplateFlow does not currently distribute an \emph{inflated}
+\code{fsaverage}
 mesh, so the available surfaces are \code{"midthickness"} (default),
 \code{"pial"}, and \code{"white"}.
 }

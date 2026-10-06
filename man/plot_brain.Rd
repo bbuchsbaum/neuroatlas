@@ -317,9 +317,10 @@ controls whether and where to add a standalone colorbar panel. Use
 \code{"none"} to omit it. Default: \code{FALSE}.}
 
 \item{colorbar_source}{Which mapped quantity supplies the static colorbar:
-\code{"auto"}, \code{"base"}, \code{"overlay"}, or \code{"none"}.
-\code{"auto"} chooses the overlay whenever one was supplied, even if all
-of its values are removed by thresholding; otherwise it chooses \code{vals}.}
+  \code{"auto"}, \code{"base"}, \code{"overlay"}, or \code{"none"}.
+  \code{"auto"} chooses the overlay whenever one was supplied, even if all
+  of its values are removed by thresholding; otherwise it chooses
+\code{vals}.}
 
 \item{colorbar_title}{Optional character label for the colorbar.}
 
@@ -396,7 +397,8 @@ When \code{NULL}, a safe unique key is inferred.}
 contain every atlas parcel. If \code{TRUE}, missing parcels are rendered
 with \code{NA} values. Unknown and duplicate keys always error.}
 
-\item{anatomy_style, anatomy_midpoint, anatomy_invert, anatomy_range}{CPU underlay
+\item{anatomy_style, anatomy_midpoint, anatomy_invert, anatomy_range}{CPU
+underlay
 controls passed to [neurosurf::render_surface_rgba()].}
 
 \item{vals_threshold}{Optional non-negative magnitude for the CPU parcel

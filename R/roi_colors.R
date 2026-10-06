@@ -53,15 +53,25 @@ contrast_ratio_wcag <- function(hex1, hex2) {
 #' Filter candidate colours so they stay legible over anatomy slices
 #' @keywords internal
 #' @noRd
-filter_by_overlay_contrast <- function(cols,
-                                       bg_hex = "#808080",
-                                       alpha = 0.85,
-                                       min_contrast = 1.8) {
+filter_by_overlay_contrast <- function(
+  cols,
+  bg_hex = "#808080",
+  alpha = 0.85,
+  min_contrast = 1.8
+) {
   fg <- hex_to_rgb01(cols)
   bg <- hex_to_rgb01(rep(bg_hex, length(cols)))
   blended <- blend_rgb(fg, bg, alpha)
   blended_hex <- rgb01_to_hex(blended)
-  keep <- contrast_ratio_wcag(blended_hex, rep(bg_hex, length(cols))) >= min_contrast
+  keep <- contrast_ratio_wcag(
+    blended_hex,
+    rep(
+      bg_hex,
+      length(
+        cols
+      )
+    )
+  ) >= min_contrast
   cols[keep]
 }
 
@@ -149,20 +159,26 @@ adjust_by_hemi <- function(hex, hemi, amount = 0.08) {
 #' }
 #'
 #' @export
-build_conflict_edges <- function(rois,
-                                 id_col = "roi",
-                                 xyz_cols = c("x", "y", "z"),
-                                 k = 12,
-                                 sigma_3d = NULL,
-                                 views = c("axial", "coronal", "sagittal"),
-                                 view_weights = c(axial = 1, coronal = 1, sagittal = 1),
-                                 sigma_xy = 25,
-                                 sigma_slice = 10,
-                                 hemi_col = NULL,
-                                 cross_hemi_factor = 0.85,
-                                 network_col = NULL,
-                                 diff_network_factor = 1.15,
-                                 weight_transform = NULL) {
+build_conflict_edges <- function(
+  rois,
+  id_col = "roi",
+  xyz_cols = c("x", "y", "z"),
+  k = 12,
+  sigma_3d = NULL,
+  views = c("axial", "coronal", "sagittal"),
+  view_weights = c(
+    axial = 1,
+    coronal = 1,
+    sagittal = 1
+  ),
+  sigma_xy = 25,
+  sigma_slice = 10,
+  hemi_col = NULL,
+  cross_hemi_factor = 0.85,
+  network_col = NULL,
+  diff_network_factor = 1.15,
+  weight_transform = NULL
+) {
   stopifnot(is.data.frame(rois))
   stopifnot(all(c(id_col, xyz_cols) %in% names(rois)))
 
@@ -223,7 +239,12 @@ build_conflict_edges <- function(rois,
     } else {
       stop("Unknown view: ", view)
     }
-    exp(-(d_plane^2) / (2 * sigma_xy^2)) * exp(-(d_slice^2) / (2 * sigma_slice^2))
+    exp(-(d_plane^2) / (2 * sigma_xy^2)) * exp(
+      -(d_slice^2) / (
+        2 *
+          sigma_slice^2
+      )
+    )
   }
 
   for (v in views) {
@@ -272,15 +293,17 @@ build_conflict_edges <- function(rois,
 #' Greedy soft-min colour assignment
 #' @keywords internal
 #' @noRd
-greedy_assign_colors <- function(rois,
-                                 edges,
-                                 id_col = "roi",
-                                 candidates_hex,
-                                 candidate_group = NULL,
-                                 roi_group = NULL,
-                                 tau = 10,
-                                 lambda_global = 0,
-                                 seed = 1) {
+greedy_assign_colors <- function(
+  rois,
+  edges,
+  id_col = "roi",
+  candidates_hex,
+  candidate_group = NULL,
+  roi_group = NULL,
+  tau = 10,
+  lambda_global = 0,
+  seed = 1
+) {
   stopifnot(is.data.frame(rois))
   n <- nrow(rois)
   ids <- rois[[id_col]]
@@ -380,14 +403,16 @@ greedy_assign_colors <- function(rois,
 #' Generate well-spread candidate colours using HCL sampling
 #' @keywords internal
 #' @noRd
-make_candidate_pool <- function(n,
-                                oversample = 12,
-                                L_range = c(45, 80),
-                                C_range = c(35, 90),
-                                bg_hex = "#808080",
-                                alpha = 0.85,
-                                min_contrast = 1.8,
-                                seed = 1) {
+make_candidate_pool <- function(
+  n,
+  oversample = 12,
+  L_range = c(45, 80),
+  C_range = c(35, 90),
+  bg_hex = "#808080",
+  alpha = 0.85,
+  min_contrast = 1.8,
+  seed = 1
+) {
   set.seed(seed)
   N0 <- max(n * oversample, n + 200)
 
@@ -414,7 +439,12 @@ make_candidate_pool <- function(n,
   dmin <- rep(Inf, nrow(lab))
   for (k in seq_len(n - 1) + 1) {
     last <- picked[k - 1]
-    d <- sqrt(rowSums((lab - matrix(lab[last, ], nrow(lab), 3, byrow = TRUE))^2))
+    d <- sqrt(
+      rowSums(
+        (lab - matrix(lab[last, ], nrow(lab), 3, byrow = TRUE))^
+          2
+      )
+    )
     dmin <- pmin(dmin, d)
     picked[k] <- which.max(dmin)
   }
@@ -438,9 +468,11 @@ make_candidate_pool <- function(n,
 #' hues
 #'
 #' @export
-network_anchor_hues <- function(network_levels,
-                                scheme = c("even", "triadic", "tetradic", "complementary"),
-                                start_hue = 15) {
+network_anchor_hues <- function(
+  network_levels,
+  scheme = c("even", "triadic", "tetradic", "complementary"),
+  start_hue = 15
+) {
   scheme <- match.arg(scheme)
   K <- length(network_levels)
 
@@ -461,16 +493,18 @@ network_anchor_hues <- function(network_levels,
 #' Build network-specific candidate palettes
 #' @keywords internal
 #' @noRd
-make_network_candidates <- function(network_levels,
-                                    n_per_network,
-                                    anchor_hues,
-                                    hue_width = 28,
-                                    L_range = c(45, 80),
-                                    C_range = c(35, 90),
-                                    bg_hex = "#808080",
-                                    alpha = 0.85,
-                                    min_contrast = 1.8,
-                                    seed = 1) {
+make_network_candidates <- function(
+  network_levels,
+  n_per_network,
+  anchor_hues,
+  hue_width = 28,
+  L_range = c(45, 80),
+  C_range = c(35, 90),
+  bg_hex = "#808080",
+  alpha = 0.85,
+  min_contrast = 1.8,
+  seed = 1
+) {
   set.seed(seed)
 
   out_hex <- character(0)
@@ -505,7 +539,18 @@ make_network_candidates <- function(network_levels,
     dmin <- rep(Inf, nrow(lab))
     for (k in seq_len(M - 1) + 1) {
       last <- picked[k - 1]
-      d <- sqrt(rowSums((lab - matrix(lab[last, ], nrow(lab), 3, byrow = TRUE))^2))
+      d <- sqrt(
+        rowSums(
+          (
+            lab - matrix(
+              lab[last, ],
+              nrow(lab),
+              3,
+              byrow = TRUE
+            )
+          )^2
+        )
+      )
       dmin <- pmin(dmin, d)
       picked[k] <- which.max(dmin)
     }
@@ -534,7 +579,8 @@ make_network_candidates <- function(network_levels,
 #' @param network_col Optional network label column to slightly boost
 #'   cross-network conflicts.
 #' @param pair_col Optional column identifying homologous L/R ROI pairs. When
-#'   supplied, colours are first assigned to the homolog pair and then nudged per
+#'   supplied, colours are first assigned to the homolog pair and then nudged
+#' per
 #'   hemisphere.
 #' @param candidate_multiplier How many candidate colours to generate relative
 #'   to the number of ROIs.
@@ -560,22 +606,24 @@ make_network_candidates <- function(network_levels,
 #' }
 #'
 #' @export
-roi_colors_maximin_view <- function(rois,
-                                    id_col = "roi",
-                                    xyz_cols = c("x", "y", "z"),
-                                    hemi_col = NULL,
-                                    network_col = NULL,
-                                    pair_col = NULL,
-                                    k = 12,
-                                    sigma_xy = 25,
-                                    sigma_slice = 10,
-                                    candidate_multiplier = 10,
-                                    tau = 10,
-                                    lambda_global = 0.15,
-                                    bg_hex = "#808080",
-                                    alpha = 0.85,
-                                    seed = 1,
-                                    weight_transform = NULL) {
+roi_colors_maximin_view <- function(
+  rois,
+  id_col = "roi",
+  xyz_cols = c("x", "y", "z"),
+  hemi_col = NULL,
+  network_col = NULL,
+  pair_col = NULL,
+  k = 12,
+  sigma_xy = 25,
+  sigma_slice = 10,
+  candidate_multiplier = 10,
+  tau = 10,
+  lambda_global = 0.15,
+  bg_hex = "#808080",
+  alpha = 0.85,
+  seed = 1,
+  weight_transform = NULL
+) {
   stopifnot(all(c(id_col, xyz_cols) %in% names(rois)))
   rois0 <- rois
 
@@ -698,29 +746,33 @@ roi_colors_maximin_view <- function(rois,
 #'   roi = 1:10, network = rep(c("Vis", "DMN"), 5),
 #'   x = runif(10, 0, 90), y = runif(10, 0, 100), z = runif(10, 0, 80)
 #' )
-#' pal <- roi_colors_network_harmony(rois, xyz_cols = c("x","y","z"),
-#'                                    network_col = "network")
+#' pal <- roi_colors_network_harmony(rois,
+#'   xyz_cols = c("x", "y", "z"),
+#'   network_col = "network"
+#' )
 #' }
 #'
 #' @export
-roi_colors_network_harmony <- function(rois,
-                                       id_col = "roi",
-                                       xyz_cols = c("x", "y", "z"),
-                                       network_col = "network",
-                                       hemi_col = NULL,
-                                       k = 12,
-                                       sigma_xy = 25,
-                                       sigma_slice = 10,
-                                       scheme = "even",
-                                       start_hue = 15,
-                                       hue_width = 28,
-                                       candidate_multiplier = 8,
-                                       tau = 10,
-                                       lambda_global = 0.1,
-                                       bg_hex = "#808080",
-                                       alpha = 0.85,
-                                       seed = 1,
-                                       weight_transform = NULL) {
+roi_colors_network_harmony <- function(
+  rois,
+  id_col = "roi",
+  xyz_cols = c("x", "y", "z"),
+  network_col = "network",
+  hemi_col = NULL,
+  k = 12,
+  sigma_xy = 25,
+  sigma_slice = 10,
+  scheme = "even",
+  start_hue = 15,
+  hue_width = 28,
+  candidate_multiplier = 8,
+  tau = 10,
+  lambda_global = 0.1,
+  bg_hex = "#808080",
+  alpha = 0.85,
+  seed = 1,
+  weight_transform = NULL
+) {
   stopifnot(all(c(id_col, xyz_cols, network_col) %in% names(rois)))
 
   edges <- build_conflict_edges(
@@ -803,22 +855,26 @@ roi_colors_network_harmony <- function(rois,
 #'   hemi = rep(c("left", "right"), 5),
 #'   x = runif(10), y = runif(10), z = runif(10)
 #' )
-#' pal <- roi_colors_rule_hcl(rois, network_col = "network",
-#'                             hemi_col = "hemi", xyz_cols = c("x","y","z"))
+#' pal <- roi_colors_rule_hcl(rois,
+#'   network_col = "network",
+#'   hemi_col = "hemi", xyz_cols = c("x", "y", "z")
+#' )
 #' }
 #'
 #' @export
-roi_colors_rule_hcl <- function(rois,
-                                id_col = "roi",
-                                xyz_cols = c("x", "y", "z"),
-                                network_col = NULL,
-                                hemi_col = NULL,
-                                scheme = "even",
-                                start_hue = 15,
-                                hue_width = 30,
-                                C = 70,
-                                L_L = 72,
-                                L_R = 60) {
+roi_colors_rule_hcl <- function(
+  rois,
+  id_col = "roi",
+  xyz_cols = c("x", "y", "z"),
+  network_col = NULL,
+  hemi_col = NULL,
+  scheme = "even",
+  start_hue = 15,
+  hue_width = 30,
+  C = 70,
+  L_L = 72,
+  L_R = 60
+) {
   stopifnot(all(c(id_col, xyz_cols) %in% names(rois)))
 
   n <- nrow(rois)
@@ -888,19 +944,23 @@ roi_colors_rule_hcl <- function(rois,
 #'   roi = 1:10, network = rep(c("Vis", "DMN"), 5),
 #'   x = runif(10), y = runif(10), z = runif(10)
 #' )
-#' pal <- roi_colors_embedding(rois, feature_cols = c("x","y","z"),
-#'                              method = "pca")
+#' pal <- roi_colors_embedding(rois,
+#'   feature_cols = c("x", "y", "z"),
+#'   method = "pca"
+#' )
 #' }
 #'
 #' @export
-roi_colors_embedding <- function(rois,
-                                 id_col = "roi",
-                                 feature_cols = c("x", "y", "z"),
-                                 hemi_col = NULL,
-                                 method = c("umap", "pca"),
-                                 C_range = c(40, 90),
-                                 L = 65,
-                                 seed = 1) {
+roi_colors_embedding <- function(
+  rois,
+  id_col = "roi",
+  feature_cols = c("x", "y", "z"),
+  hemi_col = NULL,
+  method = c("umap", "pca"),
+  C_range = c(40, 90),
+  L = 65,
+  seed = 1
+) {
   method <- match.arg(method)
   stopifnot(all(c(id_col, feature_cols) %in% names(rois)))
 

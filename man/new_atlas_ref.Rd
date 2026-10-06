@@ -50,11 +50,18 @@ new_atlas_ref(
 \item{notes}{Optional free-text notes.}
 
 \item{id_convention}{Optional parcel ID convention. Glasser uses
-\code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.}
+  \code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for
+surfaces.}
 }
 \value{
 An object of class `"atlas_ref"`.
 }
 \description{
 Structured provenance and space metadata for atlas objects.
+}
+\examples{
+ref <- new_atlas_ref("toy", "two-regions",
+  template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+)
+ref
 }

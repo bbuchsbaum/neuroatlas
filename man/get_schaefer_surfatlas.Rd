@@ -39,25 +39,31 @@ A list with classes c("schaefer", "surfatlas", "atlas") containing:
 }
 }
 \description{
-Loads the surface-based version of the Schaefer parcellation atlas, compatible
+Loads the surface-based version of the Schaefer parcellation atlas,
+compatible
 with FreeSurfer surface representations.
 }
 \details{
 Provides the Schaefer parcellation mapped to FreeSurfer surface meshes. The
 atlas can be loaded onto different surface representations (inflated, white,
-or pial) and maintains the same parcellation scheme as the volumetric version.
+or pial) and maintains the same parcellation scheme as the volumetric
+version.
 }
 \examples{
 \dontrun{
 # Load inflated surface atlas
-surf_atlas <- get_schaefer_surfatlas(parcels = "300",
-                                    networks = "7",
-                                    surf = "inflated")
+surf_atlas <- get_schaefer_surfatlas(
+  parcels = "300",
+  networks = "7",
+  surf = "inflated"
+)
 
 # Load pial surface version
-pial_atlas <- get_schaefer_surfatlas(parcels = "400",
-                                    networks = "17",
-                                    surf = "pial")
+pial_atlas <- get_schaefer_surfatlas(
+  parcels = "400",
+  networks = "17",
+  surf = "pial"
+)
 }
 
 }

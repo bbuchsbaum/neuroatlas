@@ -64,8 +64,17 @@ An object of class `"parcel_data"`.
 Convert an Object to `parcel_data`
 }
 \details{
-Glasser ID joins require a matching \code{id_convention} in the input table or
-\code{parcel_data} atlas metadata. See \code{\link{align_parcel_values}()} for safe joins
+Glasser ID joins require a matching \code{id_convention} in the input table
+or
+\code{parcel_data} atlas metadata. See \code{\link{align_parcel_values}()}
+for safe joins
 between Glasser volume and surface representations. Numeric vectors are
 positional: they must already follow the target atlas's parcel order.
+}
+\examples{
+x <- parcel_data(data.frame(
+  id = 1:2, label = c("A", "B"),
+  hemi = c("left", "right"), value = c(0.2, 0.7)
+), atlas_id = "toy")
+as_parcel_data(x)
 }

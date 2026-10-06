@@ -16,3 +16,8 @@ Invisibly returns the running app object.
 Convenience wrapper around \code{\link{cluster_explorer}()} that launches the
 app in an interactive session.
 }
+\examples{
+\dontrun{
+launch_cluster_explorer()
+}
+}

@@ -27,15 +27,18 @@ Default: 0}
 \item{radius}{Numeric. Radius for smoothing neighborhood in voxels.
 If NULL, uses max(spacing)+0.5. Default: NULL}
 
-\item{min_neighbors}{Integer. Minimum number of neighbors required for smoothing.
+\item{min_neighbors}{Integer. Minimum number of neighbors required for
+smoothing.
 Default: 3}
 }
 \value{
 A resampled NeuroVol object in the new space
 }
 \description{
-Resamples a volume to a new space with optional smoothing of parcel boundaries.
-This is particularly useful for atlas parcellations where maintaining discrete
+Resamples a volume to a new space with optional smoothing of parcel
+boundaries.
+This is particularly useful for atlas parcellations where maintaining
+discrete
 labels is important.
 }
 \details{

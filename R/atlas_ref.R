@@ -19,23 +19,31 @@
 #'   `"uncertain"`.
 #' @param notes Optional free-text notes.
 #' @param id_convention Optional parcel ID convention. Glasser uses
-#'   \code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.
+#'   \code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for
+#' surfaces.
 #'
 #' @return An object of class `"atlas_ref"`.
+#' @examples
+#' ref <- new_atlas_ref("toy", "two-regions",
+#'   template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#' )
+#' ref
 #' @export
-new_atlas_ref <- function(family,
-                          model,
-                          representation = c("volume", "surface", "derived"),
-                          template_space = NA_character_,
-                          coord_space = NA_character_,
-                          resolution = NA_character_,
-                          density = NA_character_,
-                          provenance = NA_character_,
-                          source = NA_character_,
-                          lineage = NA_character_,
-                          confidence = c("uncertain", "exact", "high", "approximate"),
-                          notes = NA_character_,
-                          id_convention = NA_character_) {
+new_atlas_ref <- function(
+  family,
+  model,
+  representation = c("volume", "surface", "derived"),
+  template_space = NA_character_,
+  coord_space = NA_character_,
+  resolution = NA_character_,
+  density = NA_character_,
+  provenance = NA_character_,
+  source = NA_character_,
+  lineage = NA_character_,
+  confidence = c("uncertain", "exact", "high", "approximate"),
+  notes = NA_character_,
+  id_convention = NA_character_
+) {
   representation <- match.arg(representation)
   confidence <- match.arg(confidence)
 
@@ -65,6 +73,11 @@ new_atlas_ref <- function(family,
 #' @param x Object to validate.
 #'
 #' @return Invisibly returns `x` when valid.
+#' @examples
+#' ref <- new_atlas_ref("toy", "two-regions",
+#'   template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#' )
+#' validate_atlas_ref(ref)
 #' @export
 validate_atlas_ref <- function(x) {
   if (!inherits(x, "atlas_ref")) {
@@ -72,14 +85,25 @@ validate_atlas_ref <- function(x) {
   }
 
   required <- c(
-    "family", "model", "representation", "template_space", "coord_space",
-    "resolution", "density", "provenance", "source", "lineage",
-    "confidence", "notes"
+    "family",
+    "model",
+    "representation",
+    "template_space",
+    "coord_space",
+    "resolution",
+    "density",
+    "provenance",
+    "source",
+    "lineage",
+    "confidence",
+    "notes"
   )
   missing <- setdiff(required, names(x))
   if (length(missing) > 0L) {
-    stop("atlas_ref is missing required fields: ",
-         paste(missing, collapse = ", "))
+    stop(
+      "atlas_ref is missing required fields: ",
+      paste(missing, collapse = ", ")
+    )
   }
 
   if (!is.character(x$family) || length(x$family) != 1L || !nzchar(x$family)) {
@@ -96,7 +120,8 @@ validate_atlas_ref <- function(x) {
   }
   if (!is.null(x$id_convention)) {
     assertthat::assert_that(
-      is.character(x$id_convention), length(x$id_convention) == 1L,
+      is.character(x$id_convention),
+      length(x$id_convention) == 1L,
       is.na(x$id_convention) || nzchar(x$id_convention)
     )
   }
@@ -113,6 +138,22 @@ validate_atlas_ref <- function(x) {
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return An object of class `"atlas_ref"`.
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' atlas_ref(atlas)
 #' @export
 atlas_ref <- function(x, ...) {
   UseMethod("atlas_ref")
@@ -121,7 +162,9 @@ atlas_ref <- function(x, ...) {
 #' @rdname atlas_ref
 #' @export
 atlas_ref.atlas <- function(x, ...) {
-  if (!is.null(x$metadata)) return(.metadata_ref(atlas_metadata(x)))
+  if (!is.null(x$metadata)) {
+    return(.metadata_ref(atlas_metadata(x)))
+  }
   if (!is.null(x$atlas_ref)) {
     return(validate_atlas_ref(x$atlas_ref))
   }
@@ -147,8 +190,10 @@ atlas_ref.atlas <- function(x, ...) {
 #' @rdname atlas_ref
 #' @export
 atlas_ref.default <- function(x, ...) {
-  stop("No atlas_ref() method for objects of class: ",
-       paste(class(x), collapse = ", "))
+  stop(
+    "No atlas_ref() method for objects of class: ",
+    paste(class(x), collapse = ", ")
+  )
 }
 
 
@@ -157,6 +202,22 @@ atlas_ref.default <- function(x, ...) {
 #' @param x An atlas object.
 #'
 #' @return Character scalar.
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' atlas_family(atlas)
 #' @export
 atlas_family <- function(x) {
   atlas_ref(x)$family
@@ -168,6 +229,22 @@ atlas_family <- function(x) {
 #' @param x An atlas object.
 #'
 #' @return Character scalar (or `NA_character_`).
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' atlas_space(atlas)
 #' @export
 atlas_space <- function(x) {
   atlas_ref(x)$template_space
@@ -179,6 +256,22 @@ atlas_space <- function(x) {
 #' @param x An atlas object.
 #'
 #' @return Character scalar (or `NA_character_`).
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' atlas_coord_space(atlas)
 #' @export
 atlas_coord_space <- function(x) {
   atlas_ref(x)$coord_space
@@ -191,6 +284,11 @@ atlas_coord_space <- function(x) {
 #' @param ... Unused.
 #'
 #' @return Invisibly returns `x`.
+#' @examples
+#' ref <- new_atlas_ref("toy", "two-regions",
+#'   template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#' )
+#' print(ref)
 #' @export
 print.atlas_ref <- function(x, ...) {
   validate_atlas_ref(x)
@@ -244,8 +342,10 @@ print.atlas_ref <- function(x, ...) {
   if (is.character(outspace) && length(outspace) == 1L) {
     return(as.character(outspace))
   }
-  if (is.list(outspace) && !is.null(outspace$space) &&
-      is.character(outspace$space) && length(outspace$space) == 1L) {
+  if (
+    is.list(outspace) && !is.null(outspace$space) &&
+      is.character(outspace$space) && length(outspace$space) == 1L
+  ) {
     return(as.character(outspace$space))
   }
   "custom"

@@ -16,6 +16,9 @@
 ^_pkgdown\.yml$
 ^check_output.*\.txt$
 ^checklist.yml$
+^CONTRIBUTING\.md$
+^\.lintr$
+^\.renvignore$
 ^codecov\.yml$
 ^cran-comments\.md$
 ^data-raw$

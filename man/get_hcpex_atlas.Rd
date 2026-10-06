@@ -17,11 +17,13 @@ nearest neighbours and changes the sampling grid only; it does not register
 the atlas to a different anatomical template. Small regions may disappear.}
 
 \item{use_cache}{Logical. Reuse checksum-verified files in the neuroatlas
-user cache. If \code{FALSE}, download temporary files and remove them after loading.}
+user cache. If \code{FALSE}, download temporary files and remove them after
+loading.}
 }
 \value{
 An object with classes \code{hcpex} and \code{atlas}, containing a \code{NeuroVol},
-region IDs, labels, hemisphere assignments, RGB colors, and resource metadata.
+region IDs, labels, hemisphere assignments, RGB colors, and resource
+metadata.
 }
 \description{
 Load HCPex v1.1, a volumetric atlas with 360 cortical and 66 subcortical
@@ -42,7 +44,8 @@ The complete region catalogue is retained after resampling, even when some
 regions no longer have voxels. No surface representation is supplied.
 
 The upstream data are distributed under GPL-3.0; their license, source
-revision, file receipts, and publication references are attached to the atlas.
+revision, file receipts, and publication references are attached to the
+atlas.
 }
 \examples{
 \dontrun{

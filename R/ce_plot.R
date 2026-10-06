@@ -19,15 +19,33 @@
     name = "demo_atlas",
     atlas = atlas_vol,
     ids = 1:6,
-    labels = c("Frontal-A", "Frontal-B", "Parietal-A",
-               "Parietal-B", "Temporal-A", "Temporal-B"),
-    orig_labels = c("Frontal-A", "Frontal-B", "Parietal-A",
-                    "Parietal-B", "Temporal-A", "Temporal-B"),
+    labels = c(
+      "Frontal-A",
+      "Frontal-B",
+      "Parietal-A",
+      "Parietal-B",
+      "Temporal-A",
+      "Temporal-B"
+    ),
+    orig_labels = c(
+      "Frontal-A",
+      "Frontal-B",
+      "Parietal-A",
+      "Parietal-B",
+      "Temporal-A",
+      "Temporal-B"
+    ),
     hemi = c("left", "right", "left", "right", "left", "right"),
     roi_metadata = tibble::tibble(
       id = 1:6,
-      label = c("Frontal-A", "Frontal-B", "Parietal-A",
-                "Parietal-B", "Temporal-A", "Temporal-B"),
+      label = c(
+        "Frontal-A",
+        "Frontal-B",
+        "Parietal-A",
+        "Parietal-B",
+        "Temporal-A",
+        "Temporal-B"
+      ),
       hemi = c("left", "right", "left", "right", "left", "right")
     )
   )
@@ -56,11 +74,11 @@
   bg_sig <- 0.2 + 0.15 * sin(t_idx / 9)
 
   for (t in t_idx) {
-    vol_t <- data_arr[,,, t]
+    vol_t <- data_arr[, , , t]
     vol_t[p_mask] <- p_sig[t]
     vol_t[n_mask] <- n_sig[t]
     vol_t[bg_mask] <- bg_sig[t]
-    data_arr[,,, t] <- vol_t
+    data_arr[, , , t] <- vol_t
   }
 
   data_source <- neuroim2::NeuroVec(data_arr, sp4)
@@ -95,12 +113,14 @@
   )
 }
 
-.fallback_brain_plot <- function(surfatlas,
-                                 vals = NULL,
-                                 palette = "vik",
-                                 lim = NULL,
-                                 interactive = TRUE,
-                                 title = "Parcel Layout (Fallback)") {
+.fallback_brain_plot <- function(
+  surfatlas,
+  vals = NULL,
+  palette = "vik",
+  lim = NULL,
+  interactive = TRUE,
+  title = "Parcel Layout (Fallback)"
+) {
   ids <- as.integer(surfatlas$ids)
   if (length(ids) == 0) {
     ids <- seq_len(if (!is.null(vals)) length(vals) else 12L)
@@ -207,22 +227,28 @@
   xtype <- infer_design_var_type(x)
 
   if (xtype == "continuous") {
-    if (identical(x_var, ".sample_index") ||
-        inherits(x, "Date") || inherits(x, "POSIXt")) {
+    if (
+      identical(x_var, ".sample_index") ||
+        inherits(x, "Date") || inherits(x, "POSIXt")
+    ) {
       p <- ggplot2::ggplot(
         plot_data,
-        ggplot2::aes(x = .data[[x_var]],
-                     y = signal,
-                     color = cluster_id)
+        ggplot2::aes(
+          x = .data[[x_var]],
+          y = signal,
+          color = cluster_id
+        )
       ) +
         ggplot2::geom_line(alpha = 0.7) +
         ggplot2::geom_point(size = 1.5, alpha = 0.8)
     } else {
       p <- ggplot2::ggplot(
         plot_data,
-        ggplot2::aes(x = .data[[x_var]],
-                     y = signal,
-                     color = cluster_id)
+        ggplot2::aes(
+          x = .data[[x_var]],
+          y = signal,
+          color = cluster_id
+        )
       ) +
         ggplot2::geom_point(alpha = 0.7) +
         ggplot2::geom_smooth(se = FALSE, method = "loess")
@@ -230,16 +256,18 @@
   } else {
     p <- ggplot2::ggplot(
       plot_data,
-      ggplot2::aes(x = factor(.data[[x_var]]),
-                   y = signal,
-                   color = cluster_id)
+      ggplot2::aes(
+        x = factor(.data[[x_var]]),
+        y = signal,
+        color = cluster_id
+      )
     ) +
       ggplot2::geom_boxplot(outlier.shape = NA, alpha = 0.25) +
       ggplot2::geom_jitter(width = 0.15, alpha = 0.75, size = 1.5)
   }
 
   if (length(unique(plot_data$cluster_id)) > 1) {
-    p <- p + ggplot2::facet_wrap(~ cluster_id, scales = "free_y")
+    p <- p + ggplot2::facet_wrap(~cluster_id, scales = "free_y")
   }
 
   p +

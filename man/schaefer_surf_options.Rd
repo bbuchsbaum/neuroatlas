@@ -9,7 +9,8 @@ schaefer_surf_options()
 \value{
 A data frame with columns:
   \itemize{
-    \item \code{space}: Schaefer surface space (fsaverage, fsaverage5, fsaverage6).
+    \item \code{space}: Schaefer surface space (fsaverage, fsaverage5,
+fsaverage6).
     \item \code{parcels}: Number of parcels.
     \item \code{networks}: Number of networks.
     \item \code{surf}: Surface type ("inflated", "white", "pial").

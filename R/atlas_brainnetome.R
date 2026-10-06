@@ -13,13 +13,22 @@
       "subregion_func_network_Yeo_updated.csv"
     ),
     share_id = c("gfGflpp3Q0E", "Edvop4rRtU", "6eRCJ0zDTFk", "EYTnTX5SS5c"),
-    fid = c("86217173499925", "86217173499928",
-            "86217173499917", "86217173500082"),
+    fid = c(
+      "86217173499925",
+      "86217173499928",
+      "86217173499917",
+      "86217173500082"
+    ),
     min_size = c(100000L, 1000L, 10000L, 1000L),
     stringsAsFactors = FALSE
   )
-  sources$url <- paste0(base, "?shareId=", sources$share_id,
-                        "&fid=", sources$fid)
+  sources$url <- paste0(
+    base,
+    "?shareId=",
+    sources$share_id,
+    "&fid=",
+    sources$fid
+  )
   sources$page_url <- paste0("https://pan.cstcloud.cn/s/", sources$share_id)
   sources
 }
@@ -68,6 +77,11 @@
 #'
 #' @source \url{https://atlas.brainnetome.org/download.html}
 #'
+#' @examples
+#' \dontrun{
+#' labels <- brainnetome_labels()
+#' head(labels)
+#' }
 #' @export
 brainnetome_labels <- function(use_cache = TRUE) {
   paths <- .brainnetome_asset_paths(use_cache = use_cache)
@@ -101,10 +115,17 @@ brainnetome_labels <- function(use_cache = TRUE) {
 #'
 #' @importFrom neuroim2 read_vol ClusteredNeuroVol
 #' @importFrom assertthat assert_that
+#' @examples
+#' \dontrun{
+#' atlas <- get_brainnetome_atlas()
+#' atlas_ref(atlas)
+#' }
 #' @export
-get_brainnetome_atlas <- function(outspace = NULL,
-                                  smooth = FALSE,
-                                  use_cache = TRUE) {
+get_brainnetome_atlas <- function(
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE
+) {
   template_space <- .template_space_from_outspace(
     outspace,
     default_space = "MNI152"
@@ -306,10 +327,20 @@ get_brainnetome_atlas <- function(outspace = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  nets <- nets[, c("Label", "subregion_name", "region",
-                   "Yeo_7network", "Yeo_17network")]
-  names(nets) <- c("id", "subregion_name", "region",
-                   "yeo_7network", "yeo_17network")
+  nets <- nets[, c(
+    "Label",
+    "subregion_name",
+    "region",
+    "Yeo_7network",
+    "Yeo_17network"
+  )]
+  names(nets) <- c(
+    "id",
+    "subregion_name",
+    "region",
+    "yeo_7network",
+    "yeo_17network"
+  )
   nets <- nets[!is.na(nets$id) & nets$id > 0L, , drop = FALSE]
 
   sub <- .read_brainnetome_subregions(paths[["subregions"]])
@@ -318,24 +349,45 @@ get_brainnetome_atlas <- function(outspace = NULL,
   out <- merge(out, sub, by = "id", all.x = TRUE, sort = FALSE)
   out <- out[order(out$id), , drop = FALSE]
 
-  out$hemi <- ifelse(grepl("_L$", out$label), "left",
-                     ifelse(grepl("_R$", out$label), "right", NA_character_))
-  out$yeo_7network_name <- unname(.brainnetome_yeo7_map()[
-    as.character(out$yeo_7network)
-  ])
-  out$yeo_17network_name <- unname(.brainnetome_yeo17_map()[
-    as.character(out$yeo_17network)
-  ])
+  out$hemi <- ifelse(
+    grepl("_L$", out$label),
+    "left",
+    ifelse(grepl("_R$", out$label), "right", NA_character_)
+  )
+  out$yeo_7network_name <- unname(
+    .brainnetome_yeo7_map()[
+      as.character(out$yeo_7network)
+    ]
+  )
+  out$yeo_17network_name <- unname(
+    .brainnetome_yeo17_map()[
+      as.character(out$yeo_17network)
+    ]
+  )
   out$label_full <- paste0(out$region, ": ", out$cytoarchitectonic_ref)
 
-  tibble::as_tibble(out[, c(
-    "id", "label", "label_full", "hemi",
-    "subregion_name", "region", "lobe", "gyrus",
-    "cytoarchitectonic_ref", "mni_coord",
-    "yeo_7network", "yeo_7network_name",
-    "yeo_17network", "yeo_17network_name",
-    "red", "green", "blue", "alpha"
-  )])
+  tibble::as_tibble(
+    out[, c(
+      "id",
+      "label",
+      "label_full",
+      "hemi",
+      "subregion_name",
+      "region",
+      "lobe",
+      "gyrus",
+      "cytoarchitectonic_ref",
+      "mni_coord",
+      "yeo_7network",
+      "yeo_7network_name",
+      "yeo_17network",
+      "yeo_17network_name",
+      "red",
+      "green",
+      "blue",
+      "alpha"
+    )]
+  )
 }
 
 #' @keywords internal
@@ -352,8 +404,11 @@ get_brainnetome_atlas <- function(outspace = NULL,
   )
 
   shared <- .xlsx_shared_strings(file.path(tmp, "xl/sharedStrings.xml"))
-  sheet <- .xlsx_sheet_matrix(file.path(tmp, "xl/worksheets/sheet1.xml"),
-                              shared, ncol = 9L)
+  sheet <- .xlsx_sheet_matrix(
+    file.path(tmp, "xl/worksheets/sheet1.xml"),
+    shared,
+    ncol = 9L
+  )
   sheet <- sheet[-1L, , drop = FALSE]
 
   lobe <- .fill_down(sheet[, 1])
@@ -451,14 +506,18 @@ get_brainnetome_atlas <- function(outspace = NULL,
 .xlsx_shared_strings <- function(path) {
   xml <- paste(readLines(path, warn = FALSE), collapse = "")
   items <- regmatches(xml, gregexpr("(?s)<si>.*?</si>", xml, perl = TRUE))[[1]]
-  vapply(items, function(item) {
-    parts <- regmatches(
-      item,
-      gregexpr("(?s)<t[^>]*>.*?</t>", item, perl = TRUE)
-    )[[1]]
-    txt <- gsub("(?s)^<t[^>]*>|</t>$", "", parts, perl = TRUE)
-    .xml_unescape(paste(txt, collapse = ""))
-  }, character(1))
+  vapply(
+    items,
+    function(item) {
+      parts <- regmatches(
+        item,
+        gregexpr("(?s)<t[^>]*>.*?</t>", item, perl = TRUE)
+      )[[1]]
+      txt <- gsub("(?s)^<t[^>]*>|</t>$", "", parts, perl = TRUE)
+      .xml_unescape(paste(txt, collapse = ""))
+    },
+    character(1)
+  )
 }
 
 #' @keywords internal
@@ -488,7 +547,13 @@ get_brainnetome_atlas <- function(outspace = NULL,
       }
       if (grepl(' t="s"', cell, fixed = TRUE)) {
         idx <- as.integer(value) + 1L
-        value <- if (!is.na(idx) && idx <= length(shared)) shared[[idx]] else NA_character_
+        value <- if (!is.na(idx) && idx <= length(shared)) {
+          shared[[
+            idx
+          ]]
+        } else {
+          NA_character_
+        }
       }
       out[i, col] <- .xml_unescape(value)
     }
@@ -502,8 +567,10 @@ get_brainnetome_atlas <- function(outspace = NULL,
 .xlsx_col_index <- function(x) {
   chars <- strsplit(x, "", fixed = TRUE)[[1]]
   vals <- match(chars, LETTERS)
-  if (anyNA(vals)) return(NA_integer_)
-  sum(vals * 26L ^ rev(seq_along(vals) - 1L))
+  if (anyNA(vals)) {
+    return(NA_integer_)
+  }
+  sum(vals * 26L^rev(seq_along(vals) - 1L))
 }
 
 #' @keywords internal

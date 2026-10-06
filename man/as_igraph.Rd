@@ -23,3 +23,11 @@ Dispatches to methods.
 \description{
 Convert Atlas Connectivity to igraph
 }
+\examples{
+if (requireNamespace("igraph", quietly = TRUE)) {
+  connectivity <- structure(matrix(c(0, 0.5, 0.5, 0), 2),
+    class = c("atlas_connectivity", "matrix", "array")
+  )
+  as_igraph(connectivity)
+}
+}

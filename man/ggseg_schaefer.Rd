@@ -23,9 +23,11 @@ ggseg_schaefer(
 
 \item{pos}{Logical. If TRUE, uses raw values for thresholding.}
 
-\item{palette}{Character string specifying the color palette. Default: "Spectral"}
+\item{palette}{Character string specifying the color palette. Default:
+"Spectral"}
 
-\item{interactive}{Logical. If TRUE, creates an interactive plot. Default: TRUE}
+\item{interactive}{Logical. If TRUE, creates an interactive plot. Default:
+TRUE}
 
 \item{lim}{Numeric vector of length 2 specifying the range for color mapping.}
 }

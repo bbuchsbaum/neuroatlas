@@ -15,9 +15,10 @@ keys and values.}
 \item{value}{A numeric value column, supplied as a bare name or string.}
 
 \item{by}{Parcel-key specification. Use a shared column name such as `"id"`,
-or a named character vector to map an atlas metadata column to a differently
-named data column, for example `c(id = "roi_index")`. Composite keys are
-supported. When `NULL`, a safe unique key is inferred.}
+  or a named character vector to map an atlas metadata column to a
+differently
+  named data column, for example `c(id = "roi_index")`. Composite keys are
+  supported. When `NULL`, a safe unique key is inferred.}
 
 \item{allow_partial}{Logical. If `FALSE` (default), `data` must contain every
 atlas parcel. If `TRUE`, unmatched atlas parcels receive `NA`. Unknown and
@@ -44,7 +45,8 @@ They are never allowed to overwrite canonical metadata.
 
 Glasser volume and surface IDs number opposite hemispheres first. Any
 Glasser join using \code{id} (including renamed or composite keys) therefore
-requires a matching \code{id_convention} column, or a \code{parcel_data} object
+requires a matching \code{id_convention} column, or a \code{parcel_data}
+object
 with a matching \code{atlas$id_convention}. The convention is
 \code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.
 Only declare a convention
@@ -54,10 +56,12 @@ cause an error. Reload older Glasser atlas objects that lack this metadata.
 To move Glasser values between representations, supply only the shared
 \code{label_full} key and value columns, then use \code{by = "label_full"};
 alternatively use \code{by = c("area", "hemi")}. For example, select
-\code{source$parcels[c("label_full", "value")]} from a \code{parcel_data} object.
+\code{source$parcels[c("label_full", "value")]} from a \code{parcel_data}
+object.
 Representation-specific IDs, labels, colours and provenance in a full
 source table remain consistency checks and must be omitted for such a join.
-A complete \code{parcel_data} object remains bound to its source representation.
+A complete \code{parcel_data} object remains bound to its source
+representation.
 }
 \examples{
 atlas <- structure(

@@ -6,7 +6,8 @@
 #' Rosanna Olsen and colleagues.
 #'
 #' @details
-#' The atlas provides a detailed segmentation of MTL structures in MNI space at 1mm
+#' The atlas provides a detailed segmentation of MTL structures in MNI space at
+#' 1mm
 #' resolution. It includes bilateral parcellation of:
 #' \itemize{
 #'   \item Hippocampal subfields
@@ -51,7 +52,8 @@
 #' Loads the Olsen medial temporal lobe atlas and optionally resamples it to a
 #' different space.
 #'
-#' @param outspace Optional \code{NeuroSpace} object specifying desired output space.
+#' @param outspace Optional \code{NeuroSpace} object specifying desired output
+#'   space.
 #'   If NULL (default), returns atlas in native 1mm MNI space.
 #'
 #' @return A list with class 'atlas' containing the MTL parcellation
@@ -71,8 +73,8 @@
 #'
 #' @importFrom utils data
 #' @export
-get_olsen_mtl <- function(outspace=NULL) {
-  olsen_mtl <- NULL  # To avoid R CMD check NOTE
+get_olsen_mtl <- function(outspace = NULL) {
+  olsen_mtl <- NULL # To avoid R CMD check NOTE
   utils::data("olsen_mtl", envir = environment())
   template_space <- .template_space_from_outspace(
     outspace,
@@ -100,7 +102,15 @@ get_olsen_mtl <- function(outspace=NULL) {
     ret$roi_metadata <- tibble::tibble(
       id = ret$ids,
       label = ret$labels,
-      label_full = if (!is.null(ret$orig_labels)) ret$orig_labels else ret$labels,
+      label_full = if (
+        !is.null(
+          ret$orig_labels
+        )
+      ) {
+        ret$orig_labels
+      } else {
+        ret$labels
+      },
       hemi = ret$hemi,
       color_r = color_r,
       color_g = color_g,
@@ -175,7 +185,9 @@ get_olsen_mtl <- function(outspace=NULL) {
 
   ret <- .attach_atlas_ref(ret, ref)
   ret <- .attach_atlas_provenance(
-    ret, artifacts = artifacts, history = history,
+    ret,
+    artifacts = artifacts,
+    history = history,
     metadata_inputs = list(processing = attr(ret$atlas, "neuroatlas_processing"))
   )
   ret
@@ -189,7 +201,8 @@ get_olsen_mtl <- function(outspace=NULL) {
 #'
 #' @details
 #' This function extracts hippocampal regions from the full MTL atlas and can
-#' subdivide them into anterior-posterior segments. The resulting atlas maintains
+#' subdivide them into anterior-posterior segments. The resulting atlas
+#' maintains
 #' bilateral organization and can be used for targeted hippocampal analyses.
 #'
 #' @param outspace Optional \code{NeuroSpace} object for resampling
@@ -219,8 +232,7 @@ get_olsen_mtl <- function(outspace=NULL) {
 #' @importFrom neuroim2 index_to_coord
 #' @importFrom grDevices col2rgb rainbow
 #' @export
-get_hipp_atlas <- function(outspace=NULL, apsections=1) {
-  olsen_mtl <- NULL  # To avoid R CMD check NOTE
+get_hipp_atlas <- function(outspace = NULL, apsections = 1) {
   # Load and potentially resample base atlas
   x <- get_olsen_mtl(outspace = outspace)
   processing <- attr(x$atlas, "neuroatlas_processing")
@@ -231,22 +243,22 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
 
   # Extract hippocampal regions
   atlas <- x$atlas
-  atlas[atlas %in% c(1,2,3,6,8,9,10,11,14,16)] <- 1
-  atlas[!(atlas %in% c(1,2,3,6,8,9,10,11,14,16))] <- 0
+  atlas[atlas %in% c(1, 2, 3, 6, 8, 9, 10, 11, 14, 16)] <- 1
+  atlas[!(atlas %in% c(1, 2, 3, 6, 8, 9, 10, 11, 14, 16))] <- 0
 
   ind <- which(atlas > 0)
   grid <- neuroim2::index_to_coord(atlas, which(atlas > 0))
 
   # Create anterior-posterior subdivisions if requested
   if (apsections > 1) {
-    qz <- cut(grid[,2], apsections)
-    levels(qz) <- paste0(seq(1,apsections))
+    qz <- cut(grid[, 2], apsections)
+    levels(qz) <- paste0(seq(1, apsections))
     for (lev in levels(qz)) {
       atlas[ind[qz == lev]] <- as.numeric(lev)
     }
-    atlas[ind[grid[,1] > 0]] <- atlas[ind[grid[,1] > 0]] + apsections
+    atlas[ind[grid[, 1] > 0]] <- atlas[ind[grid[, 1] > 0]] + apsections
   } else {
-    atlas[ind[grid[,1] > 0]] <- 2
+    atlas[ind[grid[, 1] > 0]] <- 2
   }
 
   # Create return object
@@ -345,8 +357,10 @@ get_hipp_atlas <- function(outspace=NULL, apsections=1) {
     ref = ref,
     artifacts = artifacts,
     history = history,
-    metadata = list(processing = processing,
-                     parameters = list(apsections = apsections),
-                     parents = list(olsen_mtl = atlas_metadata(x)))
+    metadata = list(
+      processing = processing,
+      parameters = list(apsections = apsections),
+      parents = list(olsen_mtl = atlas_metadata(x))
+    )
   )
 }

@@ -31,3 +31,13 @@ A `SurfaceGeometry` containing the verified domain and arrays.
 Checks the ordered sphere, topology and cortical mask against an exact
 [surface_domain()] descriptor. This does not estimate a registration.
 }
+\examples{
+sphere <- diag(3)
+faces <- matrix(c(0L, 1L, 2L), nrow = 1)
+cortex <- rep(TRUE, 3)
+domain <- surface_domain(
+  "toy", "L", "3v", sphere, faces, cortex,
+  "analytic", "v1"
+)
+surface_geometry(domain, sphere, faces, cortex)
+}

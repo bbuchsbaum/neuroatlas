@@ -9,7 +9,8 @@
 #'     \item A \code{NeuroVol} (3D) or \code{NeuroVec} (4D) object
 #'     \item A character string file path (read via \code{neuroim2::read_vol})
 #'   }
-#'   If unnamed, subjects are auto-named \code{"sub_001"}, \code{"sub_002"}, etc.
+#'   If unnamed, subjects are auto-named \code{"sub_001"}, \code{"sub_002"},
+#' etc.
 #' @param atlas An atlas object.
 #' @param stat_func Function to apply within each ROI (default: \code{mean}).
 #' @param ... Additional arguments passed to \code{\link{reduce_atlas}}.
@@ -31,8 +32,10 @@
 #' results <- batch_reduce(vols, atlas, mean)
 #'
 #' # With file paths
-#' files <- list(sub01 = "path/to/sub01.nii.gz",
-#'               sub02 = "path/to/sub02.nii.gz")
+#' files <- list(
+#'   sub01 = "path/to/sub01.nii.gz",
+#'   sub02 = "path/to/sub02.nii.gz"
+#' )
 #' results <- batch_reduce(files, atlas, mean, parallel = TRUE)
 #' }
 #'
@@ -41,9 +44,15 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom neuroim2 read_vol
 #' @export
-batch_reduce <- function(inputs, atlas, stat_func = mean, ...,
-                          format = "long", parallel = FALSE,
-                          .progress = TRUE) {
+batch_reduce <- function(
+  inputs,
+  atlas,
+  stat_func = mean,
+  ...,
+  format = "long",
+  parallel = FALSE,
+  .progress = TRUE
+) {
   if (!is.list(inputs)) {
     stop("'inputs' must be a list of NeuroVol/NeuroVec objects or file paths")
   }
@@ -75,8 +84,10 @@ batch_reduce <- function(inputs, atlas, stat_func = mean, ...,
 
   if (parallel) {
     if (!requireNamespace("future.apply", quietly = TRUE)) {
-      stop("Package 'future.apply' is required for parallel processing. ",
-           "Install it with install.packages('future.apply')")
+      stop(
+        "Package 'future.apply' is required for parallel processing. ",
+        "Install it with install.packages('future.apply')"
+      )
     }
 
     results <- future.apply::future_mapply(

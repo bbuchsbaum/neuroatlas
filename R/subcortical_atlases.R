@@ -32,9 +32,16 @@
 #'
 #' @export
 subcortical_atlas_options <- function() {
-  .subcortical_specs()[, c("id", "atlas", "label", "default_space",
-                           "spaces", "default_resolution",
-                           "resolutions", "default_desc")]
+  .subcortical_specs()[, c(
+    "id",
+    "atlas",
+    "label",
+    "default_space",
+    "spaces",
+    "default_resolution",
+    "resolutions",
+    "default_desc"
+  )]
 }
 
 #' Load harmonized subcortical atlases via TemplateFlow
@@ -86,15 +93,16 @@ subcortical_atlas_options <- function() {
 #' paths <- get_subcortical_atlas("mdtb10", path_only = TRUE)
 #' }
 #' @export
-get_subcortical_atlas <- function(name,
-                                  template_space = NULL,
-                                  resolution = NULL,
-                                  desc = NULL,
-                                  outspace = NULL,
-                                  use_cache = TRUE,
-                                  path_only = FALSE,
-                                  ...) {
-
+get_subcortical_atlas <- function(
+  name,
+  template_space = NULL,
+  resolution = NULL,
+  desc = NULL,
+  outspace = NULL,
+  use_cache = TRUE,
+  path_only = FALSE,
+  ...
+) {
   spec <- .match_subcortical_spec(name)
 
   # Resolve space and ensure it is supported
@@ -146,8 +154,10 @@ get_subcortical_atlas <- function(name,
   label_path <- .fetch_label_path(tf_query, ...)
 
   if (path_only) {
-    atlas_path <- do.call(get_template,
-                          c(tf_query, list(path_only = TRUE), list(...)))
+    atlas_path <- do.call(
+      get_template,
+      c(tf_query, list(path_only = TRUE), list(...))
+    )
     ret <- list(
       name = spec$label,
       atlas_path = atlas_path,
@@ -162,8 +172,10 @@ get_subcortical_atlas <- function(name,
   }
 
   # Retrieve and optionally resample the atlas volume
-  atlas_vol <- do.call(get_template,
-                       c(tf_query, list(path_only = FALSE), list(...)))
+  atlas_vol <- do.call(
+    get_template,
+    c(tf_query, list(path_only = FALSE), list(...))
+  )
   source_metadata <- attr(atlas_vol, "neuroatlas_metadata")
 
   if (!is.null(outspace)) {
@@ -248,8 +260,11 @@ get_subcortical_atlas <- function(name,
     status = "available",
     confidence = "high",
     details = paste0(
-      "Loaded TemplateFlow atlas ", spec$atlas,
-      " (resolution=", res, ")."
+      "Loaded TemplateFlow atlas ",
+      spec$atlas,
+      " (resolution=",
+      res,
+      ")."
     )
   )
   if (!is.null(outspace)) {
@@ -287,9 +302,15 @@ get_subcortical_atlas <- function(name,
     ref = ref,
     artifacts = artifacts,
     history = history,
-    metadata = list(source = source_metadata, processing = processing,
-                     parameters = list(atlas = spec$atlas, desc = tf_desc,
-                                        resolution_key = res))
+    metadata = list(
+      source = source_metadata,
+      processing = processing,
+      parameters = list(
+        atlas = spec$atlas,
+        desc = tf_desc,
+        resolution_key = res
+      )
+    )
   )
 }
 
@@ -298,10 +319,12 @@ get_subcortical_atlas <- function(name,
   tibble::tibble(
     id = c("cit168", "hcp_thalamus", "mdtb10", "hcp_hippamyg"),
     atlas = c("CIT168", "hcpthalamic", "MDTB10", "HPandAMYG"),
-    label = c("CIT168 subcortex (LR split)",
-              "HCP thalamic nuclei",
-              "MDTB10 cerebellum",
-              "HCP hippocampus/amygdala"),
+    label = c(
+      "CIT168 subcortex (LR split)",
+      "HCP thalamic nuclei",
+      "MDTB10 cerebellum",
+      "HCP hippocampus/amygdala"
+    ),
     default_space = rep("MNI152NLin6Asym", 4),
     spaces = list(
       c("MNI152NLin6Asym", "MNI152NLin2009cAsym"),
@@ -321,8 +344,13 @@ get_subcortical_atlas <- function(name,
       c("cit", "cit_168", "cit-168"),
       c("hcpthalamus", "hcp_thalamus", "hcpthalamic", "thalamus_hcp"),
       c("cerebellum", "cerebellum_mdtb10", "diedrichsen", "mdtb-10"),
-      c("hpandamyg", "hcp_hippamyg", "hippamyg", "hcp_hipp_amyg",
-        "hippocampus_amygdala")
+      c(
+        "hpandamyg",
+        "hcp_hippamyg",
+        "hippamyg",
+        "hcp_hipp_amyg",
+        "hippocampus_amygdala"
+      )
     )
   )
 }
@@ -332,9 +360,13 @@ get_subcortical_atlas <- function(name,
   nm_clean <- function(x) gsub("[^a-z0-9]", "", tolower(x))
   target <- nm_clean(name)
 
-  idx <- vapply(seq_len(nrow(specs)), function(i) {
-    target %in% nm_clean(c(specs$id[i], specs$aliases[[i]]))
-  }, logical(1))
+  idx <- vapply(
+    seq_len(nrow(specs)),
+    function(i) {
+      target %in% nm_clean(c(specs$id[i], specs$aliases[[i]]))
+    },
+    logical(1)
+  )
 
   if (!any(idx)) {
     cli::cli_abort(
@@ -353,10 +385,14 @@ get_subcortical_atlas <- function(name,
   # the underlying error as a once-per-session warning so users have a clue
   # when labels are absent because TemplateFlow misbehaved.
   tryCatch(
-    do.call(get_template,
-            c(tf_query,
-              list(extension = ".tsv", path_only = TRUE),
-              list(...))),
+    do.call(
+      get_template,
+      c(
+        tf_query,
+        list(extension = ".tsv", path_only = TRUE),
+        list(...)
+      )
+    ),
     error = function(e) {
       cli::cli_warn(
         c(
@@ -378,13 +414,22 @@ get_subcortical_atlas <- function(name,
     return(list(labels = labels, cmap = NULL))
   }
 
-  tbl <- tryCatch({
-    utils::read.table(label_path, header = TRUE, sep = "\t",
-                      stringsAsFactors = FALSE, comment.char = "",
-                      check.names = FALSE, quote = "")
-  }, error = function(e) {
-    NULL
-  })
+  tbl <- tryCatch(
+    {
+      utils::read.table(
+        label_path,
+        header = TRUE,
+        sep = "\t",
+        stringsAsFactors = FALSE,
+        comment.char = "",
+        check.names = FALSE,
+        quote = ""
+      )
+    },
+    error = function(e) {
+      NULL
+    }
+  )
 
   if (is.null(tbl) || ncol(tbl) < 2) {
     labels <- paste0("Region", ids)
@@ -410,21 +455,27 @@ get_subcortical_atlas <- function(name,
 
   color_col <- if ("color" %in% cn) tbl[[which(cn == "color")[1]]] else NULL
 
-  labels <- vapply(ids, function(i) {
-    idx <- which(id_col == i)
-    if (length(idx) == 0) {
-      paste0("Region", i)
-    } else {
-      label_col[idx[1]]
-    }
-  }, character(1))
+  labels <- vapply(
+    ids,
+    function(i) {
+      idx <- which(id_col == i)
+      if (length(idx) == 0) {
+        paste0("Region", i)
+      } else {
+        label_col[idx[1]]
+      }
+    },
+    character(1)
+  )
 
   cmap <- NULL
   if (!is.null(color_col)) {
     parse_rgb <- function(x) {
       parts <- strsplit(x, "x")[[1]]
       parts <- parts[parts != ""]
-      if (length(parts) < 3) return(c(NA, NA, NA))
+      if (length(parts) < 3) {
+        return(c(NA, NA, NA))
+      }
       as.numeric(parts[1:3])
     }
     rgb_mat <- t(vapply(color_col, parse_rgb, numeric(3)))
@@ -440,9 +491,13 @@ get_subcortical_atlas <- function(name,
 
 .infer_hemi <- function(labels) {
   hemi <- rep(NA_character_, length(labels))
-  hemi[grepl("^(lh_|l_|left)", labels, ignore.case = TRUE) |
-         grepl("_l$", labels, ignore.case = TRUE)] <- "left"
-  hemi[grepl("^(rh_|r_|right)", labels, ignore.case = TRUE) |
-         grepl("_r$", labels, ignore.case = TRUE)] <- "right"
+  hemi[
+    grepl("^(lh_|l_|left)", labels, ignore.case = TRUE) |
+      grepl("_l$", labels, ignore.case = TRUE)
+  ] <- "left"
+  hemi[
+    grepl("^(rh_|r_|right)", labels, ignore.case = TRUE) |
+      grepl("_r$", labels, ignore.case = TRUE)
+  ] <- "right"
   hemi
 }

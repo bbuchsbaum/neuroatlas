@@ -56,10 +56,21 @@ A `SurfaceDomain` descriptor containing counts, metadata, SHA-256
 }
 \description{
 Constructs a descriptor from an ordered registration sphere, its triangles,
-and its cortical mask. Template names and vertex counts alone cannot establish
+and its cortical mask. Template names and vertex counts alone cannot
+establish
 correspondence. This function records identity; it does not establish that a
 registration is anatomically valid or qualify a resampling method. Array
 validation does not establish closed-manifold topology or mesh quality.
+}
+\examples{
+sphere <- diag(3)
+faces <- matrix(c(0L, 1L, 2L), nrow = 1)
+cortex <- rep(TRUE, 3)
+domain <- surface_domain(
+  "toy", "L", "3v", sphere, faces, cortex,
+  "analytic", "v1"
+)
+domain
 }
 \seealso{
 [atlas_transform_plan()]

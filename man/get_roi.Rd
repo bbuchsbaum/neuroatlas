@@ -22,7 +22,8 @@ get_roi(x, label = NULL, id = NULL, hemi = NULL)
 Returns a subset of the atlas containing only the specified ROI
 }
 \description{
-Extracts a specific region of interest from an atlas object based on label, ID,
+Extracts a specific region of interest from an atlas object based on label,
+ID,
 and hemisphere information.
 }
 \examples{

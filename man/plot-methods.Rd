@@ -65,7 +65,8 @@ drawn when \code{legend = TRUE}. Default \code{30}.}
 \item{...}{Additional arguments passed to \code{neuroim2::plot_montage()} or
 \code{neuroim2::plot_ortho()}.}
 
-\item{vals}{Numeric vector of values to visualize. If NULL (default), all regions
+\item{vals}{Numeric vector of values to visualize. If NULL (default), all
+regions
 will be assigned a value of 1, creating a uniform visualization}
 
 \item{thresh}{Numeric vector of length 2 for thresholding values}
@@ -74,7 +75,8 @@ will be assigned a value of 1, creating a uniform visualization}
 
 \item{palette}{Character. Name of scico color palette}
 
-\item{lim}{Numeric vector of length 2 for color scale limits. If NULL, will be
+\item{lim}{Numeric vector of length 2 for color scale limits. If NULL, will
+be
 set to range of vals}
 
 \item{views}{Character vector of views to render for surface atlases.

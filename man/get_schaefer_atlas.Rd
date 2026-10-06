@@ -274,7 +274,11 @@ Features include:
 }
 \section{Convenience Functions}{
 
-Shorthand functions are provided for common Schaefer atlas configurations. These functions call \code{get_schaefer_atlas} with the \code{parcels} and \code{networks} arguments pre-set. They all accept \code{resolution} (default "2"), \code{outspace}, \code{smooth}, \code{use_cache}, \code{cache_dir}, and \code{...} arguments.
+Shorthand functions are provided for common Schaefer atlas configurations.
+These functions call \code{get_schaefer_atlas} with the \code{parcels} and
+\code{networks} arguments pre-set. They all accept \code{resolution} (default
+"2"), \code{outspace}, \code{smooth}, \code{use_cache}, \code{cache_dir}, and
+\code{...} arguments.
 \itemize{
   \item \code{sy_100_7()}: 100 parcels, 7 networks.
   \item \code{sy_100_17()}: 100 parcels, 17 networks.
@@ -301,15 +305,21 @@ Shorthand functions are provided for common Schaefer atlas configurations. These
 atlas <- get_schaefer_atlas(parcels = "300", networks = "7")
 
 # Load high-resolution version
-atlas_hires <- get_schaefer_atlas(parcels = "400",
-                                 networks = "17",
-                                 resolution = "1")
+atlas_hires <- get_schaefer_atlas(
+  parcels = "400",
+  networks = "17",
+  resolution = "1"
+)
 
 # Resample to a different space
-new_space <- neuroim2::NeuroSpace(dim = c(91,109,91),
-                                 spacing = c(2,2,2))
-atlas_resampled <- get_schaefer_atlas(parcels = "300",
-                                     outspace = new_space)
+new_space <- neuroim2::NeuroSpace(
+  dim = c(91, 109, 91),
+  spacing = c(2, 2, 2)
+)
+atlas_resampled <- get_schaefer_atlas(
+  parcels = "300",
+  outspace = new_space
+)
 }
 
 }

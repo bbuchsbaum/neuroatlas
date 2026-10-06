@@ -45,7 +45,7 @@ get_cache_dir <- function() {
 #' @noRd
 clear_cache <- function() {
   dname <- paste0(Sys.getenv("HOME"), "/.neuroatlas_cache")
-  fnames <- list.files(dname, full.names=TRUE)
+  fnames <- list.files(dname, full.names = TRUE)
   sapply(fnames, unlink)
 }
 
@@ -53,7 +53,8 @@ clear_cache <- function() {
 #'
 #' @description
 #' Combines two brain atlases into a single unified atlas object, preserving all
-#' region information and adjusting region IDs to prevent conflicts. This is useful
+#' region information and adjusting region IDs to prevent conflicts. This is
+#' useful
 #' for creating composite atlases that combine different parcellation schemes.
 #'
 #' @details
@@ -108,18 +109,29 @@ clear_cache <- function() {
 #' @export
 merge_atlases <- function(atlas1, atlas2) {
   assertthat::assert_that(all(dim(atlas1$atlas) == dim(atlas2$atlas)))
-  parents <- list(atlas1 = atlas_metadata(atlas1),
-                  atlas2 = atlas_metadata(atlas2))
+  parents <- list(
+    atlas1 = atlas_metadata(atlas1),
+    atlas2 = atlas_metadata(atlas2)
+  )
   sp1 <- neuroim2::space(atlas1$atlas)
   sp2 <- neuroim2::space(atlas2$atlas)
-  if (!isTRUE(all.equal(neuroim2::trans(sp1), neuroim2::trans(sp2),
-                        tolerance = 1e-7))) {
+  if (
+    !isTRUE(
+      all.equal(
+        neuroim2::trans(sp1),
+        neuroim2::trans(sp2),
+        tolerance = 1e-7
+      )
+    )
+  ) {
     stop("Cannot merge atlases on different voxel grids; align them first.")
   }
   space1 <- atlas_space(atlas1)
   space2 <- atlas_space(atlas2)
-  known <- function(s) !is.na(s) && !s %in%
-    c("custom", "MNI152", "MNI152_custom", "MNI152_unspecified", "Unknown")
+  known <- function(s) {
+    !is.na(s) && !s %in%
+      c("custom", "MNI152", "MNI152_custom", "MNI152_unspecified", "Unknown")
+  }
   if (known(space1) && known(space2) && space1 != space2) {
     stop("Cannot merge atlases with conflicting anatomical template identities.")
   }
@@ -142,8 +154,14 @@ merge_atlases <- function(atlas1, atlas2) {
   # Every atlas2 id (declared or present in the volume) gets its own new id
   # above atlas1's range, so declared ids absent from the volume cannot
   # collide with remapped ones.
-  a2_vals <- sort(unique(c(as.integer(atlas2$ids),
-                           as.integer(a2[a2 != 0]))))
+  a2_vals <- sort(
+    unique(
+      c(
+        as.integer(atlas2$ids),
+        as.integer(a2[a2 != 0])
+      )
+    )
+  )
   remap <- if (length(a2_vals)) {
     stats::setNames(max_atlas1_id + seq_along(a2_vals), as.character(a2_vals))
   } else {
@@ -164,12 +182,19 @@ merge_atlases <- function(atlas1, atlas2) {
   merged_array[mask] <- a2_remapped[mask]
 
   merged_mask <- merged_array != 0
-  mask_vol <- neuroim2::LogicalNeuroVol(merged_mask, neuroim2::space(atlas1$atlas))
+  mask_vol <- neuroim2::LogicalNeuroVol(
+    merged_mask,
+    neuroim2::space(
+      atlas1$atlas
+    )
+  )
   cluster_values <- as.integer(merged_array[merged_mask])
-  atlmerged <- neuroim2::ClusteredNeuroVol(mask = mask_vol, clusters = cluster_values)
+  atlmerged <- neuroim2::ClusteredNeuroVol(
+    mask = mask_vol,
+    clusters = cluster_values
+  )
 
   shifted_ids <- as.integer(remap[as.character(as.integer(atlas2$ids))])
-
 
 
   cmap <- rbind(as.matrix(atlas1$cmap), as.matrix(atlas2$cmap))
@@ -179,52 +204,78 @@ merge_atlases <- function(atlas1, atlas2) {
   cmap <- .normalize_cmap(cmap)
 
   ret <- list(
-    name=paste0(atlas1$name,"::", atlas2$name),
-    atlas=atlmerged,
-    cmap=cmap,
-    ids=c(atlas1$ids, shifted_ids),
-    labels=c(atlas1$labels, atlas2$labels),
-    orig_labels=c(atlas1$orig_labels, atlas2$orig_labels),
-    hemi=c(atlas1$hemi, atlas2$hemi)
+    name = paste0(atlas1$name, "::", atlas2$name),
+    atlas = atlmerged,
+    cmap = cmap,
+    ids = c(atlas1$ids, shifted_ids),
+    labels = c(atlas1$labels, atlas2$labels),
+    orig_labels = c(atlas1$orig_labels, atlas2$orig_labels),
+    hemi = c(atlas1$hemi, atlas2$hemi)
   )
   region_fields <- .merge_region_fields(atlas1, atlas2)
   for (nm in names(region_fields)) {
     ret[[nm]] <- region_fields[[nm]]
   }
 
-  class(ret) <- c(paste0(atlas1$name,"::", atlas2$name), "atlas")
+  class(ret) <- c(paste0(atlas1$name, "::", atlas2$name), "atlas")
   common_space <- if (identical(space1, space2)) space1 else NA_character_
   ref <- new_atlas_ref(
-    "composite", ret$name, representation = "derived",
+    "composite",
+    ret$name,
+    representation = "derived",
     template_space = common_space,
-    coord_space = if (identical(atlas_coord_space(atlas1),
-                                atlas_coord_space(atlas2))) {
+    coord_space = if (
+      identical(
+        atlas_coord_space(atlas1),
+        atlas_coord_space(atlas2)
+      )
+    ) {
       atlas_coord_space(atlas1)
-    } else NA_character_,
-    source = "merge_atlases", lineage = "Composite of two parent atlases.",
+    } else {
+      NA_character_
+    },
+    source = "merge_atlases",
+    lineage = "Composite of two parent atlases.",
     confidence = "uncertain"
   )
   ret <- .attach_atlas_ref(ret, ref)
   ret <- .attach_atlas_provenance(
     ret,
-    artifacts = dplyr::bind_rows(parents$atlas1$artifacts,
-                                 parents$atlas2$artifacts),
+    artifacts = dplyr::bind_rows(
+      parents$atlas1$artifacts,
+      parents$atlas2$artifacts
+    ),
     history = .new_atlas_history(
-      "merge", "volume", to_template_space = common_space,
+      "merge",
+      "volume",
+      to_template_space = common_space,
       details = "Merged parents; nonzero atlas2 labels take precedence.",
-      parameters = list(parent_ids = vapply(parents, function(p) p$identity$id,
-                                            character(1)),
-                         atlas2_id_map = remap,
-                         overlap = "atlas2_overwrites_atlas1")
+      parameters = list(
+        parent_ids = vapply(
+          parents,
+          function(p) p$identity$id,
+          character(1)
+        ),
+        atlas2_id_map = remap,
+        overlap = "atlas2_overwrites_atlas1"
+      )
     )
   )
   meta <- ret$metadata
   meta$parents <- parents
-  meta$citations <- .deduplicate_citations(dplyr::bind_rows(
-    parents$atlas1$citations, parents$atlas2$citations))
+  meta$citations <- .deduplicate_citations(
+    dplyr::bind_rows(
+      parents$atlas1$citations,
+      parents$atlas2$citations
+    )
+  )
   meta$identity$description <- "Composite atlas; both parent records retained."
-  meta$provenance$issues <- unique(c(parents$atlas1$provenance$issues,
-                                    parents$atlas2$provenance$issues))
+  meta$provenance$issues <- unique(
+    c(
+      parents$atlas1$provenance$issues,
+      parents$atlas2$provenance$issues
+    )
+  )
   .store_atlas_metadata(ret, meta)
 }
 
@@ -238,13 +289,37 @@ merge_atlases <- function(atlas1, atlas2) {
 #' @noRd
 .merge_region_fields <- function(atlas1, atlas2) {
   skip <- c(
-    "id", "label", "label_full", "hemi", "color_r", "color_g", "color_b",
-    "id_convention", "template_space", "coord_space", "atlas_family",
-    "atlas_model", "atlas_representation", "atlas_source", "atlas_confidence",
+    "id",
+    "label",
+    "label_full",
+    "hemi",
+    "color_r",
+    "color_g",
+    "color_b",
+    "id_convention",
+    "template_space",
+    "coord_space",
+    "atlas_family",
+    "atlas_model",
+    "atlas_representation",
+    "atlas_source",
+    "atlas_confidence",
     # Top-level atlas fields that must not be overwritten.
-    "name", "atlas", "cmap", "ids", "labels", "orig_labels", "roi_metadata",
-    "atlas_ref", "atlas_artifacts", "atlas_history", "metadata",
-    "metadata_parameters", "metadata_processing", "space", "confidence"
+    "name",
+    "atlas",
+    "cmap",
+    "ids",
+    "labels",
+    "orig_labels",
+    "roi_metadata",
+    "atlas_ref",
+    "atlas_artifacts",
+    "atlas_history",
+    "metadata",
+    "metadata_parameters",
+    "metadata_processing",
+    "space",
+    "confidence"
   )
   region_columns <- function(x) {
     n <- length(x$ids)
@@ -287,7 +362,7 @@ merge_atlases <- function(atlas1, atlas2) {
 #' @rdname get_roi
 #' @importFrom neuroim2 space ROIVol index_to_grid
 #' @export
-get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
+get_roi.atlas <- function(x, label = NULL, id = NULL, hemi = NULL) {
   if (!is.null(label) && !is.null(id)) {
     stop("must supply one of 'id' or 'label' but not both")
   }
@@ -312,28 +387,39 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
   atlas_vals <- as.vector(x$atlas)
 
   if (!is.null(label)) {
-    ret <- lapply(label, function(l) {
-      # Find matching labels, filtered by hemisphere if specified
-      match_idx <- which(x$labels == l)
-      if (!is.null(hemi)) {
-        match_idx <- intersect(match_idx, valid_idx)
-      }
-
-      if (length(match_idx) == 0) {
+    ret <- lapply(
+      label,
+      function(l) {
+        # Find matching labels, filtered by hemisphere if specified
+        match_idx <- which(x$labels == l)
         if (!is.null(hemi)) {
-          stop(paste0("label '", l, "' not found in atlas for hemisphere: ",
-                      paste(hemi, collapse = ", ")))
-        } else {
-          stop(paste0("label '", l, "' not found in atlas"))
+          match_idx <- intersect(match_idx, valid_idx)
         }
-      }
 
-      roi_ids <- x$ids[match_idx]
-      rind <- which(atlas_vals %in% roi_ids)
-      neuroim2::ROIVol(neuroim2::space(x$atlas),
-                       coords = neuroim2::index_to_grid(x$atlas, rind),
-                       data = atlas_vals[rind])
-    })
+        if (length(match_idx) == 0) {
+          if (!is.null(hemi)) {
+            stop(
+              paste0(
+                "label '",
+                l,
+                "' not found in atlas for hemisphere: ",
+                paste(hemi, collapse = ", ")
+              )
+            )
+          } else {
+            stop(paste0("label '", l, "' not found in atlas"))
+          }
+        }
+
+        roi_ids <- x$ids[match_idx]
+        rind <- which(atlas_vals %in% roi_ids)
+        neuroim2::ROIVol(
+          neuroim2::space(x$atlas),
+          coords = neuroim2::index_to_grid(x$atlas, rind),
+          data = atlas_vals[rind]
+        )
+      }
+    )
 
     names(ret) <- label
     ret
@@ -343,17 +429,24 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
       valid_ids <- x$ids[valid_idx]
       invalid_ids <- setdiff(id, valid_ids)
       if (length(invalid_ids) > 0) {
-        stop("IDs not found in specified hemisphere(s): ",
-             paste(invalid_ids, collapse = ", "))
+        stop(
+          "IDs not found in specified hemisphere(s): ",
+          paste(invalid_ids, collapse = ", ")
+        )
       }
     }
 
-    ret <- lapply(id, function(i) {
-      rind <- which(atlas_vals %in% i)
-      neuroim2::ROIVol(neuroim2::space(x$atlas),
-                       coords = neuroim2::index_to_grid(x$atlas, rind),
-                       data = atlas_vals[rind])
-    })
+    ret <- lapply(
+      id,
+      function(i) {
+        rind <- which(atlas_vals %in% i)
+        neuroim2::ROIVol(
+          neuroim2::space(x$atlas),
+          coords = neuroim2::index_to_grid(x$atlas, rind),
+          data = atlas_vals[rind]
+        )
+      }
+    )
     names(ret) <- id
     ret
   }
@@ -368,7 +461,8 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
 #' matched region, carrying the mesh vertices of that area on the appropriate
 #' hemisphere.
 #'
-#' Because a surface atlas stores each hemisphere on its own mesh, a \code{label}
+#' Because a surface atlas stores each hemisphere on its own mesh, a
+#' \code{label}
 #' present in both hemispheres yields one ROI per hemisphere, named
 #' \code{"<label>_left"} / \code{"<label>_right"}; pass \code{hemi} to restrict.
 #' When selecting by \code{id}, results are named by id (ids are unique across
@@ -381,6 +475,11 @@ get_roi.atlas <- function(x, label=NULL, id=NULL, hemi=NULL) {
 #' @return A named list of \code{\link[neurosurf]{ROISurface}} objects.
 #' @seealso \code{\link{get_roi}}
 #' @rdname get_roi-surfatlas
+#' @examples
+#' \dontrun{
+#' atlas <- get_schaefer_surfatlas(100)
+#' roi <- get_roi(atlas, id = atlas$ids[1])
+#' }
 #' @export
 #' @method get_roi surfatlas
 get_roi.surfatlas <- function(x, label = NULL, id = NULL, hemi = NULL) {
@@ -407,12 +506,18 @@ get_roi.surfatlas <- function(x, label = NULL, id = NULL, hemi = NULL) {
       m <- which(x$labels == l)
       if (!is.null(hemi)) m <- intersect(m, valid_idx)
       if (length(m) == 0) {
-        stop(if (!is.null(hemi)) {
-          paste0("label '", l, "' not found in atlas for hemisphere: ",
-                 paste(hemi, collapse = ", "))
-        } else {
-          paste0("label '", l, "' not found in atlas")
-        })
+        stop(
+          if (!is.null(hemi)) {
+            paste0(
+              "label '",
+              l,
+              "' not found in atlas for hemisphere: ",
+              paste(hemi, collapse = ", ")
+            )
+          } else {
+            paste0("label '", l, "' not found in atlas")
+          }
+        )
       }
       sel_idx <- c(sel_idx, m)
     }
@@ -424,45 +529,50 @@ get_roi.surfatlas <- function(x, label = NULL, id = NULL, hemi = NULL) {
     if (!is.null(hemi)) {
       bad <- setdiff(m, valid_idx)
       if (length(bad) > 0) {
-        stop("IDs not found in specified hemisphere(s): ",
-             paste(x$ids[bad], collapse = ", "))
+        stop(
+          "IDs not found in specified hemisphere(s): ",
+          paste(x$ids[bad], collapse = ", ")
+        )
       }
     }
     sel_idx <- m
   }
 
   hemi_key <- c(left = "lh", right = "rh")
-  ret <- lapply(sel_idx, function(ix) {
-    roi_id <- x$ids[ix]
-    h <- x$hemi[ix]
-    surf <- x[[paste0(hemi_key[[h]], "_atlas")]]
-    vox <- as.integer(surf@data)
+  ret <- lapply(
+    sel_idx,
+    function(ix) {
+      roi_id <- x$ids[ix]
+      h <- x$hemi[ix]
+      surf <- x[[paste0(hemi_key[[h]], "_atlas")]]
+      vox <- as.integer(surf@data)
 
-    # Per-vertex code conventions differ across surface atlases: some
-    # (e.g. Wang, Schaefer) store the global id in the surface data, others
-    # (e.g. Glasser) store a within-hemisphere code. Prefer the global id and
-    # fall back to the within-hemisphere ordinal, then error if neither hits.
-    vidx <- which(vox == roi_id)
-    if (length(vidx) == 0L) {
-      local_code <- match(ix, which(x$hemi == h))
-      vidx <- which(vox == local_code)
-    }
-    if (length(vidx) == 0L) {
-      cli::cli_abort(
-        c(
-          "No surface vertices found for region {.val {x$labels[ix]}} (id {roi_id}).",
-          "i" = "The surface data uses a vertex coding get_roi() could not map."
-        ),
-        class = c("neuroatlas_error_get_roi", "neuroatlas_error")
+      # Per-vertex code conventions differ across surface atlases: some
+      # (e.g. Wang, Schaefer) store the global id in the surface data, others
+      # (e.g. Glasser) store a within-hemisphere code. Prefer the global id and
+      # fall back to the within-hemisphere ordinal, then error if neither hits.
+      vidx <- which(vox == roi_id)
+      if (length(vidx) == 0L) {
+        local_code <- match(ix, which(x$hemi == h))
+        vidx <- which(vox == local_code)
+      }
+      if (length(vidx) == 0L) {
+        cli::cli_abort(
+          c(
+            "No surface vertices found for region {.val {x$labels[ix]}} (id {roi_id}).",
+            "i" = "The surface data uses a vertex coding get_roi() could not map."
+          ),
+          class = c("neuroatlas_error_get_roi", "neuroatlas_error")
+        )
+      }
+
+      neurosurf::ROISurface(
+        geometry = surf@geometry,
+        indices = vidx,
+        data = vox[vidx]
       )
     }
-
-    neurosurf::ROISurface(
-      geometry = surf@geometry,
-      indices = vidx,
-      data = vox[vidx]
-    )
-  })
+  )
   names(ret) <- if (!is.null(label)) {
     paste0(x$labels[sel_idx], "_", x$hemi[sel_idx])
   } else {
@@ -474,8 +584,14 @@ get_roi.surfatlas <- function(x, label = NULL, id = NULL, hemi = NULL) {
 #' @rdname sub_atlas
 #' @export
 #' @method sub_atlas surfatlas
-sub_atlas.surfatlas <- function(x, ids = NULL, labels = NULL, hemi = NULL,
-                                network = NULL, ...) {
+sub_atlas.surfatlas <- function(
+  x,
+  ids = NULL,
+  labels = NULL,
+  hemi = NULL,
+  network = NULL,
+  ...
+) {
   # The volume-oriented subsetter relies on x$atlas (a NeuroVol) which surface
   # atlases do not have, and cannot subset the per-hemisphere meshes, so it
   # would silently produce a broken object. Fail clearly instead.
@@ -492,7 +608,14 @@ sub_atlas.surfatlas <- function(x, ids = NULL, labels = NULL, hemi = NULL,
 #' @rdname sub_atlas
 #' @export
 #' @method sub_atlas atlas
-sub_atlas.atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, network = NULL, ...) {
+sub_atlas.atlas <- function(
+  x,
+  ids = NULL,
+  labels = NULL,
+  hemi = NULL,
+  network = NULL,
+  ...
+) {
   if (is.null(ids) && is.null(labels) && is.null(hemi) && is.null(network)) {
     stop("at least one of 'ids', 'labels', 'hemi', or 'network' must be supplied")
   }
@@ -554,10 +677,15 @@ sub_atlas.atlas <- function(x, ids = NULL, labels = NULL, hemi = NULL, network =
 #'
 #' @export
 #' @method reduce_atlas atlas
-reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
-                                level = c("parcel", "network", "hemisphere"),
-                                by = NULL) {
-
+reduce_atlas.atlas <- function(
+  atlas,
+  data_vol,
+  stat_func,
+  ...,
+  format = NULL,
+  level = c("parcel", "network", "hemisphere"),
+  by = NULL
+) {
   # --- Input Validation ---
   if (!methods::is(data_vol, "NeuroVol") && !methods::is(data_vol, "NeuroVec")) {
     stop("'data_vol' must be a NeuroVol or NeuroVec object.")
@@ -569,12 +697,18 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
   # --- Determine ROI definition volume from 'atlas' ---
   roi_definition_vol <- .get_atlas_volume(atlas)
 
-  # --- Ensure data_vol and ROI definition share spatial dimensions (ignore time) ---
+  # --- Ensure data_vol and ROI definition share spatial dimensions (ignore
+  # time) ---
   atlas_dims <- dim(roi_definition_vol)[1:3]
   data_dims <- dim(data_vol)[1:3]
   if (!all(atlas_dims == data_dims)) {
-    stop("Dimensions of atlas (", paste(atlas_dims, collapse="x"),
-         ") do not match dimensions of data volume (", paste(data_dims, collapse="x"), ")")
+    stop(
+      "Dimensions of atlas (",
+      paste(atlas_dims, collapse = "x"),
+      ") do not match dimensions of data volume (",
+      paste(data_dims, collapse = "x"),
+      ")"
+    )
   }
 
   # --- Extract data using ROI matching ---
@@ -588,7 +722,7 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
     roi_vol_data[which(roi_definition_vol@mask)] <- roi_definition_vol@clusters
   } else {
     # For regular NeuroVol
-    roi_vol_data <- roi_definition_vol[,,]
+    roi_vol_data <- roi_definition_vol[, , ]
     roi_labels <- sort(unique(as.vector(roi_vol_data)))
     roi_labels <- roi_labels[roi_labels != 0]
   }
@@ -608,12 +742,15 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
   # Extract values for each ROI
   if (inherits(data_vol, "NeuroVol")) {
     # 3D data -> single row with one column per ROI
-    data_vol_data <- data_vol[,,]
-    extracted_values <- sapply(roi_labels, function(label) {
-      mask <- roi_vol_data == label
-      roi_data <- data_vol_data[mask]
-      apply_stat(roi_data)
-    })
+    data_vol_data <- data_vol[, , ]
+    extracted_values <- sapply(
+      roi_labels,
+      function(label) {
+        mask <- roi_vol_data == label
+        roi_data <- data_vol_data[mask]
+        apply_stat(roi_data)
+      }
+    )
     extracted_values <- matrix(extracted_values, nrow = 1)
     colnames(extracted_values) <- as.character(roi_labels)
   } else if (inherits(data_vol, "NeuroVec")) {
@@ -627,7 +764,7 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
 
       # Extract time series for this ROI
       for (t in 1:nvol) {
-        vol_t <- data_vol[,,,t]
+        vol_t <- data_vol[, , , t]
         # Convert mask to array indices for subsetting
         roi_data <- vol_t[which(mask)]
         extracted_values[t, i] <- apply_stat(roi_data)
@@ -659,9 +796,9 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
     # Default: long for NeuroVol, wide for NeuroVec
     format <- if (inherits(data_vol, "NeuroVol")) "long" else "wide"
   }
-  
+
   format <- match.arg(format, c("wide", "long"))
-  
+
   # --- Convert to tibble ---
   if (format == "wide") {
     # Wide format (current behavior)
@@ -669,10 +806,12 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
       result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
     } else {
       result_tibble <- tibble::as_tibble(extracted_values, .name_repair = "minimal")
-      result_tibble <- tibble::add_column(result_tibble,
-                                          time = seq_len(nrow(result_tibble)),
-                                          .before = TRUE,
-                                          .name_repair = "minimal")
+      result_tibble <- tibble::add_column(
+        result_tibble,
+        time = seq_len(nrow(result_tibble)),
+        .before = TRUE,
+        .name_repair = "minimal"
+      )
     }
   } else {
     # Long format
@@ -708,18 +847,24 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
     # Validate group vars exist in metadata
     missing_vars <- setdiff(group_vars, names(meta))
     if (length(missing_vars) > 0) {
-      stop("Variables not found in roi_metadata: ",
-           paste(missing_vars, collapse = ", "))
+      stop(
+        "Variables not found in roi_metadata: ",
+        paste(missing_vars, collapse = ", ")
+      )
     }
 
     # Ensure we have long-format results for grouping
     if (format == "wide" && nrow(extracted_values) > 1) {
       # For NeuroVec wide format, convert to long first
       long_results <- tibble::tibble(
-        time = rep(seq_len(nrow(extracted_values)),
-                   each = ncol(extracted_values)),
-        region = rep(colnames(extracted_values),
-                     nrow(extracted_values)),
+        time = rep(
+          seq_len(nrow(extracted_values)),
+          each = ncol(extracted_values)
+        ),
+        region = rep(
+          colnames(extracted_values),
+          nrow(extracted_values)
+        ),
         value = as.numeric(t(extracted_values))
       )
     } else if (format == "long") {
@@ -745,18 +890,24 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
     }
 
     # Merge and aggregate
-    merged <- merge(long_results, group_lookup,
-                    by.x = region_col, by.y = "label", all.x = TRUE)
+    merged <- merge(
+      long_results,
+      group_lookup,
+      by.x = region_col,
+      by.y = "label",
+      all.x = TRUE
+    )
 
     group_cols <- group_vars
     if ("time" %in% names(merged)) group_cols <- c("time", group_cols)
 
-    agg <- stats::aggregate(merged[["value"]],
-                            by = merged[group_cols],
-                            FUN = stat_func)
+    agg <- stats::aggregate(
+      merged[["value"]],
+      by = merged[group_cols],
+      FUN = stat_func
+    )
     names(agg)[ncol(agg)] <- "value"
     result_tibble <- tibble::as_tibble(agg)
-
   } else if (level != "parcel") {
     # level-based aggregation
     if (level == "network") {
@@ -770,9 +921,17 @@ reduce_atlas.atlas <- function(atlas, data_vol, stat_func, ..., format = NULL,
 
     # Recursive call with by= instead of level=
     by_formula <- stats::as.formula(paste("~", group_var))
-    return(reduce_atlas.atlas(atlas, data_vol, stat_func, ...,
-                               format = format, level = "parcel",
-                               by = by_formula))
+    return(
+      reduce_atlas.atlas(
+        atlas,
+        data_vol,
+        stat_func,
+        ...,
+        format = format,
+        level = "parcel",
+        by = by_formula
+      )
+    )
   }
 
   return(result_tibble)

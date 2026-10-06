@@ -49,8 +49,10 @@ rois <- data.frame(
   roi = 1:10, network = rep(c("Vis", "DMN"), 5),
   x = runif(10), y = runif(10), z = runif(10)
 )
-pal <- roi_colors_embedding(rois, feature_cols = c("x","y","z"),
-                             method = "pca")
+pal <- roi_colors_embedding(rois,
+  feature_cols = c("x", "y", "z"),
+  method = "pca"
+)
 }
 
 }

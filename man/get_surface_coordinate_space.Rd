@@ -13,7 +13,8 @@ Examples: "fsaverage", "fsaverage5", "fsaverage6", "fsLR".}
 \value{
 Character string indicating the coordinate space:
   \itemize{
-    \item \code{"MNI305"} for fsaverage variants (fsaverage, fsaverage5, fsaverage6)
+    \item \code{"MNI305"} for fsaverage variants (fsaverage, fsaverage5,
+fsaverage6)
     \item \code{"MNI152"} for fsLR (HCP template)
     \item \code{"Unknown"} for unrecognized templates
   }
@@ -31,9 +32,9 @@ The HCP's fsLR template was designed to align with MNI152 space, so no
 transform is needed when working with MNI152 volumetric data.
 }
 \examples{
-get_surface_coordinate_space("fsaverage")   # "MNI305"
-get_surface_coordinate_space("fsaverage6")  # "MNI305"
-get_surface_coordinate_space("fsLR")        # "MNI152"
+get_surface_coordinate_space("fsaverage") # "MNI305"
+get_surface_coordinate_space("fsaverage6") # "MNI305"
+get_surface_coordinate_space("fsLR") # "MNI152"
 
 }
 \seealso{

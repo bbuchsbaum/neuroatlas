@@ -38,8 +38,9 @@ adjustment.}
 cross-network conflicts.}
 
 \item{pair_col}{Optional column identifying homologous L/R ROI pairs. When
-supplied, colours are first assigned to the homolog pair and then nudged per
-hemisphere.}
+  supplied, colours are first assigned to the homolog pair and then nudged
+per
+  hemisphere.}
 
 \item{k}{Number of nearest neighbours to evaluate when forming edges.}
 

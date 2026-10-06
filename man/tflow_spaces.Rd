@@ -8,7 +8,8 @@ tflow_spaces(pattern = NULL, api_handle = NULL, ...)
 }
 \arguments{
 \item{pattern}{(Optional) A character string containing a regular expression
-to filter the template space names. If `NULL` (default), all names are returned.}
+  to filter the template space names. If `NULL` (default), all names are
+returned.}
 
 \item{api_handle}{Deprecated and ignored.}
 
@@ -19,14 +20,15 @@ to filter the template space names. If `NULL` (default), all names are returned.
 A character vector of available template space names.
 }
 \description{
-Retrieves a list of all available template space identifiers from the TemplateFlow archive.
+Retrieves a list of all available template space identifiers from the
+TemplateFlow archive.
 }
 \examples{
 \donttest{
-  # List all template spaces
-  # all_spaces <- tflow_spaces()
+# List all template spaces
+# all_spaces <- tflow_spaces()
 
-  # List template spaces containing "MNI"
-  # mni_spaces <- tflow_spaces(pattern = "MNI")
+# List template spaces containing "MNI"
+# mni_spaces <- tflow_spaces(pattern = "MNI")
 }
 }

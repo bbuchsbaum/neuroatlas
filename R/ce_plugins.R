@@ -5,6 +5,9 @@
 #'
 #' @param x A vector.
 #' @return A character scalar.
+#' @examples
+#' infer_design_var_type(c(0.1, 0.2, 0.3))
+#' infer_design_var_type(c("control", "patient"))
 #' @export
 infer_design_var_type <- function(x) {
   if (inherits(x, "Date") || inherits(x, "POSIXt")) {
@@ -20,23 +23,35 @@ infer_design_var_type <- function(x) {
 }
 
 .as_analysis_plugin <- function(x, fallback_id = "plugin") {
-  if (is.null(x)) return(NULL)
+  if (is.null(x)) {
+    return(NULL)
+  }
 
   if (is.function(x)) {
-    return(list(
-      id = fallback_id,
-      label = fallback_id,
-      run = x,
-      param_defs = list()
-    ))
+    return(
+      list(
+        id = fallback_id,
+        label = fallback_id,
+        run = x,
+        param_defs = list()
+      )
+    )
   }
 
   if (is.list(x)) {
     if (!is.function(x$run)) {
-      stop("Analysis plugin must define a callable '$run' function.",
-           call. = FALSE)
+      stop(
+        "Analysis plugin must define a callable '$run' function.",
+        call. = FALSE
+      )
     }
-    id <- if (!is.null(x$id) && nzchar(x$id)) as.character(x$id) else fallback_id
+    id <- if (!is.null(x$id) && nzchar(x$id)) {
+      as.character(
+        x$id
+      )
+    } else {
+      fallback_id
+    }
     label <- if (!is.null(x$label) && nzchar(x$label)) {
       as.character(x$label)
     } else {
@@ -44,20 +59,26 @@ infer_design_var_type <- function(x) {
     }
     defs <- x$param_defs
     if (is.null(defs)) defs <- list()
-    return(list(
-      id = id,
-      label = label,
-      run = x$run,
-      param_defs = defs
-    ))
+    return(
+      list(
+        id = id,
+        label = label,
+        run = x$run,
+        param_defs = defs
+      )
+    )
   }
 
-  stop("Analysis plugins must be functions or lists with fields id/label/run.",
-       call. = FALSE)
+  stop(
+    "Analysis plugins must be functions or lists with fields id/label/run.",
+    call. = FALSE
+  )
 }
 
-.normalize_analysis_plugins <- function(analysis_plugins = NULL,
-                                        default_plugin = "none") {
+.normalize_analysis_plugins <- function(
+  analysis_plugins = NULL,
+  default_plugin = "none"
+) {
   none_plugin <- list(
     id = "none",
     label = "None (raw signal)",
@@ -74,7 +95,9 @@ infer_design_var_type <- function(x) {
     }
     nm <- names(analysis_plugins)
     for (i in seq_along(analysis_plugins)) {
-      fallback_id <- if (!is.null(nm) && nzchar(nm[i])) nm[i] else {
+      fallback_id <- if (!is.null(nm) && nzchar(nm[i])) {
+        nm[i]
+      } else {
         paste0("plugin", i)
       }
       p <- .as_analysis_plugin(analysis_plugins[[i]], fallback_id = fallback_id)
@@ -86,8 +109,10 @@ infer_design_var_type <- function(x) {
     default_plugin <- "none"
   }
 
-  plugs <- c(plugs[setdiff(names(plugs), default_plugin)],
-             plugs[default_plugin])
+  plugs <- c(
+    plugs[setdiff(names(plugs), default_plugin)],
+    plugs[default_plugin]
+  )
   plugs[c(default_plugin, setdiff(names(plugs), default_plugin))]
 }
 
@@ -99,78 +124,113 @@ infer_design_var_type <- function(x) {
     return(shiny::tags$div(class = "ce-help", "No plugin parameters."))
   }
 
-  controls <- lapply(defs, function(def) {
-    type <- if (!is.null(def$type)) as.character(def$type) else "numeric"
-    name <- as.character(def$name)
-    label <- if (!is.null(def$label)) as.character(def$label) else name
-    if (!is.null(def$help) && nzchar(as.character(def$help))) {
-      label <- .ce_label_with_help(label, as.character(def$help))
-    }
-    input_id <- paste0("analysis_param_", name)
-    value <- def$default
+  controls <- lapply(
+    defs,
+    function(def) {
+      type <- if (!is.null(def$type)) as.character(def$type) else "numeric"
+      name <- as.character(def$name)
+      label <- if (!is.null(def$label)) as.character(def$label) else name
+      if (!is.null(def$help) && nzchar(as.character(def$help))) {
+        label <- .ce_label_with_help(label, as.character(def$help))
+      }
+      input_id <- paste0("analysis_param_", name)
+      value <- def$default
 
-    switch(
-      type,
-      numeric = shiny::numericInput(
-        input_id, label, value = as.numeric(val_or(value, 0)),
-        min = if (!is.null(def$min)) as.numeric(def$min) else NA_real_,
-        max = if (!is.null(def$max)) as.numeric(def$max) else NA_real_,
-        step = if (!is.null(def$step)) as.numeric(def$step) else NA_real_
-      ),
-      integer = shiny::numericInput(
-        input_id, label, value = as.integer(val_or(value, 0L)),
-        min = if (!is.null(def$min)) as.integer(def$min) else NA_integer_,
-        max = if (!is.null(def$max)) as.integer(def$max) else NA_integer_,
-        step = if (!is.null(def$step)) as.integer(def$step) else 1L
-      ),
-      logical = shiny::checkboxInput(
-        input_id, label, value = isTRUE(value)
-      ),
-      text = shiny::textInput(
-        input_id, label, value = as.character(val_or(value, ""))
-      ),
-      select = shiny::selectInput(
-        input_id, label,
-        choices = val_or(def$choices, character(0)),
-        selected = value
-      ),
-      shiny::textInput(
-        input_id, label, value = as.character(val_or(value, ""))
+      switch(type,
+        numeric = shiny::numericInput(
+          input_id,
+          label,
+          value = as.numeric(val_or(value, 0)),
+          min = if (!is.null(def$min)) as.numeric(def$min) else NA_real_,
+          max = if (!is.null(def$max)) as.numeric(def$max) else NA_real_,
+          step = if (!is.null(def$step)) as.numeric(def$step) else NA_real_
+        ),
+        integer = shiny::numericInput(
+          input_id,
+          label,
+          value = as.integer(val_or(value, 0L)),
+          min = if (!is.null(def$min)) as.integer(def$min) else NA_integer_,
+          max = if (!is.null(def$max)) as.integer(def$max) else NA_integer_,
+          step = if (!is.null(def$step)) as.integer(def$step) else 1L
+        ),
+        logical = shiny::checkboxInput(
+          input_id,
+          label,
+          value = isTRUE(value)
+        ),
+        text = shiny::textInput(
+          input_id,
+          label,
+          value = as.character(val_or(value, ""))
+        ),
+        select = shiny::selectInput(
+          input_id,
+          label,
+          choices = val_or(def$choices, character(0)),
+          selected = value
+        ),
+        shiny::textInput(
+          input_id,
+          label,
+          value = as.character(val_or(value, ""))
+        )
       )
-    )
-  })
+    }
+  )
 
   shiny::tagList(controls)
 }
 
 .collect_analysis_params <- function(input, plugin) {
   defs <- plugin$param_defs
-  if (length(defs) == 0) return(list())
+  if (length(defs) == 0) {
+    return(list())
+  }
 
-  params <- lapply(defs, function(def) {
-    input_id <- paste0("analysis_param_", as.character(def$name))
-    val <- input[[input_id]]
-    if (is.null(val) && !is.null(def$default)) {
-      val <- def$default
+  params <- lapply(
+    defs,
+    function(def) {
+      input_id <- paste0("analysis_param_", as.character(def$name))
+      val <- input[[input_id]]
+      if (is.null(val) && !is.null(def$default)) {
+        val <- def$default
+      }
+      val
     }
-    val
-  })
-  names(params) <- vapply(defs, function(def) as.character(def$name), character(1))
+  )
+  names(params) <- vapply(
+    defs,
+    function(def) as.character(def$name),
+    character(1)
+  )
   params
 }
 
-.run_analysis_plugin <- function(plugin,
-                                 ts_data,
-                                 design,
-                                 params = list(),
-                                 context = list()) {
+.run_analysis_plugin <- function(
+  plugin,
+  ts_data,
+  design,
+  params = list(),
+  context = list()
+) {
   if (nrow(ts_data) == 0 || is.null(plugin) || identical(plugin$id, "none")) {
-    return(list(data = ts_data, design = design, diagnostics = NULL, meta = list()))
+    return(
+      list(
+        data = ts_data,
+        design = design,
+        diagnostics = NULL,
+        meta = list()
+      )
+    )
   }
 
   raw <- tryCatch(
-    plugin$run(ts_data = ts_data, design = design, params = params,
-               context = context),
+    plugin$run(
+      ts_data = ts_data,
+      design = design,
+      params = params,
+      context = context
+    ),
     error = function(e) {
       list(
         data = ts_data,
@@ -186,20 +246,26 @@ infer_design_var_type <- function(x) {
   )
 
   if (is.data.frame(raw)) {
-    raw <- list(data = tibble::as_tibble(raw), design = design,
-                diagnostics = NULL, meta = list(plugin_id = plugin$id))
+    raw <- list(
+      data = tibble::as_tibble(raw),
+      design = design,
+      diagnostics = NULL,
+      meta = list(plugin_id = plugin$id)
+    )
   }
 
   if (!is.list(raw)) {
-    return(list(
-      data = ts_data,
-      design = design,
-      diagnostics = list(
-        status = "error",
-        reason = "Plugin returned unsupported output type."
-      ),
-      meta = list(plugin_id = plugin$id, failed = TRUE)
-    ))
+    return(
+      list(
+        data = ts_data,
+        design = design,
+        diagnostics = list(
+          status = "error",
+          reason = "Plugin returned unsupported output type."
+        ),
+        meta = list(plugin_id = plugin$id, failed = TRUE)
+      )
+    )
   }
 
   if (is.null(raw$data) || !is.data.frame(raw$data)) {

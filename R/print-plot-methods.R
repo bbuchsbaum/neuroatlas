@@ -71,8 +71,12 @@ print.schaefer <- function(x, ...) {
 #'   Any combination of \code{"lateral"}, \code{"medial"}, \code{"dorsal"},
 #'   \code{"ventral"}. Default: \code{c("lateral", "medial")}.
 #' @export
-plot.surfatlas <- function(x, y, vals = NULL,
-                           views = c("lateral", "medial"),
-                           ...) {
+plot.surfatlas <- function(
+  x,
+  y,
+  vals = NULL,
+  views = c("lateral", "medial"),
+  ...
+) {
   plot_brain(x, vals = vals, views = views, ...)
 }

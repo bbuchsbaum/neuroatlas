@@ -11,7 +11,8 @@ tflow_files(space, query_args = list(), api_handle = NULL)
 space (e.g., "MNI152NLin2009cAsym").}
 
 \item{query_args}{(Optional) A named list of additional query parameters to
-filter the results (e.g., `list(suffix = "T1w", resolution = 1, desc = "brain")`).}
+  filter the results (e.g., `list(suffix = "T1w", resolution = 1, desc =
+"brain")`).}
 
 \item{api_handle}{Deprecated and ignored.}
 }
@@ -25,8 +26,8 @@ space and other optional metadata query parameters.
 }
 \examples{
 \donttest{
-  # List all T1w files for MNI152NLin2009cAsym template
-  # mni_t1w_files <- tflow_files("MNI152NLin2009cAsym",
-  #                              query_args = list(suffix = "T1w"))
+# List all T1w files for MNI152NLin2009cAsym template
+# mni_t1w_files <- tflow_files("MNI152NLin2009cAsym",
+#                              query_args = list(suffix = "T1w"))
 }
 }

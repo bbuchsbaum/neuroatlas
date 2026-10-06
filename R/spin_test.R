@@ -7,13 +7,16 @@
 #' randomly rotated and reassigned to the nearest original centroid, generating
 #' a null distribution of correlations.
 #'
-#' @param map1 Numeric vector of parcel values (length K, aligned to atlas parcels).
-#' @param map2 Numeric vector of parcel values (length K, aligned to atlas parcels).
+#' @param map1 Numeric vector of parcel values (length K, aligned to atlas
+#'   parcels).
+#' @param map2 Numeric vector of parcel values (length K, aligned to atlas
+#'   parcels).
 #' @param atlas A surface atlas object (class \code{"surfatlas"}) with
 #'   \code{lh_atlas} and \code{rh_atlas} fields, or any atlas whose geometry
 #'   can provide sphere coordinates.
 #' @param n_perm Integer. Number of spin permutations. Default: 1000.
-#' @param cor_method Character. Correlation method passed to \code{\link[stats]{cor}}.
+#' @param cor_method Character. Correlation method passed to
+#'   \code{\link[stats]{cor}}.
 #'   One of \code{"pearson"}, \code{"spearman"}, or \code{"kendall"}.
 #'   Default: \code{"pearson"}.
 #' @param sphere Optional list with elements \code{lh} and \code{rh}, each an
@@ -24,7 +27,8 @@
 #'
 #' @return A list of class \code{"spin_test"} with:
 #' \describe{
-#'   \item{observed}{The observed correlation between \code{map1} and \code{map2}.}
+#'   \item{observed}{The observed correlation between \code{map1} and
+#' \code{map2}.}
 #'   \item{null_distribution}{Numeric vector of length \code{n_perm} containing
 #'     null correlations.}
 #'   \item{p_value}{Two-sided p-value: proportion of null correlations with
@@ -58,17 +62,20 @@
 #' K <- length(atlas$ids)
 #' map1 <- rnorm(K)
 #' map2 <- map1 + rnorm(K, sd = 0.5)
-#' res  <- spin_test(map1, map2, atlas, n_perm = 500, seed = 42)
+#' res <- spin_test(map1, map2, atlas, n_perm = 500, seed = 42)
 #' print(res)
 #' }
 #'
 #' @export
-spin_test <- function(map1, map2, atlas,
-                      n_perm = 1000L,
-                      cor_method = c("pearson", "spearman", "kendall"),
-                      sphere = NULL,
-                      seed = NULL) {
-
+spin_test <- function(
+  map1,
+  map2,
+  atlas,
+  n_perm = 1000L,
+  cor_method = c("pearson", "spearman", "kendall"),
+  sphere = NULL,
+  seed = NULL
+) {
   cor_method <- match.arg(cor_method)
   n_perm <- as.integer(n_perm)
 
@@ -142,8 +149,10 @@ print.spin_test <- function(x, ...) {
 #' @noRd
 .get_atlas_sphere <- function(atlas) {
   if (!inherits(atlas, "surfatlas")) {
-    stop("Automatic sphere lookup requires a 'surfatlas' object. ",
-         "Provide 'sphere' explicitly for other atlas types.")
+    stop(
+      "Automatic sphere lookup requires a 'surfatlas' object. ",
+      "Provide 'sphere' explicitly for other atlas types."
+    )
   }
 
   # Determine the template_id and density/resolution from atlas metadata
@@ -191,8 +200,20 @@ print.spin_test <- function(x, ...) {
   }
 
   # Extract per-vertex labels for each hemisphere
-  lh_labels <- if (!is.null(atlas$lh_atlas)) as.integer(atlas$lh_atlas@data) else integer(0)
-  rh_labels <- if (!is.null(atlas$rh_atlas)) as.integer(atlas$rh_atlas@data) else integer(0)
+  lh_labels <- if (!is.null(atlas$lh_atlas)) {
+    as.integer(
+      atlas$lh_atlas@data
+    )
+  } else {
+    integer(0)
+  }
+  rh_labels <- if (!is.null(atlas$rh_atlas)) {
+    as.integer(
+      atlas$rh_atlas@data
+    )
+  } else {
+    integer(0)
+  }
 
   # Combine coordinates and labels
   all_coords <- rbind(sphere$lh, sphere$rh)

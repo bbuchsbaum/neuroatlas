@@ -30,7 +30,8 @@ anterior-posterior subdivisions.
 }
 \details{
 This function extracts hippocampal regions from the full MTL atlas and can
-subdivide them into anterior-posterior segments. The resulting atlas maintains
+subdivide them into anterior-posterior segments. The resulting atlas
+maintains
 bilateral organization and can be used for targeted hippocampal analyses.
 }
 \examples{

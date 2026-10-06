@@ -7,7 +7,8 @@
 find_atlas_spec(name)
 }
 \arguments{
-\item{name}{Character scalar; an id or alias, matched case/underscore-insensitively.}
+\item{name}{Character scalar; an id or alias, matched
+case/underscore-insensitively.}
 }
 \value{
 The matching `atlas_spec` list.

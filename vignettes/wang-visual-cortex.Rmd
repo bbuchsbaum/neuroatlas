@@ -28,11 +28,11 @@ if (requireNamespace("ragg", quietly = TRUE)) {
   knitr::opts_chunk$set(dev = "ragg_png")
 }
 if (requireNamespace("systemfonts", quietly = TRUE) &&
-    requireNamespace("albersdown", quietly = TRUE)) {
+      requireNamespace("albersdown", quietly = TRUE)) {
   albersdown::albers_register_fonts()
 }
 if (requireNamespace("ggplot2", quietly = TRUE) &&
-    requireNamespace("albersdown", quietly = TRUE)) {
+      requireNamespace("albersdown", quietly = TRUE)) {
   ggplot2::theme_set(
     albersdown::theme_albers(
       family = params$family,
@@ -54,7 +54,7 @@ cat(sprintf(
     '<script>document.addEventListener("DOMContentLoaded",function(){',
     'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");',
     'document.body.classList.add("palette-%s","preset-%s");',
-    '});</script>'
+    "});</script>"
   ),
   params$family,
   params$preset

@@ -33,37 +33,50 @@ get_surface_template(
 )
 }
 \arguments{
-\item{space}{Character string. The primary TemplateFlow identifier for the template space
-(e.g., \code{"MNI152NLin2009cAsym"}). Default: \code{"MNI152NLin2009cAsym"}.}
+\item{space}{Character string. The primary TemplateFlow identifier for the
+  template space
+  (e.g., \code{"MNI152NLin2009cAsym"}). Default:
+\code{"MNI152NLin2009cAsym"}.}
 
-\item{variant}{Character string. A high-level descriptor for common template types.
-Supported: \code{"brain"} (default), \code{"head"}, \code{"mask"}, \code{"probseg"}, \code{"dseg"}.
-This is used to infer \code{desc} and sometimes \code{suffix} if they are not explicitly provided.}
+\item{variant}{Character string. A high-level descriptor for common template
+  types.
+  Supported: \code{"brain"} (default), \code{"head"}, \code{"mask"},
+\code{"probseg"}, \code{"dseg"}.
+  This is used to infer \code{desc} and sometimes \code{suffix} if they are
+not explicitly provided.}
 
-\item{modality}{Character string. The imaging modality or primary suffix for the template file.
+\item{modality}{Character string. The imaging modality or primary suffix for
+the template file.
 Supported: \code{"T1w"} (default), \code{"T2w"}, \code{"mask"}.
 This is used to infer \code{suffix} if not explicitly provided.}
 
-\item{resolution}{(Optional) Character string specifying the resolution, primarily for
-fsaverage variants (e.g., "06" for fsaverage6).}
+\item{resolution}{(Optional) Character string specifying the resolution,
+primarily for
+     fsaverage variants (e.g., "06" for fsaverage6).}
 
 \item{cohort}{Character string. Optional cohort identifier.}
 
-\item{desc}{Character string. Specific TemplateFlow \code{desc} field. Defaults to \code{"brain"}.}
+\item{desc}{Character string. Specific TemplateFlow \code{desc} field.
+Defaults to \code{"brain"}.}
 
-\item{label}{Character string. Specific TemplateFlow \code{label} field (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"}).}
+\item{label}{Character string. Specific TemplateFlow \code{label} field
+(e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"}).}
 
-\item{atlas}{Character string. Specific TemplateFlow \code{atlas} field (e.g., \code{"Schaefer2018"}).}
+\item{atlas}{Character string. Specific TemplateFlow \code{atlas} field
+(e.g., \code{"Schaefer2018"}).}
 
-\item{suffix}{Character string. Specific TemplateFlow \code{suffix} field. Overrides
+\item{suffix}{Character string. Specific TemplateFlow \code{suffix} field.
+Overrides
 any \code{suffix} inferred from \code{modality} or \code{variant}.}
 
-\item{extension}{Character string. The file extension. Default: \code{".nii.gz"}.}
+\item{extension}{Character string. The file extension. Default:
+\code{".nii.gz"}.}
 
 \item{path_only}{Logical. If \code{TRUE}, returns the file path as a string
 instead of loading as a \code{NeuroVol}. Default: \code{FALSE}.}
 
-\item{use_cache}{Logical. If \code{TRUE} (default), uses memoised NeuroVol loading.}
+\item{use_cache}{Logical. If \code{TRUE} (default), uses memoised NeuroVol
+loading.}
 
 \item{api_handle}{Deprecated and ignored. Kept for backward compatibility.}
 
@@ -71,25 +84,32 @@ instead of loading as a \code{NeuroVol}. Default: \code{FALSE}.}
 (e.g., \code{hemi}, \code{density}).}
 
 \item{template_id}{The main TemplateFlow template identifier for the surface
-(e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to `get_template`.}
+       (e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to
+`get_template`.}
 
-\item{surface_type}{A character string indicating the type of surface to retrieve.
-Common values include: "pial", "white", "inflated", "midthickness", "sphere".
-This is passed as the `suffix` argument to `get_template`.}
+\item{surface_type}{A character string indicating the type of surface to
+  retrieve.
+       Common values include: "pial", "white", "inflated", "midthickness",
+"sphere".
+       This is passed as the `suffix` argument to `get_template`.}
 
-\item{hemi}{Character string, "L" for left hemisphere or "R" for right hemisphere.
-Passed as `hemi` to `get_template`.}
+\item{hemi}{Character string, "L" for left hemisphere or "R" for right
+hemisphere.
+     Passed as `hemi` to `get_template`.}
 
 \item{density}{(Optional) Character string specifying the surface density
-(e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to TemplateFlow
-as `density`.}
+       (e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to
+TemplateFlow
+       as `density`.}
 
 \item{load_as_path}{Logical, whether to return only the path to the file.
 Defaults to `TRUE`.}
 }
 \value{
-If any of \code{space}, \code{variant}, \code{modality}, \code{resolution},
-  or \code{label} are vectors of length > 1, a named list of results is returned.
+If any of \code{space}, \code{variant}, \code{modality},
+  \code{resolution},
+  or \code{label} are vectors of length > 1, a named list of results is
+returned.
   Otherwise a single \code{neuroim2::NeuroVol} or file path string.
 
 If `load_as_path` is `TRUE`, a character string (path).
@@ -112,19 +132,21 @@ Caching behaviour:
 }
 \examples{
 \dontrun{
-  # Get default MNI T1w brain template
-  mni_brain <- get_template()
+# Get default MNI T1w brain template
+mni_brain <- get_template()
 
-  # Vectorized: Get MNI brain and mask variants
-  mni_variants <- get_template(variant = c("brain", "mask"))
+# Vectorized: Get MNI brain and mask variants
+mni_variants <- get_template(variant = c("brain", "mask"))
 
-  # Path only
-  path <- get_template(path_only = TRUE)
+# Path only
+path <- get_template(path_only = TRUE)
 }
 \donttest{
-  # Get the pial surface for the left hemisphere of fsLR 32k template (as path)
-  # fslr_pial_L_path <- get_surface_template(template_id = "fsLR", surface_type = "pial",
-  #                                        hemi = "L", density = "32k")
-  # print(fslr_pial_L_path)
+# Get the pial surface for the left hemisphere of fsLR 32k template (as path)
+# fslr_pial_L_path <- get_surface_template(
+#   template_id = "fsLR", surface_type = "pial",
+#   hemi = "L", density = "32k"
+# )
+# print(fslr_pial_L_path)
 }
 }

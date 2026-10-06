@@ -42,14 +42,16 @@ NULL
 #'
 #' @return Invisibly, the spec list.
 #' @keywords internal
-register_atlas <- function(id,
-                           label,
-                           family,
-                           loader,
-                           default_space = NA_character_,
-                           representation = c("volume", "surface", "derived"),
-                           aliases = character(),
-                           description = NA_character_) {
+register_atlas <- function(
+  id,
+  label,
+  family,
+  loader,
+  default_space = NA_character_,
+  representation = c("volume", "surface", "derived"),
+  aliases = character(),
+  description = NA_character_
+) {
   representation <- match.arg(representation)
   if (!is.character(id) || length(id) != 1L || !nzchar(id)) {
     cli::cli_abort(
@@ -102,14 +104,16 @@ register_atlas <- function(id,
 list_atlases <- function() {
   ids <- ls(.neuroatlas_atlas_registry)
   if (length(ids) == 0L) {
-    return(tibble::tibble(
-      id = character(),
-      label = character(),
-      family = character(),
-      representation = character(),
-      default_space = character(),
-      aliases = character()
-    ))
+    return(
+      tibble::tibble(
+        id = character(),
+        label = character(),
+        family = character(),
+        representation = character(),
+        default_space = character(),
+        aliases = character()
+      )
+    )
   }
 
   specs <- lapply(ids, function(i) get(i, envir = .neuroatlas_atlas_registry))
@@ -119,15 +123,19 @@ list_atlases <- function() {
     family = vapply(specs, `[[`, character(1), "family"),
     representation = vapply(specs, `[[`, character(1), "representation"),
     default_space = vapply(specs, `[[`, character(1), "default_space"),
-    aliases = vapply(specs, function(s) paste(s$aliases, collapse = ","),
-                     character(1))
+    aliases = vapply(
+      specs,
+      function(s) paste(s$aliases, collapse = ","),
+      character(1)
+    )
   )
 }
 
 
 #' Look Up an Atlas Spec by ID or Alias
 #'
-#' @param name Character scalar; an id or alias, matched case/underscore-insensitively.
+#' @param name Character scalar; an id or alias, matched
+#'   case/underscore-insensitively.
 #'
 #' @return The matching `atlas_spec` list.
 #' @keywords internal
@@ -151,7 +159,8 @@ find_atlas_spec <- function(name) {
     }
   }
 
-  available <- if (length(ids) > 0L) {
+  # cli interpolates the available IDs from this environment.
+  available <- if (length(ids) > 0L) { # nolint: object_usage_linter.
     paste(ids, collapse = ", ")
   } else {
     "<none registered>"

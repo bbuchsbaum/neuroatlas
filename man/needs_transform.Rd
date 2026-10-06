@@ -23,12 +23,12 @@ when working with a surface template and volumetric data in a given space.
 }
 \examples{
 # fsaverage + MNI152 volume: transform needed
-needs_transform("fsaverage", "MNI152")  # TRUE
+needs_transform("fsaverage", "MNI152") # TRUE
 
 # fsLR + MNI152 volume: no transform needed
-needs_transform("fsLR", "MNI152")  # FALSE
+needs_transform("fsLR", "MNI152") # FALSE
 
 # fsaverage + MNI305 volume: no transform needed
-needs_transform("fsaverage", "MNI305")  # FALSE
+needs_transform("fsaverage", "MNI305") # FALSE
 
 }

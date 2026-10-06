@@ -13,7 +13,8 @@ NULL
 #' hemisphere and view. Results are memoised so repeated calls with
 #' identical arguments return cached data.
 #'
-#' @param surfatlas A surfatlas object (e.g. from \code{\link{schaefer_surf}()}).
+#' @param surfatlas A surfatlas object (e.g. from
+#'   \code{\link{schaefer_surf}()}).
 #' @param views Character vector of views to render
 #'   (e.g. \code{c("lateral", "medial")}).
 #' @param surface Character: surface type (\code{"inflated"}, \code{"pial"},
@@ -29,10 +30,22 @@ NULL
 #'     \item{\code{boundaries}}{Tibble of boundary edges with columns
 #'       \code{x, y, xend, yend, panel}.}
 #'   }
+#' @examples
+#' \dontrun{
+#' atlas <- get_schaefer_surfatlas(100)
+#' polygons <- build_brain_polygon_data(atlas,
+#'   views = "lateral",
+#'   surface = "inflated"
+#' )
+#' }
 #' @export
-build_brain_polygon_data <- function(surfatlas, views, surface,
-                                     projection_smooth = 0L,
-                                     depth_cull = TRUE) {
+build_brain_polygon_data <- function(
+  surfatlas,
+  views,
+  surface,
+  projection_smooth = 0L,
+  depth_cull = TRUE
+) {
   .build_merged_polygon_data_memo(
     surfatlas = surfatlas,
     views = views,

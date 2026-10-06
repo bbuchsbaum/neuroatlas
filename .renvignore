@@ -1,0 +1,10 @@
+# Downloaded libraries and caches are local build inputs, not project source.
+data-raw/surface-transforms-v1/work/
+data-raw/transform-artifacts-v1/work/
+# Frozen receipts retain the historical environment and example code verbatim.
+data-raw/surface-transforms-v1/qualification/
+data-raw/transform-artifacts-v1/qualification/
+# Generated sites and dependency bootstrap copies are checked at their source.
+docs/
+renv/
+packrat/

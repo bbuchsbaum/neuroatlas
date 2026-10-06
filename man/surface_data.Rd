@@ -13,7 +13,8 @@ surface_data(
 }
 \arguments{
 \item{values}{Numeric vertex vector or vertex-by-map matrix, or a metric or
-label GIFTI filename. `NA` values represent missing data; infinity is rejected.}
+  label GIFTI filename. `NA` values represent missing data; infinity is
+rejected.}
 
 \item{domain}{A `SurfaceDomain` descriptor.}
 
@@ -25,10 +26,21 @@ optional names/colors. Required when importing label GIFTI; read from the
 file when omitted. Every finite input key must appear in the table.}
 }
 \value{
-`SurfaceData`, preserving values, domain, label table and input identity.
+`SurfaceData`, preserving values, domain, label table and input
+  identity.
 }
 \description{
 Explicitly declaring the domain binds the caller's vertex ordering. GIFTI
 hemisphere metadata, when present, must agree. A GIFTI file alone cannot
 establish topology or vertex order; the caller must know its domain.
+}
+\examples{
+sphere <- diag(3)
+faces <- matrix(c(0L, 1L, 2L), nrow = 1)
+cortex <- rep(TRUE, 3)
+domain <- surface_domain(
+  "toy", "L", "3v", sphere, faces, cortex,
+  "analytic", "v1"
+)
+surface_data(c(0, 0.25, 0.5), domain)
 }

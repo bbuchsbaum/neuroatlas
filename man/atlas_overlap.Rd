@@ -7,9 +7,11 @@
 atlas_overlap(atlas1, atlas2, metrics = c("dice", "jaccard"), min_overlap = 0)
 }
 \arguments{
-\item{atlas1}{An atlas object (with \code{$atlas}, \code{$ids}, \code{$labels}).}
+\item{atlas1}{An atlas object (with \code{$atlas}, \code{$ids},
+\code{$labels}).}
 
-\item{atlas2}{An atlas object (with \code{$atlas}, \code{$ids}, \code{$labels}).}
+\item{atlas2}{An atlas object (with \code{$atlas}, \code{$ids},
+\code{$labels}).}
 
 \item{metrics}{Character vector of overlap metrics to compute. One or more of
 \code{"dice"} and \code{"jaccard"}. Default is both.}

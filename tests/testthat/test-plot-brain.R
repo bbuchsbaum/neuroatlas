@@ -1,366 +1,612 @@
-test_that(".face_normals computes correct normals", {
-  # Simple triangle in the xy-plane: vertices at (0,0,0), (1,0,0), (0,1,0)
-  verts <- matrix(c(0, 0, 0,
-                     1, 0, 0,
-                     0, 1, 0), nrow = 3, byrow = TRUE)
-  faces <- matrix(c(1, 2, 3), nrow = 1)
+test_that(
+  ".face_normals computes correct normals",
+  {
+    # Simple triangle in the xy-plane: vertices at (0,0,0), (1,0,0), (0,1,0)
+    verts <- matrix(
+      c(
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ),
+      nrow = 3,
+      byrow = TRUE
+    )
+    faces <- matrix(c(1, 2, 3), nrow = 1)
 
-  normals <- neuroatlas:::.face_normals(verts, faces)
+    normals <- neuroatlas:::.face_normals(verts, faces)
 
-  expect_equal(nrow(normals), 1)
-  expect_equal(ncol(normals), 3)
-  # Normal should point in the +z direction
-  expect_equal(normals[1, 3], 1, tolerance = 1e-10)
-  expect_equal(normals[1, 1], 0, tolerance = 1e-10)
-  expect_equal(normals[1, 2], 0, tolerance = 1e-10)
-})
+    expect_equal(nrow(normals), 1)
+    expect_equal(ncol(normals), 3)
+    # Normal should point in the +z direction
+    expect_equal(normals[1, 3], 1, tolerance = 1e-10)
+    expect_equal(normals[1, 1], 0, tolerance = 1e-10)
+    expect_equal(normals[1, 2], 0, tolerance = 1e-10)
+  }
+)
 
-test_that("project_surface_view validates and projects vertices", {
-  verts <- matrix(c(
-    -1, 0, 0,
-    -1, 1, 0,
-    -1, 0, 1
-  ), ncol = 3, byrow = TRUE)
+test_that(
+  "project_surface_view validates and projects vertices",
+  {
+    verts <- matrix(
+      c(
+        -1,
+        0,
+        0,
+        -1,
+        1,
+        0,
+        -1,
+        0,
+        1
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
 
-  proj <- project_surface_view(verts, view = "lateral", hemi = "left")
-  expect_true(is.list(proj))
-  expect_true(all(c("xy", "view_dir") %in% names(proj)))
-  expect_equal(dim(proj$xy), c(3, 2))
-  expect_equal(length(proj$view_dir), 3)
-})
+    proj <- project_surface_view(verts, view = "lateral", hemi = "left")
+    expect_true(is.list(proj))
+    expect_true(all(c("xy", "view_dir") %in% names(proj)))
+    expect_equal(dim(proj$xy), c(3, 2))
+    expect_equal(length(proj$view_dir), 3)
+  }
+)
 
-test_that("build_surface_polygon_data rejects non-surfatlas input", {
-  fake <- list(name = "fake")
-  class(fake) <- "atlas"
-  expect_error(build_surface_polygon_data(fake), "surfatlas")
-})
+test_that(
+  "build_surface_polygon_data rejects non-surfatlas input",
+  {
+    fake <- list(name = "fake")
+    class(fake) <- "atlas"
+    expect_error(build_surface_polygon_data(fake), "surfatlas")
+  }
+)
 
-test_that(".face_normals handles multiple faces", {
-  verts <- matrix(c(0, 0, 0,
-                     1, 0, 0,
-                     0, 1, 0,
-                     0, 0, 1), nrow = 4, byrow = TRUE)
-  faces <- matrix(c(1, 2, 3,
-                     1, 2, 4), nrow = 2, byrow = TRUE)
+test_that(
+  ".face_normals handles multiple faces",
+  {
+    verts <- matrix(
+      c(
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1
+      ),
+      nrow = 4,
+      byrow = TRUE
+    )
+    faces <- matrix(
+      c(
+        1,
+        2,
+        3,
+        1,
+        2,
+        4
+      ),
+      nrow = 2,
+      byrow = TRUE
+    )
 
-  normals <- neuroatlas:::.face_normals(verts, faces)
+    normals <- neuroatlas:::.face_normals(verts, faces)
 
-  expect_equal(nrow(normals), 2)
-  # First face normal: +z
+    expect_equal(nrow(normals), 2)
+    # First face normal: +z
 
-  expect_equal(normals[1, 3], 1, tolerance = 1e-10)
-  # Second face normal: should be perpendicular to edge (1,0,0) and (0,0,1)
-  # Cross product of (1,0,0) x (0,0,1) = (0,-1,0), normalised = (0,-1,0)
-  expect_equal(abs(normals[2, 2]), 1, tolerance = 1e-10)
-})
+    expect_equal(normals[1, 3], 1, tolerance = 1e-10)
+    # Second face normal: should be perpendicular to edge (1,0,0) and (0,0,1)
+    # Cross product of (1,0,0) x (0,0,1) = (0,-1,0), normalised = (0,-1,0)
+    expect_equal(abs(normals[2, 2]), 1, tolerance = 1e-10)
+  }
+)
 
-test_that(".face_parcel_ids assigns by majority vote", {
-  parcel_ids <- c(1L, 1L, 2L, 2L, 3L)
-  faces <- matrix(c(1, 2, 3,   # parcels: 1, 1, 2 -> majority = 1
-                     3, 4, 5,   # parcels: 2, 2, 3 -> majority = 2
-                     1, 3, 5),  # parcels: 1, 2, 3 -> no majority, returns 1
-                  nrow = 3, byrow = TRUE)
+test_that(
+  ".face_parcel_ids assigns by majority vote",
+  {
+    parcel_ids <- c(1L, 1L, 2L, 2L, 3L)
+    faces <- matrix(
+      c(
+        1,
+        2,
+        3,
+        # parcels: 1, 1, 2 -> majority = 1
+        3,
+        4,
+        5,
+        # parcels: 2, 2, 3 -> majority = 2
+        1,
+        3,
+        5
+      ),
+      # parcels: 1, 2, 3 -> no majority, returns 1
+      nrow = 3,
+      byrow = TRUE
+    )
 
-  result <- neuroatlas:::.face_parcel_ids(parcel_ids, faces)
+    result <- neuroatlas:::.face_parcel_ids(parcel_ids, faces)
 
-  expect_equal(length(result), 3)
-  expect_equal(result[1], 1L)
-  expect_equal(result[2], 2L)
-  # For all-different case, the function returns p1 (first vertex)
-  expect_true(result[3] %in% c(1L, 2L, 3L))
-})
+    expect_equal(length(result), 3)
+    expect_equal(result[1], 1L)
+    expect_equal(result[2], 2L)
+    # For all-different case, the function returns p1 (first vertex)
+    expect_true(result[3] %in% c(1L, 2L, 3L))
+  }
+)
 
-test_that(".face_depth computes mean depth along a view direction", {
-  verts <- matrix(c(
-    0, 0, 1,
-    0, 0, 2,
-    0, 0, 3,
-    0, 0, 6,
-    0, 0, 7,
-    0, 0, 8
-  ), ncol = 3, byrow = TRUE)
-  faces <- matrix(c(
-    1L, 2L, 3L,
-    4L, 5L, 6L
-  ), ncol = 3, byrow = TRUE)
+test_that(
+  ".face_depth computes mean depth along a view direction",
+  {
+    verts <- matrix(
+      c(
+        0,
+        0,
+        1,
+        0,
+        0,
+        2,
+        0,
+        0,
+        3,
+        0,
+        0,
+        6,
+        0,
+        0,
+        7,
+        0,
+        0,
+        8
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
+    faces <- matrix(
+      c(
+        1L,
+        2L,
+        3L,
+        4L,
+        5L,
+        6L
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
 
-  depth <- neuroatlas:::.face_depth(verts, faces, c(0, 0, 1))
+    depth <- neuroatlas:::.face_depth(verts, faces, c(0, 0, 1))
 
-  expect_equal(depth, c(2, 7))
-})
+    expect_equal(depth, c(2, 7))
+  }
+)
 
-test_that(".depth_cull_faces removes far faces at the same projected location", {
-  faces <- matrix(c(
-    1L, 2L, 3L,
-    4L, 5L, 6L,
-    7L, 8L, 9L
-  ), ncol = 3, byrow = TRUE)
-  proj_xy <- matrix(c(
-    0, 0,
-    1, 0,
-    0, 1,
-    0, 0,
-    1, 0,
-    0, 1,
-    5, 5,
-    6, 5,
-    5, 6
-  ), ncol = 2, byrow = TRUE)
-  face_depth <- c(10, 1, 0)
+test_that(
+  ".depth_cull_faces removes far faces at the same projected location",
+  {
+    faces <- matrix(
+      c(
+        1L,
+        2L,
+        3L,
+        4L,
+        5L,
+        6L,
+        7L,
+        8L,
+        9L
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
+    proj_xy <- matrix(
+      c(
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        5,
+        5,
+        6,
+        5,
+        5,
+        6
+      ),
+      ncol = 2,
+      byrow = TRUE
+    )
+    face_depth <- c(10, 1, 0)
 
-  kept <- neuroatlas:::.depth_cull_faces(
-    faces,
-    proj_xy,
-    face_depth,
-    candidates = seq_len(nrow(faces)),
-    resolution = 32L,
-    tolerance = 0,
-    neighborhood = 0L
-  )
+    kept <- neuroatlas:::.depth_cull_faces(
+      faces,
+      proj_xy,
+      face_depth,
+      candidates = seq_len(nrow(faces)),
+      resolution = 32L,
+      tolerance = 0,
+      neighborhood = 0L
+    )
 
-  expect_equal(kept, c(1L, 3L))
-})
+    expect_equal(kept, c(1L, 3L))
+  }
+)
 
-test_that(".merge_parcel_polygons is robust to inconsistent face winding", {
-  # Square split into two triangles, with the second triangle deliberately
-  # reversed (inconsistent winding). Boundary detection should be
-  # orientation-invariant and still recover the outer square polygon.
-  proj_xy <- matrix(c(
-    0, 0,  # 1
-    1, 0,  # 2
-    1, 1,  # 3
-    0, 1   # 4
-  ), ncol = 2, byrow = TRUE)
+test_that(
+  ".merge_parcel_polygons is robust to inconsistent face winding",
+  {
+    # Square split into two triangles, with the second triangle deliberately
+    # reversed (inconsistent winding). Boundary detection should be
+    # orientation-invariant and still recover the outer square polygon.
+    proj_xy <- matrix(
+      c(
+        0,
+        0,
+        # 1
+        1,
+        0,
+        # 2
+        1,
+        1,
+        # 3
+        0,
+        1 # 4
+      ),
+      ncol = 2,
+      byrow = TRUE
+    )
 
-  vis_faces <- matrix(c(
-    1, 2, 3,
-    1, 4, 3
-  ), ncol = 3, byrow = TRUE)
+    vis_faces <- matrix(
+      c(
+        1,
+        2,
+        3,
+        1,
+        4,
+        3
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
 
-  vis_parcel <- c(1L, 1L)
-  id_to_label <- c("1" = "square")
+    vis_parcel <- c(1L, 1L)
+    id_to_label <- c("1" = "square")
 
-  poly <- neuroatlas:::.merge_parcel_polygons(
-    vis_faces,
-    vis_parcel,
-    proj_xy,
-    id_to_label
-  )
+    poly <- neuroatlas:::.merge_parcel_polygons(
+      vis_faces,
+      vis_parcel,
+      proj_xy,
+      id_to_label
+    )
 
-  expect_s3_class(poly, "tbl_df")
-  expect_true(all(c("x", "y", "poly_id", "parcel_id", "label") %in% names(poly)))
+    expect_s3_class(poly, "tbl_df")
+    expect_true(all(c("x", "y", "poly_id", "parcel_id", "label") %in% names(poly)))
 
-  expect_equal(length(unique(poly$poly_id)), 1L)
-  expect_equal(unique(poly$parcel_id), 1L)
+    expect_equal(length(unique(poly$poly_id)), 1L)
+    expect_equal(unique(poly$parcel_id), 1L)
 
-  got <- unique(paste0(poly$x, ",", poly$y))
-  expected <- paste0(proj_xy[, 1], ",", proj_xy[, 2])
-  expect_setequal(got, expected)
-})
+    got <- unique(paste0(poly$x, ",", poly$y))
+    expected <- paste0(proj_xy[, 1], ",", proj_xy[, 2])
+    expect_setequal(got, expected)
+  }
+)
 
-test_that(".compute_boundary_edges classifies silhouette and network boundaries", {
-  proj_xy <- matrix(c(
-    0, 0,  # 1
-    1, 0,  # 2
-    1, 1,  # 3
-    0, 1   # 4
-  ), ncol = 2, byrow = TRUE)
+test_that(
+  ".compute_boundary_edges classifies silhouette and network boundaries",
+  {
+    proj_xy <- matrix(
+      c(
+        0,
+        0,
+        # 1
+        1,
+        0,
+        # 2
+        1,
+        1,
+        # 3
+        0,
+        1 # 4
+      ),
+      ncol = 2,
+      byrow = TRUE
+    )
 
-  # Two triangles sharing the (1,3) diagonal
-  vis_faces <- matrix(c(
-    1, 2, 3,
-    1, 3, 4
-  ), ncol = 3, byrow = TRUE)
+    # Two triangles sharing the (1,3) diagonal
+    vis_faces <- matrix(
+      c(
+        1,
+        2,
+        3,
+        1,
+        3,
+        4
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
 
-  # Different parcels (and networks) on each face
-  vis_parcel <- c(1L, 2L)
-  id_to_network <- c("1" = "A", "2" = "B")
+    # Different parcels (and networks) on each face
+    vis_parcel <- c(1L, 2L)
+    id_to_network <- c("1" = "A", "2" = "B")
 
-  edges <- neuroatlas:::.compute_boundary_edges(
-    vis_faces,
-    vis_parcel,
-    proj_xy,
-    id_to_network = id_to_network
-  )
+    edges <- neuroatlas:::.compute_boundary_edges(
+      vis_faces,
+      vis_parcel,
+      proj_xy,
+      id_to_network = id_to_network
+    )
 
-  expect_s3_class(edges, "tbl_df")
-  expect_true("edge_type" %in% names(edges))
-  expect_true(all(c("v1", "v2") %in% names(edges)))
+    expect_s3_class(edges, "tbl_df")
+    expect_true("edge_type" %in% names(edges))
+    expect_true(all(c("v1", "v2") %in% names(edges)))
 
-  # Outer square edges appear once -> silhouette (4 edges)
-  expect_equal(sum(edges$edge_type == "silhouette"), 4L)
-  # Shared diagonal is between different parcels and networks -> network (1 edge)
-  expect_equal(sum(edges$edge_type == "network"), 1L)
-})
+    # Outer square edges appear once -> silhouette (4 edges)
+    expect_equal(sum(edges$edge_type == "silhouette"), 4L)
+    # Shared diagonal is between different parcels and networks -> network (1
+    # edge)
+    expect_equal(sum(edges$edge_type == "network"), 1L)
+  }
+)
 
-test_that(".boundary_edges_to_paths chains undirected edges into ordered paths", {
-  edges <- tibble::tibble(
-    panel = "Left Lateral",
-    edge_type = "parcel",
-    v1 = c(1L, 2L, 3L, 4L),
-    v2 = c(2L, 3L, 4L, 1L),
-    x = c(0, 1, 1, 0),
-    y = c(0, 0, 1, 1),
-    xend = c(1, 1, 0, 0),
-    yend = c(0, 1, 1, 0)
-  )
+test_that(
+  ".boundary_edges_to_paths chains undirected edges into ordered paths",
+  {
+    edges <- tibble::tibble(
+      panel = "Left Lateral",
+      edge_type = "parcel",
+      v1 = c(1L, 2L, 3L, 4L),
+      v2 = c(2L, 3L, 4L, 1L),
+      x = c(0, 1, 1, 0),
+      y = c(0, 0, 1, 1),
+      xend = c(1, 1, 0, 0),
+      yend = c(0, 1, 1, 0)
+    )
 
-  paths <- neuroatlas:::.boundary_edges_to_paths(edges)
-  expect_s3_class(paths, "tbl_df")
-  expect_true(all(c("x", "y", "path_id", "vertex_order", "edge_type", "panel") %in%
-                    names(paths)))
+    paths <- neuroatlas:::.boundary_edges_to_paths(edges)
+    expect_s3_class(paths, "tbl_df")
+    expect_true(
+      all(
+        c("x", "y", "path_id", "vertex_order", "edge_type", "panel") %in%
+          names(paths)
+      )
+    )
 
-  # A simple 4-edge cycle should become one path
-  expect_equal(length(unique(paths$path_id)), 1L)
+    # A simple 4-edge cycle should become one path
+    expect_equal(length(unique(paths$path_id)), 1L)
 
-  got <- unique(paste0(paths$x, ",", paths$y))
-  expect_setequal(got, c("0,0", "1,0", "1,1", "0,1"))
-})
+    got <- unique(paste0(paths$x, ",", paths$y))
+    expect_setequal(got, c("0,0", "1,0", "1,1", "0,1"))
+  }
+)
 
-test_that(".smooth_boundary_paths increases path density while preserving ids", {
-  edges <- tibble::tibble(
-    panel = "Left Lateral",
-    edge_type = "parcel",
-    v1 = c(1L, 2L, 3L, 4L),
-    v2 = c(2L, 3L, 4L, 1L),
-    x = c(0, 1, 1, 0),
-    y = c(0, 0, 1, 1),
-    xend = c(1, 1, 0, 0),
-    yend = c(0, 1, 1, 0)
-  )
+test_that(
+  ".smooth_boundary_paths increases path density while preserving ids",
+  {
+    edges <- tibble::tibble(
+      panel = "Left Lateral",
+      edge_type = "parcel",
+      v1 = c(1L, 2L, 3L, 4L),
+      v2 = c(2L, 3L, 4L, 1L),
+      x = c(0, 1, 1, 0),
+      y = c(0, 0, 1, 1),
+      xend = c(1, 1, 0, 0),
+      yend = c(0, 1, 1, 0)
+    )
 
-  paths <- neuroatlas:::.boundary_edges_to_paths(edges)
-  smooth0 <- neuroatlas:::.smooth_boundary_paths(paths, n_iter = 0L)
-  smooth1 <- neuroatlas:::.smooth_boundary_paths(paths, n_iter = 1L)
+    paths <- neuroatlas:::.boundary_edges_to_paths(edges)
+    smooth0 <- neuroatlas:::.smooth_boundary_paths(paths, n_iter = 0L)
+    smooth1 <- neuroatlas:::.smooth_boundary_paths(paths, n_iter = 1L)
 
-  expect_equal(smooth0$x, paths$x)
-  expect_equal(smooth0$y, paths$y)
-  expect_gt(nrow(smooth1), nrow(paths))
-  expect_equal(unique(smooth1$path_id), unique(paths$path_id))
-  expect_equal(unique(smooth1$edge_type), unique(paths$edge_type))
-  expect_equal(unique(smooth1$panel), unique(paths$panel))
-})
+    expect_equal(smooth0$x, paths$x)
+    expect_equal(smooth0$y, paths$y)
+    expect_gt(nrow(smooth1), nrow(paths))
+    expect_equal(unique(smooth1$path_id), unique(paths$path_id))
+    expect_equal(unique(smooth1$edge_type), unique(paths$edge_type))
+    expect_equal(unique(smooth1$panel), unique(paths$panel))
+  }
+)
 
-test_that(".mesh_vertex_neighbors builds expected adjacency from faces", {
-  faces <- matrix(
-    c(1L, 2L, 3L,
-      1L, 3L, 4L),
-    ncol = 3,
-    byrow = TRUE
-  )
+test_that(
+  ".mesh_vertex_neighbors builds expected adjacency from faces",
+  {
+    faces <- matrix(
+      c(
+        1L,
+        2L,
+        3L,
+        1L,
+        3L,
+        4L
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
 
-  nb <- neuroatlas:::.mesh_vertex_neighbors(faces, n_vertices = 4L)
+    nb <- neuroatlas:::.mesh_vertex_neighbors(faces, n_vertices = 4L)
 
-  expect_length(nb, 4L)
-  expect_setequal(nb[[1]], c(2L, 3L, 4L))
-  expect_setequal(nb[[2]], c(1L, 3L))
-  expect_setequal(nb[[3]], c(1L, 2L, 4L))
-  expect_setequal(nb[[4]], c(1L, 3L))
-})
+    expect_length(nb, 4L)
+    expect_setequal(nb[[1]], c(2L, 3L, 4L))
+    expect_setequal(nb[[2]], c(1L, 3L))
+    expect_setequal(nb[[3]], c(1L, 2L, 4L))
+    expect_setequal(nb[[4]], c(1L, 3L))
+  }
+)
 
-test_that(".smooth_projected_xy smooths coordinates while preserving shape", {
-  faces <- matrix(
-    c(1L, 2L, 3L,
-      1L, 3L, 4L),
-    ncol = 3,
-    byrow = TRUE
-  )
-  nb <- neuroatlas:::.mesh_vertex_neighbors(faces, n_vertices = 4L)
+test_that(
+  ".smooth_projected_xy smooths coordinates while preserving shape",
+  {
+    faces <- matrix(
+      c(
+        1L,
+        2L,
+        3L,
+        1L,
+        3L,
+        4L
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
+    nb <- neuroatlas:::.mesh_vertex_neighbors(faces, n_vertices = 4L)
 
-  xy <- matrix(
-    c(0, 0,
-      1, 0,
-      1, 1,
-      0, 1),
-    ncol = 2,
-    byrow = TRUE
-  )
+    xy <- matrix(
+      c(
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ),
+      ncol = 2,
+      byrow = TRUE
+    )
 
-  sm0 <- neuroatlas:::.smooth_projected_xy(xy, nb, n_iter = 0L)
-  sm1 <- neuroatlas:::.smooth_projected_xy(xy, nb, n_iter = 1L, lambda = 0.5)
+    sm0 <- neuroatlas:::.smooth_projected_xy(xy, nb, n_iter = 0L)
+    sm1 <- neuroatlas:::.smooth_projected_xy(xy, nb, n_iter = 1L, lambda = 0.5)
 
-  expect_equal(sm0, xy)
-  expect_equal(dim(sm1), dim(xy))
-  expect_true(any(abs(sm1 - xy) > 1e-8))
-})
+    expect_equal(sm0, xy)
+    expect_equal(dim(sm1), dim(xy))
+    expect_true(any(abs(sm1 - xy) > 1e-8))
+  }
+)
 
-test_that(".overlay_alpha_values supports soft threshold ramps", {
-  vals <- c(0.5, 1, 1.5, 2, NA_real_)
+test_that(
+  ".overlay_alpha_values supports soft threshold ramps",
+  {
+    vals <- c(0.5, 1, 1.5, 2, NA_real_)
 
-  constant <- neuroatlas:::.overlay_alpha_values(
-    vals, threshold = 1, alpha = 0.8, mode = "constant", ramp = 1
-  )
-  expect_equal(constant, rep(0.8, length(vals)))
+    constant <- neuroatlas:::.overlay_alpha_values(
+      vals,
+      threshold = 1,
+      alpha = 0.8,
+      mode = "constant",
+      ramp = 1
+    )
+    expect_equal(constant, rep(0.8, length(vals)))
 
-  ramped <- neuroatlas:::.overlay_alpha_values(
-    vals, threshold = 1, alpha = 0.8, mode = "threshold", ramp = 1
-  )
+    ramped <- neuroatlas:::.overlay_alpha_values(
+      vals,
+      threshold = 1,
+      alpha = 0.8,
+      mode = "threshold",
+      ramp = 1
+    )
 
-  expect_equal(ramped[1], 0)
-  expect_equal(ramped[2], 0)
-  expect_gt(ramped[3], 0)
-  expect_lt(ramped[3], 0.8)
-  expect_equal(ramped[4], 0.8)
-  expect_equal(ramped[5], 0)
-})
+    expect_equal(ramped[1], 0)
+    expect_equal(ramped[2], 0)
+    expect_gt(ramped[3], 0)
+    expect_lt(ramped[3], 0.8)
+    expect_equal(ramped[4], 0.8)
+    expect_equal(ramped[5], 0)
+  }
+)
 
-test_that("colorbar source and threshold breaks follow overlay semantics", {
-  expect_equal(
-    neuroatlas:::.resolve_colorbar_source(
-      "auto", vals = c(0, 0), overlay_values = c(-3, 2)
-    ),
-    "overlay"
-  )
-  expect_equal(
-    neuroatlas:::.resolve_colorbar_source(
-      "auto", vals = c(1, 2), overlay_values = NULL
-    ),
-    "base"
-  )
-  expect_equal(
-    neuroatlas:::.resolve_colorbar_source(
-      "auto", vals = c(0, 0), overlay_values = NULL,
-      overlay_present = TRUE
-    ),
-    "overlay"
-  )
-  expect_equal(
-    neuroatlas:::.colorbar_break_values(c(-4, 4), threshold = 2),
-    c(-4, -2, 0, 2, 4)
-  )
-})
+test_that(
+  "colorbar source and threshold breaks follow overlay semantics",
+  {
+    expect_equal(
+      neuroatlas:::.resolve_colorbar_source(
+        "auto",
+        vals = c(0, 0),
+        overlay_values = c(-3, 2)
+      ),
+      "overlay"
+    )
+    expect_equal(
+      neuroatlas:::.resolve_colorbar_source(
+        "auto",
+        vals = c(1, 2),
+        overlay_values = NULL
+      ),
+      "base"
+    )
+    expect_equal(
+      neuroatlas:::.resolve_colorbar_source(
+        "auto",
+        vals = c(0, 0),
+        overlay_values = NULL,
+        overlay_present = TRUE
+      ),
+      "overlay"
+    )
+    expect_equal(
+      neuroatlas:::.colorbar_break_values(c(-4, 4), threshold = 2),
+      c(-4, -2, 0, 2, 4)
+    )
+  }
+)
 
-test_that("outer contour keeps only the largest exterior loop per panel", {
-  base <- tibble::tibble(
-    x = c(0, 4, 4, 0, 1, 2, 2, 1),
-    y = c(0, 0, 4, 4, 1, 1, 2, 2),
-    poly_id = rep(1:2, each = 4),
-    panel = "Left Lateral"
-  )
+test_that(
+  "outer contour keeps only the largest exterior loop per panel",
+  {
+    base <- tibble::tibble(
+      x = c(0, 4, 4, 0, 1, 2, 2, 1),
+      y = c(0, 0, 4, 4, 1, 1, 2, 2),
+      poly_id = rep(1:2, each = 4),
+      panel = "Left Lateral"
+    )
 
-  contour <- neuroatlas:::.surface_outer_contour_data(base)
-  expect_s3_class(contour, "tbl_df")
-  expect_equal(length(unique(contour$contour_id)), 1L)
-  expect_equal(nrow(contour), 5L)
-  expect_equal(contour[1, c("x", "y")], contour[5, c("x", "y")])
-  expect_equal(range(contour$x), c(0, 4))
-  expect_equal(range(contour$y), c(0, 4))
-})
+    contour <- neuroatlas:::.surface_outer_contour_data(base)
+    expect_s3_class(contour, "tbl_df")
+    expect_equal(length(unique(contour$contour_id)), 1L)
+    expect_equal(nrow(contour), 5L)
+    expect_equal(contour[1, c("x", "y")], contour[5, c("x", "y")])
+    expect_equal(range(contour$x), c(0, 4))
+    expect_equal(range(contour$y), c(0, 4))
+  }
+)
 
 .make_plot_brain_overlay_test_atlas <- function() {
   skip_if_not_installed("neurosurf")
 
   verts <- matrix(
-    c(-1, 0, 0,
-      -1, 0, 1,
-      -1, 1, 0,
-      -1, 1, 1),
+    c(
+      -1,
+      0,
+      0,
+      -1,
+      0,
+      1,
+      -1,
+      1,
+      0,
+      -1,
+      1,
+      1
+    ),
     ncol = 3,
     byrow = TRUE
   )
   faces <- matrix(
-    c(0L, 1L, 2L,
-      1L, 3L, 2L),
+    c(
+      0L,
+      1L,
+      2L,
+      1L,
+      3L,
+      2L
+    ),
     ncol = 3,
     byrow = TRUE
   )
@@ -394,27 +640,32 @@ test_that("outer contour keeps only the largest exterior loop per panel", {
 .collect_cpu_raster_panels <- function(plot) {
   if (inherits(plot, "patchwork")) {
     panels <- list()
-    for (i in seq_len(length(plot))) {
+    for (i in seq_along(plot)) {
       panels <- c(panels, .collect_cpu_raster_panels(plot[[i]]))
     }
     return(panels)
   }
 
-  has_raster <- inherits(plot, "ggplot") && any(vapply(
-    plot$layers,
-    function(layer) !is.null(layer$geom_params$raster),
-    logical(1)
-  ))
+  has_raster <- inherits(plot, "ggplot") && any(
+    vapply(
+      plot$layers,
+      function(layer) !is.null(layer$geom_params$raster),
+      logical(1)
+    )
+  )
   if (has_raster) list(plot) else list()
 }
 
 .measure_plot_panel_aspect <- function(plot, width, height) {
   output <- tempfile(fileext = ".pdf")
   grDevices::pdf(output, width = width, height = height)
-  on.exit({
-    grDevices::dev.off()
-    unlink(output)
-  }, add = TRUE)
+  on.exit(
+    {
+      grDevices::dev.off()
+      unlink(output)
+    },
+    add = TRUE
+  )
 
   grid::grid.newpage()
   grid::grid.draw(ggplot2::ggplotGrob(plot))
@@ -429,491 +680,665 @@ test_that("outer contour keeps only the largest exterior loop per panel", {
   }
   grid::seekViewport(panel_name)
   panel_width <- grid::convertWidth(
-    grid::unit(1, "npc"), "in", valueOnly = TRUE
+    grid::unit(1, "npc"),
+    "in",
+    valueOnly = TRUE
   )
   panel_height <- grid::convertHeight(
-    grid::unit(1, "npc"), "in", valueOnly = TRUE
+    grid::unit(1, "npc"),
+    "in",
+    valueOnly = TRUE
   )
   panel_width / panel_height
 }
 
-test_that("plot_brain leaves overlay threshold borders off by default", {
-  atl <- .make_plot_brain_overlay_test_atlas()
-  overlay <- list(lh = c(0, 2, 0, 2), rh = c(0, 2, 0, 2))
+test_that(
+  "plot_brain leaves overlay threshold borders off by default",
+  {
+    atl <- .make_plot_brain_overlay_test_atlas()
+    overlay <- list(lh = c(0, 2, 0, 2), rh = c(0, 2, 0, 2))
 
-  p_default <- plot_brain(
-    atl,
-    views = "lateral",
-    hemis = "left",
-    overlay = overlay,
-    overlay_threshold = 1,
-    interactive = FALSE,
-    border = FALSE
-  )
-  p_border <- plot_brain(
-    atl,
-    views = "lateral",
-    hemis = "left",
-    overlay = overlay,
-    overlay_threshold = 1,
-    overlay_border = TRUE,
-    interactive = FALSE,
-    border = FALSE
-  )
+    p_default <- plot_brain(
+      atl,
+      views = "lateral",
+      hemis = "left",
+      overlay = overlay,
+      overlay_threshold = 1,
+      interactive = FALSE,
+      border = FALSE
+    )
+    p_border <- plot_brain(
+      atl,
+      views = "lateral",
+      hemis = "left",
+      overlay = overlay,
+      overlay_threshold = 1,
+      overlay_border = TRUE,
+      interactive = FALSE,
+      border = FALSE
+    )
 
-  expect_equal(length(p_default$layers), 2L)
-  expect_gt(length(p_border$layers), length(p_default$layers))
-})
-
-test_that("plot_brain can soften thresholded overlay opacity", {
-  atl <- .make_plot_brain_overlay_test_atlas()
-  overlay <- list(lh = c(1, 1.5, 1.5, 4), rh = c(1, 1.5, 1.5, 4))
-
-  p <- plot_brain(
-    atl,
-    views = "lateral",
-    hemis = "left",
-    overlay = overlay,
-    overlay_threshold = 1,
-    overlay_alpha = 0.8,
-    overlay_alpha_mode = "threshold",
-    overlay_alpha_ramp = 1,
-    interactive = FALSE,
-    border = FALSE
-  )
-
-  overlay_layer <- ggplot2::layer_data(p, 2)
-  alpha <- unique(overlay_layer$alpha)
-
-  expect_true(any(alpha > 0 & alpha < 0.8))
-  expect_true(any(abs(alpha - 0.8) < 1e-8))
-})
-
-test_that("stat_publication keeps anatomy below the overlay and removes atlas lines", {
-  atl <- .make_plot_brain_overlay_test_atlas()
-  overlay <- list(lh = rep(4, 4), rh = rep(4, 4))
-
-  p <- plot_brain(
-    atl,
-    vals = 0,
-    lim = c(0, 0),
-    views = "lateral",
-    hemis = "left",
-    overlay = overlay,
-    overlay_threshold = 1,
-    overlay_lim = c(-4, 4),
-    style = "stat_publication",
-    interactive = FALSE,
-    colorbar = FALSE
-  )
-
-  layer_has <- function(layer, column) {
-    is.data.frame(layer$data) && column %in% names(layer$data)
+    expect_equal(length(p_default$layers), 2L)
+    expect_gt(length(p_border$layers), length(p_default$layers))
   }
-  shade_idx <- which(vapply(p$layers, layer_has, logical(1), column = "shade"))
-  overlay_idx <- which(vapply(p$layers, layer_has, logical(1),
-                              column = "overlay_value"))
-  edge_idx <- which(vapply(p$layers, layer_has, logical(1), column = "edge_type"))
-  contour_idx <- which(vapply(p$layers, layer_has, logical(1),
-                              column = "contour_id"))
+)
 
-  expect_length(shade_idx, 1L)
-  expect_length(overlay_idx, 1L)
-  expect_lt(shade_idx, overlay_idx)
-  expect_length(edge_idx, 0L)
-  expect_length(contour_idx, 1L)
-})
+test_that(
+  "plot_brain can soften thresholded overlay opacity",
+  {
+    atl <- .make_plot_brain_overlay_test_atlas()
+    overlay <- list(lh = c(1, 1.5, 1.5, 4), rh = c(1, 1.5, 1.5, 4))
 
-test_that("overlay-only colorbar uses overlay limits, palette, title, and thresholds", {
-  skip_if_not_installed("patchwork")
-  atl <- .make_plot_brain_overlay_test_atlas()
-  overlay <- list(lh = c(-4, -2, 2, 4), rh = c(-4, -2, 2, 4))
-
-  p <- plot_brain(
-    atl,
-    vals = 0,
-    lim = c(0, 0),
-    views = "lateral",
-    hemis = "left",
-    overlay = overlay,
-    overlay_threshold = 2,
-    overlay_palette = "vik",
-    overlay_lim = c(-4, 4),
-    overlay_title = "Statistic",
-    style = "stat_publication",
-    interactive = FALSE,
-    colorbar = TRUE,
-    colorbar_source = "auto"
-  )
-
-  meta <- attr(p, "plot_brain_colorbar")
-  projection <- attr(p, "plot_brain_projection")
-  expect_s3_class(p, "patchwork")
-  expect_identical(meta$source, "overlay")
-  expect_identical(meta$palette, "vik")
-  expect_equal(meta$lim, c(-4, 4))
-  expect_identical(meta$title, "Statistic")
-  expect_equal(meta$breaks, c(-4, -2, 0, 2, 4))
-  expect_identical(projection$interpolation, "linear")
-  expect_identical(projection$sampling, "thickness")
-  expect_equal(projection$depth, seq(0.1, 0.9, length.out = 5L))
-})
-
-test_that("plot_brain rejects an explicit surface mismatch", {
-  atl <- .make_plot_brain_overlay_test_atlas()
-  expect_error(
-    plot_brain(atl, surface = "pial", interactive = FALSE),
-    "does not match surfatlas\\$surf_type"
-  )
-})
-
-test_that("CPU backend records mask, anatomy, camera, and legend provenance", {
-  skip_if_not_installed("patchwork")
-  atl <- .make_plot_brain_overlay_test_atlas()
-  mask <- list(lh = c(TRUE, TRUE, TRUE, FALSE),
-               rh = c(TRUE, TRUE, TRUE, FALSE))
-  anatomy <- list(lh = c(-1, 0, 1, 0), rh = c(-1, 0, 1, 0))
-  p <- plot_brain(
-    atl, vals = 0, lim = c(0, 0), views = "lateral", hemis = "left",
-    overlay = list(lh = rep(4, 4), rh = rep(4, 4)),
-    overlay_threshold = 2, overlay_lim = c(-4, 4),
-    style = "stat_publication", static_backend = "cpu",
-    cortex_mask = mask, cortex_mask_source = "toy_cortex_label",
-    anatomy_metric = anatomy, anatomy_metric_source = "toy_sulc",
-    medial_wall = "outline", camera = "canonical",
-    render_width = 80, render_height = 60, render_antialias = 1,
-    interactive = FALSE, colorbar = TRUE
-  )
-  prov <- attr(p, "plot_brain_anatomy")
-  expect_s3_class(p, "patchwork")
-  expect_identical(attr(p, "plot_brain_backend"), "cpu_barycentric")
-  expect_identical(prov$mask$lh$source, "toy_cortex_label")
-  expect_equal(prov$mask$lh$n_medial_wall, 1)
-  expect_identical(prov$anatomy$lh$source, "toy_sulc")
-  expect_false(prov$anatomy$lh$topology_verified)
-  expect_identical(prov$camera$`Left Lateral`$projection,
-                   "canonical_orthographic")
-  expect_identical(attr(p, "plot_brain_colorbar")$source, "overlay")
-})
-
-test_that("CPU panels preserve raster aspect across figure layouts", {
-  skip_if_not_installed("patchwork")
-  atl <- .make_plot_brain_overlay_test_atlas()
-  overlay <- list(lh = rep(4, 4), rh = rep(4, 4))
-  mask <- list(lh = rep(TRUE, 4), rh = rep(TRUE, 4))
-  anatomy <- list(lh = c(-1, 0, 1, 0), rh = c(-1, 0, 1, 0))
-  panel_labels <- c(
-    "Left Lateral" = "LH lateral",
-    "Left Medial" = "LH medial"
-  )
-
-  default_plot <- plot_brain(
-    atl, views = "lateral", hemis = "left", overlay = overlay,
-    overlay_lim = c(-4, 4), static_backend = "cpu",
-    cortex_mask = mask, anatomy_metric = anatomy,
-    orientation_labels = TRUE, panel_labels = panel_labels,
-    render_antialias = 1, interactive = FALSE, colorbar = FALSE
-  )
-  default_panel <- .collect_cpu_raster_panels(default_plot)[[1L]]
-  default_raster <- default_panel$layers[[1L]]$geom_params$raster
-  raster_aspect <- ncol(default_raster) / nrow(default_raster)
-
-  expect_equal(dim(default_raster), c(750L, 1200L))
-  expect_equal(default_panel$coordinates$ratio, 750 / 1200)
-  expect_equal(
-    .measure_plot_panel_aspect(default_panel, width = 8, height = 8),
-    raster_aspect,
-    tolerance = 1e-6
-  )
-  expect_equal(
-    .measure_plot_panel_aspect(default_panel, width = 12, height = 5),
-    raster_aspect,
-    tolerance = 1e-6
-  )
-
-  layouts <- list(
-    list(colorbar = TRUE, position = "right"),
-    list(colorbar = "bottom", position = "bottom")
-  )
-  for (layout in layouts) {
-    composed <- plot_brain(
-      atl, views = c("lateral", "medial"), hemis = "left",
-      overlay = overlay, overlay_lim = c(-4, 4),
-      static_backend = "cpu", cortex_mask = mask,
-      anatomy_metric = anatomy, orientation_labels = TRUE,
-      panel_labels = panel_labels, render_width = 80,
-      render_height = 50, render_antialias = 1,
-      interactive = FALSE, colorbar = layout$colorbar,
-      title = paste("CPU", layout$position)
+    p <- plot_brain(
+      atl,
+      views = "lateral",
+      hemis = "left",
+      overlay = overlay,
+      overlay_threshold = 1,
+      overlay_alpha = 0.8,
+      overlay_alpha_mode = "threshold",
+      overlay_alpha_ramp = 1,
+      interactive = FALSE,
+      border = FALSE
     )
 
-    expect_s3_class(composed, "patchwork")
-    expect_silent(patchwork::patchworkGrob(composed))
-    panels <- .collect_cpu_raster_panels(composed)
-    expect_length(panels, 2L)
-    expect_setequal(
-      vapply(panels, function(panel) panel$labels$title, character(1)),
-      unname(panel_labels)
+    overlay_layer <- ggplot2::layer_data(p, 2)
+    alpha <- unique(overlay_layer$alpha)
+
+    expect_true(any(alpha > 0 & alpha < 0.8))
+    expect_true(any(abs(alpha - 0.8) < 1e-8))
+  }
+)
+
+test_that(
+  "stat_publication keeps anatomy below the overlay and removes atlas lines",
+  {
+    atl <- .make_plot_brain_overlay_test_atlas()
+    overlay <- list(lh = rep(4, 4), rh = rep(4, 4))
+
+    p <- plot_brain(
+      atl,
+      vals = 0,
+      lim = c(0, 0),
+      views = "lateral",
+      hemis = "left",
+      overlay = overlay,
+      overlay_threshold = 1,
+      overlay_lim = c(-4, 4),
+      style = "stat_publication",
+      interactive = FALSE,
+      colorbar = FALSE
     )
 
-    for (panel in panels) {
-      raster <- panel$layers[[1L]]$geom_params$raster
-      expect_equal(dim(raster), c(50L, 80L))
-      expect_equal(panel$coordinates$ratio, 50 / 80)
-      orientation_layers <- Filter(
-        function(layer) {
-          is.data.frame(layer$data) &&
-            all(c("x", "y", "label") %in% names(layer$data))
-        },
-        panel$layers
+    layer_has <- function(layer, column) {
+      is.data.frame(layer$data) && column %in% names(layer$data)
+    }
+    shade_idx <- which(vapply(p$layers, layer_has, logical(1), column = "shade"))
+    overlay_idx <- which(
+      vapply(
+        p$layers,
+        layer_has,
+        logical(1),
+        column = "overlay_value"
       )
-      expect_length(orientation_layers, 1L)
-      orientation <- orientation_layers[[1L]]$data
-      expect_true(all(orientation$x >= 0 & orientation$x <= 1))
-      expect_true(all(orientation$y >= 0 & orientation$y <= 1))
+    )
+    edge_idx <- which(vapply(p$layers, layer_has, logical(1), column = "edge_type"))
+    contour_idx <- which(
+      vapply(
+        p$layers,
+        layer_has,
+        logical(1),
+        column = "contour_id"
+      )
+    )
+
+    expect_length(shade_idx, 1L)
+    expect_length(overlay_idx, 1L)
+    expect_lt(shade_idx, overlay_idx)
+    expect_length(edge_idx, 0L)
+    expect_length(contour_idx, 1L)
+  }
+)
+
+test_that(
+  "overlay-only colorbar uses overlay limits, palette, title, and thresholds",
+  {
+    skip_if_not_installed("patchwork")
+    atl <- .make_plot_brain_overlay_test_atlas()
+    overlay <- list(lh = c(-4, -2, 2, 4), rh = c(-4, -2, 2, 4))
+
+    p <- plot_brain(
+      atl,
+      vals = 0,
+      lim = c(0, 0),
+      views = "lateral",
+      hemis = "left",
+      overlay = overlay,
+      overlay_threshold = 2,
+      overlay_palette = "vik",
+      overlay_lim = c(-4, 4),
+      overlay_title = "Statistic",
+      style = "stat_publication",
+      interactive = FALSE,
+      colorbar = TRUE,
+      colorbar_source = "auto"
+    )
+
+    meta <- attr(p, "plot_brain_colorbar")
+    projection <- attr(p, "plot_brain_projection")
+    expect_s3_class(p, "patchwork")
+    expect_identical(meta$source, "overlay")
+    expect_identical(meta$palette, "vik")
+    expect_equal(meta$lim, c(-4, 4))
+    expect_identical(meta$title, "Statistic")
+    expect_equal(meta$breaks, c(-4, -2, 0, 2, 4))
+    expect_identical(projection$interpolation, "linear")
+    expect_identical(projection$sampling, "thickness")
+    expect_equal(projection$depth, seq(0.1, 0.9, length.out = 5L))
+  }
+)
+
+test_that(
+  "plot_brain rejects an explicit surface mismatch",
+  {
+    atl <- .make_plot_brain_overlay_test_atlas()
+    expect_error(
+      plot_brain(atl, surface = "pial", interactive = FALSE),
+      "does not match surfatlas\\$surf_type"
+    )
+  }
+)
+
+test_that(
+  "CPU backend records mask, anatomy, camera, and legend provenance",
+  {
+    skip_if_not_installed("patchwork")
+    atl <- .make_plot_brain_overlay_test_atlas()
+    mask <- list(
+      lh = c(TRUE, TRUE, TRUE, FALSE),
+      rh = c(TRUE, TRUE, TRUE, FALSE)
+    )
+    anatomy <- list(lh = c(-1, 0, 1, 0), rh = c(-1, 0, 1, 0))
+    p <- plot_brain(
+      atl,
+      vals = 0,
+      lim = c(0, 0),
+      views = "lateral",
+      hemis = "left",
+      overlay = list(lh = rep(4, 4), rh = rep(4, 4)),
+      overlay_threshold = 2,
+      overlay_lim = c(-4, 4),
+      style = "stat_publication",
+      static_backend = "cpu",
+      cortex_mask = mask,
+      cortex_mask_source = "toy_cortex_label",
+      anatomy_metric = anatomy,
+      anatomy_metric_source = "toy_sulc",
+      medial_wall = "outline",
+      camera = "canonical",
+      render_width = 80,
+      render_height = 60,
+      render_antialias = 1,
+      interactive = FALSE,
+      colorbar = TRUE
+    )
+    prov <- attr(p, "plot_brain_anatomy")
+    expect_s3_class(p, "patchwork")
+    expect_identical(attr(p, "plot_brain_backend"), "cpu_barycentric")
+    expect_identical(prov$mask$lh$source, "toy_cortex_label")
+    expect_equal(prov$mask$lh$n_medial_wall, 1)
+    expect_identical(prov$anatomy$lh$source, "toy_sulc")
+    expect_false(prov$anatomy$lh$topology_verified)
+    expect_identical(
+      prov$camera$`Left Lateral`$projection,
+      "canonical_orthographic"
+    )
+    expect_identical(attr(p, "plot_brain_colorbar")$source, "overlay")
+  }
+)
+
+test_that(
+  "CPU panels preserve raster aspect across figure layouts",
+  {
+    skip_if_not_installed("patchwork")
+    atl <- .make_plot_brain_overlay_test_atlas()
+    overlay <- list(lh = rep(4, 4), rh = rep(4, 4))
+    mask <- list(lh = rep(TRUE, 4), rh = rep(TRUE, 4))
+    anatomy <- list(lh = c(-1, 0, 1, 0), rh = c(-1, 0, 1, 0))
+    panel_labels <- c(
+      "Left Lateral" = "LH lateral",
+      "Left Medial" = "LH medial"
+    )
+
+    default_plot <- plot_brain(
+      atl,
+      views = "lateral",
+      hemis = "left",
+      overlay = overlay,
+      overlay_lim = c(-4, 4),
+      static_backend = "cpu",
+      cortex_mask = mask,
+      anatomy_metric = anatomy,
+      orientation_labels = TRUE,
+      panel_labels = panel_labels,
+      render_antialias = 1,
+      interactive = FALSE,
+      colorbar = FALSE
+    )
+    default_panel <- .collect_cpu_raster_panels(default_plot)[[1L]]
+    default_raster <- default_panel$layers[[1L]]$geom_params$raster
+    raster_aspect <- ncol(default_raster) / nrow(default_raster)
+
+    expect_equal(dim(default_raster), c(750L, 1200L))
+    expect_equal(default_panel$coordinates$ratio, 750 / 1200)
+    expect_equal(
+      .measure_plot_panel_aspect(default_panel, width = 8, height = 8),
+      raster_aspect,
+      tolerance = 1e-6
+    )
+    expect_equal(
+      .measure_plot_panel_aspect(default_panel, width = 12, height = 5),
+      raster_aspect,
+      tolerance = 1e-6
+    )
+
+    layouts <- list(
+      list(colorbar = TRUE, position = "right"),
+      list(colorbar = "bottom", position = "bottom")
+    )
+    for (layout in layouts) {
+      composed <- plot_brain(
+        atl,
+        views = c("lateral", "medial"),
+        hemis = "left",
+        overlay = overlay,
+        overlay_lim = c(-4, 4),
+        static_backend = "cpu",
+        cortex_mask = mask,
+        anatomy_metric = anatomy,
+        orientation_labels = TRUE,
+        panel_labels = panel_labels,
+        render_width = 80,
+        render_height = 50,
+        render_antialias = 1,
+        interactive = FALSE,
+        colorbar = layout$colorbar,
+        title = paste("CPU", layout$position)
+      )
+
+      expect_s3_class(composed, "patchwork")
+      expect_silent(patchwork::patchworkGrob(composed))
+      panels <- .collect_cpu_raster_panels(composed)
+      expect_length(panels, 2L)
+      expect_setequal(
+        vapply(panels, function(panel) panel$labels$title, character(1)),
+        unname(panel_labels)
+      )
+
+      for (panel in panels) {
+        raster <- panel$layers[[1L]]$geom_params$raster
+        expect_equal(dim(raster), c(50L, 80L))
+        expect_equal(panel$coordinates$ratio, 50 / 80)
+        orientation_layers <- Filter(
+          function(layer) {
+            is.data.frame(layer$data) &&
+              all(c("x", "y", "label") %in% names(layer$data))
+          },
+          panel$layers
+        )
+        expect_length(orientation_layers, 1L)
+        orientation <- orientation_layers[[1L]]$data
+        expect_true(all(orientation$x >= 0 & orientation$x <= 1))
+        expect_true(all(orientation$y >= 0 & orientation$y <= 1))
+      }
     }
   }
-})
+)
 
-test_that("surface topology verification compares face connectivity", {
-  atl <- .make_plot_brain_overlay_test_atlas()
-  display <- atl$lh_atlas@geometry
+test_that(
+  "surface topology verification compares face connectivity",
+  {
+    atl <- .make_plot_brain_overlay_test_atlas()
+    display <- atl$lh_atlas@geometry
 
-  expect_true(neuroatlas:::.surface_geometry_topology_equal(display, display))
+    expect_true(neuroatlas:::.surface_geometry_topology_equal(display, display))
 
-  changed <- display
-  changed@mesh$it <- changed@mesh$it[, ncol(changed@mesh$it):1, drop = FALSE]
-  expect_false(neuroatlas:::.surface_geometry_topology_equal(display, changed))
-})
-
-test_that("cortex masks never fall back to atlas label zero semantics", {
-  atl <- .make_plot_brain_overlay_test_atlas()
-  domain <- neuroatlas:::.resolve_surface_domain(atl, "lh")
-  expect_true(all(domain$mask))
-  expect_identical(domain$provenance$source, "geometry_all_vertices")
-})
-
-test_that(".encode_plot_brain_data_id creates stable polygon keys", {
-  key <- neuroatlas:::.encode_plot_brain_data_id(
-    panel = "Left Lateral",
-    parcel_id = 12L,
-    shape_id = 44L
-  )
-  expect_equal(key, "Left Lateral::12::44")
-})
-
-test_that("plot_brain rejects non-surfatlas input", {
-  fake <- list(name = "fake")
-  class(fake) <- "atlas"
-
-  expect_error(plot_brain(fake), "surfatlas")
-})
-
-test_that("plot_brain rejects vals of wrong length", {
-  skip_on_cran()
-
-  # Create a minimal surfatlas-like object for validation testing
-  fake_surf <- list(ids = 1:10, labels = paste0("R", 1:10))
-  class(fake_surf) <- c("schaefer", "surfatlas", "atlas")
-
-  expect_error(plot_brain(fake_surf, vals = 1:5), "Length of 'vals'")
-})
-
-test_that("plot_brain returns ggplot when interactive = FALSE", {
-  skip_on_cran()
-
-  atl <- tryCatch({
-    schaefer_surf(100, 7)
-  }, error = function(e) {
-    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
-  })
-
-  p <- plot_brain(atl, interactive = FALSE)
-  expect_s3_class(p, "ggplot")
-})
-
-test_that("plot_brain validates the 'background' argument before any rendering", {
-  # Runs offline: the check fires before the surfatlas/network path.
-  expect_error(plot_brain(NULL, background = "yes"),
-               "'background' must be TRUE or FALSE")
-  expect_error(plot_brain(NULL, background = NA),
-               "'background' must be TRUE or FALSE")
-  expect_error(plot_brain(NULL, depth_cull = NA),
-               "'depth_cull' must be TRUE or FALSE")
-})
-
-test_that("plot_brain draws a cortex backdrop when background = TRUE", {
-  skip_on_cran()
-
-  atl <- tryCatch({
-    schaefer_surf(100, 7)
-  }, error = function(e) {
-    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
-  })
-
-  p_bg <- plot_brain(atl, views = "lateral", interactive = FALSE,
-                     background = TRUE)
-  p_no <- plot_brain(atl, views = "lateral", interactive = FALSE,
-                     background = FALSE)
-  expect_s3_class(p_bg, "ggplot")
-  # The backdrop adds one extra geom_polygon layer beneath the parcels.
-  expect_gt(length(p_bg$layers), length(p_no$layers))
-
-  # The silhouette builder yields one or more filled polygons per panel.
-  sil <- neuroatlas:::.build_surface_silhouette_data(
-    atl, views = "lateral", hemis = c("left", "right"),
-    surface = "inflated", projection_smooth = 0L
-  )
-  expect_true(is.data.frame(sil) && nrow(sil) > 0)
-  expect_true(all(c("x", "y", "poly_id", "panel") %in% names(sil)))
-})
-
-test_that("plot_brain normalizes colorbar position inputs", {
-  expect_equal(neuroatlas:::.normalize_colorbar_position(TRUE), "right")
-  expect_equal(neuroatlas:::.normalize_colorbar_position(FALSE), "none")
-  expect_equal(neuroatlas:::.normalize_colorbar_position("bottom"), "bottom")
-  expect_error(
-    neuroatlas:::.normalize_colorbar_position("left"),
-    "'colorbar' must be TRUE, FALSE"
-  )
-})
-
-test_that("plot_brain applies static annotations and panel label overrides", {
-  skip_on_cran()
-
-  atl <- tryCatch({
-    schaefer_surf(100, 7)
-  }, error = function(e) {
-    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
-  })
-
-  p <- plot_brain(
-    atl,
-    views = "lateral",
-    interactive = FALSE,
-    title = "Surface map",
-    panel_labels = c(
-      "Left Lateral" = "LH lateral",
-      "Right Lateral" = "RH lateral"
+    changed <- display
+    order <- rev(seq_len(ncol(changed@mesh$it)))
+    changed@mesh$it <- changed@mesh$it[, order, drop = FALSE]
+    expect_false(
+      neuroatlas:::.surface_geometry_topology_equal(display, changed)
     )
-  )
+  }
+)
 
-  expect_s3_class(p, "ggplot")
-  expect_equal(p$labels$title, "Surface map")
+test_that(
+  "cortex masks never fall back to atlas label zero semantics",
+  {
+    atl <- .make_plot_brain_overlay_test_atlas()
+    domain <- neuroatlas:::.resolve_surface_domain(atl, "lh")
+    expect_true(all(domain$mask))
+    expect_identical(domain$provenance$source, "geometry_all_vertices")
+  }
+)
 
-  strip_labels <- p$facet$params$labeller(data.frame(
-    panel = c("Left Lateral", "Right Lateral")
-  ))
-  expect_equal(unname(strip_labels$panel), c("LH lateral", "RH lateral"))
-})
+test_that(
+  ".encode_plot_brain_data_id creates stable polygon keys",
+  {
+    key <- neuroatlas:::.encode_plot_brain_data_id(
+      panel = "Left Lateral",
+      parcel_id = 12L,
+      shape_id = 44L
+    )
+    expect_equal(key, "Left Lateral::12::44")
+  }
+)
 
-test_that("plot_brain composes a bottom colorbar when requested", {
-  skip_on_cran()
-  skip_if_not_installed("patchwork")
+test_that(
+  "plot_brain rejects non-surfatlas input",
+  {
+    fake <- list(name = "fake")
+    class(fake) <- "atlas"
 
-  atl <- tryCatch({
-    schaefer_surf(100, 7)
-  }, error = function(e) {
-    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
-  })
+    expect_error(plot_brain(fake), "surfatlas")
+  }
+)
 
-  p <- plot_brain(
-    atl,
-    vals = rnorm(length(atl$ids)),
-    views = "lateral",
-    interactive = FALSE,
-    colorbar = "bottom",
-    colorbar_title = "z-score",
-    title = "Contrast"
-  )
+test_that(
+  "plot_brain rejects vals of wrong length",
+  {
+    skip_on_cran()
 
-  expect_s3_class(p, "patchwork")
-  expect_s3_class(patchwork::patchworkGrob(p), "gtable")
-})
+    # Create a minimal surfatlas-like object for validation testing
+    fake_surf <- list(ids = 1:10, labels = paste0("R", 1:10))
+    class(fake_surf) <- c("schaefer", "surfatlas", "atlas")
 
-test_that("plot_brain suppresses the built-in fill guide for static maps", {
-  skip_on_cran()
+    expect_error(plot_brain(fake_surf, vals = 1:5), "Length of 'vals'")
+  }
+)
 
-  atl <- tryCatch({
-    schaefer_surf(100, 7)
-  }, error = function(e) {
-    skip(paste("Surface atlas unavailable:", conditionMessage(e)))
-  })
+test_that(
+  "plot_brain returns ggplot when interactive = FALSE",
+  {
+    skip_on_cran()
 
-  p <- plot_brain(
-    atl,
-    vals = rnorm(length(atl$ids)),
-    views = "lateral",
-    interactive = FALSE,
-    colorbar = FALSE
-  )
+    atl <- tryCatch(
+      {
+        schaefer_surf(100, 7)
+      },
+      error = function(e) {
+        skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+      }
+    )
 
-  fill_scale <- p$scales$get_scales("fill")
-  expect_equal(fill_scale$guide, "none")
-})
+    p <- plot_brain(atl, interactive = FALSE)
+    expect_s3_class(p, "ggplot")
+  }
+)
 
-test_that(".repair_legacy_surface_geometry rebuilds bundled legacy fsaverage", {
-  skip_if_not_installed("neurosurf")
-  e <- new.env()
-  utils::data("fsaverage", package = "neuroatlas", envir = e)
-  fsavg <- e$fsaverage
-  skip_if_not(length(fsavg) > 0, "bundled fsaverage data unavailable")
-  legacy <- fsavg[[1]]
-  # Sanity: bundled data is missing slots added in current SurfaceGeometry.
-  expect_error(methods::validObject(legacy))
+test_that(
+  "plot_brain validates the 'background' argument before any rendering",
+  {
+    # Runs offline: the check fires before the surfatlas/network path.
+    expect_error(
+      plot_brain(NULL, background = "yes"),
+      "'background' must be TRUE or FALSE"
+    )
+    expect_error(
+      plot_brain(NULL, background = NA),
+      "'background' must be TRUE or FALSE"
+    )
+    expect_error(
+      plot_brain(NULL, depth_cull = NA),
+      "'depth_cull' must be TRUE or FALSE"
+    )
+  }
+)
 
-  repaired <- neuroatlas:::.repair_legacy_surface_geometry(legacy)
-  expect_silent(methods::validObject(repaired))
-  expect_true(is.matrix(neurosurf::surf_to_world(repaired)))
-  expect_equal(nrow(t(repaired@mesh$vb[1:3, , drop = FALSE])),
-               nrow(t(legacy@mesh$vb[1:3, , drop = FALSE])))
-})
+test_that(
+  "plot_brain draws a cortex backdrop when background = TRUE",
+  {
+    skip_on_cran()
 
-test_that(".resolve_overlay_surface_pair returns geometries with all slots", {
-  skip_on_cran()
-  skip_if_not_installed("neurosurf")
-  skip_if_not_installed("neuroatlas")
-  atl <- tryCatch(
-    neuroatlas::schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated"),
-    error = function(e) skip(paste("schaefer_surf unavailable:", conditionMessage(e)))
-  )
+    atl <- tryCatch(
+      {
+        schaefer_surf(100, 7)
+      },
+      error = function(e) {
+        skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+      }
+    )
 
-  pair <- neuroatlas:::.resolve_overlay_surface_pair(atl, hemi = "lh")
-  expect_silent(methods::validObject(pair$white))
-  expect_silent(methods::validObject(pair$pial))
-  expect_true(is.matrix(neurosurf::surf_to_world(pair$white)))
-  expect_true(is.matrix(neurosurf::surf_to_world(pair$pial)))
-})
+    p_bg <- plot_brain(
+      atl,
+      views = "lateral",
+      interactive = FALSE,
+      background = TRUE
+    )
+    p_no <- plot_brain(
+      atl,
+      views = "lateral",
+      interactive = FALSE,
+      background = FALSE
+    )
+    expect_s3_class(p_bg, "ggplot")
+    # The backdrop adds one extra geom_polygon layer beneath the parcels.
+    expect_gt(length(p_bg$layers), length(p_no$layers))
 
-test_that("volume->surface overlay leaves off-coverage vertices NA (transparent)", {
-  skip_if_not_installed("neurosurf")
-  skip_if_not_installed("neuroim2")
+    # The silhouette builder yields one or more filled polygons per panel.
+    sil <- neuroatlas:::.build_surface_silhouette_data(
+      atl,
+      views = "lateral",
+      hemis = c("left", "right"),
+      surface = "inflated",
+      projection_smooth = 0L
+    )
+    expect_true(is.data.frame(sil) && nrow(sil) > 0)
+    expect_true(all(c("x", "y", "poly_id", "panel") %in% names(sil)))
+  }
+)
 
-  sp <- neuroim2::NeuroSpace(c(10L, 10L, 10L), spacing = c(1, 1, 1))
-  arr <- array(0, dim = c(10, 10, 10))
-  arr[4:6, 4:6, 4:6] <- 1.5
-  vol <- neuroim2::NeuroVol(arr, space = sp)
+test_that(
+  "plot_brain normalizes colorbar position inputs",
+  {
+    expect_equal(neuroatlas:::.normalize_colorbar_position(TRUE), "right")
+    expect_equal(neuroatlas:::.normalize_colorbar_position(FALSE), "none")
+    expect_equal(neuroatlas:::.normalize_colorbar_position("bottom"), "bottom")
+    expect_error(
+      neuroatlas:::.normalize_colorbar_position("left"),
+      "'colorbar' must be TRUE, FALSE"
+    )
+  }
+)
 
-  verts <- matrix(c(
-    4, 4, 4,
-    50, 50, 50,
-    4, 5, 4,
-    4, 6, 4
-  ), ncol = 3, byrow = TRUE)
-  faces <- matrix(c(0L, 2L, 3L, 1L, 2L, 3L), ncol = 3, byrow = TRUE)
+test_that(
+  "plot_brain applies static annotations and panel label overrides",
+  {
+    skip_on_cran()
 
-  surf_wm <- neurosurf::SurfaceGeometry(vert = verts,
-                                        faces = faces, hemi = "left")
-  surf_pial <- neurosurf::SurfaceGeometry(vert = verts + 0.1,
-                                          faces = faces, hemi = "left")
+    atl <- tryCatch(
+      {
+        schaefer_surf(100, 7)
+      },
+      error = function(e) {
+        skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+      }
+    )
 
-  vals <- neuroatlas:::.project_overlay_one_hemi(
-    cluster_vol = vol,
-    surf_wm = surf_wm, surf_pial = surf_pial,
-    target_n = nrow(verts), fun = "avg", sampling = "midpoint"
-  )
+    p <- plot_brain(
+      atl,
+      views = "lateral",
+      interactive = FALSE,
+      title = "Surface map",
+      panel_labels = c(
+        "Left Lateral" = "LH lateral",
+        "Right Lateral" = "RH lateral"
+      )
+    )
 
-  expect_true(is.finite(vals[1]))
-  expect_true(is.na(vals[2]))
-  expect_equal(vals[1], 1.5, tolerance = 1e-6)
-})
+    expect_s3_class(p, "ggplot")
+    expect_equal(p$labels$title, "Surface map")
+
+    strip_labels <- p$facet$params$labeller(
+      data.frame(
+        panel = c("Left Lateral", "Right Lateral")
+      )
+    )
+    expect_equal(unname(strip_labels$panel), c("LH lateral", "RH lateral"))
+  }
+)
+
+test_that(
+  "plot_brain composes a bottom colorbar when requested",
+  {
+    skip_on_cran()
+    skip_if_not_installed("patchwork")
+
+    atl <- tryCatch(
+      {
+        schaefer_surf(100, 7)
+      },
+      error = function(e) {
+        skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+      }
+    )
+
+    p <- plot_brain(
+      atl,
+      vals = rnorm(length(atl$ids)),
+      views = "lateral",
+      interactive = FALSE,
+      colorbar = "bottom",
+      colorbar_title = "z-score",
+      title = "Contrast"
+    )
+
+    expect_s3_class(p, "patchwork")
+    expect_s3_class(patchwork::patchworkGrob(p), "gtable")
+  }
+)
+
+test_that(
+  "plot_brain suppresses the built-in fill guide for static maps",
+  {
+    skip_on_cran()
+
+    atl <- tryCatch(
+      {
+        schaefer_surf(100, 7)
+      },
+      error = function(e) {
+        skip(paste("Surface atlas unavailable:", conditionMessage(e)))
+      }
+    )
+
+    p <- plot_brain(
+      atl,
+      vals = rnorm(length(atl$ids)),
+      views = "lateral",
+      interactive = FALSE,
+      colorbar = FALSE
+    )
+
+    fill_scale <- p$scales$get_scales("fill")
+    expect_equal(fill_scale$guide, "none")
+  }
+)
+
+test_that(
+  ".repair_legacy_surface_geometry rebuilds bundled legacy fsaverage",
+  {
+    skip_if_not_installed("neurosurf")
+    e <- new.env()
+    utils::data("fsaverage", package = "neuroatlas", envir = e)
+    fsavg <- e$fsaverage
+    skip_if_not(length(fsavg) > 0, "bundled fsaverage data unavailable")
+    legacy <- fsavg[[1]]
+    # Sanity: bundled data is missing slots added in current SurfaceGeometry.
+    expect_error(methods::validObject(legacy))
+
+    repaired <- neuroatlas:::.repair_legacy_surface_geometry(legacy)
+    expect_silent(methods::validObject(repaired))
+    expect_true(is.matrix(neurosurf::surf_to_world(repaired)))
+    expect_equal(
+      nrow(t(repaired@mesh$vb[1:3, , drop = FALSE])),
+      nrow(t(legacy@mesh$vb[1:3, , drop = FALSE]))
+    )
+  }
+)
+
+test_that(
+  ".resolve_overlay_surface_pair returns geometries with all slots",
+  {
+    skip_on_cran()
+    skip_if_not_installed("neurosurf")
+    skip_if_not_installed("neuroatlas")
+    atl <- tryCatch(
+      neuroatlas::schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated"),
+      error = function(e) skip(paste("schaefer_surf unavailable:", conditionMessage(e)))
+    )
+
+    pair <- neuroatlas:::.resolve_overlay_surface_pair(atl, hemi = "lh")
+    expect_silent(methods::validObject(pair$white))
+    expect_silent(methods::validObject(pair$pial))
+    expect_true(is.matrix(neurosurf::surf_to_world(pair$white)))
+    expect_true(is.matrix(neurosurf::surf_to_world(pair$pial)))
+  }
+)
+
+test_that(
+  "volume->surface overlay leaves off-coverage vertices NA (transparent)",
+  {
+    skip_if_not_installed("neurosurf")
+    skip_if_not_installed("neuroim2")
+
+    sp <- neuroim2::NeuroSpace(c(10L, 10L, 10L), spacing = c(1, 1, 1))
+    arr <- array(0, dim = c(10, 10, 10))
+    arr[4:6, 4:6, 4:6] <- 1.5
+    vol <- neuroim2::NeuroVol(arr, space = sp)
+
+    verts <- matrix(
+      c(
+        4,
+        4,
+        4,
+        50,
+        50,
+        50,
+        4,
+        5,
+        4,
+        4,
+        6,
+        4
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
+    faces <- matrix(c(0L, 2L, 3L, 1L, 2L, 3L), ncol = 3, byrow = TRUE)
+
+    surf_wm <- neurosurf::SurfaceGeometry(
+      vert = verts,
+      faces = faces,
+      hemi = "left"
+    )
+    surf_pial <- neurosurf::SurfaceGeometry(
+      vert = verts + 0.1,
+      faces = faces,
+      hemi = "left"
+    )
+
+    vals <- neuroatlas:::.project_overlay_one_hemi(
+      cluster_vol = vol,
+      surf_wm = surf_wm,
+      surf_pial = surf_pial,
+      target_n = nrow(verts),
+      fun = "avg",
+      sampling = "midpoint"
+    )
+
+    expect_true(is.finite(vals[1]))
+    expect_true(is.na(vals[2]))
+    expect_equal(vals[1], 1.5, tolerance = 1e-6)
+  }
+)

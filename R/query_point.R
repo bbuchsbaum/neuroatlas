@@ -93,10 +93,17 @@
 #' @importFrom neuroim2 space coord_to_grid grid_to_coord
 #' @importFrom tibble tibble
 #' @export
-query_point <- function(coords, atlas, radius = 0, from_space = "MNI152",
-                        nearest = FALSE) {
-  if (!is.numeric(radius) || length(radius) != 1L ||
-      is.na(radius) || radius < 0) {
+query_point <- function(
+  coords,
+  atlas,
+  radius = 0,
+  from_space = "MNI152",
+  nearest = FALSE
+) {
+  if (
+    !is.numeric(radius) || length(radius) != 1L ||
+      is.na(radius) || radius < 0
+  ) {
     stop("'radius' must be a non-negative numeric scalar")
   }
   if (!is.logical(nearest) || length(nearest) != 1L || is.na(nearest)) {
@@ -114,7 +121,6 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152",
   if (ncol(coords) != 3L) {
     stop("'coords' must have exactly 3 columns (x, y, z)")
   }
-  n_points <- nrow(coords)
 
 
   # --- Normalise atlas to a named list ---
@@ -130,10 +136,13 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152",
   }
 
   # --- Query each atlas ---
-  result_parts <- lapply(names(atlas_list), function(aname) {
-    atlas_obj <- atlas_list[[aname]]
-    .query_one_atlas(coords, atlas_obj, aname, radius, from_space, nearest)
-  })
+  result_parts <- lapply(
+    names(atlas_list),
+    function(aname) {
+      atlas_obj <- atlas_list[[aname]]
+      .query_one_atlas(coords, atlas_obj, aname, radius, from_space, nearest)
+    }
+  )
 
   do.call(rbind, result_parts)
 }
@@ -155,6 +164,22 @@ query_point <- function(coords, atlas, radius = 0, from_space = "MNI152",
 #'   `radius`, `from_space`, or `nearest`.
 #'
 #' @return A tibble with atlas labels at the requested locations.
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' query_coord(atlas, matrix(c(1, 0, 0), nrow = 1), radius = 0)
 #' @export
 query_coord <- function(x, coords, ...) {
   query_point(coords, x, ...)
@@ -193,11 +218,14 @@ query_vox <- function(x, ijk, ...) {
 # Internal: query a single atlas for all points
 # Returns a tibble
 #' @noRd
-.query_one_atlas <- function(coords, atlas_obj, atlas_name, radius,
-                             from_space, nearest = FALSE) {
-  n_points <- nrow(coords)
-
-
+.query_one_atlas <- function(
+  coords,
+  atlas_obj,
+  atlas_name,
+  radius,
+  from_space,
+  nearest = FALSE
+) {
   # --- Get the volume ---
   vol <- .get_atlas_volume(atlas_obj)
 
@@ -240,15 +268,22 @@ query_vox <- function(x, ijk, ...) {
     } else {
       dQuote(target[1], FALSE)
     }
-    warning(warningCondition(
-      paste0(
-        "Atlas '", atlas_name, "' has no single coordinate space ",
-        "(coord_space is ", shown, "); assuming the coordinates are ",
-        "already in its world space and applying no transform from '",
-        from_space, "'."
-      ),
-      class = "neuroatlas_unknown_coord_space"
-    ))
+    warning(
+      warningCondition(
+        paste0(
+          "Atlas '",
+          atlas_name,
+          "' has no single coordinate space ",
+          "(coord_space is ",
+          shown,
+          "); assuming the coordinates are ",
+          "already in its world space and applying no transform from '",
+          from_space,
+          "'."
+        ),
+        class = "neuroatlas_unknown_coord_space"
+      )
+    )
     return(FALSE)
   }
   !identical(toupper(target), toupper(from_space))
@@ -265,8 +300,13 @@ query_vox <- function(x, ijk, ...) {
 
 # Internal: exact voxel lookup (radius == 0)
 #' @noRd
-.query_exact <- function(query_coords, output_coords, vol, atlas_obj,
-                         atlas_name) {
+.query_exact <- function(
+  query_coords,
+  output_coords,
+  vol,
+  atlas_obj,
+  atlas_name
+) {
   n_points <- nrow(query_coords)
   sp <- neuroim2::space(vol)
 
@@ -291,8 +331,14 @@ query_vox <- function(x, ijk, ...) {
 
 # Internal: radius-based fuzzy search
 #' @noRd
-.query_radius <- function(query_coords, output_coords, vol, atlas_obj,
-                          atlas_name, radius) {
+.query_radius <- function(
+  query_coords,
+  output_coords,
+  vol,
+  atlas_obj,
+  atlas_name,
+  radius
+) {
   n_points <- nrow(query_coords)
   sp <- neuroim2::space(vol)
   vol_dims <- dim(vol)
@@ -322,11 +368,19 @@ query_vox <- function(x, ijk, ...) {
     }
 
     cand_world <- neuroim2::grid_to_coord(sp, cand_grid)
-    dists <- sqrt(rowSums(
-      (cand_world -
-         matrix(query_coords[i, ], nrow(cand_world), 3L,
-                byrow = TRUE))^2
-    ))
+    dists <- sqrt(
+      rowSums(
+        (
+          cand_world -
+            matrix(
+              query_coords[i, ],
+              nrow(cand_world),
+              3L,
+              byrow = TRUE
+            )
+        )^2
+      )
+    )
     within <- dists <= radius + sqrt(.Machine$double.eps)
     cand_grid <- cand_grid[within, , drop = FALSE]
 
@@ -371,8 +425,14 @@ query_vox <- function(x, ijk, ...) {
 # The containing voxel wins at distance 0; otherwise the closest labelled
 # voxel centre within `radius`; ties go to the smallest region id.
 #' @noRd
-.query_nearest <- function(query_coords, output_coords, vol, atlas_obj,
-                           atlas_name, radius) {
+.query_nearest <- function(
+  query_coords,
+  output_coords,
+  vol,
+  atlas_obj,
+  atlas_name,
+  radius
+) {
   n_points <- nrow(query_coords)
   sp <- neuroim2::space(vol)
   vol_dims <- dim(vol)
@@ -406,9 +466,11 @@ query_vox <- function(x, ijk, ...) {
 
     world <- neuroim2::grid_to_coord(sp, cand)
     if (is.null(dim(world))) world <- matrix(world, nrow = 1L)
-    d <- sqrt(rowSums(
-      (world - matrix(pt, nrow(world), 3L, byrow = TRUE))^2
-    ))
+    d <- sqrt(
+      rowSums(
+        (world - matrix(pt, nrow(world), 3L, byrow = TRUE))^2
+      )
+    )
     within <- d <= radius + tol
     if (!any(within)) next
     d_min <- min(d[within])
@@ -417,8 +479,13 @@ query_vox <- function(x, ijk, ...) {
     dist[i] <- d_min
   }
 
-  out <- .ids_to_tibble(ids, output_coords, atlas_obj, atlas_name,
-                        point = seq_len(n_points))
+  out <- .ids_to_tibble(
+    ids,
+    output_coords,
+    atlas_obj,
+    atlas_name,
+    point = seq_len(n_points)
+  )
   tibble::add_column(out, distance = dist, .after = "network")
 }
 
@@ -428,8 +495,10 @@ query_vox <- function(x, ijk, ...) {
 .radius_grid_offsets <- function(radius, sp) {
   spacing <- tryCatch(neuroim2::spacing(sp), error = function(e) NULL)
   spacing <- as.numeric(spacing)
-  if (length(spacing) != 3L || any(!is.finite(spacing)) ||
-      any(spacing <= 0)) {
+  if (
+    length(spacing) != 3L || any(!is.finite(spacing)) ||
+      any(spacing <= 0)
+  ) {
     spacing <- rep(1, 3)
   }
 
@@ -527,10 +596,21 @@ query_vox <- function(x, ijk, ...) {
   meta <- tryCatch(roi_metadata(atlas_obj), error = function(e) NULL)
   if (!is.null(meta)) {
     skip <- c(
-      "id", "label", "label_full", "hemi", "network",
-      "color_r", "color_g", "color_b",
-      "template_space", "coord_space", "atlas_family", "atlas_model",
-      "atlas_representation", "atlas_source", "atlas_confidence"
+      "id",
+      "label",
+      "label_full",
+      "hemi",
+      "network",
+      "color_r",
+      "color_g",
+      "color_b",
+      "template_space",
+      "coord_space",
+      "atlas_family",
+      "atlas_model",
+      "atlas_representation",
+      "atlas_source",
+      "atlas_confidence"
     )
     extra_cols <- setdiff(names(meta), skip)
     for (col in extra_cols) {

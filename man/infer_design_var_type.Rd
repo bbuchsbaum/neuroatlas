@@ -16,3 +16,7 @@ A character scalar.
 Classify a vector as \code{"continuous"} or \code{"categorical"} for plot
 defaults.
 }
+\examples{
+infer_design_var_type(c(0.1, 0.2, 0.3))
+infer_design_var_type(c("control", "patient"))
+}

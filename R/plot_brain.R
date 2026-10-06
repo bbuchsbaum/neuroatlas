@@ -1,11 +1,35 @@
 # Global variables to avoid R CMD check NOTEs
-utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
-                         "view", "tooltip", "data_id", "fill_color",
-                         "fill_value", "xend", "yend", "poly_id", "edge_type",
-                         "path_id", "v1", "v2", "alpha", "shade",
-                         "overlay_color",
-                         "xmin", "xmax", "ymin", "ymax",
-                         "rotate", "height", "width", "contour_id"))
+utils::globalVariables(
+  c(
+    "face_id",
+    "vertex_order",
+    "parcel_id",
+    "panel",
+    "view",
+    "tooltip",
+    "data_id",
+    "fill_color",
+    "fill_value",
+    "xend",
+    "yend",
+    "poly_id",
+    "edge_type",
+    "path_id",
+    "v1",
+    "v2",
+    "alpha",
+    "shade",
+    "overlay_color",
+    "xmin",
+    "xmax",
+    "ymin",
+    "ymax",
+    "rotate",
+    "height",
+    "width",
+    "contour_id"
+  )
+)
 
 .plot_brain_depth_resolution <- 240L
 .plot_brain_depth_neighborhood <- 0L
@@ -93,41 +117,60 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @return Integer vector of retained face indices in candidate order.
 #' @keywords internal
 #' @noRd
-.depth_cull_faces <- function(faces, proj_xy, face_depth, candidates,
-                              resolution = .plot_brain_depth_resolution,
-                              tolerance = NULL,
-                              neighborhood = .plot_brain_depth_neighborhood) {
+.depth_cull_faces <- function(
+  faces,
+  proj_xy,
+  face_depth,
+  candidates,
+  resolution = .plot_brain_depth_resolution,
+  tolerance = NULL,
+  neighborhood = .plot_brain_depth_neighborhood
+) {
   candidates <- as.integer(candidates)
   candidates <- candidates[
     !is.na(candidates) & candidates >= 1L & candidates <= nrow(faces)
   ]
-  if (length(candidates) <= 1L) return(candidates)
+  if (length(candidates) <= 1L) {
+    return(candidates)
+  }
 
-  if (!is.matrix(faces) || ncol(faces) != 3 ||
+  if (
+    !is.matrix(faces) || ncol(faces) != 3 ||
       !is.matrix(proj_xy) || ncol(proj_xy) != 2 ||
-      length(face_depth) != nrow(faces)) {
+      length(face_depth) != nrow(faces)
+  ) {
     return(candidates)
   }
 
   resolution <- as.integer(resolution)
-  if (is.na(resolution) || resolution < 8L) return(candidates)
+  if (is.na(resolution) || resolution < 8L) {
+    return(candidates)
+  }
 
   neighborhood <- as.integer(neighborhood)
   if (is.na(neighborhood) || neighborhood < 0L) neighborhood <- 0L
 
-  cx <- (proj_xy[faces[, 1], 1] +
-         proj_xy[faces[, 2], 1] +
-         proj_xy[faces[, 3], 1]) / 3
-  cy <- (proj_xy[faces[, 1], 2] +
-         proj_xy[faces[, 2], 2] +
-         proj_xy[faces[, 3], 2]) / 3
+  cx <- (
+    proj_xy[faces[, 1], 1] +
+      proj_xy[faces[, 2], 1] +
+      proj_xy[faces[, 3], 1]
+  ) / 3
+  cy <- (
+    proj_xy[faces[, 1], 2] +
+      proj_xy[faces[, 2], 2] +
+      proj_xy[faces[, 3], 2]
+  ) / 3
   finite_face <- is.finite(cx) & is.finite(cy) & is.finite(face_depth)
-  if (!any(finite_face)) return(candidates)
+  if (!any(finite_face)) {
+    return(candidates)
+  }
 
   xr <- range(cx[finite_face])
   yr <- range(cy[finite_face])
-  if (!is.finite(diff(xr)) || !is.finite(diff(yr)) ||
-      diff(xr) <= 0 || diff(yr) <= 0) {
+  if (
+    !is.finite(diff(xr)) || !is.finite(diff(yr)) ||
+      diff(xr) <= 0 || diff(yr) <= 0
+  ) {
     return(candidates)
   }
 
@@ -152,7 +195,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 
   keep <- rep(TRUE, length(candidates))
   valid_candidate_pos <- which(finite_face[candidates])
-  if (length(valid_candidate_pos) == 0L) return(candidates)
+  if (length(valid_candidate_pos) == 0L) {
+    return(candidates)
+  }
 
   cand <- candidates[valid_candidate_pos]
   local_max <- rep(-Inf, length(cand))
@@ -181,7 +226,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' the silhouette of the visible mesh. Optionally flags between-network
 #' boundaries when a parcel->network map is supplied.
 #'
-#' @param vis_faces F_vis x 3 integer matrix of vertex indices for visible faces.
+#' @param vis_faces F_vis x 3 integer matrix of vertex indices for visible
+#'   faces.
 #' @param vis_parcel Integer vector of parcel IDs per visible face.
 #' @param proj_xy N x 2 matrix of 2D projected vertex coordinates.
 #' @param id_to_network Optional named character vector mapping parcel IDs to
@@ -190,10 +236,16 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #'   \code{NULL} if no boundary edges are found.
 #' @keywords internal
 #' @noRd
-.compute_boundary_edges <- function(vis_faces, vis_parcel, proj_xy,
-                                    id_to_network = NULL) {
+.compute_boundary_edges <- function(
+  vis_faces,
+  vis_parcel,
+  proj_xy,
+  id_to_network = NULL
+) {
   n_vis <- nrow(vis_faces)
-  if (n_vis == 0) return(NULL)
+  if (n_vis == 0) {
+    return(NULL)
+  }
 
   # Build all half-edges (3 per face)
   v_a <- c(vis_faces[, 1], vis_faces[, 2], vis_faces[, 3])
@@ -288,17 +340,24 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @param edges Tibble from [.compute_boundary_edges()] with columns
 #'   \code{panel}, \code{edge_type}, \code{v1}, \code{v2}, \code{x}, \code{y},
 #'   \code{xend}, \code{yend}.
-#' @return Tibble with columns \code{x, y, path_id, vertex_order, edge_type, panel},
+#' @return Tibble with columns \code{x, y, path_id, vertex_order, edge_type,
+#'   panel},
 #'   or \code{NULL} if no paths can be formed.
 #' @keywords internal
 #' @noRd
 .boundary_edges_to_paths <- function(edges) {
   needed <- c("panel", "edge_type", "v1", "v2", "x", "y", "xend", "yend")
-  if (is.null(edges) || nrow(edges) == 0) return(NULL)
-  if (!all(needed %in% names(edges))) return(NULL)
+  if (is.null(edges) || nrow(edges) == 0) {
+    return(NULL)
+  }
+  if (!all(needed %in% names(edges))) {
+    return(NULL)
+  }
 
   edges <- edges[!is.na(edges$v1) & !is.na(edges$v2), , drop = FALSE]
-  if (nrow(edges) == 0) return(NULL)
+  if (nrow(edges) == 0) {
+    return(NULL)
+  }
 
   split_groups <- split(
     seq_len(nrow(edges)),
@@ -350,7 +409,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       cur_e <- start_edge
 
       repeat {
-        visited[cur_e] <<- TRUE
+        # Update the visited vector shared by these traversal callbacks.
+        visited[cur_e] <<- TRUE # nolint: assignment_linter.
         nxt_v <- other_vertex(cur_e, cur_v)
         v_seq <- c(v_seq, nxt_v)
 
@@ -374,7 +434,7 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       cur_e <- start_edge
 
       repeat {
-        visited[cur_e] <<- TRUE
+        visited[cur_e] <<- TRUE # nolint: assignment_linter.
         nxt_v <- other_vertex(cur_e, cur_v)
         v_seq <- c(v_seq, nxt_v)
 
@@ -435,7 +495,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
     }
   }
 
-  if (length(out) == 0) return(NULL)
+  if (length(out) == 0) {
+    return(NULL)
+  }
   dplyr::bind_rows(out)
 }
 
@@ -449,11 +511,15 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @noRd
 .chaikin_smooth_xy <- function(x, y, n_iter = 1L) {
   n_iter <- as.integer(n_iter)
-  if (n_iter <= 0L) return(list(x = x, y = y))
+  if (n_iter <= 0L) {
+    return(list(x = x, y = y))
+  }
 
   pts <- cbind(as.numeric(x), as.numeric(y))
   n <- nrow(pts)
-  if (n < 3L) return(list(x = pts[, 1], y = pts[, 2]))
+  if (n < 3L) {
+    return(list(x = pts[, 1], y = pts[, 2]))
+  }
 
   tol <- 1e-8
   is_closed <- n >= 4L &&
@@ -509,13 +575,19 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @keywords internal
 #' @noRd
 .smooth_boundary_paths <- function(paths, n_iter = 1L) {
-  if (is.null(paths) || nrow(paths) == 0) return(paths)
+  if (is.null(paths) || nrow(paths) == 0) {
+    return(paths)
+  }
 
   n_iter <- as.integer(n_iter)
-  if (is.na(n_iter) || n_iter <= 0L) return(paths)
+  if (is.na(n_iter) || n_iter <= 0L) {
+    return(paths)
+  }
 
   needed <- c("x", "y", "path_id", "vertex_order", "edge_type", "panel")
-  if (!all(needed %in% names(paths))) return(paths)
+  if (!all(needed %in% names(paths))) {
+    return(paths)
+  }
 
   split_paths <- split(paths, paths$path_id)
   out <- vector("list", length(split_paths))
@@ -553,17 +625,24 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' and chains them into ordered vertex loops suitable for
 #' \code{ggplot2::geom_polygon}.
 #'
-#' @param vis_faces F_vis x 3 integer matrix of vertex indices for visible faces.
+#' @param vis_faces F_vis x 3 integer matrix of vertex indices for visible
+#'   faces.
 #' @param vis_parcel Integer vector of parcel IDs per visible face.
 #' @param proj_xy N x 2 matrix of 2D projected vertex coordinates.
 #' @param id_to_label Named character vector mapping parcel IDs to labels.
 #' @return A tibble with columns: x, y, poly_id, parcel_id, label.
 #' @keywords internal
 #' @noRd
-.merge_parcel_polygons <- function(vis_faces, vis_parcel, proj_xy,
-                                   id_to_label) {
+.merge_parcel_polygons <- function(
+  vis_faces,
+  vis_parcel,
+  proj_xy,
+  id_to_label
+) {
   n_vis <- nrow(vis_faces)
-  if (n_vis == 0) return(NULL)
+  if (n_vis == 0) {
+    return(NULL)
+  }
 
   # Build undirected boundary edges per parcel.
   #
@@ -581,8 +660,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   max_v <- max(e_max)
   stride <- max_v + 1
   e_key <- as.numeric(e_parcel) * stride * stride +
-           as.numeric(e_min) * stride +
-           as.numeric(e_max)
+    as.numeric(e_min) * stride +
+    as.numeric(e_max)
 
   ord <- order(e_key)
   sk <- e_key[ord]
@@ -591,7 +670,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   sv <- e_max[ord]
 
   n <- length(sk)
-  if (n == 0) return(NULL)
+  if (n == 0) {
+    return(NULL)
+  }
 
   # Run-length encode identical (parcel, edge) keys
   is_break <- c(TRUE, diff(sk) != 0)
@@ -603,7 +684,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   b_u <- su[boundary_run]
   b_v <- sv[boundary_run]
 
-  if (length(b_u) == 0) return(NULL)
+  if (length(b_u) == 0) {
+    return(NULL)
+  }
 
   unique_parcels <- sort(unique(b_parcel))
   poly_list <- vector("list", length(unique_parcels) * 2L)
@@ -654,16 +737,26 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
         # straightest continuation in the projected 2D plane.
         chosen <- cand[1]
         if (length(cand) > 1 && !is.na(prev)) {
-          in_vec <- proj_xy[curr, , drop = FALSE] - proj_xy[prev, , drop = FALSE]
+          in_vec <- proj_xy[curr, , drop = FALSE] - proj_xy[prev, ,
+            drop = FALSE
+          ]
           in_norm <- sqrt(sum(in_vec^2))
           if (is.finite(in_norm) && in_norm > 0) {
-            scores <- vapply(cand, function(k) {
-              nv <- nbrs$to[k]
-              out_vec <- proj_xy[nv, , drop = FALSE] - proj_xy[curr, , drop = FALSE]
-              out_norm <- sqrt(sum(out_vec^2))
-              if (!is.finite(out_norm) || out_norm == 0) return(-Inf)
-              sum(in_vec * out_vec) / (in_norm * out_norm)
-            }, numeric(1))
+            scores <- vapply(
+              cand,
+              function(k) {
+                nv <- nbrs$to[k]
+                out_vec <- proj_xy[nv, , drop = FALSE] - proj_xy[curr, ,
+                  drop = FALSE
+                ]
+                out_norm <- sqrt(sum(out_vec^2))
+                if (!is.finite(out_norm) || out_norm == 0) {
+                  return(-Inf)
+                }
+                sum(in_vec * out_vec) / (in_norm * out_norm)
+              },
+              numeric(1)
+            )
             chosen <- cand[which.max(scores)]
           }
         }
@@ -698,7 +791,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
     }
   }
 
-  if (poly_count == 0L) return(NULL)
+  if (poly_count == 0L) {
+    return(NULL)
+  }
   dplyr::bind_rows(poly_list[seq_len(poly_count)])
 }
 
@@ -713,9 +808,13 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @return A list with \code{polygons} and \code{boundaries} tibbles.
 #' @keywords internal
 #' @noRd
-.build_merged_polygon_data <- function(surfatlas, views, surface,
-                                       projection_smooth = 0L,
-                                       depth_cull = TRUE) {
+.build_merged_polygon_data <- function(
+  surfatlas,
+  views,
+  surface,
+  projection_smooth = 0L,
+  depth_cull = TRUE
+) {
   hemis <- c("left", "right")
   hemi_keys <- c(left = "lh", right = "rh")
 
@@ -723,10 +822,14 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   all_ids <- surfatlas$ids
   id_to_label <- stats::setNames(all_labels, as.character(all_ids))
   id_to_network <- NULL
-  if (!is.null(surfatlas$network) &&
-      length(surfatlas$network) == length(surfatlas$ids)) {
-    id_to_network <- stats::setNames(as.character(surfatlas$network),
-                                     as.character(surfatlas$ids))
+  if (
+    !is.null(surfatlas$network) &&
+      length(surfatlas$network) == length(surfatlas$ids)
+  ) {
+    id_to_network <- stats::setNames(
+      as.character(surfatlas$network),
+      as.character(surfatlas$ids)
+    )
   }
 
   polygon_list <- list()
@@ -762,8 +865,8 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       vdir <- proj$view_dir
 
       dots <- fnormals[, 1] * vdir[1] +
-              fnormals[, 2] * vdir[2] +
-              fnormals[, 3] * vdir[3]
+        fnormals[, 2] * vdir[2] +
+        fnormals[, 3] * vdir[3]
       visible <- which(dots > 0)
       if (isTRUE(depth_cull)) {
         visible <- .depth_cull_faces(
@@ -776,26 +879,37 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       visible <- visible[fparcel[visible] != 0]
       if (length(visible) == 0) next
 
-      vis_faces  <- faces[visible, , drop = FALSE]
+      vis_faces <- faces[visible, , drop = FALSE]
       vis_parcel <- fparcel[visible]
-      panel_label <- paste0(tools::toTitleCase(h), " ",
-                            tools::toTitleCase(v))
+      panel_label <- paste0(
+        tools::toTitleCase(h),
+        " ",
+        tools::toTitleCase(v)
+      )
 
       # Merged parcel polygons
-      merged <- .merge_parcel_polygons(vis_faces, vis_parcel, proj$xy,
-                                       id_to_label)
+      merged <- .merge_parcel_polygons(
+        vis_faces,
+        vis_parcel,
+        proj$xy,
+        id_to_label
+      )
       if (!is.null(merged)) {
         merged$poly_id <- merged$poly_id + global_offset
         global_offset <- max(merged$poly_id)
-        merged$hemi  <- h
-        merged$view  <- v
+        merged$hemi <- h
+        merged$view <- v
         merged$panel <- panel_label
         polygon_list[[length(polygon_list) + 1L]] <- merged
       }
 
       # Boundary edges for the border line layer
-      bedge <- .compute_boundary_edges(vis_faces, vis_parcel, proj$xy,
-                                       id_to_network = id_to_network)
+      bedge <- .compute_boundary_edges(
+        vis_faces,
+        vis_parcel,
+        proj$xy,
+        id_to_network = id_to_network
+      )
       if (!is.null(bedge)) {
         bedge$panel <- panel_label
         boundary_list[[length(boundary_list) + 1L]] <- bedge
@@ -831,9 +945,14 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #'   \code{NULL}.
 #' @keywords internal
 #' @noRd
-.build_surface_silhouette_data <- function(surfatlas, views, hemis, surface,
-                                           projection_smooth = 0L,
-                                           depth_cull = TRUE) {
+.build_surface_silhouette_data <- function(
+  surfatlas,
+  views,
+  hemis,
+  surface,
+  projection_smooth = 0L,
+  depth_cull = TRUE
+) {
   hemi_keys <- c(left = "lh", right = "rh")
   out <- list()
   global_offset <- 0L
@@ -881,7 +1000,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       panel_label <- paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v))
 
       merged <- .merge_parcel_polygons(
-        vis_faces, vis_parcel, proj$xy,
+        vis_faces,
+        vis_parcel,
+        proj$xy,
         id_to_label = c("1" = "")
       )
       if (!is.null(merged) && nrow(merged) > 0) {
@@ -889,13 +1010,20 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
         global_offset <- max(merged$poly_id)
         merged$panel <- panel_label
         merged$view <- v
-        out[[length(out) + 1L]] <- merged[, c("x", "y", "poly_id", "panel",
-                                             "view")]
+        out[[length(out) + 1L]] <- merged[, c(
+          "x",
+          "y",
+          "poly_id",
+          "panel",
+          "view"
+        )]
       }
     }
   }
 
-  if (length(out) == 0) return(NULL)
+  if (length(out) == 0) {
+    return(NULL)
+  }
   dplyr::bind_rows(out)
 }
 
@@ -924,9 +1052,14 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #'   \code{NULL}.
 #' @keywords internal
 #' @noRd
-.build_surface_background_data <- function(surfatlas, views, hemis, surface,
-                                           projection_smooth = 0L,
-                                           depth_cull = TRUE) {
+.build_surface_background_data <- function(
+  surfatlas,
+  views,
+  hemis,
+  surface,
+  projection_smooth = 0L,
+  depth_cull = TRUE
+) {
   hemi_keys <- c(left = "lh", right = "rh")
   out <- list()
   global_face_id <- 0L
@@ -979,10 +1112,16 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
       panel_label <- paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v))
 
       out[[length(out) + 1L]] <- tibble::tibble(
-        x = c(proj$xy[vis_faces[, 1], 1], proj$xy[vis_faces[, 2], 1],
-              proj$xy[vis_faces[, 3], 1]),
-        y = c(proj$xy[vis_faces[, 1], 2], proj$xy[vis_faces[, 2], 2],
-              proj$xy[vis_faces[, 3], 2]),
+        x = c(
+          proj$xy[vis_faces[, 1], 1],
+          proj$xy[vis_faces[, 2], 1],
+          proj$xy[vis_faces[, 3], 1]
+        ),
+        y = c(
+          proj$xy[vis_faces[, 1], 2],
+          proj$xy[vis_faces[, 2], 2],
+          proj$xy[vis_faces[, 3], 2]
+        ),
         face_id = rep(fids, 3),
         shade = rep(vis_shade, 3),
         panel = panel_label
@@ -990,7 +1129,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
     }
   }
 
-  if (length(out) == 0) return(NULL)
+  if (length(out) == 0) {
+    return(NULL)
+  }
   dplyr::bind_rows(out)
 }
 
@@ -1018,29 +1159,29 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   # across both lateral and medial views.
   if (view == "lateral" && hemi == "left") {
     view_dir <- c(-1, 0, 0)
-    xy <- cbind(-verts[, 2], verts[, 3])         # (-y, z)
+    xy <- cbind(-verts[, 2], verts[, 3]) # (-y, z)
   } else if (view == "medial" && hemi == "left") {
     view_dir <- c(1, 0, 0)
-    xy <- cbind(-verts[, 2], verts[, 3])          # (-y, z)
+    xy <- cbind(-verts[, 2], verts[, 3]) # (-y, z)
   } else if (view == "lateral" && hemi == "right") {
     view_dir <- c(1, 0, 0)
-    xy <- cbind(verts[, 2], verts[, 3])           # (y, z)
+    xy <- cbind(verts[, 2], verts[, 3]) # (y, z)
   } else if (view == "medial" && hemi == "right") {
     view_dir <- c(-1, 0, 0)
-    xy <- cbind(verts[, 2], verts[, 3])           # (y, z)
+    xy <- cbind(verts[, 2], verts[, 3]) # (y, z)
   } else if (view == "dorsal") {
     view_dir <- c(0, 0, 1)
     xy <- if (hemi == "left") {
-      cbind(verts[, 1], verts[, 2])               # (x, y)
+      cbind(verts[, 1], verts[, 2]) # (x, y)
     } else {
-      cbind(-verts[, 1], verts[, 2])              # (-x, y)
+      cbind(-verts[, 1], verts[, 2]) # (-x, y)
     }
   } else if (view == "ventral") {
     view_dir <- c(0, 0, -1)
     xy <- if (hemi == "left") {
-      cbind(verts[, 1], -verts[, 2])              # (x, -y)
+      cbind(verts[, 1], -verts[, 2]) # (x, -y)
     } else {
-      cbind(-verts[, 1], -verts[, 2])             # (-x, -y)
+      cbind(-verts[, 1], -verts[, 2]) # (-x, -y)
     }
   } else {
     stop("Unknown view: ", view)
@@ -1071,7 +1212,9 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
   edges <- edges[order(edges[, 1], edges[, 2]), , drop = FALSE]
 
   neigh <- vector("list", as.integer(n_vertices))
-  if (nrow(edges) == 0) return(neigh)
+  if (nrow(edges) == 0) {
+    return(neigh)
+  }
 
   split_nb <- split(edges[, 2], edges[, 1])
   idx <- as.integer(names(split_nb))
@@ -1102,11 +1245,21 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #' @noRd
 .smooth_projected_xy <- function(xy, neighbors, n_iter = 1L, lambda = 0.35) {
   n_iter <- as.integer(n_iter)
-  if (is.na(n_iter) || n_iter <= 0L) return(xy)
-  if (!is.matrix(xy) || ncol(xy) != 2) return(xy)
-  if (!is.list(neighbors) || length(neighbors) != nrow(xy)) return(xy)
-  if (!is.numeric(lambda) || length(lambda) != 1 || is.na(lambda) ||
-      lambda <= 0 || lambda >= 1) return(xy)
+  if (is.na(n_iter) || n_iter <= 0L) {
+    return(xy)
+  }
+  if (!is.matrix(xy) || ncol(xy) != 2) {
+    return(xy)
+  }
+  if (!is.list(neighbors) || length(neighbors) != nrow(xy)) {
+    return(xy)
+  }
+  if (
+    !is.numeric(lambda) || length(lambda) != 1 || is.na(lambda) ||
+      lambda <= 0 || lambda >= 1
+  ) {
+    return(xy)
+  }
 
   out <- xy
   n <- nrow(out)
@@ -1143,15 +1296,26 @@ utils::globalVariables(c("face_id", "vertex_order", "parcel_id", "panel",
 #'
 #' @return A list with elements:
 #' \describe{
-#'   \item{\code{xy}}{Numeric matrix (\eqn{N \times 2}) of projected coordinates.}
+#'   \item{\code{xy}}{Numeric matrix (\eqn{N \times 2}) of projected
+#' coordinates.}
 #'   \item{\code{view_dir}}{Numeric length-3 view direction vector used for
 #'     backface culling.}
 #' }
+#' @examples
+#' project_surface_view(rbind(c(0, 0, 0), c(1, 2, 3)),
+#'   view = "lateral", hemi = "left"
+#' )
 #' @export
-project_surface_view <- function(verts,
-                                 view = c("lateral", "medial",
-                                          "dorsal", "ventral"),
-                                 hemi = c("left", "right")) {
+project_surface_view <- function(
+  verts,
+  view = c(
+    "lateral",
+    "medial",
+    "dorsal",
+    "ventral"
+  ),
+  hemi = c("left", "right")
+) {
   view <- match.arg(view)
   hemi <- match.arg(hemi)
 
@@ -1192,9 +1356,13 @@ project_surface_view <- function(verts,
 #'   \code{boundaries} (tibble with columns x, y, xend, yend, panel).
 #' @keywords internal
 #' @noRd
-.build_brain_polygon_data <- function(surfatlas, views, surface,
-                                      projection_smooth = 0L,
-                                      depth_cull = TRUE) {
+.build_brain_polygon_data <- function(
+  surfatlas,
+  views,
+  surface,
+  projection_smooth = 0L,
+  depth_cull = TRUE
+) {
   hemis <- c("left", "right")
   hemi_keys <- c(left = "lh", right = "rh")
 
@@ -1203,10 +1371,14 @@ project_surface_view <- function(verts,
   # Build label lookup: parcel_id -> label
   id_to_label <- stats::setNames(all_labels, as.character(all_ids))
   id_to_network <- NULL
-  if (!is.null(surfatlas$network) &&
-      length(surfatlas$network) == length(surfatlas$ids)) {
-    id_to_network <- stats::setNames(as.character(surfatlas$network),
-                                     as.character(surfatlas$ids))
+  if (
+    !is.null(surfatlas$network) &&
+      length(surfatlas$network) == length(surfatlas$ids)
+  ) {
+    id_to_network <- stats::setNames(
+      as.character(surfatlas$network),
+      as.character(surfatlas$ids)
+    )
   }
 
   polygon_list <- list()
@@ -1219,8 +1391,8 @@ project_surface_view <- function(verts,
 
     # Extract geometry from the LabeledNeuroSurface
     geom <- atlas_hemi@geometry
-    verts <- t(geom@mesh$vb[1:3, ])   # N x 3
-    faces <- t(geom@mesh$it)           # F x 3
+    verts <- t(geom@mesh$vb[1:3, ]) # N x 3
+    faces <- t(geom@mesh$it) # F x 3
     neighbors <- NULL
     if (projection_smooth > 0L) {
       neighbors <- .mesh_vertex_neighbors(faces, nrow(verts))
@@ -1246,7 +1418,10 @@ project_surface_view <- function(verts,
       vdir <- proj$view_dir
 
       # Backface culling: keep faces whose normal dots positively with view dir
-      dots <- fnormals[, 1] * vdir[1] + fnormals[, 2] * vdir[2] + fnormals[, 3] * vdir[3]
+      dots <- fnormals[, 1] * vdir[1] + fnormals[, 2] * vdir[2] + fnormals[
+        ,
+        3
+      ] * vdir[3]
       face_depth <- .face_depth(verts, faces, vdir)
       visible <- which(dots > 0)
       if (isTRUE(depth_cull)) {
@@ -1271,12 +1446,16 @@ project_surface_view <- function(verts,
       vis_parcel <- fparcel[visible]
       vis_shade <- dots[visible]
 
-      x_coords <- c(proj$xy[vis_faces[, 1], 1],
-                     proj$xy[vis_faces[, 2], 1],
-                     proj$xy[vis_faces[, 3], 1])
-      y_coords <- c(proj$xy[vis_faces[, 1], 2],
-                     proj$xy[vis_faces[, 2], 2],
-                     proj$xy[vis_faces[, 3], 2])
+      x_coords <- c(
+        proj$xy[vis_faces[, 1], 1],
+        proj$xy[vis_faces[, 2], 1],
+        proj$xy[vis_faces[, 3], 1]
+      )
+      y_coords <- c(
+        proj$xy[vis_faces[, 1], 2],
+        proj$xy[vis_faces[, 2], 2],
+        proj$xy[vis_faces[, 3], 2]
+      )
 
       panel_label <- paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v))
 
@@ -1299,8 +1478,12 @@ project_surface_view <- function(verts,
       polygon_list[[length(polygon_list) + 1L]] <- chunk
 
       # Compute parcel boundary edges for this view
-      bedge <- .compute_boundary_edges(vis_faces, vis_parcel, proj$xy,
-                                       id_to_network = id_to_network)
+      bedge <- .compute_boundary_edges(
+        vis_faces,
+        vis_parcel,
+        proj$xy,
+        id_to_network = id_to_network
+      )
       if (!is.null(bedge)) {
         bedge$panel <- panel_label
         boundary_list[[length(boundary_list) + 1L]] <- bedge
@@ -1347,14 +1530,22 @@ project_surface_view <- function(verts,
 #'   \item{\code{polygons}}{A tibble of projected polygon vertices.}
 #'   \item{\code{boundaries}}{A tibble of projected boundary segments.}
 #' }
+#' @examples
+#' \dontrun{
+#' atlas <- get_schaefer_surfatlas(100)
+#' polygons <- build_surface_polygon_data(atlas, views = "lateral")
+#' head(polygons$polygons)
+#' }
 #' @export
-build_surface_polygon_data <- function(surfatlas,
-                                       views = c("lateral", "medial"),
-                                       surface = "inflated",
-                                       merged = TRUE,
-                                       projection_smooth = 0L,
-                                       use_cache = TRUE,
-                                       depth_cull = TRUE) {
+build_surface_polygon_data <- function(
+  surfatlas,
+  views = c("lateral", "medial"),
+  surface = "inflated",
+  merged = TRUE,
+  projection_smooth = 0L,
+  use_cache = TRUE,
+  depth_cull = TRUE
+) {
   if (!inherits(surfatlas, "surfatlas")) {
     stop("'surfatlas' must inherit from class 'surfatlas'.", call. = FALSE)
   }
@@ -1371,15 +1562,21 @@ build_surface_polygon_data <- function(surfatlas,
   if (!is.logical(use_cache) || length(use_cache) != 1 || is.na(use_cache)) {
     stop("'use_cache' must be TRUE or FALSE.", call. = FALSE)
   }
-  if (!is.logical(depth_cull) || length(depth_cull) != 1 ||
-      is.na(depth_cull)) {
+  if (
+    !is.logical(depth_cull) || length(depth_cull) != 1 ||
+      is.na(depth_cull)
+  ) {
     stop("'depth_cull' must be TRUE or FALSE.", call. = FALSE)
   }
-  if (!is.numeric(projection_smooth) || length(projection_smooth) != 1 ||
+  if (
+    !is.numeric(projection_smooth) || length(projection_smooth) != 1 ||
       is.na(projection_smooth) || projection_smooth < 0 ||
-      projection_smooth != as.integer(projection_smooth)) {
-    stop("'projection_smooth' must be a non-negative integer scalar.",
-         call. = FALSE)
+      projection_smooth != as.integer(projection_smooth)
+  ) {
+    stop(
+      "'projection_smooth' must be a non-negative integer scalar.",
+      call. = FALSE
+    )
   }
   projection_smooth <- as.integer(projection_smooth)
 
@@ -1418,13 +1615,15 @@ build_surface_polygon_data <- function(surfatlas,
 #' @return A list with \code{polygons} and \code{boundaries}.
 #' @keywords internal
 #' @noRd
-.build_overlay_polygon_data <- function(surfatlas,
-                                        overlay,
-                                        views,
-                                        hemis,
-                                        projection_smooth = 0L,
-                                        threshold = NULL,
-                                        depth_cull = TRUE) {
+.build_overlay_polygon_data <- function(
+  surfatlas,
+  overlay,
+  views,
+  hemis,
+  projection_smooth = 0L,
+  threshold = NULL,
+  depth_cull = TRUE
+) {
   hemi_keys <- c(left = "lh", right = "rh")
   poly_list <- list()
   boundary_list <- list()
@@ -1517,12 +1716,16 @@ build_surface_polygon_data <- function(surfatlas,
       global_face_id <- global_face_id + n_keep
 
       chunk <- tibble::tibble(
-        x = c(proj$xy[vis_faces_keep[, 1], 1],
-              proj$xy[vis_faces_keep[, 2], 1],
-              proj$xy[vis_faces_keep[, 3], 1]),
-        y = c(proj$xy[vis_faces_keep[, 1], 2],
-              proj$xy[vis_faces_keep[, 2], 2],
-              proj$xy[vis_faces_keep[, 3], 2]),
+        x = c(
+          proj$xy[vis_faces_keep[, 1], 1],
+          proj$xy[vis_faces_keep[, 2], 1],
+          proj$xy[vis_faces_keep[, 3], 1]
+        ),
+        y = c(
+          proj$xy[vis_faces_keep[, 1], 2],
+          proj$xy[vis_faces_keep[, 2], 2],
+          proj$xy[vis_faces_keep[, 3], 2]
+        ),
         face_id = rep(fids, 3),
         panel = panel_label,
         overlay_value = rep(vals_keep, 3)
@@ -1541,11 +1744,13 @@ build_surface_polygon_data <- function(surfatlas,
 #' Map numeric overlay values to alpha values
 #' @keywords internal
 #' @noRd
-.overlay_alpha_values <- function(values,
-                                  threshold = NULL,
-                                  alpha = 0.45,
-                                  mode = c("constant", "threshold"),
-                                  ramp = NULL) {
+.overlay_alpha_values <- function(
+  values,
+  threshold = NULL,
+  alpha = 0.45,
+  mode = c("constant", "threshold"),
+  ramp = NULL
+) {
   mode <- match.arg(mode)
   values <- as.numeric(values)
   out <- rep(alpha, length(values))
@@ -1553,8 +1758,10 @@ build_surface_polygon_data <- function(surfatlas,
     return(out)
   }
 
-  if (is.null(threshold) || length(threshold) != 1L ||
-      !is.finite(threshold)) {
+  if (
+    is.null(threshold) || length(threshold) != 1L ||
+      !is.finite(threshold)
+  ) {
     return(out)
   }
 
@@ -1567,8 +1774,11 @@ build_surface_polygon_data <- function(surfatlas,
       ramp <- sqrt(.Machine$double.eps)
     } else {
       span <- max(above, na.rm = TRUE) - threshold
-      ramp <- max(span * 0.10, threshold * 0.25,
-                  sqrt(.Machine$double.eps))
+      ramp <- max(
+        span * 0.10,
+        threshold * 0.25,
+        sqrt(.Machine$double.eps)
+      )
     }
   }
   ramp <- as.numeric(ramp)
@@ -1595,11 +1805,15 @@ build_surface_polygon_data <- function(surfatlas,
   vals <- as.numeric(vals)
   finite <- is.finite(vals)
   out <- rep(NA_character_, length(vals))
-  if (!any(finite)) return(out)
+  if (!any(finite)) {
+    return(out)
+  }
 
   if (is.null(lim)) {
     lim <- range(vals[finite], na.rm = TRUE)
-    if (!all(is.finite(lim))) return(out)
+    if (!all(is.finite(lim))) {
+      return(out)
+    }
     if (lim[1] == lim[2]) {
       lim <- lim + c(-1e-6, 1e-6)
     }
@@ -1625,15 +1839,25 @@ build_surface_polygon_data <- function(surfatlas,
 #' @return A tibble with per-panel transform parameters, or \code{NULL}.
 #' @keywords internal
 #' @noRd
-.compute_panel_layout_transforms <- function(poly_data,
-                                             panel_layout = c("native",
-                                                              "presentation")) {
+.compute_panel_layout_transforms <- function(
+  poly_data,
+  panel_layout = c(
+    "native",
+    "presentation"
+  )
+) {
   panel_layout <- match.arg(panel_layout)
-  if (panel_layout == "native") return(NULL)
-  if (is.null(poly_data) || nrow(poly_data) == 0) return(NULL)
+  if (panel_layout == "native") {
+    return(NULL)
+  }
+  if (is.null(poly_data) || nrow(poly_data) == 0) {
+    return(NULL)
+  }
 
   needed <- c("panel", "view", "x", "y")
-  if (!all(needed %in% names(poly_data))) return(NULL)
+  if (!all(needed %in% names(poly_data))) {
+    return(NULL)
+  }
 
   ext <- poly_data |>
     dplyr::group_by(panel, view) |>
@@ -1670,11 +1894,21 @@ build_surface_polygon_data <- function(surfatlas,
 #' @return Transformed data frame.
 #' @keywords internal
 #' @noRd
-.apply_panel_layout_to_points <- function(dat, transforms,
-                                          x_col = "x", y_col = "y") {
-  if (is.null(dat) || nrow(dat) == 0) return(dat)
-  if (is.null(transforms) || nrow(transforms) == 0) return(dat)
-  if (!all(c("panel", x_col, y_col) %in% names(dat))) return(dat)
+.apply_panel_layout_to_points <- function(
+  dat,
+  transforms,
+  x_col = "x",
+  y_col = "y"
+) {
+  if (is.null(dat) || nrow(dat) == 0) {
+    return(dat)
+  }
+  if (is.null(transforms) || nrow(transforms) == 0) {
+    return(dat)
+  }
+  if (!all(c("panel", x_col, y_col) %in% names(dat))) {
+    return(dat)
+  }
 
   out <- dplyr::left_join(
     dat,
@@ -1718,9 +1952,15 @@ build_surface_polygon_data <- function(surfatlas,
 #' @keywords internal
 #' @noRd
 .apply_panel_layout_to_segments <- function(dat, transforms) {
-  if (is.null(dat) || nrow(dat) == 0) return(dat)
-  if (is.null(transforms) || nrow(transforms) == 0) return(dat)
-  if (!all(c("panel", "x", "y", "xend", "yend") %in% names(dat))) return(dat)
+  if (is.null(dat) || nrow(dat) == 0) {
+    return(dat)
+  }
+  if (is.null(transforms) || nrow(transforms) == 0) {
+    return(dat)
+  }
+  if (!all(c("panel", "x", "y", "xend", "yend") %in% names(dat))) {
+    return(dat)
+  }
 
   out <- dplyr::left_join(
     dat,
@@ -1781,15 +2021,29 @@ build_surface_polygon_data <- function(surfatlas,
   )
 }
 
-.resolve_colorbar_source <- function(colorbar_source = c("auto", "base",
-                                                          "overlay", "none"),
-                                     vals = NULL,
-                                     overlay_values = NULL,
-                                     overlay_present = !is.null(overlay_values)) {
+.resolve_colorbar_source <- function(
+  colorbar_source = c(
+    "auto",
+    "base",
+    "overlay",
+    "none"
+  ),
+  vals = NULL,
+  overlay_values = NULL,
+  overlay_present = !is.null(
+    overlay_values
+  )
+) {
   colorbar_source <- match.arg(colorbar_source)
-  if (!identical(colorbar_source, "auto")) return(colorbar_source)
-  if (isTRUE(overlay_present)) return("overlay")
-  if (!is.null(vals) && any(is.finite(vals))) return("base")
+  if (!identical(colorbar_source, "auto")) {
+    return(colorbar_source)
+  }
+  if (isTRUE(overlay_present)) {
+    return("overlay")
+  }
+  if (!is.null(vals) && any(is.finite(vals))) {
+    return("base")
+  }
   "none"
 }
 
@@ -1799,8 +2053,10 @@ build_surface_polygon_data <- function(surfatlas,
   }
   out <- as.numeric(lim)
   if (lim[[1]] <= 0 && lim[[2]] >= 0) out <- c(out, 0)
-  if (!is.null(threshold) && length(threshold) == 1L &&
-      is.finite(threshold) && threshold > 0) {
+  if (
+    !is.null(threshold) && length(threshold) == 1L &&
+      is.finite(threshold) && threshold > 0
+  ) {
     marks <- c(-abs(threshold), abs(threshold))
     out <- c(out, marks[marks >= lim[[1]] & marks <= lim[[2]]])
   }
@@ -1808,37 +2064,65 @@ build_surface_polygon_data <- function(surfatlas,
 }
 
 .polygon_signed_area <- function(x, y) {
-  if (length(x) < 3L || length(y) != length(x)) return(0)
+  if (length(x) < 3L || length(y) != length(x)) {
+    return(0)
+  }
   j <- c(seq.int(2L, length(x)), 1L)
   0.5 * sum(x * y[j] - x[j] * y)
 }
 
 .surface_outer_contour_data <- function(base_data) {
   needed <- c("x", "y", "poly_id", "panel")
-  if (is.null(base_data) || nrow(base_data) == 0L ||
-      !all(needed %in% names(base_data))) return(NULL)
+  if (
+    is.null(base_data) || nrow(base_data) == 0L ||
+      !all(needed %in% names(base_data))
+  ) {
+    return(NULL)
+  }
 
-  groups <- split(base_data, interaction(base_data$panel, base_data$poly_id,
-                                         drop = TRUE))
-  areas <- vapply(groups, function(g) {
-    abs(.polygon_signed_area(g$x, g$y))
-  }, numeric(1))
+  groups <- split(
+    base_data,
+    interaction(
+      base_data$panel,
+      base_data$poly_id,
+      drop = TRUE
+    )
+  )
+  areas <- vapply(
+    groups,
+    function(g) {
+      abs(.polygon_signed_area(g$x, g$y))
+    },
+    numeric(1)
+  )
   panels <- vapply(groups, function(g) as.character(g$panel[[1]]), character(1))
-  keep <- unlist(lapply(split(seq_along(groups), panels), function(idx) {
-    idx[[which.max(areas[idx])]]
-  }), use.names = FALSE)
+  keep <- unlist(
+    lapply(
+      split(seq_along(groups), panels),
+      function(idx) {
+        idx[[which.max(areas[idx])]]
+      }
+    ),
+    use.names = FALSE
+  )
 
-  out <- lapply(seq_along(keep), function(k) {
-    g <- groups[[keep[[k]]]]
-    g <- g[, c("x", "y", "panel"), drop = FALSE]
-    g <- rbind(g, g[1L, , drop = FALSE])
-    g$contour_id <- k
-    g
-  })
+  out <- lapply(
+    seq_along(keep),
+    function(k) {
+      g <- groups[[keep[[k]]]]
+      g <- g[, c("x", "y", "panel"), drop = FALSE]
+      g <- rbind(g, g[1L, , drop = FALSE])
+      g$contour_id <- k
+      g
+    }
+  )
   dplyr::bind_rows(out)
 }
 
-.resolve_plot_brain_panel_labels <- function(panel_levels, panel_labels = NULL) {
+.resolve_plot_brain_panel_labels <- function(
+  panel_levels,
+  panel_labels = NULL
+) {
   if (is.null(panel_labels)) {
     return(panel_levels)
   }
@@ -1857,7 +2141,9 @@ build_surface_polygon_data <- function(surfatlas,
   if (is.null(names(panel_labels))) {
     if (length(panel_labels) != length(panel_levels)) {
       stop(
-        "Unnamed 'panel_labels' must have length ", length(panel_levels), ".",
+        "Unnamed 'panel_labels' must have length ",
+        length(panel_levels),
+        ".",
         call. = FALSE
       )
     }
@@ -1870,18 +2156,22 @@ build_surface_polygon_data <- function(surfatlas,
   unname(out)
 }
 
-.compose_plot_brain_figure <- function(main_plot,
-                                       colorbar_plot = NULL,
-                                       colorbar_position = "none",
-                                       title = NULL,
-                                       subtitle = NULL,
-                                       caption = NULL,
-                                       bg = "white") {
+.compose_plot_brain_figure <- function(
+  main_plot,
+  colorbar_plot = NULL,
+  colorbar_position = "none",
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  bg = "white"
+) {
   is_patchwork_plot <- inherits(main_plot, "patchwork")
   annotation_theme <- ggplot2::theme(
     plot.background = ggplot2::element_rect(fill = bg, colour = NA),
-    plot.title = ggplot2::element_text(face = "bold",
-                                       margin = ggplot2::margin(t = 4, b = 6)),
+    plot.title = ggplot2::element_text(
+      face = "bold",
+      margin = ggplot2::margin(t = 4, b = 6)
+    ),
     plot.subtitle = ggplot2::element_text(margin = ggplot2::margin(b = 8)),
     plot.caption = ggplot2::element_text(margin = ggplot2::margin(t = 8)),
     plot.title.position = "plot",
@@ -1890,12 +2180,14 @@ build_surface_polygon_data <- function(surfatlas,
 
   if (identical(colorbar_position, "none") || is.null(colorbar_plot)) {
     if (is_patchwork_plot) {
-      return(main_plot + patchwork::plot_annotation(
-        title = title,
-        subtitle = subtitle,
-        caption = caption,
-        theme = annotation_theme
-      ))
+      return(
+        main_plot + patchwork::plot_annotation(
+          title = title,
+          subtitle = subtitle,
+          caption = caption,
+          theme = annotation_theme
+        )
+      )
     }
 
     return(
@@ -1914,11 +2206,19 @@ build_surface_polygon_data <- function(surfatlas,
   }
 
   combined <- if (identical(colorbar_position, "bottom")) {
-    patchwork::wrap_plots(main_plot, colorbar_plot, ncol = 1,
-                          heights = c(1, 0.16))
+    patchwork::wrap_plots(
+      main_plot,
+      colorbar_plot,
+      ncol = 1,
+      heights = c(1, 0.16)
+    )
   } else {
-    patchwork::wrap_plots(main_plot, colorbar_plot, ncol = 2,
-                          widths = c(1, 0.12))
+    patchwork::wrap_plots(
+      main_plot,
+      colorbar_plot,
+      ncol = 2,
+      widths = c(1, 0.12)
+    )
   }
 
   combined + patchwork::plot_annotation(
@@ -2122,7 +2422,8 @@ build_surface_polygon_data <- function(surfatlas,
 #' @param colorbar_source Which mapped quantity supplies the static colorbar:
 #'   \code{"auto"}, \code{"base"}, \code{"overlay"}, or \code{"none"}.
 #'   \code{"auto"} chooses the overlay whenever one was supplied, even if all
-#'   of its values are removed by thresholding; otherwise it chooses \code{vals}.
+#'   of its values are removed by thresholding; otherwise it chooses
+#' \code{vals}.
 #' @param colorbar_title Optional character label for the colorbar.
 #' @param overlay_title Optional character label used when the colorbar source
 #'   is the overlay. Defaults to \code{colorbar_title}.
@@ -2139,7 +2440,8 @@ build_surface_polygon_data <- function(surfatlas,
 #'   sulcal metric is preferred; otherwise the CPU backend computes curvature
 #'   on matched white geometry and verifies vertex correspondence.
 #' @param anatomy_metric_source Provenance label for an explicit metric.
-#' @param anatomy_style,anatomy_midpoint,anatomy_invert,anatomy_range CPU underlay
+#' @param anatomy_style,anatomy_midpoint,anatomy_invert,anatomy_range CPU
+#'   underlay
 #'   controls passed to [neurosurf::render_surface_rgba()].
 #' @param vals_threshold Optional non-negative magnitude for the CPU parcel
 #'   renderer (\code{static_backend = "cpu"} with \code{vals}): parcels with
@@ -2224,98 +2526,105 @@ build_surface_polygon_data <- function(surfatlas,
 #' @importFrom dplyr left_join bind_rows
 #' @importFrom memoise memoise
 #' @export
-plot_brain <- function(surfatlas,
-                       vals = NULL,
-                       views = c("lateral", "medial"),
-                       hemis = c("left", "right"),
-                       surface = "inflated",
-                       color_method = "rule_hcl",
-                       colors = NULL,
-                       palette = "cork",
-                       lim = NULL,
-                       interactive = TRUE,
-                       static_backend = c("ggplot", "cpu"),
-                       data_id_mode = c("parcel", "polygon"),
-                       ncol = 2L,
-                       panel_layout = c("native", "presentation"),
-                       style = c("default", "ggseg_like", "stat_publication"),
-                       border = TRUE,
-                       border_geom = c("path", "segment"),
-                       boundary_smooth = 0L,
-                       projection_smooth = 0L,
-                       border_color = "grey30",
-                       border_size = 0.15,
-                       border_lineend = "round",
-                       border_linejoin = "round",
-                       silhouette = border,
-                       silhouette_color = border_color,
-                       silhouette_size = border_size,
-                       outer_contour = FALSE,
-                       outer_contour_color = "grey35",
-                       outer_contour_size = 0.3,
-                       network_border = FALSE,
-                       network_border_color = border_color,
-                       network_border_size = border_size * 2,
-                       shading = FALSE,
-                       shading_strength = 0.22,
-                       shading_gamma = 1,
-                       shading_color = "black",
-                       fill_alpha = 1,
-                       overlay = NULL,
-                       overlay_threshold = NULL,
-                       overlay_alpha = 0.45,
-                       overlay_alpha_mode = c("constant", "threshold"),
-                       overlay_alpha_ramp = NULL,
-                       overlay_palette = "vik",
-                       overlay_lim = NULL,
-                       overlay_border = FALSE,
-                       overlay_border_color = "black",
-                       overlay_border_size = 0.25,
-                       overlay_fun = c("avg", "nn", "mode"),
-                       overlay_sampling = c("midpoint", "normal_line",
-                                            "thickness"),
-                       overlay_interpolation = c("legacy", "nearest", "linear"),
-                       overlay_aggregate = NULL,
-                       overlay_n_samples = NULL,
-                       overlay_depth = NULL,
-                       overlay_surface_smooth_fwhm = 0,
-                       colorbar = FALSE,
-                       colorbar_source = c("auto", "base", "overlay", "none"),
-                       colorbar_title = NULL,
-                       overlay_title = colorbar_title,
-                       title = NULL,
-                       subtitle = NULL,
-                       caption = NULL,
-                       panel_labels = NULL,
-                       cortex_mask = NULL,
-                       cortex_mask_source = NULL,
-                       anatomy_metric = NULL,
-                       anatomy_metric_source = NULL,
-                       medial_wall = c("shade", "mask", "outline"),
-                       camera = c("canonical", "presentation"),
-                       orientation_labels = TRUE,
-                       render_width = 1200L,
-                       render_height = 750L,
-                       render_antialias = 2L,
-                       outline = FALSE,
-                       background = FALSE,
-                       background_color = "grey80",
-                       depth_cull = TRUE,
-                       bg = "white",
-                       data = NULL,
-                       value = NULL,
-                       by = NULL,
-                       allow_partial = FALSE,
-                       anatomy_style = "publication",
-                       anatomy_midpoint = NULL,
-                       anatomy_invert = FALSE,
-                       anatomy_range = c(0.72, 0.90),
-                       vals_threshold = NULL,
-                       parcel_style = NULL,
-                       ...) {
-  render_size_missing <- c(width = missing(render_width),
-                           height = missing(render_height),
-                           antialias = missing(render_antialias))
+plot_brain <- function(
+  surfatlas,
+  vals = NULL,
+  views = c("lateral", "medial"),
+  hemis = c("left", "right"),
+  surface = "inflated",
+  color_method = "rule_hcl",
+  colors = NULL,
+  palette = "cork",
+  lim = NULL,
+  interactive = TRUE,
+  static_backend = c("ggplot", "cpu"),
+  data_id_mode = c("parcel", "polygon"),
+  ncol = 2L,
+  panel_layout = c("native", "presentation"),
+  style = c("default", "ggseg_like", "stat_publication"),
+  border = TRUE,
+  border_geom = c("path", "segment"),
+  boundary_smooth = 0L,
+  projection_smooth = 0L,
+  border_color = "grey30",
+  border_size = 0.15,
+  border_lineend = "round",
+  border_linejoin = "round",
+  silhouette = border,
+  silhouette_color = border_color,
+  silhouette_size = border_size,
+  outer_contour = FALSE,
+  outer_contour_color = "grey35",
+  outer_contour_size = 0.3,
+  network_border = FALSE,
+  network_border_color = border_color,
+  network_border_size = border_size * 2,
+  shading = FALSE,
+  shading_strength = 0.22,
+  shading_gamma = 1,
+  shading_color = "black",
+  fill_alpha = 1,
+  overlay = NULL,
+  overlay_threshold = NULL,
+  overlay_alpha = 0.45,
+  overlay_alpha_mode = c("constant", "threshold"),
+  overlay_alpha_ramp = NULL,
+  overlay_palette = "vik",
+  overlay_lim = NULL,
+  overlay_border = FALSE,
+  overlay_border_color = "black",
+  overlay_border_size = 0.25,
+  overlay_fun = c("avg", "nn", "mode"),
+  overlay_sampling = c(
+    "midpoint",
+    "normal_line",
+    "thickness"
+  ),
+  overlay_interpolation = c("legacy", "nearest", "linear"),
+  overlay_aggregate = NULL,
+  overlay_n_samples = NULL,
+  overlay_depth = NULL,
+  overlay_surface_smooth_fwhm = 0,
+  colorbar = FALSE,
+  colorbar_source = c("auto", "base", "overlay", "none"),
+  colorbar_title = NULL,
+  overlay_title = colorbar_title,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  panel_labels = NULL,
+  cortex_mask = NULL,
+  cortex_mask_source = NULL,
+  anatomy_metric = NULL,
+  anatomy_metric_source = NULL,
+  medial_wall = c("shade", "mask", "outline"),
+  camera = c("canonical", "presentation"),
+  orientation_labels = TRUE,
+  render_width = 1200L,
+  render_height = 750L,
+  render_antialias = 2L,
+  outline = FALSE,
+  background = FALSE,
+  background_color = "grey80",
+  depth_cull = TRUE,
+  bg = "white",
+  data = NULL,
+  value = NULL,
+  by = NULL,
+  allow_partial = FALSE,
+  anatomy_style = "publication",
+  anatomy_midpoint = NULL,
+  anatomy_invert = FALSE,
+  anatomy_range = c(0.72, 0.90),
+  vals_threshold = NULL,
+  parcel_style = NULL,
+  ...
+) {
+  render_size_missing <- c(
+    width = missing(render_width),
+    height = missing(render_height),
+    antialias = missing(render_antialias)
+  )
   style <- match.arg(style)
   overlay_present <- !is.null(overlay)
   data_present <- !is.null(data)
@@ -2327,14 +2636,20 @@ plot_brain <- function(surfatlas,
   if (!is.logical(depth_cull) || length(depth_cull) != 1 || is.na(depth_cull)) {
     stop("'depth_cull' must be TRUE or FALSE.", call. = FALSE)
   }
-  if (!is.logical(outer_contour) || length(outer_contour) != 1 ||
-      is.na(outer_contour)) {
+  if (
+    !is.logical(outer_contour) || length(outer_contour) != 1 ||
+      is.na(outer_contour)
+  ) {
     stop("'outer_contour' must be TRUE or FALSE.", call. = FALSE)
   }
-  if (!is.numeric(outer_contour_size) || length(outer_contour_size) != 1L ||
-      !is.finite(outer_contour_size) || outer_contour_size < 0) {
-    stop("'outer_contour_size' must be a non-negative numeric scalar.",
-         call. = FALSE)
+  if (
+    !is.numeric(outer_contour_size) || length(outer_contour_size) != 1L ||
+      !is.finite(outer_contour_size) || outer_contour_size < 0
+  ) {
+    stop(
+      "'outer_contour_size' must be a non-negative numeric scalar.",
+      call. = FALSE
+    )
   }
 
   panel_layout_missing <- missing(panel_layout)
@@ -2397,9 +2712,11 @@ plot_brain <- function(surfatlas,
 
   # Input validation
   if (!inherits(surfatlas, "surfatlas")) {
-    stop("'surfatlas' must be a surface atlas object of class 'surfatlas'.\n",
-         "Use schaefer_surf() or glasser_surf() to create one.",
-         call. = FALSE)
+    stop(
+      "'surfatlas' must be a surface atlas object of class 'surfatlas'.\n",
+      "Use schaefer_surf() or glasser_surf() to create one.",
+      call. = FALSE
+    )
   }
 
   if (data_present) {
@@ -2417,8 +2734,10 @@ plot_brain <- function(surfatlas,
       allow_partial = allow_partial
     )
     vals <- .parcel_value_from_aligned(aligned, surfatlas, value_col)
-  } else if (value_supplied || !is.null(by) ||
-             !identical(allow_partial, FALSE)) {
+  } else if (
+    value_supplied || !is.null(by) ||
+      !identical(allow_partial, FALSE)
+  ) {
     cli::cli_abort(
       "{.arg value}, {.arg by}, and {.arg allow_partial} require {.arg data}.",
       class = c("neuroatlas_error_parcel_value", "neuroatlas_error")
@@ -2426,22 +2745,35 @@ plot_brain <- function(surfatlas,
   }
 
   surface_missing <- missing(surface)
-  if (surface_missing && !is.null(surfatlas$surf_type) &&
-      length(surfatlas$surf_type) == 1L && nzchar(surfatlas$surf_type)) {
+  if (
+    surface_missing && !is.null(surfatlas$surf_type) &&
+      length(surfatlas$surf_type) == 1L && nzchar(surfatlas$surf_type)
+  ) {
     surface <- surfatlas$surf_type
   }
   surface <- match.arg(surface, c("inflated", "pial", "white", "midthickness"))
-  if (!is.null(surfatlas$surf_type) && length(surfatlas$surf_type) == 1L &&
-      nzchar(surfatlas$surf_type) && !identical(surface, surfatlas$surf_type)) {
+  if (
+    !is.null(surfatlas$surf_type) && length(surfatlas$surf_type) == 1L &&
+      nzchar(surfatlas$surf_type) && !identical(
+      surface,
+      surfatlas$surf_type
+    )
+  ) {
     stop(
-      "Requested surface '", surface, "' does not match surfatlas$surf_type '",
-      surfatlas$surf_type, "'. Construct or resolve an atlas with the requested geometry.",
+      "Requested surface '",
+      surface,
+      "' does not match surfatlas$surf_type '",
+      surfatlas$surf_type,
+      "'. Construct or resolve an atlas with the requested geometry.",
       call. = FALSE
     )
   }
 
-  views <- match.arg(views, c("lateral", "medial", "dorsal", "ventral"),
-                     several.ok = TRUE)
+  views <- match.arg(
+    views,
+    c("lateral", "medial", "dorsal", "ventral"),
+    several.ok = TRUE
+  )
   hemis <- match.arg(hemis, c("left", "right"), several.ok = TRUE)
   colorbar_position <- .normalize_colorbar_position(colorbar)
   static_backend <- match.arg(static_backend)
@@ -2458,13 +2790,21 @@ plot_brain <- function(surfatlas,
       stop("'vals' must be a numeric vector.", call. = FALSE)
     }
     if (length(vals) != length(surfatlas$ids)) {
-      stop("Length of 'vals' (", length(vals), ") must match number of atlas ",
-           "regions (", length(surfatlas$ids), ").",
-           call. = FALSE)
+      stop(
+        "Length of 'vals' (",
+        length(vals),
+        ") must match number of atlas ",
+        "regions (",
+        length(surfatlas$ids),
+        ").",
+        call. = FALSE
+      )
     }
     if (any(is.infinite(vals))) {
-      stop("'vals' may contain finite numbers or NA, but not infinite values.",
-           call. = FALSE)
+      stop(
+        "'vals' may contain finite numbers or NA, but not infinite values.",
+        call. = FALSE
+      )
     }
   }
   if (data_present && !interactive && identical(static_backend, "cpu")) {
@@ -2477,109 +2817,176 @@ plot_brain <- function(surfatlas,
       class = c("neuroatlas_error_unsupported", "neuroatlas_error")
     )
   }
-  if (!interactive && identical(static_backend, "cpu") && !overlay_present &&
-      !is.null(vals)) {
-    return(.plot_brain_cpu_parcels(
-      surfatlas = surfatlas, vals = vals, views = views, hemis = hemis,
-      palette = palette, lim = lim, threshold = vals_threshold,
-      colorbar_position = if (isTRUE(colorbar)) "auto" else
-        .normalize_colorbar_position(colorbar),
-      colorbar_title = colorbar_title,
-      title = title, subtitle = subtitle, caption = caption,
-      panel_labels = panel_labels, bg = bg,
-      cortex_mask = cortex_mask, anatomy_metric = anatomy_metric,
-      camera = camera,
-      render_width = if (render_size_missing[["width"]]) 900L else render_width,
-      render_height = if (render_size_missing[["height"]]) 620L else render_height,
-      render_antialias = if (render_size_missing[["antialias"]]) 3L else
-        render_antialias,
-      parcel_style = parcel_style
-    ))
+  if (
+    !interactive && identical(static_backend, "cpu") && !overlay_present &&
+      !is.null(vals)
+  ) {
+    return(
+      .plot_brain_cpu_parcels(
+        surfatlas = surfatlas,
+        vals = vals,
+        views = views,
+        hemis = hemis,
+        palette = palette,
+        lim = lim,
+        threshold = vals_threshold,
+        colorbar_position = if (isTRUE(colorbar)) {
+          "auto"
+        } else {
+          .normalize_colorbar_position(colorbar)
+        },
+        colorbar_title = colorbar_title,
+        title = title,
+        subtitle = subtitle,
+        caption = caption,
+        panel_labels = panel_labels,
+        bg = bg,
+        cortex_mask = cortex_mask,
+        anatomy_metric = anatomy_metric,
+        camera = camera,
+        render_width = if (render_size_missing[["width"]]) 900L else render_width,
+        render_height = if (render_size_missing[["height"]]) 620L else render_height,
+        render_antialias = if (render_size_missing[["antialias"]]) {
+          3L
+        } else {
+          render_antialias
+        },
+        parcel_style = parcel_style
+      )
+    )
   }
   if (!interactive && identical(static_backend, "cpu")) {
-    return(.plot_brain_cpu(
-      surfatlas = surfatlas, overlay = overlay, views = views, hemis = hemis,
-      overlay_threshold = overlay_threshold, overlay_alpha = overlay_alpha,
-      overlay_alpha_ramp = overlay_alpha_ramp,
-      overlay_palette = overlay_palette, overlay_lim = overlay_lim,
-      overlay_fun = match.arg(overlay_fun),
-      overlay_sampling = match.arg(overlay_sampling),
-      overlay_interpolation = overlay_interpolation,
-      overlay_aggregate = overlay_aggregate,
-      overlay_n_samples = overlay_n_samples, overlay_depth = overlay_depth,
-      overlay_surface_smooth_fwhm = overlay_surface_smooth_fwhm,
-      colorbar_position = colorbar_position,
-      colorbar_source = colorbar_source, overlay_title = overlay_title,
-      title = title, subtitle = subtitle, caption = caption,
-      panel_labels = panel_labels, bg = bg,
-      cortex_mask = cortex_mask, cortex_mask_source = cortex_mask_source,
-      anatomy_metric = anatomy_metric,
-      anatomy_metric_source = anatomy_metric_source,
-      anatomy_style = anatomy_style,
-      anatomy_midpoint = anatomy_midpoint,
-      anatomy_invert = anatomy_invert,
-      anatomy_range = anatomy_range,
-      medial_wall = medial_wall, camera = camera,
-      orientation_labels = orientation_labels,
-      render_width = render_width, render_height = render_height,
-      render_antialias = render_antialias
-    ))
+    return(
+      .plot_brain_cpu(
+        surfatlas = surfatlas,
+        overlay = overlay,
+        views = views,
+        hemis = hemis,
+        overlay_threshold = overlay_threshold,
+        overlay_alpha = overlay_alpha,
+        overlay_alpha_ramp = overlay_alpha_ramp,
+        overlay_palette = overlay_palette,
+        overlay_lim = overlay_lim,
+        overlay_fun = match.arg(overlay_fun),
+        overlay_sampling = match.arg(overlay_sampling),
+        overlay_interpolation = overlay_interpolation,
+        overlay_aggregate = overlay_aggregate,
+        overlay_n_samples = overlay_n_samples,
+        overlay_depth = overlay_depth,
+        overlay_surface_smooth_fwhm = overlay_surface_smooth_fwhm,
+        colorbar_position = colorbar_position,
+        colorbar_source = colorbar_source,
+        overlay_title = overlay_title,
+        title = title,
+        subtitle = subtitle,
+        caption = caption,
+        panel_labels = panel_labels,
+        bg = bg,
+        cortex_mask = cortex_mask,
+        cortex_mask_source = cortex_mask_source,
+        anatomy_metric = anatomy_metric,
+        anatomy_metric_source = anatomy_metric_source,
+        anatomy_style = anatomy_style,
+        anatomy_midpoint = anatomy_midpoint,
+        anatomy_invert = anatomy_invert,
+        anatomy_range = anatomy_range,
+        medial_wall = medial_wall,
+        camera = camera,
+        orientation_labels = orientation_labels,
+        render_width = render_width,
+        render_height = render_height,
+        render_antialias = render_antialias
+      )
+    )
   }
-  if (!is.numeric(boundary_smooth) || length(boundary_smooth) != 1 ||
+  if (
+    !is.numeric(boundary_smooth) || length(boundary_smooth) != 1 ||
       is.na(boundary_smooth) || boundary_smooth < 0 ||
-      boundary_smooth != as.integer(boundary_smooth)) {
-    stop("'boundary_smooth' must be a non-negative integer scalar.",
-         call. = FALSE)
+      boundary_smooth != as.integer(boundary_smooth)
+  ) {
+    stop(
+      "'boundary_smooth' must be a non-negative integer scalar.",
+      call. = FALSE
+    )
   }
   boundary_smooth <- as.integer(boundary_smooth)
-  if (!is.numeric(projection_smooth) || length(projection_smooth) != 1 ||
+  if (
+    !is.numeric(projection_smooth) || length(projection_smooth) != 1 ||
       is.na(projection_smooth) || projection_smooth < 0 ||
-      projection_smooth != as.integer(projection_smooth)) {
-    stop("'projection_smooth' must be a non-negative integer scalar.",
-         call. = FALSE)
+      projection_smooth != as.integer(projection_smooth)
+  ) {
+    stop(
+      "'projection_smooth' must be a non-negative integer scalar.",
+      call. = FALSE
+    )
   }
   projection_smooth <- as.integer(projection_smooth)
 
   border_lineend <- match.arg(border_lineend, c("butt", "round", "square"))
   border_linejoin <- match.arg(border_linejoin, c("round", "mitre", "bevel"))
 
-  if (!is.numeric(fill_alpha) || length(fill_alpha) != 1 ||
-      is.na(fill_alpha) || fill_alpha < 0 || fill_alpha > 1) {
+  if (
+    !is.numeric(fill_alpha) || length(fill_alpha) != 1 ||
+      is.na(fill_alpha) || fill_alpha < 0 || fill_alpha > 1
+  ) {
     stop("'fill_alpha' must be a numeric scalar in [0, 1].", call. = FALSE)
   }
-  if (!is.numeric(overlay_alpha) || length(overlay_alpha) != 1 ||
-      is.na(overlay_alpha) || overlay_alpha < 0 || overlay_alpha > 1) {
+  if (
+    !is.numeric(overlay_alpha) || length(overlay_alpha) != 1 ||
+      is.na(overlay_alpha) || overlay_alpha < 0 || overlay_alpha > 1
+  ) {
     stop("'overlay_alpha' must be a numeric scalar in [0, 1].", call. = FALSE)
   }
-  if (!is.null(overlay_threshold) &&
-      (!is.numeric(overlay_threshold) || length(overlay_threshold) != 1 ||
-       is.na(overlay_threshold) || overlay_threshold < 0)) {
-    stop("'overlay_threshold' must be NULL or a non-negative numeric scalar.",
-         call. = FALSE)
+  if (
+    !is.null(overlay_threshold) &&
+      (
+        !is.numeric(overlay_threshold) || length(overlay_threshold) != 1 ||
+          is.na(overlay_threshold) || overlay_threshold < 0
+      )
+  ) {
+    stop(
+      "'overlay_threshold' must be NULL or a non-negative numeric scalar.",
+      call. = FALSE
+    )
   }
-  if (!is.null(overlay_alpha_ramp) &&
-      (!is.numeric(overlay_alpha_ramp) || length(overlay_alpha_ramp) != 1 ||
-       is.na(overlay_alpha_ramp) || overlay_alpha_ramp < 0)) {
-    stop("'overlay_alpha_ramp' must be NULL or a non-negative numeric scalar.",
-         call. = FALSE)
+  if (
+    !is.null(overlay_alpha_ramp) &&
+      (
+        !is.numeric(overlay_alpha_ramp) || length(overlay_alpha_ramp) != 1 ||
+          is.na(overlay_alpha_ramp) || overlay_alpha_ramp < 0
+      )
+  ) {
+    stop(
+      "'overlay_alpha_ramp' must be NULL or a non-negative numeric scalar.",
+      call. = FALSE
+    )
   }
 
-  if (!is.numeric(shading_strength) || length(shading_strength) != 1 ||
-      is.na(shading_strength) || shading_strength < 0 || shading_strength > 1) {
+  if (
+    !is.numeric(shading_strength) || length(shading_strength) != 1 ||
+      is.na(shading_strength) || shading_strength < 0 ||
+      shading_strength > 1
+  ) {
     stop("'shading_strength' must be a numeric scalar in [0, 1].", call. = FALSE)
   }
 
-  if (!is.numeric(shading_gamma) || length(shading_gamma) != 1 ||
-      is.na(shading_gamma) || shading_gamma <= 0) {
+  if (
+    !is.numeric(shading_gamma) || length(shading_gamma) != 1 ||
+      is.na(shading_gamma) || shading_gamma <= 0
+  ) {
     stop("'shading_gamma' must be a positive numeric scalar.", call. = FALSE)
   }
 
   if (!is.null(vals)) {
     if (!is.null(lim)) {
-      if (!is.numeric(lim) || length(lim) != 2L || any(!is.finite(lim)) ||
-          lim[[1]] > lim[[2]]) {
-        stop("'lim' must contain two finite numeric values in increasing order.",
-             call. = FALSE)
+      if (
+        !is.numeric(lim) || length(lim) != 2L || any(!is.finite(lim)) ||
+          lim[[1]] > lim[[2]]
+      ) {
+        stop(
+          "'lim' must contain two finite numeric values in increasing order.",
+          call. = FALSE
+        )
       }
     } else {
       finite_vals <- vals[is.finite(vals)]
@@ -2620,15 +3027,18 @@ plot_brain <- function(surfatlas,
   poly_data <- poly_data[poly_data$hemi %in% hemis, , drop = FALSE]
   if (!is.null(boundary_data) && nrow(boundary_data) > 0) {
     boundary_data <- boundary_data[boundary_data$panel %in% poly_data$panel, ,
-                                   drop = FALSE]
+      drop = FALSE
+    ]
     if (!"edge_type" %in% names(boundary_data)) {
       boundary_data$edge_type <- "parcel"
     }
   }
 
   if (nrow(poly_data) == 0) {
-    stop("No polygon data generated. Check views and hemis arguments.",
-         call. = FALSE)
+    stop(
+      "No polygon data generated. Check views and hemis arguments.",
+      call. = FALSE
+    )
   }
 
   # Merged polygons use poly_id; triangle mode uses face_id.
@@ -2640,7 +3050,10 @@ plot_brain <- function(surfatlas,
   silhouette_data <- NULL
   if (isTRUE(background) || panel_layout == "presentation") {
     silhouette_data <- .build_surface_silhouette_data_memo(
-      surfatlas, views, hemis, surface,
+      surfatlas,
+      views,
+      hemis,
+      surface,
       projection_smooth = projection_smooth,
       depth_cull = depth_cull
     )
@@ -2651,11 +3064,15 @@ plot_brain <- function(surfatlas,
   )
   if (!is.null(panel_transforms)) {
     poly_data <- .apply_panel_layout_to_points(poly_data, panel_transforms)
-    silhouette_data <- .apply_panel_layout_to_points(silhouette_data,
-                                                     panel_transforms)
+    silhouette_data <- .apply_panel_layout_to_points(
+      silhouette_data,
+      panel_transforms
+    )
     if (!is.null(boundary_data) && nrow(boundary_data) > 0) {
-      boundary_data <- .apply_panel_layout_to_segments(boundary_data,
-                                                       panel_transforms)
+      boundary_data <- .apply_panel_layout_to_segments(
+        boundary_data,
+        panel_transforms
+      )
     }
   }
 
@@ -2667,27 +3084,40 @@ plot_brain <- function(surfatlas,
       # voxel centroids) won't work.  Use the bundled cmap instead.
       if (!is.null(surfatlas$cmap)) {
         cmap <- surfatlas$cmap
-        hex <- grDevices::rgb(cmap[[1]], cmap[[2]], cmap[[3]], maxColorValue = 255)
+        hex <- grDevices::rgb(
+          cmap[[1]],
+          cmap[[2]],
+          cmap[[3]],
+          maxColorValue = 255
+        )
         color_tbl <- tibble::tibble(id = surfatlas$ids, color = hex)
       } else {
         # Fallback: generate simple HCL palette
         n <- length(surfatlas$ids)
-        hex <- grDevices::hcl(h = seq(15, 375, length.out = n + 1)[seq_len(n)],
-                              c = 70, l = 65, fixup = TRUE)
+        hex <- grDevices::hcl(
+          h = seq(15, 375, length.out = n + 1)[seq_len(n)],
+          c = 70,
+          l = 65,
+          fixup = TRUE
+        )
         color_tbl <- tibble::tibble(id = surfatlas$ids, color = hex)
       }
     } else if (is.data.frame(colors)) {
       color_tbl <- colors
     } else if (is.character(colors)) {
       if (!is.null(names(colors))) {
-        color_tbl <- tibble::tibble(id = as.integer(names(colors)),
-                                    color = unname(colors))
+        color_tbl <- tibble::tibble(
+          id = as.integer(names(colors)),
+          color = unname(colors)
+        )
       } else {
         color_tbl <- tibble::tibble(id = surfatlas$ids, color = colors)
       }
     } else {
-      stop("'colors' must be NULL, a tibble, or a character vector of hex colours",
-           call. = FALSE)
+      stop(
+        "'colors' must be NULL, a tibble, or a character vector of hex colours",
+        call. = FALSE
+      )
     }
 
     color_map <- stats::setNames(color_tbl$color, as.character(color_tbl$id))
@@ -2707,8 +3137,10 @@ plot_brain <- function(surfatlas,
   if (!is.null(vals)) {
     val_lookup <- stats::setNames(vals, as.character(surfatlas$ids))
     poly_data$tooltip <- paste0(
-      poly_data$label, "\n",
-      "Value: ", round(val_lookup[as.character(poly_data$parcel_id)], 3)
+      poly_data$label,
+      "\n",
+      "Value: ",
+      round(val_lookup[as.character(poly_data$parcel_id)], 3)
     )
   } else {
     poly_data$tooltip <- poly_data$label
@@ -2727,8 +3159,10 @@ plot_brain <- function(surfatlas,
   panel_levels <- c()
   for (v in views) {
     for (h in hemis) {
-      panel_levels <- c(panel_levels,
-                        paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v)))
+      panel_levels <- c(
+        panel_levels,
+        paste0(tools::toTitleCase(h), " ", tools::toTitleCase(v))
+      )
     }
   }
   panel_display_labels <- .resolve_plot_brain_panel_labels(
@@ -2738,7 +3172,10 @@ plot_brain <- function(surfatlas,
   panel_label_map <- stats::setNames(panel_display_labels, panel_levels)
   poly_data$panel <- factor(poly_data$panel, levels = panel_levels)
   if (!is.null(silhouette_data)) {
-    silhouette_data$panel <- factor(silhouette_data$panel, levels = panel_levels)
+    silhouette_data$panel <- factor(
+      silhouette_data$panel,
+      levels = panel_levels
+    )
   }
 
   # Optional grey cortex backdrop: the full hemisphere silhouette drawn under
@@ -2750,14 +3187,18 @@ plot_brain <- function(surfatlas,
     # Per-face lambertian shading over the whole cortex gives the grey backdrop
     # real sulcal/gyral depth (otherwise it reads as a flat silhouette).
     bg_shade_data <- .build_surface_background_data_memo(
-      surfatlas, views, hemis, surface,
+      surfatlas,
+      views,
+      hemis,
+      surface,
       projection_smooth = projection_smooth,
       depth_cull = depth_cull
     )
     if (!is.null(bg_shade_data) && nrow(bg_shade_data) > 0) {
       if (!is.null(panel_transforms)) {
         bg_shade_data <- .apply_panel_layout_to_points(
-          bg_shade_data, panel_transforms
+          bg_shade_data,
+          panel_transforms
         )
       }
       bg_shade_data$panel <- factor(bg_shade_data$panel, levels = panel_levels)
@@ -2771,8 +3212,10 @@ plot_brain <- function(surfatlas,
   # to eliminate anti-aliasing seams between adjacent same-parcel triangles.
   poly_lwd <- if (outline) 0.1 else 0.15
 
-  p <- ggplot2::ggplot(poly_data,
-                       ggplot2::aes(x = x, y = y, group = .data[[group_col]]))
+  p <- ggplot2::ggplot(
+    poly_data,
+    ggplot2::aes(x = x, y = y, group = .data[[group_col]])
+  )
   use_alpha_identity <- FALSE
 
   # Grey cortex backdrop must be drawn first so the parcellation sits on top.
@@ -2804,19 +3247,27 @@ plot_brain <- function(surfatlas,
   # Build aesthetic mapping
   if (outline) {
     if (interactive) {
-      geom_aes <- ggplot2::aes(fill = .data[[fill_sym]],
-                                tooltip = tooltip, data_id = data_id)
+      geom_aes <- ggplot2::aes(
+        fill = .data[[fill_sym]],
+        tooltip = tooltip,
+        data_id = data_id
+      )
     } else {
       geom_aes <- ggplot2::aes(fill = .data[[fill_sym]])
     }
   } else {
     if (interactive) {
-      geom_aes <- ggplot2::aes(fill = .data[[fill_sym]],
-                                colour = ggplot2::after_scale(fill),
-                                tooltip = tooltip, data_id = data_id)
+      geom_aes <- ggplot2::aes(
+        fill = .data[[fill_sym]],
+        colour = ggplot2::after_scale(fill),
+        tooltip = tooltip,
+        data_id = data_id
+      )
     } else {
-      geom_aes <- ggplot2::aes(fill = .data[[fill_sym]],
-                                colour = ggplot2::after_scale(fill))
+      geom_aes <- ggplot2::aes(
+        fill = .data[[fill_sym]],
+        colour = ggplot2::after_scale(fill)
+      )
     }
   }
 
@@ -2833,7 +3284,10 @@ plot_brain <- function(surfatlas,
     p <- p + ggplot2::scale_fill_identity()
   } else {
     p <- p + scico::scale_fill_scico(
-      palette = palette, limits = lim, oob = scales::squish, na.value = bg,
+      palette = palette,
+      limits = lim,
+      oob = scales::squish,
+      na.value = bg,
       guide = if (interactive) ggplot2::waiver() else "none"
     )
   }
@@ -2852,27 +3306,37 @@ plot_brain <- function(surfatlas,
       shade_data <- bg_shade_data
     } else if (!outline) {
       shade_build <- .build_brain_polygon_data_memo(
-        surfatlas, views, surface,
+        surfatlas,
+        views,
+        surface,
         projection_smooth = projection_smooth,
         depth_cull = depth_cull
       )
       shade_data <- shade_build$polygons
       shade_data <- shade_data[shade_data$hemi %in% hemis, , drop = FALSE]
       shade_data <- shade_data[shade_data$panel %in% levels(poly_data$panel), ,
-                               drop = FALSE]
+        drop = FALSE
+      ]
       if (!is.null(panel_transforms)) {
-        shade_data <- .apply_panel_layout_to_points(shade_data, panel_transforms)
+        shade_data <- .apply_panel_layout_to_points(
+          shade_data,
+          panel_transforms
+        )
       }
-      shade_data$panel <- factor(shade_data$panel,
-                                 levels = levels(poly_data$panel))
+      shade_data$panel <- factor(
+        shade_data$panel,
+        levels = levels(poly_data$panel)
+      )
     } else {
       shade_data <- poly_data
     }
 
-    if (!is.null(shade_data) && nrow(shade_data) > 0 &&
-        "shade" %in% names(shade_data)) {
+    if (
+      !is.null(shade_data) && nrow(shade_data) > 0 &&
+        "shade" %in% names(shade_data)
+    ) {
       shade_data$alpha <- shading_strength *
-        (pmax(0, 1 - shade_data$shade) ^ shading_gamma)
+        (pmax(0, 1 - shade_data$shade)^shading_gamma)
       p <- p + ggplot2::geom_polygon(
         data = shade_data,
         ggplot2::aes(x = x, y = y, group = face_id, alpha = alpha),
@@ -2905,8 +3369,10 @@ plot_brain <- function(surfatlas,
       overlay <- proj$overlay
     }
     if (!is.list(overlay)) {
-      stop("'overlay' must be a NeuroVol, or a list with 'lh'/'rh' vertex vectors.",
-           call. = FALSE)
+      stop(
+        "'overlay' must be a NeuroVol, or a list with 'lh'/'rh' vertex vectors.",
+        call. = FALSE
+      )
     }
 
     ov_build <- .build_overlay_polygon_data(
@@ -2953,7 +3419,9 @@ plot_brain <- function(surfatlas,
       p <- p + ggplot2::geom_polygon(
         data = ov_poly,
         ggplot2::aes(
-          x = x, y = y, group = face_id,
+          x = x,
+          y = y,
+          group = face_id,
           fill = I(overlay_color),
           alpha = overlay_alpha
         ),
@@ -2976,14 +3444,17 @@ plot_brain <- function(surfatlas,
                 n_iter = boundary_smooth
               )
             }
-            ov_paths$panel <- factor(ov_paths$panel,
-                                     levels = levels(poly_data$panel))
+            ov_paths$panel <- factor(
+              ov_paths$panel,
+              levels = levels(poly_data$panel)
+            )
           }
         }
 
         if (!is.null(ov_paths) && nrow(ov_paths) > 0) {
           ov_paths <- ov_paths[order(ov_paths$path_id, ov_paths$vertex_order), ,
-                               drop = FALSE]
+            drop = FALSE
+          ]
           p <- p + ggplot2::geom_path(
             data = ov_paths,
             ggplot2::aes(x = x, y = y, group = path_id),
@@ -3010,8 +3481,10 @@ plot_brain <- function(surfatlas,
 
   # Add parcel boundary lines (non-interactive, unaffected by hover dimming)
   if (!is.null(boundary_data) && nrow(boundary_data) > 0) {
-    boundary_data$panel <- factor(boundary_data$panel,
-                                  levels = levels(poly_data$panel))
+    boundary_data$panel <- factor(
+      boundary_data$panel,
+      levels = levels(poly_data$panel)
+    )
 
     boundary_paths <- NULL
     if (border_geom == "path") {
@@ -3023,20 +3496,28 @@ plot_brain <- function(surfatlas,
             n_iter = boundary_smooth
           )
         }
-        boundary_paths$panel <- factor(boundary_paths$panel,
-                                       levels = levels(poly_data$panel))
+        boundary_paths$panel <- factor(
+          boundary_paths$panel,
+          levels = levels(poly_data$panel)
+        )
       }
     }
 
     if (border) {
       if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
-        border_data <- boundary_paths[boundary_paths$edge_type %in%
-                                        c("parcel", "network"), ,
-                                      drop = FALSE]
+        border_data <- boundary_paths[
+          boundary_paths$edge_type %in%
+            c("parcel", "network"), ,
+          drop = FALSE
+        ]
         if (nrow(border_data) > 0) {
-          border_data <- border_data[order(border_data$path_id,
-                                           border_data$vertex_order), ,
-                                     drop = FALSE]
+          border_data <- border_data[
+            order(
+              border_data$path_id,
+              border_data$vertex_order
+            ), ,
+            drop = FALSE
+          ]
           p <- p + ggplot2::geom_path(
             data = border_data,
             ggplot2::aes(x = x, y = y, group = path_id),
@@ -3048,9 +3529,11 @@ plot_brain <- function(surfatlas,
           )
         }
       } else {
-        border_data <- boundary_data[boundary_data$edge_type %in%
-                                       c("parcel", "network"), ,
-                                     drop = FALSE]
+        border_data <- boundary_data[
+          boundary_data$edge_type %in%
+            c("parcel", "network"), ,
+          drop = FALSE
+        ]
         if (nrow(border_data) > 0) {
           p <- p + ggplot2::geom_segment(
             data = border_data,
@@ -3068,11 +3551,16 @@ plot_brain <- function(surfatlas,
     if (network_border) {
       if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
         net_data <- boundary_paths[boundary_paths$edge_type == "network", ,
-                                  drop = FALSE]
+          drop = FALSE
+        ]
         if (nrow(net_data) > 0) {
-          net_data <- net_data[order(net_data$path_id,
-                                     net_data$vertex_order), ,
-                               drop = FALSE]
+          net_data <- net_data[
+            order(
+              net_data$path_id,
+              net_data$vertex_order
+            ), ,
+            drop = FALSE
+          ]
           p <- p + ggplot2::geom_path(
             data = net_data,
             ggplot2::aes(x = x, y = y, group = path_id),
@@ -3085,7 +3573,8 @@ plot_brain <- function(surfatlas,
         }
       } else {
         net_data <- boundary_data[boundary_data$edge_type == "network", ,
-                                  drop = FALSE]
+          drop = FALSE
+        ]
         if (nrow(net_data) > 0) {
           p <- p + ggplot2::geom_segment(
             data = net_data,
@@ -3103,11 +3592,16 @@ plot_brain <- function(surfatlas,
     if (silhouette) {
       if (!is.null(boundary_paths) && nrow(boundary_paths) > 0) {
         sil_data <- boundary_paths[boundary_paths$edge_type == "silhouette", ,
-                                  drop = FALSE]
+          drop = FALSE
+        ]
         if (nrow(sil_data) > 0) {
-          sil_data <- sil_data[order(sil_data$path_id,
-                                     sil_data$vertex_order), ,
-                               drop = FALSE]
+          sil_data <- sil_data[
+            order(
+              sil_data$path_id,
+              sil_data$vertex_order
+            ), ,
+            drop = FALSE
+          ]
           p <- p + ggplot2::geom_path(
             data = sil_data,
             ggplot2::aes(x = x, y = y, group = path_id),
@@ -3120,7 +3614,8 @@ plot_brain <- function(surfatlas,
         }
       } else {
         sil_data <- boundary_data[boundary_data$edge_type == "silhouette", ,
-                                  drop = FALSE]
+          drop = FALSE
+        ]
         if (nrow(sil_data) > 0) {
           p <- p + ggplot2::geom_segment(
             data = sil_data,
@@ -3144,7 +3639,12 @@ plot_brain <- function(surfatlas,
     NULL
   }
   if (!is.null(outer_data) && nrow(outer_data) > 0L) {
-    outer_data$panel <- factor(outer_data$panel, levels = levels(poly_data$panel))
+    outer_data$panel <- factor(
+      outer_data$panel,
+      levels = levels(
+        poly_data$panel
+      )
+    )
     p <- p + ggplot2::geom_path(
       data = outer_data,
       ggplot2::aes(x = x, y = y, group = contour_id),
@@ -3162,7 +3662,7 @@ plot_brain <- function(surfatlas,
 
   p <- p +
     ggplot2::facet_wrap(
-      ~ panel,
+      ~panel,
       ncol = ncol,
       labeller = ggplot2::as_labeller(panel_label_map)
     ) +
@@ -3180,8 +3680,11 @@ plot_brain <- function(surfatlas,
       } else {
         ggplot2::unit(0.5, "lines")
       },
-      strip.text = ggplot2::element_text(size = 11, face = "bold",
-                                         margin = ggplot2::margin(t = 2, b = 6))
+      strip.text = ggplot2::element_text(
+        size = 11,
+        face = "bold",
+        margin = ggplot2::margin(t = 2, b = 6)
+      )
     ) +
     ggplot2::labs(fill = NULL)
 
@@ -3197,8 +3700,10 @@ plot_brain <- function(surfatlas,
       colorbar_position <- "none"
     }
     colorbar_meta <- list(source = resolved_colorbar_source)
-    if (!identical(colorbar_position, "none") &&
-        identical(resolved_colorbar_source, "base") && !is.null(vals)) {
+    if (
+      !identical(colorbar_position, "none") &&
+        identical(resolved_colorbar_source, "base") && !is.null(vals)
+    ) {
       cb <- .make_colorbar_panel(
         palette = palette,
         lim = lim,
@@ -3206,13 +3711,20 @@ plot_brain <- function(surfatlas,
         position = colorbar_position,
         bg = bg
       )
-      colorbar_meta <- c(colorbar_meta, list(
-        palette = palette, lim = lim, title = colorbar_title,
-        breaks = .colorbar_break_values(lim)
-      ))
-    } else if (!identical(colorbar_position, "none") &&
-               identical(resolved_colorbar_source, "overlay") &&
-               !is.null(overlay_lim_effective)) {
+      colorbar_meta <- c(
+        colorbar_meta,
+        list(
+          palette = palette,
+          lim = lim,
+          title = colorbar_title,
+          breaks = .colorbar_break_values(lim)
+        )
+      )
+    } else if (
+      !identical(colorbar_position, "none") &&
+        identical(resolved_colorbar_source, "overlay") &&
+        !is.null(overlay_lim_effective)
+    ) {
       overlay_breaks <- .colorbar_break_values(
         overlay_lim_effective,
         threshold = overlay_threshold
@@ -3225,10 +3737,15 @@ plot_brain <- function(surfatlas,
         bg = bg,
         breaks = overlay_breaks
       )
-      colorbar_meta <- c(colorbar_meta, list(
-        palette = overlay_palette, lim = overlay_lim_effective,
-        title = overlay_title, breaks = overlay_breaks
-      ))
+      colorbar_meta <- c(
+        colorbar_meta,
+        list(
+          palette = overlay_palette,
+          lim = overlay_lim_effective,
+          title = overlay_title,
+          breaks = overlay_breaks
+        )
+      )
     }
     out <- .compose_plot_brain_figure(
       main_plot = p,
@@ -3294,12 +3811,14 @@ plot_brain <- function(surfatlas,
 #' @return A \code{ggplot2} object containing only a colour bar.
 #' @keywords internal
 #' @noRd
-.make_colorbar_panel <- function(palette,
-                                 lim,
-                                 title = NULL,
-                                 position = c("right", "bottom"),
-                                 bg = "white",
-                                 breaks = NULL) {
+.make_colorbar_panel <- function(
+  palette,
+  lim,
+  title = NULL,
+  position = c("right", "bottom"),
+  bg = "white",
+  breaks = NULL
+) {
   position <- match.arg(position)
   guide <- if (identical(position, "bottom")) {
     ggplot2::guide_colorbar(
@@ -3337,7 +3856,8 @@ plot_brain <- function(surfatlas,
     # alpha of zero into the guide (which would erase the colorbar as well).
     ggplot2::geom_tile(width = 0, height = 0, show.legend = TRUE) +
     color_scale(
-      limits = lim, oob = scales::squish,
+      limits = lim,
+      oob = scales::squish,
       name = title,
       # `breaks = NULL` means "draw no breaks" in ggplot2 and suppresses the
       # guide entirely. Use the scale default unless explicit breaks were

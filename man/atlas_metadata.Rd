@@ -26,7 +26,8 @@ validate_resource_metadata(x)
 }
 \arguments{
 \item{x}{An atlas, or a template returned by [get_template()] or
-[load_surface_template()]. For validation, a `NeuroResourceMetadata` record.}
+  [load_surface_template()]. For validation, a `NeuroResourceMetadata`
+record.}
 
 \item{...}{Reserved for methods.}
 }
@@ -44,7 +45,8 @@ and surfaces use the `neuroatlas_metadata` attribute, preserving their class.
 }
 \details{
 `identity` describes the resource and its published version (unknown versions
-are `NA`). `content` describes the loaded representation, value type, selected
+are `NA`). `content` describes the loaded representation, value type,
+selected
 parameters and current region count. `spatial` describes the current sampling
 geometry; `artifacts` retain source-space and resolution descriptors.
 A TemplateFlow resolution key

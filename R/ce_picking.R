@@ -22,43 +22,57 @@
   ids <- as.character(ids)
   ids <- ids[!is.na(ids) & nzchar(ids)]
   if (length(ids) == 0) {
-    return(tibble::tibble(
-      raw_id = character(0),
-      panel = character(0),
-      parcel_id = integer(0),
-      shape_id = integer(0)
-    ))
+    return(
+      tibble::tibble(
+        raw_id = character(0),
+        panel = character(0),
+        parcel_id = integer(0),
+        shape_id = integer(0)
+      )
+    )
   }
 
-  rows <- lapply(ids, function(id) {
-    parts <- strsplit(id, "::", fixed = TRUE)[[1]]
-    if (length(parts) == 3) {
-      pid <- suppressWarnings(as.integer(parts[2]))
-      sid <- suppressWarnings(as.integer(parts[3]))
-      if (is.finite(pid) && is.finite(sid)) {
-        return(tibble::tibble(
-          raw_id = id,
-          panel = as.character(parts[1]),
-          parcel_id = as.integer(pid),
-          shape_id = as.integer(sid)
-        ))
+  rows <- lapply(
+    ids,
+    function(id) {
+      parts <- strsplit(id, "::", fixed = TRUE)[[1]]
+      if (length(parts) == 3) {
+        pid <- suppressWarnings(as.integer(parts[2]))
+        sid <- suppressWarnings(as.integer(parts[3]))
+        if (is.finite(pid) && is.finite(sid)) {
+          return(
+            tibble::tibble(
+              raw_id = id,
+              panel = as.character(parts[1]),
+              parcel_id = as.integer(pid),
+              shape_id = as.integer(sid)
+            )
+          )
+        }
       }
-    }
 
-    pid <- suppressWarnings(as.integer(id))
-    tibble::tibble(
-      raw_id = id,
-      panel = NA_character_,
-      parcel_id = if (is.finite(pid)) as.integer(pid) else NA_integer_,
-      shape_id = NA_integer_
-    )
-  })
+      pid <- suppressWarnings(as.integer(id))
+      tibble::tibble(
+        raw_id = id,
+        panel = NA_character_,
+        parcel_id = if (is.finite(pid)) as.integer(pid) else NA_integer_,
+        shape_id = NA_integer_
+      )
+    }
+  )
 
   dplyr::bind_rows(rows)
 }
 
 .surface_pick_surface_to_world <- function(geometry, surface_xyz) {
-  xform <- tryCatch(neurosurf::surf_to_world(geometry), error = function(e) NULL)
+  xform <- tryCatch(
+    neurosurf::surf_to_world(geometry),
+    error = function(
+      e
+    ) {
+      NULL
+    }
+  )
   if (is.null(xform) || !is.matrix(xform) || !all(dim(xform) == c(4, 4))) {
     return(as.numeric(surface_xyz))
   }
@@ -116,8 +130,7 @@
     sub <- poly[
       poly$panel == panel &
         poly$parcel_id == parcel_id &
-        poly$poly_id == shape_id,
-      ,
+        poly$poly_id == shape_id, ,
       drop = FALSE
     ]
     if (nrow(sub) == 0) next
@@ -164,11 +177,13 @@
   dplyr::bind_rows(rows)
 }
 
-.build_plot_brain_surface_pick_lookup <- function(surfatlas,
-                                                  stat_map,
-                                                  views = c("lateral", "medial"),
-                                                  hemis = c("left", "right"),
-                                                  surface = "inflated") {
+.build_plot_brain_surface_pick_lookup <- function(
+  surfatlas,
+  stat_map,
+  views = c("lateral", "medial"),
+  hemis = c("left", "right"),
+  surface = "inflated"
+) {
   empty <- .surface_pick_lookup_from_polygons(
     poly = NULL,
     panel_ctx = list(),
@@ -227,11 +242,15 @@
   )
 }
 
-.clusters_for_grid_centers <- function(cluster_voxels,
-                                       centers,
-                                       radius = 0,
-                                       fallback_nearest = TRUE) {
-  if (length(cluster_voxels) == 0) return(character(0))
+.clusters_for_grid_centers <- function(
+  cluster_voxels,
+  centers,
+  radius = 0,
+  fallback_nearest = TRUE
+) {
+  if (length(cluster_voxels) == 0) {
+    return(character(0))
+  }
 
   centers <- as.matrix(centers)
   if (is.null(dim(centers)) || ncol(centers) != 3 || nrow(centers) == 0) {
@@ -267,7 +286,9 @@
 
   if (isTRUE(fallback_nearest)) {
     finite <- which(is.finite(score))
-    if (length(finite) == 0) return(character(0))
+    if (length(finite) == 0) {
+      return(character(0))
+    }
     best <- finite[which.min(score[finite])]
     return(names(score)[best])
   }
@@ -275,12 +296,16 @@
   character(0)
 }
 
-.parcel_values_from_clusters <- function(cluster_parcels,
-                                         atlas_ids,
-                                         selected_cluster_ids = NULL,
-                                         mode = c("dominant",
-                                                  "positive_only",
-                                                  "negative_only")) {
+.parcel_values_from_clusters <- function(
+  cluster_parcels,
+  atlas_ids,
+  selected_cluster_ids = NULL,
+  mode = c(
+    "dominant",
+    "positive_only",
+    "negative_only"
+  )
+) {
   mode <- match.arg(mode)
   vals <- rep(NA_real_, length(atlas_ids))
   names(vals) <- as.character(atlas_ids)
@@ -298,20 +323,24 @@
   }
 
   parcel_groups <- split(cp, cp$parcel_id)
-  out_vals <- vapply(parcel_groups, function(df) {
-    if (mode == "dominant") {
-      peak <- df$peak_stat[which.max(abs(df$peak_stat))]
-      as.numeric(peak)
-    } else if (mode == "positive_only") {
-      x <- df$max_pos
-      x <- x[is.finite(x)]
-      if (length(x) == 0) NA_real_ else max(x)
-    } else {
-      x <- df$min_neg
-      x <- x[is.finite(x)]
-      if (length(x) == 0) NA_real_ else min(x)
-    }
-  }, numeric(1))
+  out_vals <- vapply(
+    parcel_groups,
+    function(df) {
+      if (mode == "dominant") {
+        peak <- df$peak_stat[which.max(abs(df$peak_stat))]
+        as.numeric(peak)
+      } else if (mode == "positive_only") {
+        x <- df$max_pos
+        x <- x[is.finite(x)]
+        if (length(x) == 0) NA_real_ else max(x)
+      } else {
+        x <- df$min_neg
+        x <- x[is.finite(x)]
+        if (length(x) == 0) NA_real_ else min(x)
+      }
+    },
+    numeric(1)
+  )
 
   common <- intersect(names(out_vals), names(vals))
   vals[common] <- out_vals[common]

@@ -64,6 +64,7 @@ plans/*
 !plans/neurotransform-space-warp-bridge.md
 !plans/template-transform-coverage.md
 !plans/resume-neuroatlas.md
+!plans/complexity-review.md
 
 # Generated template-transform inputs, attempts, and release staging
 data-raw/transform-artifacts-v1-work/
@@ -71,3 +72,5 @@ data-raw/transform-artifacts-v1/niflowr.nibi.yml
 data-raw/transform-artifacts-v1/niflowr.lock.yml
 data-raw/transform-artifacts-v1/campaign.nibi-smoke.generated.toml
 data-raw/transform-artifacts-v1/campaign.*.generated.toml
+# Python reference and CI bytecode caches
+__pycache__/

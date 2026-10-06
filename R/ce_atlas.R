@@ -6,13 +6,17 @@
     return(FALSE)
   }
 
-  ok_hemi <- vapply(c("lh_atlas", "rh_atlas"), function(hk) {
-    obj <- surfatlas[[hk]]
-    if (is.null(obj) || !isS4(obj)) {
-      return(FALSE)
-    }
-    all(c("geometry", "data") %in% methods::slotNames(obj))
-  }, logical(1))
+  ok_hemi <- vapply(
+    c("lh_atlas", "rh_atlas"),
+    function(hk) {
+      obj <- surfatlas[[hk]]
+      if (is.null(obj) || !isS4(obj)) {
+        return(FALSE)
+      }
+      all(c("geometry", "data") %in% methods::slotNames(obj))
+    },
+    logical(1)
+  )
 
   all(ok_hemi)
 }
@@ -48,8 +52,14 @@
   if (!setequal(atlas_ids, surf_ids)) {
     warning(
       "`atlas` and `surfatlas` ROI IDs partially overlap (",
-      n_overlap, "/", length(atlas_ids), " atlas IDs; ",
-      n_overlap, "/", length(surf_ids), " surface IDs). ",
+      n_overlap,
+      "/",
+      length(atlas_ids),
+      " atlas IDs; ",
+      n_overlap,
+      "/",
+      length(surf_ids),
+      " surface IDs). ",
       "Results may be difficult to interpret unless both atlases match.",
       call. = FALSE
     )
@@ -78,9 +88,11 @@
     parcels <- NULL
     networks <- NULL
 
-    if (!is.na(name) &&
+    if (
+      !is.na(name) &&
         nzchar(name) &&
-        grepl("^Schaefer-\\d+-\\d+networks", name, perl = TRUE)) {
+        grepl("^Schaefer-\\d+-\\d+networks", name, perl = TRUE)
+    ) {
       parcels <- suppressWarnings(
         as.integer(sub("^Schaefer-(\\d+)-.*$", "\\1", name))
       )
@@ -104,31 +116,39 @@
       }
     }
 
-    if (is.na(parcels) &&
-        !is.null(atlas$ids) && length(atlas$ids) > 0) {
+    if (
+      is.na(parcels) &&
+        !is.null(atlas$ids) && length(atlas$ids) > 0
+    ) {
       n_ids <- length(atlas$ids)
       parcels <- as.integer(n_ids)
     }
 
-    if (!is.na(parcels) && !is.na(networks) &&
+    if (
+      !is.na(parcels) && !is.na(networks) &&
         parcels %in% c(100L, 200L, 300L, 400L, 500L, 600L, 800L, 1000L) &&
-        networks %in% c(7L, 17L)) {
-      return(tryCatch(
-        schaefer_surf(
-          parcels = parcels,
-          networks = networks,
-          surf = "inflated"
-        ),
-        error = function(e) NULL
-      ))
+        networks %in% c(7L, 17L)
+    ) {
+      return(
+        tryCatch(
+          schaefer_surf(
+            parcels = parcels,
+            networks = networks,
+            surf = "inflated"
+          ),
+          error = function(e) NULL
+        )
+      )
     }
   }
 
   if (inherits(atlas, "glasser")) {
-    return(tryCatch(
-      glasser_surf(space = "fsaverage", surf = "pial"),
-      error = function(e) NULL
-    ))
+    return(
+      tryCatch(
+        glasser_surf(space = "fsaverage", surf = "pial"),
+        error = function(e) NULL
+      )
+    )
   }
 
   NULL
@@ -136,11 +156,15 @@
 
 .set_atlas_volume <- function(atlas, vol) {
   has_atlas <- !is.null(atlas$atlas) &&
-    (methods::is(atlas$atlas, "NeuroVol") ||
-       methods::is(atlas$atlas, "ClusteredNeuroVol"))
+    (
+      methods::is(atlas$atlas, "NeuroVol") ||
+        methods::is(atlas$atlas, "ClusteredNeuroVol")
+    )
   has_data <- !is.null(atlas$data) &&
-    (methods::is(atlas$data, "NeuroVol") ||
-       methods::is(atlas$data, "ClusteredNeuroVol"))
+    (
+      methods::is(atlas$data, "NeuroVol") ||
+        methods::is(atlas$data, "ClusteredNeuroVol")
+    )
 
   if (isTRUE(has_atlas)) {
     atlas$atlas <- vol
@@ -190,8 +214,10 @@
   target_space <- tryCatch(neuroim2::space(stat_map), error = function(e) NULL)
   if (is.null(target_space) || !methods::is(target_space, "NeuroSpace")) {
     ret$warning <- paste0(
-      "Spatial dimensions of atlas (", paste(atlas_dims, collapse = "x"),
-      ") and stat_map (", paste(stat_dims, collapse = "x"),
+      "Spatial dimensions of atlas (",
+      paste(atlas_dims, collapse = "x"),
+      ") and stat_map (",
+      paste(stat_dims, collapse = "x"),
       ") differ, and stat_map space is unavailable for atlas auto-resampling."
     )
     return(ret)
@@ -203,8 +229,11 @@
   )
   if (inherits(resampled, "error")) {
     ret$warning <- paste0(
-      "Failed to auto-resample atlas from ", paste(atlas_dims, collapse = "x"),
-      " to ", paste(stat_dims, collapse = "x"), ": ",
+      "Failed to auto-resample atlas from ",
+      paste(atlas_dims, collapse = "x"),
+      " to ",
+      paste(stat_dims, collapse = "x"),
+      ": ",
       conditionMessage(resampled)
     )
     return(ret)
@@ -214,7 +243,9 @@
   if (!is.finite(n_nonzero) || n_nonzero <= 0) {
     ret$warning <- paste0(
       "Atlas auto-resampling produced an empty atlas in stat_map space ",
-      "(", paste(stat_dims, collapse = "x"), ")."
+      "(",
+      paste(stat_dims, collapse = "x"),
+      ")."
     )
     return(ret)
   }
