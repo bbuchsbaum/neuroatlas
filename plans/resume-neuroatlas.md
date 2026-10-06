@@ -6,6 +6,11 @@ Mote is authoritative; its shared format and append-only operations are tracked.
 Actor identity, leases, temporary files, input downloads and operator caches are
 local. A clean Git checkout does not imply the scientific release is complete.
 
+Verified code checkpoint: `05871cbb145424e29daefed3380814f0b2a0016e`, pushed
+to this branch and rechecked against GitHub on 2026-10-06. Later handoff-only
+commits update plans/Mote history; the engineering results below are bound to
+this code checkpoint. The surface slice is not merged into master or released.
+
 ## Start from GitHub
 
 ```sh
@@ -130,13 +135,27 @@ The feature branch now triggers the existing OS matrix as well as its existing
 checklist workflow. Do not describe the whole repository as green while these
 failures remain. Preserve hosted run URLs and exact SHAs in the Mote handoff.
 
-At checkpoint `915b8e1`, macOS, Linux devel and Linux oldrel passed the hosted
-matrix. Windows rejected an unsafe cache receipt, but its test demanded the
-POSIX symlink diagnostic. The regression now accepts either documented cache
+At code checkpoint `05871cbb145424e29daefed3380814f0b2a0016e`, the final
+[R-CMD-check-OS run 37410069997](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37410069997)
+completed successfully: macOS release, Windows release, Ubuntu devel and Ubuntu
+oldrel all passed. This resolves the earlier `915b8e1` Windows test failure:
+Windows rejected an unsafe cache receipt, but its test demanded the POSIX
+symlink diagnostic. The corrected regression accepts either documented cache
 rejection and checks that neither the operator nor target is written and the
 receipt remains present. Cache implementation and scientific methods are
-unchanged. The same checkpoint's checklist job reproduced the external
-organisation-lookup crash. Consult the latest branch run for final OS status:
+unchanged.
+
+The same exact code checkpoint's
+[checklist run 37410070017](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37410070017)
+failed in the external organisation lookup. The separate pkgcheck gaps and
+eco-atlas secret blocker above remain open. The two open Motes now contain this
+final code/CI checkpoint as well as scope, limitations and next actions; they
+supersede earlier handoff notes that recorded pending runs or the Windows failure.
+
+On the remote workstation, rebuild dependencies and machine-specific engine
+receipts and run the checks above before starting implementation. The GitHub
+clone/history has been verified locally; this is not a claim that the destination
+workstation has already been configured or tested. Inspect later runs separately:
 
 ```sh
 gh run list --repo bbuchsbaum/neuroatlas --branch feat/native-surface-transforms
