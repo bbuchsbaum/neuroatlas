@@ -1,0 +1,1 @@
+{"actor":"codex-neuroatlas","entity":"bd-01M47HZ11AWSD23BCAB6NXNXGY","kind":"reserve_open","mode":"exclusive","op":"20261006T032940.673201Z-p65486-c0000-rc471-h4b7782","paths":["tests/testthat/test-surface-transform.R","plans/resume-neuroatlas.md"],"reservation_id":"rv-01M47M51T1ERR5TG0KV26MJAV0","ts":"2026-10-06T03:29:40.673201Z","ttl_s":3600,"v":2}

@@ -1,0 +1,14 @@
+{
+  "R-CMD-check.log": "d02908fc149672496d8530aa9c00972b7e70610ee3ac4b33d294d57e3eb5420b",
+  "build-ignore-probe.log": "50a1d63371fcd3fe32dc764afe28ad1aabb8d9e38079d4c26ed2882c1317bc28",
+  "build-ignore-probe.log.meta.json": "b722210e721e6fc41eedb45bc4395fb74f299cee77215b8f6d108f4c1337e17c",
+  "checked-source-manifest.json": "c8ba0491108d06274ce73f2a4e3b8889a63758fbcc9e7344d2f2ad73c04fffca",
+  "hosted-context.json": "d8898bbb56f357b3e3cf50fb4465555e8641f6bbd85482a2ac1406cd4bf771b5",
+  "package-check-windows-final.log": "fdd08865dd2cdbd87436028fbb7c8000401ee8c49c99e359d2d773c2cb63375a",
+  "package-check-windows-final.log.meta.json": "a4f15cc7b62adc992094aca7def4ab943490fd08054fb825e0a482ff9fc1ae07",
+  "surface-windows-final.log": "d049f76fcf92c4572f4adade696efaa4970454d424d0c81a0ce18d3f8a9ac566",
+  "surface-windows-final.log.meta.json": "c1aa5d13d55923021101f4861c016144fbc6a4e77de8aa611d15e143f06709ef",
+  "tests-windows-fix.log": "2d6134c0c21dd223d15f5ad82f4cd0d0770b6591012b255b31afda493d21b615",
+  "tests-windows-fix.log.meta.json": "17a7c93f835fb5de73830bb9d362db03cfe937c273db625cfb14f3397dff156e",
+  "windows-failure-excerpt.log": "e2ca7744c37052a34673da057313a18c7cee442ce472e446b17a15713443e866"
+}

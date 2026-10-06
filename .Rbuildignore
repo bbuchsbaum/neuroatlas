@@ -28,6 +28,7 @@
 ^templateflow\.md$
 ^\.omc$
 ^\.mote$
+^\.dashboard$
 ^README\.html$
 ^neuroatlas_cheatsheet_v3\.md$
 ^vignettes/.*_cache$

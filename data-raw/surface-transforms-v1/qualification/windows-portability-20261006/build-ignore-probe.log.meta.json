@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-06T03:36:49.953483+00:00",
+  "finished_utc": "2026-10-06T03:36:52.596975+00:00",
+  "duration_seconds": 2.643395,
+  "command": [
+    "R",
+    "CMD",
+    "build",
+    "--no-build-vignettes",
+    "--no-manual",
+    "/tmp/neuroatlas-resume-20261006/build-ignore-probe/source"
+  ],
+  "cwd": "/private/tmp/neuroatlas-resume-20261006/build-ignore-probe",
+  "log": "/tmp/neuroatlas-resume-20261006/build-ignore-probe.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 300.0,
+  "log_bytes": 346
+}

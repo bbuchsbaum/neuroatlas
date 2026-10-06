@@ -1,0 +1,10 @@
+{
+  "head_sha": "915b8e1560138e2d8e9dd60a57374d219cacf3bd",
+  "matrix_run": "https://github.com/bbuchsbaum/neuroatlas/actions/runs/37407025321",
+  "macOS": "passed",
+  "linux_devel": "passed",
+  "linux_oldrel": "passed",
+  "windows": "failed on platform-specific error message assertion; corrected and requires fresh hosted validation",
+  "checklist_run": "https://github.com/bbuchsbaum/neuroatlas/actions/runs/37407025361",
+  "checklist": "failed in external organisation lookup"
+}

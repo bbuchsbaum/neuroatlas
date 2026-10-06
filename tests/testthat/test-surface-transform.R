@@ -168,8 +168,13 @@ test_that("cache rejects dangling receipt links before writing", {
   unlink(c(path, receipt))
   target <- file.path(root, "must-not-create")
   skip_if_not(file.symlink(target, receipt))
-  expect_error(get_surface_transform(src, dst, root), "symbolic link")
+  # Sys.readlink() cannot identify Windows junctions. The orphaned-receipt
+  # guard must still refuse publication when that platform reports one exists.
+  expect_error(get_surface_transform(src, dst, root),
+               "symbolic link|Orphaned surface cache receipt")
+  expect_false(file.exists(path))
   expect_false(file.exists(target))
+  expect_true(basename(receipt) %in% list.files(dirname(receipt)))
 })
 
 test_that("probability interpolation accepts unit values despite rounding", {

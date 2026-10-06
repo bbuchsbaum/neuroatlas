@@ -103,7 +103,7 @@ Workbench equivalence, reversibility or area conservation.
 
 Remaining quality-workflow Mote: `bd-01M47HZ11AWSD23BCAB6NXNXGY`.
 
-Current local verification: 2,672 development assertions pass, zero failures,
+Current local verification: 2,674 development assertions pass, zero failures,
 45 warnings and five optional/opt-in skips. R CMD check with `--as-cran
 --no-manual` and `_R_CHECK_FORCE_SUGGESTS_=false` returns zero errors, one warning
 and zero notes; examples, installed tests and vignette rebuilds pass. The warning
@@ -129,3 +129,15 @@ The latest mainline R-CMD-check-OS run passes. Existing other mainline jobs fail
 The feature branch now triggers the existing OS matrix as well as its existing
 checklist workflow. Do not describe the whole repository as green while these
 failures remain. Preserve hosted run URLs and exact SHAs in the Mote handoff.
+
+At checkpoint `915b8e1`, macOS, Linux devel and Linux oldrel passed the hosted
+matrix. Windows rejected an unsafe cache receipt, but its test demanded the
+POSIX symlink diagnostic. The regression now accepts either documented cache
+rejection and checks that neither the operator nor target is written and the
+receipt remains present. Cache implementation and scientific methods are
+unchanged. The same checkpoint's checklist job reproduced the external
+organisation-lookup crash. Consult the latest branch run for final OS status:
+
+```sh
+gh run list --repo bbuchsbaum/neuroatlas --branch feat/native-surface-transforms
+```
