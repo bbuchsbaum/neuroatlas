@@ -1,4 +1,4 @@
-# neuroatlas ![](reference/figures/logo-en.png)
+# neuroatlas
 
 **neuroatlas** provides a unified interface for working with
 neuroimaging atlases and parcellations in R. Whether you’re conducting
