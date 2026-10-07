@@ -2,10 +2,10 @@
 
 Scalar and probability data use trilinear interpolation; labels use
 nearest voxel centers with lower-index half-voxel ties. Sampling is
-restricted to the closed voxel-center box; unsupported values are
-\`NA\`, and supported zero is preserved. Probability channels retain
-partial mass and are not normalized across maps. Missingness considers
-strictly positive contributors only. fsLR composition resolves sampling
+restricted to the closed voxel-center box; unsupported values are `NA`,
+and supported zero is preserved. Probability channels retain partial
+mass and are not normalized across maps. Missingness considers strictly
+positive contributors only. fsLR composition resolves sampling
 missingness on fsaverage first, then resolves missing surface
 contributors with the native operator. Coverage for each stage is
 retained separately. Ribbon omission combines voxel and node weights
@@ -29,13 +29,14 @@ apply_surface_projection(
 
 - x:
 
-  A 3D/4D numeric array, \`NeuroVol\`, \`NeuroVec\`, or volumetric
-  atlas.
+  A 3D/4D numeric array, `NeuroVol`, `NeuroVec`, or volumetric atlas.
 
 - projection:
 
-  A \`SurfaceProjection\` from \[get_surface_projection()\] or
-  \[ribbon_projection()\].
+  A `SurfaceProjection` from
+  [`get_surface_projection()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_projection.md)
+  or
+  [`ribbon_projection()`](https://bbuchsbaum.github.io/neuroatlas/reference/ribbon_projection.md).
 
 - source_space:
 
@@ -50,26 +51,34 @@ apply_surface_projection(
 
 - data_type:
 
-  \`"auto"\`, \`"continuous"\`, \`"label"\`, or \`"probability"\`.
-  Unannotated input requires an explicit type.
+  `"auto"`, `"continuous"`, `"label"`, or `"probability"`. Unannotated
+  input requires an explicit type.
 
 - na_policy:
 
-  \`"propagate"\`, \`"omit"\` with finite-weight normalization, or
-  \`"error"\` for a missing positive contributor in included cortical
-  support. Outside-grid samples remain unsupported under every policy.
+  `"propagate"`, `"omit"` with finite-weight normalization, or `"error"`
+  for a missing positive contributor in included cortical support.
+  Outside-grid samples remain unsupported under every policy.
 
 - label_table:
 
-  Optional key/name/color table preserved on output.
+  Optional key/name/color table preserved on output. An optional
+  `hemisphere` column declares `"L"`, `"R"`, `"both"`, or `NA`
+  (unknown); left/right and LH/RH aliases are accepted. Hemisphere
+  checks use these declarations, never label names or numeric key
+  ranges.
 
 ## Value
 
-\`SurfaceData\` with values, exact target domain, per-map availability,
+`SurfaceData` with values, exact target domain, per-map availability,
 finite source-weight mass, geometric sampling coverage, lost labels and
 directed projection provenance. Ribbon omission normalizes all finite
 voxel/node weights together; categorical nodes vote with smallest-key
 ties.
+[`projection_diagnostics()`](https://bbuchsbaum.github.io/neuroatlas/reference/projection_diagnostics.md)
+exposes per-map coverage and per-key counts at the source, sampled
+surface and final surface. These are representation counts, not
+anatomical accuracy or conservation across dimensions.
 
 ## Examples
 

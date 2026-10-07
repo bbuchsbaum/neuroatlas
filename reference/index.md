@@ -290,6 +290,8 @@
   : Check if a Nonlinear Template Warp is Needed
 - [`needs_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/needs_transform.md)
   : Check if Transform is Needed Between Spaces
+- [`projection_diagnostics()`](https://bbuchsbaum.github.io/neuroatlas/reference/projection_diagnostics.md)
+  : Inspect Coverage and Label Loss in a Cortical Projection
 - [`query_coord()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.md)
   [`query_vox()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.md)
   : Query Atlas Labels by Coordinate

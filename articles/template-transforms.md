@@ -112,41 +112,183 @@ to inspect spatial relationships.
 retains its original role of mapping supplied regional values onto an
 atlas.
 
-## Route availability and nonlinear artifacts
+## Inspect population cortical projection coverage
 
-The manifest distinguishes available and planned routes. Only available
-routes are resolved by
-[`get_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_transform.md).
+Volume-to-cortex projection can discard parcels even when interpolation
+is implemented correctly. Inspect each map and each stage with
+[`projection_diagnostics()`](https://bbuchsbaum.github.io/neuroatlas/reference/projection_diagnostics.md).
+The summary reports missing source parcels, parcels lost during
+subsequent surface resampling, and wrong-hemisphere output counts. The
+label table retains source voxel, sampled surface vertex, and final
+surface vertex counts separately; these counts are not interchangeable
+measures of area or volume.
 
 ``` r
 
-space_transform_manifest()[, c("from_space", "to_space", "backend", "status")]
-#>             from_space            to_space                  backend    status
-#> 1               MNI305              MNI152          internal_affine available
-#> 2               MNI152              MNI305          internal_affine available
-#> 3      MNI152NLin6Asym MNI152NLin2009cAsym           neurotransform available
-#> 4  MNI152NLin2009cAsym     MNI152NLin6Asym           neurotransform available
-#> 5            fsaverage          fsaverage6                sphere_nn   planned
-#> 6           fsaverage6           fsaverage                sphere_nn   planned
-#> 7            fsaverage          fsaverage5                sphere_nn   planned
-#> 8           fsaverage5           fsaverage                sphere_nn   planned
-#> 9            fsaverage            fsLR_32k                workbench   planned
-#> 10            fsLR_32k           fsaverage                workbench   planned
-#> 11 MNI152NLin2009cAsym           fsaverage                neurosurf   planned
-#> 12           fsaverage MNI152NLin2009cAsym              ribbon_fill   planned
-#> 13           fsaverage            fsLR_32k    neurotransform_native available
-#> 14            fsLR_32k           fsaverage    neurotransform_native available
-#> 15           fsaverage            fsLR_32k    neurotransform_native available
-#> 16            fsLR_32k           fsaverage    neurotransform_native available
-#> 17     MNI152NLin6Asym           fsaverage cbig_registration_fusion available
-#> 18     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available
-#> 19     MNI152NLin6Asym           fsaverage cbig_registration_fusion available
-#> 20     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available
-#> 21 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available
-#> 22 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available
-#> 23 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available
-#> 24 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available
+atlas <- get_schaefer_atlas(parcels = 200, networks = 7, resolution = 2)
+surface <- get_surface_geometry("fsLR", "32k", "L")
+projection <- get_surface_projection("MNI152NLin6Asym", surface)
+projected <- apply_surface_projection(atlas, projection)
+qa <- projection_diagnostics(projected)
+qa$summary
+subset(qa$labels, lost_at_sampling | lost_at_resampling)
+subset(qa$labels, hemisphere_mismatch)
 ```
+
+`not_sampled` identifies a source key with no supported first-stage
+sample; `lost_resampling` identifies a key that survives sampling but
+has no final surface vertex. Declared keys absent from the input are
+`absent_source`. Supported key zero is counted separately. Masked or
+unavailable vertices never contribute to label counts, and remain
+visible in the existing coverage fields.
+
+Atlas inputs supply their declared hemisphere metadata. For bare
+volumes, provide a `label_table` with an optional `hemisphere` column
+(`L`, `R`, `both`, or `NA`). Opposite-hemisphere source keys are
+excluded from expected parcel-loss totals, while any output vertices
+carrying them are reported. Without those declarations, diagnostics
+report `unchecked_labels`; they do not infer hemisphere from region
+names or numeric key ranges. The diagnostics preserve projected values
+and expose issues for review.
+
+The pinned Schaefer1000 quality campaign found three source parcels
+absent from fsLR output (keys 214, 710 and 903), with loss localized to
+surface resampling. Key 903 is also absent from the published fsLR
+reference. This limitation is retained in the [quality
+report](https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/transform-quality-v1/README.md);
+agreement with a published atlas is diagnostic compatibility, not
+independent anatomical validation. Where the required atlas is already
+published on the target surface, its native labels avoid adding another
+population projection.
+
+## Route availability and nonlinear artifacts
+
+The manifest includes executable routes and broad roadmap placeholders.
+`executable` means that the API supports a registered route when its
+required dependencies and verified inputs are present; it is not a local
+installation check. Surface routes require the recorded exact domains,
+hemisphere and method. The legacy MNI305/MNI152 affine describes a
+coordinate family, rather than a qualified exact template pair.
+
+``` r
+
+manifest <- space_transform_manifest()
+manifest[manifest$executable, c(
+  "from_space", "to_space", "hemisphere", "from_density", "to_density",
+  "backend", "route_scope"
+)]
+#>             from_space            to_space hemisphere from_density to_density
+#> 1               MNI305              MNI152       <NA>         <NA>       <NA>
+#> 2               MNI152              MNI305       <NA>         <NA>       <NA>
+#> 3      MNI152NLin6Asym MNI152NLin2009cAsym       <NA>         <NA>       <NA>
+#> 4  MNI152NLin2009cAsym     MNI152NLin6Asym       <NA>         <NA>       <NA>
+#> 13           fsaverage            fsLR_32k          L         164k        32k
+#> 14            fsLR_32k           fsaverage          L          32k       164k
+#> 15           fsaverage            fsLR_32k          R         164k        32k
+#> 16            fsLR_32k           fsaverage          R          32k       164k
+#> 17     MNI152NLin6Asym           fsaverage          L         <NA>       164k
+#> 18     MNI152NLin6Asym            fsLR_32k          L         <NA>        32k
+#> 19     MNI152NLin6Asym           fsaverage          R         <NA>       164k
+#> 20     MNI152NLin6Asym            fsLR_32k          R         <NA>        32k
+#> 21 MNI152NLin2009cAsym           fsaverage          L         <NA>       164k
+#> 22 MNI152NLin2009cAsym            fsLR_32k          L         <NA>        32k
+#> 23 MNI152NLin2009cAsym           fsaverage          R         <NA>       164k
+#> 24 MNI152NLin2009cAsym            fsLR_32k          R         <NA>        32k
+#> 25           fsaverage          fsaverage6          L         164k        41k
+#> 26          fsaverage6           fsaverage          L          41k       164k
+#> 27           fsaverage          fsaverage5          L         164k        10k
+#> 28          fsaverage5           fsaverage          L          10k       164k
+#> 29           fsaverage          fsaverage6          R         164k        41k
+#> 30          fsaverage6           fsaverage          R          41k       164k
+#> 31           fsaverage          fsaverage5          R         164k        10k
+#> 32          fsaverage5           fsaverage          R          10k       164k
+#>                     backend             route_scope
+#> 1           internal_affine       coordinate_family
+#> 2           internal_affine       coordinate_family
+#> 3            neurotransform     exact_template_pair
+#> 4            neurotransform     exact_template_pair
+#> 13    neurotransform_native   exact_surface_domains
+#> 14    neurotransform_native   exact_surface_domains
+#> 15    neurotransform_native   exact_surface_domains
+#> 16    neurotransform_native   exact_surface_domains
+#> 17 cbig_registration_fusion exact_volume_to_surface
+#> 18 cbig_registration_fusion exact_volume_to_surface
+#> 19 cbig_registration_fusion exact_volume_to_surface
+#> 20 cbig_registration_fusion exact_volume_to_surface
+#> 21 cbig_registration_fusion exact_volume_to_surface
+#> 22 cbig_registration_fusion exact_volume_to_surface
+#> 23 cbig_registration_fusion exact_volume_to_surface
+#> 24 cbig_registration_fusion exact_volume_to_surface
+#> 25    neurotransform_native   exact_surface_domains
+#> 26    neurotransform_native   exact_surface_domains
+#> 27    neurotransform_native   exact_surface_domains
+#> 28    neurotransform_native   exact_surface_domains
+#> 29    neurotransform_native   exact_surface_domains
+#> 30    neurotransform_native   exact_surface_domains
+#> 31    neurotransform_native   exact_surface_domains
+#> 32    neurotransform_native   exact_surface_domains
+```
+
+Planned rows describe proposed methods with no executable contract. They
+can share family names with an admitted exact route: a planned
+`sphere_nn` or Workbench method is a separate proposal from qualified
+native barycentric resampling. A family name alone does not identify an
+ordered surface mesh.
+
+``` r
+
+manifest[manifest$route_scope == "roadmap_placeholder", c(
+  "from_space", "to_space", "backend", "status", "executable"
+)]
+#>             from_space            to_space     backend  status executable
+#> 5            fsaverage          fsaverage6   sphere_nn planned      FALSE
+#> 6           fsaverage6           fsaverage   sphere_nn planned      FALSE
+#> 7            fsaverage          fsaverage5   sphere_nn planned      FALSE
+#> 8           fsaverage5           fsaverage   sphere_nn planned      FALSE
+#> 9            fsaverage            fsLR_32k   workbench planned      FALSE
+#> 10            fsLR_32k           fsaverage   workbench planned      FALSE
+#> 11 MNI152NLin2009cAsym           fsaverage   neurosurf planned      FALSE
+#> 12           fsaverage MNI152NLin2009cAsym ribbon_fill planned      FALSE
+```
+
+### Change fsaverage surface density
+
+The pinned fsaverage spheres support **164k ↔︎ 41k (fsaverage6)** and
+**164k ↔︎ 10k (fsaverage5)** for each hemisphere. Load the `"fsaverage"`
+family with the desired density, then pass its exact geometry to the
+template API. The following example is not run during vignette builds
+because it downloads upstream geometry on first use and requires the
+qualified native engine.
+
+``` r
+
+high <- get_surface_geometry("fsaverage", "164k", "L")
+low <- get_surface_geometry("fsaverage", "41k", "L") # fsaverage6
+# Use density = "10k" for fsaverage5; hemisphere = "R" for the right side.
+
+down <- get_template_transform(high, low)
+x <- surface_data(high$sphere[, 1] / 100, high$domain)
+y <- apply_template_transform(x, down)
+c(source_vertices = high$domain$n_vertices,
+  target_vertices = y$domain$n_vertices)
+
+up <- get_template_transform(low, high) # separately qualified direction
+resampled <- apply_template_transform(y, up)
+```
+
+The directions have independent operators. Upsampling interpolates
+values onto more vertices; it cannot recover detail lost through
+downsampling. Source cortex masks exclude contributors before row
+normalization, and target medial-wall vertices remain unavailable. Label
+data use discrete voting (`"aggregate"` or `"largest"`), so small
+parcels can disappear at lower density; compare retained keys and
+coverage for your data. Continuous interpolation is not an area
+conservation operation. The [density qualification
+report](https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/fsaverage-density-v1/README.md)
+records the pinned inputs, independent geometry checks and data-policy
+scope; these checks do not establish anatomical accuracy or an inverse.
+
+### Nonlinear volume routes
 
 Both directions between MNI152NLin6Asym and MNI152NLin2009cAsym are
 available from the [immutable artifact
@@ -193,10 +335,43 @@ MNI6 to MNI2009c alignment at 2 mm: before (top) and after (bottom) the
 nonlinear transform. Alternating tiles show target and source anatomy at
 the same three axial positions.
 
-The figure is precomputed from the released transform and cached
-TemplateFlow brain templates; building this vignette does not download
-or apply the warp. Run the download example above and then this plotting
-code to reproduce it.
+For a closer view, the compact animation below alternates once per
+second between the **same target in both panels** and the **source
+before and after alignment**. Watch the ventricular walls: less movement
+against the target indicates closer local alignment. This is a 1 mm crop
+at axial z = 10 mm; it supplements the 2 mm checkerboards above.
+
+![Synchronized blink comparison of ventricular anatomy: left is before
+alignment, right is after the released transform. Both panels alternate
+with the same stationary target.](figures/template-transform-blink.gif)
+
+Synchronized blink comparison of ventricular anatomy: left is before
+alignment, right is after the released transform. Both panels alternate
+with the same stationary target.
+
+The GIF is about 104 KiB (598 by 438 pixels, two frames), with a fixed
+64-level grayscale palette and no dithering. It uses the visual quality
+campaign’s normalization: each volume is divided by its own
+99th-percentile intensity inside the target brain mask, with the same
+0–1 display range. Contrast and interpolation differences can also cause
+flicker; this is not an anatomical error measurement. The crop is
+enlarged with nearest-neighbour display.
+
+For manual stepping, pausing, other anatomical views and both transform
+directions, [download the interactive
+viewer](https://raw.githubusercontent.com/bbuchsbaum/neuroatlas/master/data-raw/transform-quality-v1/visuals-20261007/index.html)
+and open it locally. Animation starts only when requested in that
+viewer. A [static overlay and difference
+figure](https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/transform-quality-v1/visuals-20261007/MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-detail.png)
+is also available. The GIF can be regenerated from the checked-in viewer
+with `data-raw/transform-quality-v1/make-vignette-blink.py`; its input
+and output hashes are recorded in the adjacent
+`vignette-blink-receipt.json`.
+
+The checkerboard figure is precomputed from the released transform and
+cached TemplateFlow brain templates; building this vignette does not
+download or apply the warp. Run the download example above and then this
+plotting code to reproduce it.
 
 ``` r
 

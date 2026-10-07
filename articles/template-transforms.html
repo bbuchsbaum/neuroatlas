@@ -166,44 +166,176 @@ labels from different parcellations equivalent. After alignment, use
 regional values onto an atlas.</p>
 </div>
 <div class="section level2">
+<h2 id="inspect-population-cortical-projection-coverage">Inspect population cortical projection coverage<a class="anchor" aria-label="anchor" href="#inspect-population-cortical-projection-coverage"></a>
+</h2>
+<p>Volume-to-cortex projection can discard parcels even when
+interpolation is implemented correctly. Inspect each map and each stage
+with <code><a href="../reference/projection_diagnostics.html">projection_diagnostics()</a></code>. The summary reports missing
+source parcels, parcels lost during subsequent surface resampling, and
+wrong-hemisphere output counts. The label table retains source voxel,
+sampled surface vertex, and final surface vertex counts separately;
+these counts are not interchangeable measures of area or volume.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_surface_geometry.html">get_surface_geometry</a></span><span class="op">(</span><span class="st">"fsLR"</span>, <span class="st">"32k"</span>, <span class="st">"L"</span><span class="op">)</span></span>
+<span><span class="va">projection</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_surface_projection.html">get_surface_projection</a></span><span class="op">(</span><span class="st">"MNI152NLin6Asym"</span>, <span class="va">surface</span><span class="op">)</span></span>
+<span><span class="va">projected</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apply_surface_projection.html">apply_surface_projection</a></span><span class="op">(</span><span class="va">atlas</span>, <span class="va">projection</span><span class="op">)</span></span>
+<span><span class="va">qa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/projection_diagnostics.html">projection_diagnostics</a></span><span class="op">(</span><span class="va">projected</span><span class="op">)</span></span>
+<span><span class="va">qa</span><span class="op">$</span><span class="va">summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">qa</span><span class="op">$</span><span class="va">labels</span>, <span class="va">lost_at_sampling</span> <span class="op">|</span> <span class="va">lost_at_resampling</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">qa</span><span class="op">$</span><span class="va">labels</span>, <span class="va">hemisphere_mismatch</span><span class="op">)</span></span></code></pre></div>
+<p><code>not_sampled</code> identifies a source key with no supported
+first-stage sample; <code>lost_resampling</code> identifies a key that
+survives sampling but has no final surface vertex. Declared keys absent
+from the input are <code>absent_source</code>. Supported key zero is
+counted separately. Masked or unavailable vertices never contribute to
+label counts, and remain visible in the existing coverage fields.</p>
+<p>Atlas inputs supply their declared hemisphere metadata. For bare
+volumes, provide a <code>label_table</code> with an optional
+<code>hemisphere</code> column (<code>L</code>, <code>R</code>,
+<code>both</code>, or <code>NA</code>). Opposite-hemisphere source keys
+are excluded from expected parcel-loss totals, while any output vertices
+carrying them are reported. Without those declarations, diagnostics
+report <code>unchecked_labels</code>; they do not infer hemisphere from
+region names or numeric key ranges. The diagnostics preserve projected
+values and expose issues for review.</p>
+<p>The pinned Schaefer1000 quality campaign found three source parcels
+absent from fsLR output (keys 214, 710 and 903), with loss localized to
+surface resampling. Key 903 is also absent from the published fsLR
+reference. This limitation is retained in the <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/transform-quality-v1/README.md" class="external-link">quality
+report</a>; agreement with a published atlas is diagnostic
+compatibility, not independent anatomical validation. Where the required
+atlas is already published on the target surface, its native labels
+avoid adding another population projection.</p>
+</div>
+<div class="section level2">
 <h2 id="route-availability-and-nonlinear-artifacts">Route availability and nonlinear artifacts<a class="anchor" aria-label="anchor" href="#route-availability-and-nonlinear-artifacts"></a>
 </h2>
-<p>The manifest distinguishes available and planned routes. Only
-available routes are resolved by
-<code><a href="../reference/get_template_transform.html">get_template_transform()</a></code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/space_transform_manifest.html">space_transform_manifest</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"from_space"</span>, <span class="st">"to_space"</span>, <span class="st">"backend"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;             from_space            to_space                  backend    status</span></span>
-<span><span class="co">#&gt; 1               MNI305              MNI152          internal_affine available</span></span>
-<span><span class="co">#&gt; 2               MNI152              MNI305          internal_affine available</span></span>
-<span><span class="co">#&gt; 3      MNI152NLin6Asym MNI152NLin2009cAsym           neurotransform available</span></span>
-<span><span class="co">#&gt; 4  MNI152NLin2009cAsym     MNI152NLin6Asym           neurotransform available</span></span>
-<span><span class="co">#&gt; 5            fsaverage          fsaverage6                sphere_nn   planned</span></span>
-<span><span class="co">#&gt; 6           fsaverage6           fsaverage                sphere_nn   planned</span></span>
-<span><span class="co">#&gt; 7            fsaverage          fsaverage5                sphere_nn   planned</span></span>
-<span><span class="co">#&gt; 8           fsaverage5           fsaverage                sphere_nn   planned</span></span>
-<span><span class="co">#&gt; 9            fsaverage            fsLR_32k                workbench   planned</span></span>
-<span><span class="co">#&gt; 10            fsLR_32k           fsaverage                workbench   planned</span></span>
-<span><span class="co">#&gt; 11 MNI152NLin2009cAsym           fsaverage                neurosurf   planned</span></span>
-<span><span class="co">#&gt; 12           fsaverage MNI152NLin2009cAsym              ribbon_fill   planned</span></span>
-<span><span class="co">#&gt; 13           fsaverage            fsLR_32k    neurotransform_native available</span></span>
-<span><span class="co">#&gt; 14            fsLR_32k           fsaverage    neurotransform_native available</span></span>
-<span><span class="co">#&gt; 15           fsaverage            fsLR_32k    neurotransform_native available</span></span>
-<span><span class="co">#&gt; 16            fsLR_32k           fsaverage    neurotransform_native available</span></span>
-<span><span class="co">#&gt; 17     MNI152NLin6Asym           fsaverage cbig_registration_fusion available</span></span>
-<span><span class="co">#&gt; 18     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available</span></span>
-<span><span class="co">#&gt; 19     MNI152NLin6Asym           fsaverage cbig_registration_fusion available</span></span>
-<span><span class="co">#&gt; 20     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available</span></span>
-<span><span class="co">#&gt; 21 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available</span></span>
-<span><span class="co">#&gt; 22 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available</span></span>
-<span><span class="co">#&gt; 23 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available</span></span>
-<span><span class="co">#&gt; 24 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available</span></span></code></pre></div>
+<p>The manifest includes executable routes and broad roadmap
+placeholders. <code>executable</code> means that the API supports a
+registered route when its required dependencies and verified inputs are
+present; it is not a local installation check. Surface routes require
+the recorded exact domains, hemisphere and method. The legacy
+MNI305/MNI152 affine describes a coordinate family, rather than a
+qualified exact template pair.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">manifest</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/space_transform_manifest.html">space_transform_manifest</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">manifest</span><span class="op">[</span><span class="va">manifest</span><span class="op">$</span><span class="va">executable</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"from_space"</span>, <span class="st">"to_space"</span>, <span class="st">"hemisphere"</span>, <span class="st">"from_density"</span>, <span class="st">"to_density"</span>,</span>
+<span>  <span class="st">"backend"</span>, <span class="st">"route_scope"</span></span>
+<span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;             from_space            to_space hemisphere from_density to_density</span></span>
+<span><span class="co">#&gt; 1               MNI305              MNI152       &lt;NA&gt;         &lt;NA&gt;       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2               MNI152              MNI305       &lt;NA&gt;         &lt;NA&gt;       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3      MNI152NLin6Asym MNI152NLin2009cAsym       &lt;NA&gt;         &lt;NA&gt;       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4  MNI152NLin2009cAsym     MNI152NLin6Asym       &lt;NA&gt;         &lt;NA&gt;       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 13           fsaverage            fsLR_32k          L         164k        32k</span></span>
+<span><span class="co">#&gt; 14            fsLR_32k           fsaverage          L          32k       164k</span></span>
+<span><span class="co">#&gt; 15           fsaverage            fsLR_32k          R         164k        32k</span></span>
+<span><span class="co">#&gt; 16            fsLR_32k           fsaverage          R          32k       164k</span></span>
+<span><span class="co">#&gt; 17     MNI152NLin6Asym           fsaverage          L         &lt;NA&gt;       164k</span></span>
+<span><span class="co">#&gt; 18     MNI152NLin6Asym            fsLR_32k          L         &lt;NA&gt;        32k</span></span>
+<span><span class="co">#&gt; 19     MNI152NLin6Asym           fsaverage          R         &lt;NA&gt;       164k</span></span>
+<span><span class="co">#&gt; 20     MNI152NLin6Asym            fsLR_32k          R         &lt;NA&gt;        32k</span></span>
+<span><span class="co">#&gt; 21 MNI152NLin2009cAsym           fsaverage          L         &lt;NA&gt;       164k</span></span>
+<span><span class="co">#&gt; 22 MNI152NLin2009cAsym            fsLR_32k          L         &lt;NA&gt;        32k</span></span>
+<span><span class="co">#&gt; 23 MNI152NLin2009cAsym           fsaverage          R         &lt;NA&gt;       164k</span></span>
+<span><span class="co">#&gt; 24 MNI152NLin2009cAsym            fsLR_32k          R         &lt;NA&gt;        32k</span></span>
+<span><span class="co">#&gt; 25           fsaverage          fsaverage6          L         164k        41k</span></span>
+<span><span class="co">#&gt; 26          fsaverage6           fsaverage          L          41k       164k</span></span>
+<span><span class="co">#&gt; 27           fsaverage          fsaverage5          L         164k        10k</span></span>
+<span><span class="co">#&gt; 28          fsaverage5           fsaverage          L          10k       164k</span></span>
+<span><span class="co">#&gt; 29           fsaverage          fsaverage6          R         164k        41k</span></span>
+<span><span class="co">#&gt; 30          fsaverage6           fsaverage          R          41k       164k</span></span>
+<span><span class="co">#&gt; 31           fsaverage          fsaverage5          R         164k        10k</span></span>
+<span><span class="co">#&gt; 32          fsaverage5           fsaverage          R          10k       164k</span></span>
+<span><span class="co">#&gt;                     backend             route_scope</span></span>
+<span><span class="co">#&gt; 1           internal_affine       coordinate_family</span></span>
+<span><span class="co">#&gt; 2           internal_affine       coordinate_family</span></span>
+<span><span class="co">#&gt; 3            neurotransform     exact_template_pair</span></span>
+<span><span class="co">#&gt; 4            neurotransform     exact_template_pair</span></span>
+<span><span class="co">#&gt; 13    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 14    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 15    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 16    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 17 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 18 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 19 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 20 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 21 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 22 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 23 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 24 cbig_registration_fusion exact_volume_to_surface</span></span>
+<span><span class="co">#&gt; 25    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 26    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 27    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 28    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 29    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 30    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 31    neurotransform_native   exact_surface_domains</span></span>
+<span><span class="co">#&gt; 32    neurotransform_native   exact_surface_domains</span></span></code></pre></div>
+<p>Planned rows describe proposed methods with no executable contract.
+They can share family names with an admitted exact route: a planned
+<code>sphere_nn</code> or Workbench method is a separate proposal from
+qualified native barycentric resampling. A family name alone does not
+identify an ordered surface mesh.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">manifest</span><span class="op">[</span><span class="va">manifest</span><span class="op">$</span><span class="va">route_scope</span> <span class="op">==</span> <span class="st">"roadmap_placeholder"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"from_space"</span>, <span class="st">"to_space"</span>, <span class="st">"backend"</span>, <span class="st">"status"</span>, <span class="st">"executable"</span></span>
+<span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;             from_space            to_space     backend  status executable</span></span>
+<span><span class="co">#&gt; 5            fsaverage          fsaverage6   sphere_nn planned      FALSE</span></span>
+<span><span class="co">#&gt; 6           fsaverage6           fsaverage   sphere_nn planned      FALSE</span></span>
+<span><span class="co">#&gt; 7            fsaverage          fsaverage5   sphere_nn planned      FALSE</span></span>
+<span><span class="co">#&gt; 8           fsaverage5           fsaverage   sphere_nn planned      FALSE</span></span>
+<span><span class="co">#&gt; 9            fsaverage            fsLR_32k   workbench planned      FALSE</span></span>
+<span><span class="co">#&gt; 10            fsLR_32k           fsaverage   workbench planned      FALSE</span></span>
+<span><span class="co">#&gt; 11 MNI152NLin2009cAsym           fsaverage   neurosurf planned      FALSE</span></span>
+<span><span class="co">#&gt; 12           fsaverage MNI152NLin2009cAsym ribbon_fill planned      FALSE</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="change-fsaverage-surface-density">Change fsaverage surface density<a class="anchor" aria-label="anchor" href="#change-fsaverage-surface-density"></a>
+</h3>
+<p>The pinned fsaverage spheres support <strong>164k ↔︎ 41k
+(fsaverage6)</strong> and <strong>164k ↔︎ 10k (fsaverage5)</strong> for
+each hemisphere. Load the <code>"fsaverage"</code> family with the
+desired density, then pass its exact geometry to the template API. The
+following example is not run during vignette builds because it downloads
+upstream geometry on first use and requires the qualified native
+engine.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">high</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_surface_geometry.html">get_surface_geometry</a></span><span class="op">(</span><span class="st">"fsaverage"</span>, <span class="st">"164k"</span>, <span class="st">"L"</span><span class="op">)</span></span>
+<span><span class="va">low</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_surface_geometry.html">get_surface_geometry</a></span><span class="op">(</span><span class="st">"fsaverage"</span>, <span class="st">"41k"</span>, <span class="st">"L"</span><span class="op">)</span> <span class="co"># fsaverage6</span></span>
+<span><span class="co"># Use density = "10k" for fsaverage5; hemisphere = "R" for the right side.</span></span>
+<span></span>
+<span><span class="va">down</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template_transform.html">get_template_transform</a></span><span class="op">(</span><span class="va">high</span>, <span class="va">low</span><span class="op">)</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/surface_data.html">surface_data</a></span><span class="op">(</span><span class="va">high</span><span class="op">$</span><span class="va">sphere</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="fl">100</span>, <span class="va">high</span><span class="op">$</span><span class="va">domain</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apply_template_transform.html">apply_template_transform</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">down</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>source_vertices <span class="op">=</span> <span class="va">high</span><span class="op">$</span><span class="va">domain</span><span class="op">$</span><span class="va">n_vertices</span>,</span>
+<span>  target_vertices <span class="op">=</span> <span class="va">y</span><span class="op">$</span><span class="va">domain</span><span class="op">$</span><span class="va">n_vertices</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">up</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template_transform.html">get_template_transform</a></span><span class="op">(</span><span class="va">low</span>, <span class="va">high</span><span class="op">)</span> <span class="co"># separately qualified direction</span></span>
+<span><span class="va">resampled</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apply_template_transform.html">apply_template_transform</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">up</span><span class="op">)</span></span></code></pre></div>
+<p>The directions have independent operators. Upsampling interpolates
+values onto more vertices; it cannot recover detail lost through
+downsampling. Source cortex masks exclude contributors before row
+normalization, and target medial-wall vertices remain unavailable. Label
+data use discrete voting (<code>"aggregate"</code> or
+<code>"largest"</code>), so small parcels can disappear at lower
+density; compare retained keys and coverage for your data. Continuous
+interpolation is not an area conservation operation. The <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/fsaverage-density-v1/README.md" class="external-link">density
+qualification report</a> records the pinned inputs, independent geometry
+checks and data-policy scope; these checks do not establish anatomical
+accuracy or an inverse.</p>
+</div>
+<div class="section level3">
+<h3 id="nonlinear-volume-routes">Nonlinear volume routes<a class="anchor" aria-label="anchor" href="#nonlinear-volume-routes"></a>
+</h3>
 <p>Both directions between MNI152NLin6Asym and MNI152NLin2009cAsym are
 available from the <a href="https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1" class="external-link">immutable
 artifact release</a>. Each ANTs H5 file is about 86 MiB and is verified
 before use. The download example is not run while building this
 vignette.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nonlinear</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template_transform.html">get_template_transform</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MNI152NLin6Asym"</span>, <span class="st">"MNI152NLin2009cAsym"</span>, provider <span class="op">=</span> <span class="st">"neuroatlas"</span>,</span>
 <span>  cache_dir <span class="op">=</span> <span class="fu"><a href="../reference/transform_cache_path.html">transform_cache_path</a></span><span class="op">(</span><span class="op">)</span>, download <span class="op">=</span> <span class="cn">TRUE</span>, offline <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -211,6 +343,7 @@ vignette.</p>
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">target</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span><span class="st">"MNI152NLin2009cAsym"</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">aligned</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apply_template_transform.html">apply_template_transform</a></span><span class="op">(</span><span class="va">schaefer</span>, <span class="va">nonlinear</span>, <span class="va">target</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="inspect-alignment-before-and-after">Inspect alignment before and after<a class="anchor" aria-label="anchor" href="#inspect-alignment-before-and-after"></a>
 </h3>
@@ -236,11 +369,38 @@ nonlinear transform. Alternating tiles show target and source anatomy at
 the same three axial positions.
 </p>
 </div>
-<p>The figure is precomputed from the released transform and cached
-TemplateFlow brain templates; building this vignette does not download
-or apply the warp. Run the download example above and then this plotting
-code to reproduce it.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>For a closer view, the compact animation below alternates once per
+second between the <strong>same target in both panels</strong> and the
+<strong>source before and after alignment</strong>. Watch the
+ventricular walls: less movement against the target indicates closer
+local alignment. This is a 1 mm crop at axial z = 10 mm; it supplements
+the 2 mm checkerboards above.</p>
+<div class="float">
+<img src="figures/template-transform-blink.gif" alt="Synchronized blink comparison of ventricular anatomy: left is before alignment, right is after the released transform. Both panels alternate with the same stationary target."><div class="figcaption">Synchronized blink comparison of ventricular
+anatomy: left is before alignment, right is after the released
+transform. Both panels alternate with the same stationary target.</div>
+</div>
+<p>The GIF is about 104 KiB (598 by 438 pixels, two frames), with a
+fixed 64-level grayscale palette and no dithering. It uses the visual
+quality campaign’s normalization: each volume is divided by its own
+99th-percentile intensity inside the target brain mask, with the same
+0–1 display range. Contrast and interpolation differences can also cause
+flicker; this is not an anatomical error measurement. The crop is
+enlarged with nearest-neighbour display.</p>
+<p>For manual stepping, pausing, other anatomical views and both
+transform directions, <a href="https://raw.githubusercontent.com/bbuchsbaum/neuroatlas/master/data-raw/transform-quality-v1/visuals-20261007/index.html" class="external-link">download
+the interactive viewer</a> and open it locally. Animation starts only
+when requested in that viewer. A <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/transform-quality-v1/visuals-20261007/MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-detail.png" class="external-link">static
+overlay and difference figure</a> is also available. The GIF can be
+regenerated from the checked-in viewer with
+<code>data-raw/transform-quality-v1/make-vignette-blink.py</code>; its
+input and output hashes are recorded in the adjacent
+<code>vignette-blink-receipt.json</code>.</p>
+<p>The checkerboard figure is precomputed from the released transform
+and cached TemplateFlow brain templates; building this vignette does not
+download or apply the warp. Run the download example above and then this
+plotting code to reproduce it.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"patchwork"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Install patchwork to compose the checkerboard panels."</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -308,7 +468,7 @@ be disabled; a corrupt cache entry fails rather than being used
 silently.</p>
 <p>Use <code>offline = TRUE</code> when an analysis may use only already
 verified artifacts:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_template_transform.html">get_template_transform</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MNI152NLin6Asym"</span>, <span class="st">"MNI152NLin2009cAsym"</span>, provider <span class="op">=</span> <span class="st">"neuroatlas"</span>,</span>
 <span>  cache_dir <span class="op">=</span> <span class="fu"><a href="../reference/transform_cache_path.html">transform_cache_path</a></span><span class="op">(</span><span class="op">)</span>, offline <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -316,7 +476,7 @@ verified artifacts:</p>
 <p><code><a href="../reference/clear_transform_cache.html">clear_transform_cache()</a></code> removes only entries neuroatlas
 recognizes as its own, refuses active locks, and does not clear a
 TemplateFlow cache.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/clear_transform_cache.html">clear_transform_cache</a></span><span class="op">(</span>artifact_version <span class="op">=</span> <span class="st">"released-artifact-version"</span><span class="op">)</span></span></code></pre></div>
 <p>Keep the <code>neuroatlas_transform</code> receipt with analysis
 output. It records the route, artifact checksums, grids, interpolation,

@@ -1,11 +1,11 @@
 # Fetch Exact Pinned Surface Registration Geometry
 
 Downloads checksum-locked registration spheres, cortical masks and
-vertex areas from their original providers. Only the pinned fsaverage
-164k and fsLR 32k domains are supported. The fsLR sphere is in fsaverage
-correspondence. Inputs retain their upstream licenses, independently of
-neuroatlas's license; see \`extdata/surface-assets-LICENSES.md\` in the
-installed package.
+vertex areas from their original providers. Pinned fsaverage 164k, 41k
+(fsaverage6), 10k (fsaverage5), and fsLR 32k domains are supported. The
+fsLR sphere is in fsaverage correspondence. Inputs retain their upstream
+licenses, independently of neuroatlas's license; see
+\`extdata/surface-assets-LICENSES.md\` in the installed package.
 
 ## Usage
 
@@ -28,7 +28,7 @@ get_surface_geometry(
 
 - density:
 
-  \`"164k"\` for fsaverage or \`"32k"\` for fsLR.
+  \`"164k"\`, \`"41k"\`, or \`"10k"\` for fsaverage; \`"32k"\` for fsLR.
 
 - hemisphere:
 

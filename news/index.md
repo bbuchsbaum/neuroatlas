@@ -2,6 +2,28 @@
 
 ## neuroatlas 0.2.0.9000
 
+- Accept neurosurf’s `0.1.0` CRAN-preparation version and pin its tested
+  GitHub revision. This fixes CI dependency resolution after upstream
+  release numbering replaced the higher-numbered development version.
+
+- Exact pinned fsaverage 164k surfaces support directed native
+  resampling to and from fsaverage6 (41k) and fsaverage5 (10k),
+  separately for each hemisphere. New input manifests preserve released
+  domain identities. Qualification covers numerical interpolation and
+  data policies; resampling remains lossy and does not establish
+  anatomical accuracy, area conservation or an inverse.
+  [`space_transform_manifest()`](https://bbuchsbaum.github.io/neuroatlas/reference/space_transform_manifest.md)
+  exposes route scope and surface densities, and the transform vignette
+  separates executable routes from roadmap placeholders.
+
+- [`projection_diagnostics()`](https://bbuchsbaum.github.io/neuroatlas/reference/projection_diagnostics.md)
+  reports per-map cortical coverage and per-key source, sampled-surface
+  and target counts. It distinguishes absent source keys, sampling loss
+  and surface-resampling loss. Explicit atlas or label-table hemisphere
+  declarations expose wrong-hemisphere output vertices. Diagnostics
+  preserve values, supported zero and missingness; no label repair is
+  applied.
+
 - CIFTI-2 dense scalar and label maps preserve cortical and volumetric
   brain models, ordered indices, voxel geometry, map metadata and
   per-map label tables through

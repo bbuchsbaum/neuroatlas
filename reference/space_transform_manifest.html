@@ -75,7 +75,10 @@ surfaces. `executable` indicates support by the template-transform API, given
 the required optional dependencies and artifacts; it is not a local readiness
 check. Exact admitted surface routes also bind `from_domain_id`,
 `to_domain_id`, `method`, `engine_revision`, `input_lock_sha256` and
-hemisphere.
+hemisphere. `from_density` and `to_density` record pinned surface densities;
+`route_scope` distinguishes `"roadmap_placeholder"`,
+`"exact_surface_domains"`, `"exact_volume_to_surface"`,
+`"exact_template_pair"`, and legacy `"coordinate_family"` routes.
 Broad surface names remain advisory. Numerical qualification is restricted to
 the recorded inputs and methods; it does not establish anatomical accuracy.</p>
     </div>
@@ -85,8 +88,59 @@ the recorded inputs and methods; it does not establish anatomical accuracy.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># All known routes</span></span></span>
 <span class="r-in"><span><span class="va">reg</span> <span class="op">&lt;-</span> <span class="fu">space_transform_manifest</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Only implemented routes</span></span></span>
-<span class="r-in"><span><span class="va">available</span> <span class="op">&lt;-</span> <span class="fu">space_transform_manifest</span><span class="op">(</span>status <span class="op">=</span> <span class="st">"available"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Executable routes, with their identity scope</span></span></span>
+<span class="r-in"><span><span class="va">reg</span><span class="op">[</span><span class="va">reg</span><span class="op">$</span><span class="va">executable</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"from_space"</span>, <span class="st">"to_space"</span>, <span class="st">"route_scope"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"hemisphere"</span>, <span class="st">"from_density"</span>, <span class="st">"to_density"</span>, <span class="st">"backend"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             from_space            to_space             route_scope hemisphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1               MNI305              MNI152       coordinate_family       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2               MNI152              MNI305       coordinate_family       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      MNI152NLin6Asym MNI152NLin2009cAsym     exact_template_pair       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  MNI152NLin2009cAsym     MNI152NLin6Asym     exact_template_pair       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13           fsaverage            fsLR_32k   exact_surface_domains          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14            fsLR_32k           fsaverage   exact_surface_domains          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15           fsaverage            fsLR_32k   exact_surface_domains          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16            fsLR_32k           fsaverage   exact_surface_domains          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17     MNI152NLin6Asym           fsaverage exact_volume_to_surface          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18     MNI152NLin6Asym            fsLR_32k exact_volume_to_surface          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19     MNI152NLin6Asym           fsaverage exact_volume_to_surface          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20     MNI152NLin6Asym            fsLR_32k exact_volume_to_surface          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 MNI152NLin2009cAsym           fsaverage exact_volume_to_surface          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 MNI152NLin2009cAsym            fsLR_32k exact_volume_to_surface          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 MNI152NLin2009cAsym           fsaverage exact_volume_to_surface          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 MNI152NLin2009cAsym            fsLR_32k exact_volume_to_surface          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25           fsaverage          fsaverage6   exact_surface_domains          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26          fsaverage6           fsaverage   exact_surface_domains          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27           fsaverage          fsaverage5   exact_surface_domains          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28          fsaverage5           fsaverage   exact_surface_domains          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29           fsaverage          fsaverage6   exact_surface_domains          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30          fsaverage6           fsaverage   exact_surface_domains          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31           fsaverage          fsaverage5   exact_surface_domains          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32          fsaverage5           fsaverage   exact_surface_domains          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    from_density to_density                  backend</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          &lt;NA&gt;       &lt;NA&gt;          internal_affine</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          &lt;NA&gt;       &lt;NA&gt;          internal_affine</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3          &lt;NA&gt;       &lt;NA&gt;           neurotransform</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4          &lt;NA&gt;       &lt;NA&gt;           neurotransform</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13         164k        32k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14          32k       164k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15         164k        32k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16          32k       164k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17         &lt;NA&gt;       164k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18         &lt;NA&gt;        32k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19         &lt;NA&gt;       164k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20         &lt;NA&gt;        32k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21         &lt;NA&gt;       164k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22         &lt;NA&gt;        32k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23         &lt;NA&gt;       164k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24         &lt;NA&gt;        32k cbig_registration_fusion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25         164k        41k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26          41k       164k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27         164k        10k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28          10k       164k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29         164k        41k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30          41k       164k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31         164k        10k    neurotransform_native</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32          10k       164k    neurotransform_native</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
