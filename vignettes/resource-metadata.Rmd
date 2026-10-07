@@ -3,6 +3,18 @@ title: "Identify, cite, and trace an atlas"
 output:
   rmarkdown::html_vignette:
     toc: true
+    toc_depth: 2
+    css: albers.css
+    includes:
+      in_header: albers-header.html
+params:
+  family: red
+  preset: interaction
+resource_files:
+- albers.css
+- albers.js
+- albers-header.html
+- fonts
 vignette: |
   %\VignetteIndexEntry{Identify, cite, and trace an atlas}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,6 +24,19 @@ vignette: |
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
 library(neuroatlas)
+```
+
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-interaction","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    "});</script>"
+  ),
+  params$family,
+  params$preset
+))
 ```
 
 An atlas object should tell you which resource you loaded, where its data came

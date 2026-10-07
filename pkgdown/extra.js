@@ -1,3 +1,10 @@
+// Use the same cool preset as the standalone vignettes on every site page.
+window.albersdownDefaults = {
+  family: "red",
+  preset: "interaction",
+  style: "minimal"
+};
+
 /* albersdown pkgdown/extra.js: site default classes + full albers.js. */
 (function () {
   var FAMILY_CLASSES = ["red", "lapis", "ochre", "teal", "green", "violet"];
