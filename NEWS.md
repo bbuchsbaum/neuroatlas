@@ -1,5 +1,11 @@
 # neuroatlas 0.2.0.9000
 
+* `projection_diagnostics()` reports per-map cortical coverage and per-key
+  source, sampled-surface and target counts. It distinguishes absent source
+  keys, sampling loss and surface-resampling loss. Explicit atlas or label-table
+  hemisphere declarations expose wrong-hemisphere output vertices. Diagnostics
+  preserve values, supported zero and missingness; no label repair is applied.
+
 * CIFTI-2 dense scalar and label maps preserve cortical and volumetric brain
   models, ordered indices, voxel geometry, map metadata and per-map label tables
   through `read_cifti()` and `write_cifti()`, using optional RNifti and xml2.
