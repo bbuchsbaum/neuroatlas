@@ -2,8 +2,9 @@
 
 Assessment date: 2026-09-25.
 Implementation tracker: `bd-01M3CCBG9346NRV3WEVH5YNBCQ`.
-Updated: 2026-10-06. The explicit-domain native surface slice is implemented;
-generic named-space routes and the broader release remain unfinished.
+Updated: 2026-10-06, after the 0.2.0 release. The initial cortical coverage
+is released; the full density matrix and later mixed/specialist coverage remain
+unfinished. CIFTI development is locally qualified and is not yet released.
 
 ## Outcome
 
@@ -18,24 +19,50 @@ Subject-specific registration, reconstruction, and unrestricted all-pairs fittin
 are outside this expansion. Importing an existing subject registration can be a
 later integration; a population mapping cannot substitute for it.
 
-## Verified starting point
+## Current implementation status
+
+| Ordered step | Implemented | Still pending |
+| --- | --- | --- |
+| 1. Capability contract | Released exact domain identities, representation-aware planning, honest route status and lossy/inverse restrictions | Admission evidence for additional routes |
+| 2. Surface routes | Released fsaverage 164k <-> fsLR 32k, both hemispheres: four directed native routes, pinned inputs and cache/offline replay | Other densities and within-family density changes |
+| 3. Volume-to-cortex | Released exact MNI6/MNI2009c population projection to fsaverage 164k/fsLR 32k, plus separate caller-aligned ribbon sampling | Additional source templates/targets and held-out anatomical validation |
+| 4. Mixed workflows | CIFTI dscalar/dlabel I/O and cortical dispatch implemented and numerically qualified locally on `feat/cifti-mixed-transforms`; subcortex remains on unchanged support; not released | Package validation/publication, subcortical warping, directed surface-to-volume rasterization and CIVET |
+| 5. Specialist coverage | Assessment/prioritization only; no new qualified routes | Additional MNI variants, SUIT, pediatric/infant/dHCP and newer surface families |
+
+Released behavior is [0.2.0](https://github.com/bbuchsbaum/neuroatlas/releases/tag/v0.2.0).
+The CIFTI development slice passes 17 independent file round trips and eight
+full-density mixed cases (2,874,376 values), with zero value or availability
+mismatches against direct public surface application. Its full package check is
+still running; it is not part of the published release.
+
+## Current route coverage
 
 | Capability | Current neuroatlas status |
 | --- | --- |
-| MNI152NLin6Asym <-> MNI152NLin2009cAsym | Qualified volume application at 1 and 2 mm, immutable artifacts |
-| MNI305 <-> generic MNI152 | Legacy coordinate affine; exact template identity and anatomical scope need audit |
-| fsaverage <-> fsaverage5/6 | Corrected to planned, approximate, directed; no named-space executor |
-| fsaverage <-> fsLR 32k | Planned registry edges |
-| Exact fsaverage 164k <-> registered fsLR 32k, L/R | Explicit-domain native API implemented; historical scoped numerical gates pass; no Workbench equivalence claim |
-| MNI volume -> fsaverage | Planned transform edge; separate visualization sampling exists |
-| Surface -> volume | Planned registry edge |
-| CIVET, CIFTI mapping, other MNI variants, cerebellar and age-specific routes | Not covered by the qualified V1 service |
+| MNI152NLin6Asym <-> MNI152NLin2009cAsym | Released qualified volume application at 1 and 2 mm with immutable artifacts |
+| MNI305 <-> generic MNI152 | Approximate legacy coordinate-family affine; not qualified exact-template correspondence |
+| fsaverage <-> fsaverage5/6 and other within-family density changes | Planned, approximate and directed; no qualified named-space executor |
+| Exact fsaverage 164k <-> registered fsLR 32k, L/R | Released public native execution for four pinned directed routes; native numerical qualification passes; no Workbench equivalence claim |
+| Broad fsaverage/fsLR aliases and additional densities | Planned; only the exact pinned 164k/32k domains execute |
+| Exact MNI6/MNI2009c -> fsaverage 164k/fsLR 32k, L/R | Released population registration-fusion projection; numerical qualification covers locked 1 mm and 2 mm source grids |
+| Aligned volume -> cortical ribbon | Released separate caller-aligned white/pial sampling; does not fit registration or establish Workbench ribbon equivalence |
+| CIFTI dscalar/dlabel transport and cortical resampling | Locally implemented and numerically qualified; explicitly bound cortical operators and unchanged noncortical support; not released |
+| CIFTI subcortical remapping and surface -> volume | Planned; no qualified executor |
+| CIVET correspondence | Planned; no qualified routes |
+| Other MNI variants, cerebellar and age-specific routes | Planned; no additional qualified routes |
+
+Strict historical Workbench surface agreement still fails in three of four
+ordinary cases. Held-out anatomical validation and human visual review have not
+been performed. Numerical qualification does not establish anatomical accuracy,
+conservation or an inverse. See the
+[source-bound release evidence](../data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md)
+and [machine handoff](resume-neuroatlas.md) for the released scope and limitations.
 
 Evidence anchors:
 
 - `inst/extdata/transform_registry.csv`: current route declarations.
-- `R/template_transform.R`: resolver accepts image transforms; application rejects
-  surface atlases.
+- `R/template_transform.R`: released resolver/application supports images, exact
+  surface domains and directed population cortical projection.
 - `R/coordinate_spaces.R`: legacy generic MNI152 coordinate classifications and
   affine vertex-coordinate conversion, not cortical correspondence.
 - `R/ce_overlay.R` and `R/plot_brain.R`: white/pial sampling for visualization;
@@ -141,7 +168,8 @@ drop subcortical structures.
    mappings and newer surface families such as onavg. None are interchangeable
    aliases or automatically qualified because TemplateFlow distributes them.
 
-The first three steps are the next coherent release goal. Later steps are
+The initial coverage from the first three steps shipped in 0.2.0. Additional
+surface densities and later mixed/specialist steps remain open. Later routes are
 prioritized candidates, not commitments to manufacture every possible mapping.
 [TemplateFlow catalog](https://github.com/templateflow/templateflow),
 [SUIT projection methods](https://www.diedrichsenlab.org/imaging/suit_flatmap.htm).
@@ -178,8 +206,10 @@ artifact, checksum, cache/offline, provenance, and retained-failure discipline.
 The 0.2.0 slice implements representation-safe planning, the four pinned ordinary
 fsaverage 164k / fsLR 32k routes, exact MNI6/MNI2009c population cortical
 projection, and separately declared aligned ribbon sampling. Broad aliases,
-other densities, CIFTI, directed backprojection and specialist coverage remain
-future work. The implementation Mote continues to track that broader scope.
+other densities, subcortical remapping, directed backprojection and specialist
+coverage remain future work. The CIFTI cortical adapter is implemented and
+numerically qualified locally, with package validation/publication still pending.
+The implementation Mote continues to track that broader scope.
 
 Read [the source-bound release evidence](../data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md)
 and [the machine handoff](resume-neuroatlas.md) for qualification and engineering
