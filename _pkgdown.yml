@@ -153,6 +153,7 @@ reference:
   - "needs_coord_transform"
   - "needs_template_warp"
   - "needs_transform"
+  - "projection_diagnostics"
   - "query_coord"
   - "ribbon_projection"
   - "show_templateflow_cache_path"
