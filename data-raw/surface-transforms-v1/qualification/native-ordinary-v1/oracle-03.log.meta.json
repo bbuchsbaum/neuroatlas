@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-27T13:59:27.194256+00:00",
+  "finished_utc": "2026-09-27T14:00:44.663403+00:00",
+  "duration_seconds": 77.468602,
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "python3",
+    "data-raw/surface-transforms-v1/qualify-native-oracle.py",
+    "data-raw/surface-transforms-v1/work/integration-20260927/native-03"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/integration-20260927/oracle-03.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 4631
+}

@@ -17,3 +17,9 @@ The input object \code{x}, returned invisibly.
 \description{
 Provides a brief summary of the TemplateFlow interface object.
 }
+\examples{
+\dontrun{
+interface <- create_templateflow()
+print(interface)
+}
+}

@@ -31,17 +31,18 @@
 #' @examples
 #' \dontrun{
 #' atlas <- get_schaefer_atlas(100)
-#' adj   <- atlas_graph(atlas)
+#' adj <- atlas_graph(atlas)
 #' adj_b <- atlas_graph(atlas, include_weight = FALSE)
-#' el    <- atlas_graph(atlas, as = "tibble")
+#' el <- atlas_graph(atlas, as = "tibble")
 #' }
 #'
 #' @export
-atlas_graph <- function(atlas,
-                        connectivity = c("6", "18", "26"),
-                        as = c("matrix", "igraph", "tibble"),
-                        include_weight = TRUE) {
-
+atlas_graph <- function(
+  atlas,
+  connectivity = c("6", "18", "26"),
+  as = c("matrix", "igraph", "tibble"),
+  include_weight = TRUE
+) {
   connectivity <- match.arg(connectivity)
   as <- match.arg(as)
 
@@ -57,29 +58,69 @@ atlas_graph <- function(atlas,
   dims <- dim(arr)
 
   # --- 2. Build positive-half neighbour offsets ---
-  offsets <- matrix(c(1L, 0L, 0L,
-                      0L, 1L, 0L,
-                      0L, 0L, 1L), ncol = 3, byrow = TRUE)
+  offsets <- matrix(
+    c(
+      1L,
+      0L,
+      0L,
+      0L,
+      1L,
+      0L,
+      0L,
+      0L,
+      1L
+    ),
+    ncol = 3,
+    byrow = TRUE
+  )
 
   if (connectivity %in% c("18", "26")) {
-    edge_offsets <- matrix(c(
-      1L, 1L, 0L,
-      1L, -1L, 0L,
-      1L, 0L, 1L,
-      1L, 0L, -1L,
-      0L, 1L, 1L,
-      0L, 1L, -1L
-    ), ncol = 3, byrow = TRUE)
+    edge_offsets <- matrix(
+      c(
+        1L,
+        1L,
+        0L,
+        1L,
+        -1L,
+        0L,
+        1L,
+        0L,
+        1L,
+        1L,
+        0L,
+        -1L,
+        0L,
+        1L,
+        1L,
+        0L,
+        1L,
+        -1L
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
     offsets <- rbind(offsets, edge_offsets)
   }
 
   if (connectivity == "26") {
-    corner_offsets <- matrix(c(
-      1L, 1L, 1L,
-      1L, 1L, -1L,
-      1L, -1L, 1L,
-      1L, -1L, -1L
-    ), ncol = 3, byrow = TRUE)
+    corner_offsets <- matrix(
+      c(
+        1L,
+        1L,
+        1L,
+        1L,
+        1L,
+        -1L,
+        1L,
+        -1L,
+        1L,
+        1L,
+        -1L,
+        -1L
+      ),
+      ncol = 3,
+      byrow = TRUE
+    )
     offsets <- rbind(offsets, corner_offsets)
   }
 
@@ -142,19 +183,26 @@ atlas_graph <- function(atlas,
         stop("Package 'igraph' is required for as = \"igraph\".")
       }
       wt <- if (include_weight) TRUE else NULL
-      igraph::graph_from_adjacency_matrix(adj, mode = "undirected",
-                                          weighted = wt)
+      igraph::graph_from_adjacency_matrix(
+        adj,
+        mode = "undirected",
+        weighted = wt
+      )
     },
     tibble = {
       # Upper-triangle edge list (avoid duplicate edges)
       idx <- which(adj > 0L & upper.tri(adj), arr.ind = TRUE)
       if (nrow(idx) == 0L) {
-        el <- data.frame(from = character(0), to = character(0),
-                         weight = integer(0), stringsAsFactors = FALSE)
+        el <- data.frame(
+          from = character(0),
+          to = character(0),
+          weight = integer(0),
+          stringsAsFactors = FALSE
+        )
       } else {
         el <- data.frame(
-          from   = region_labels[idx[, 1L]],
-          to     = region_labels[idx[, 2L]],
+          from = region_labels[idx[, 1L]],
+          to = region_labels[idx[, 2L]],
           weight = adj[idx],
           stringsAsFactors = FALSE
         )

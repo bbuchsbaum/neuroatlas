@@ -8,7 +8,7 @@
 A named list with the following elements:
 \describe{
   \item{MNI305}{FreeSurfer/Talairach space (fsaverage native)}
-  \item{MNI152}{ICBM 2009c space (common fMRI template)}
+  \item{MNI152}{Broad MNI152 coordinate family, without template identity}
   \item{SCANNER}{Native scanner space (subject-specific)}
   \item{UNKNOWN}{Unknown or unspecified space}
 }

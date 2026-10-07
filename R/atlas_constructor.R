@@ -60,20 +60,22 @@ NULL
 
 #' @rdname atlas_constructor
 #' @keywords internal
-new_atlas <- function(name,
-                      atlas,
-                      ids,
-                      labels,
-                      orig_labels = NULL,
-                      hemi = NULL,
-                      network = NULL,
-                      cmap = NULL,
-                      subclass = character(),
-                      extra = list(),
-                      ref,
-                      artifacts = NULL,
-                      history = NULL,
-                      metadata = list()) {
+new_atlas <- function(
+  name,
+  atlas,
+  ids,
+  labels,
+  orig_labels = NULL,
+  hemi = NULL,
+  network = NULL,
+  cmap = NULL,
+  subclass = character(),
+  extra = list(),
+  ref,
+  artifacts = NULL,
+  history = NULL,
+  metadata = list()
+) {
   ids <- as.integer(ids)
   n <- length(ids)
 
@@ -110,9 +112,22 @@ new_atlas <- function(name,
 
   # Merge extras without clobbering reserved fields.
   reserved <- c(
-    "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
-    "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
-    "atlas_history", "metadata", "space", "template_space", "coord_space",
+    "name",
+    "atlas",
+    "cmap",
+    "ids",
+    "labels",
+    "orig_labels",
+    "hemi",
+    "network",
+    "roi_metadata",
+    "atlas_ref",
+    "atlas_artifacts",
+    "atlas_history",
+    "metadata",
+    "space",
+    "template_space",
+    "coord_space",
     "confidence"
   )
   if (length(extra) > 0L) {
@@ -136,35 +151,51 @@ new_atlas <- function(name,
   validate_atlas(ret)
 
   ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history,
-                                   metadata_inputs = metadata)
+  ret <- .attach_atlas_provenance(
+    ret,
+    artifacts = artifacts,
+    history = history,
+    metadata_inputs = metadata
+  )
   ret
 }
 
 
 #' @rdname atlas_constructor
 #' @keywords internal
-new_surfatlas <- function(name,
-                          lh_atlas,
-                          rh_atlas,
-                          ids,
-                          labels,
-                          surf_type,
-                          surface_space,
-                          orig_labels = NULL,
-                          hemi = NULL,
-                          network = NULL,
-                          cmap = NULL,
-                          subclass = character(),
-                          extra = list(),
-                          ref,
-                          artifacts = NULL,
-                          history = NULL,
-                          metadata = list()) {
+new_surfatlas <- function(
+  name,
+  lh_atlas,
+  rh_atlas,
+  ids,
+  labels,
+  surf_type,
+  surface_space,
+  orig_labels = NULL,
+  hemi = NULL,
+  network = NULL,
+  cmap = NULL,
+  subclass = character(),
+  extra = list(),
+  ref,
+  artifacts = NULL,
+  history = NULL,
+  metadata = list()
+) {
   ids <- as.integer(ids)
   n <- length(ids)
   labels <- as.character(labels)
-  if (is.null(orig_labels)) orig_labels <- labels else orig_labels <- as.character(orig_labels)
+  if (
+    is.null(
+      orig_labels
+    )
+  ) {
+    orig_labels <- labels
+  } else {
+    orig_labels <- as.character(
+      orig_labels
+    )
+  }
   if (is.null(hemi)) {
     hemi <- rep(NA_character_, n)
   } else {
@@ -201,10 +232,26 @@ new_surfatlas <- function(name,
       )
     }
     reserved <- c(
-      "surf_type", "surface_space", "lh_atlas", "rh_atlas", "name", "cmap",
-      "ids", "labels", "orig_labels", "hemi", "network", "roi_metadata",
-      "atlas_ref", "atlas_artifacts", "atlas_history", "metadata", "space",
-      "template_space", "coord_space", "confidence"
+      "surf_type",
+      "surface_space",
+      "lh_atlas",
+      "rh_atlas",
+      "name",
+      "cmap",
+      "ids",
+      "labels",
+      "orig_labels",
+      "hemi",
+      "network",
+      "roi_metadata",
+      "atlas_ref",
+      "atlas_artifacts",
+      "atlas_history",
+      "metadata",
+      "space",
+      "template_space",
+      "coord_space",
+      "confidence"
     )
     drop <- extra_names %in% reserved
     for (nm in extra_names[!drop]) {
@@ -219,8 +266,12 @@ new_surfatlas <- function(name,
   validate_atlas(ret)
 
   ret <- .attach_atlas_ref(ret, ref)
-  ret <- .attach_atlas_provenance(ret, artifacts = artifacts, history = history,
-                                   metadata_inputs = metadata)
+  ret <- .attach_atlas_provenance(
+    ret,
+    artifacts = artifacts,
+    history = history,
+    metadata_inputs = metadata
+  )
   ret
 }
 
@@ -288,11 +339,13 @@ validate_atlas <- function(x) {
 
 #' @keywords internal
 #' @noRd
-.validate_atlas_field_lengths <- function(ids,
-                                          labels,
-                                          orig_labels = NULL,
-                                          hemi = NULL,
-                                          network = NULL) {
+.validate_atlas_field_lengths <- function(
+  ids,
+  labels,
+  orig_labels = NULL,
+  hemi = NULL,
+  network = NULL
+) {
   n <- length(ids)
   length_checks <- list(
     labels = labels,
@@ -327,8 +380,12 @@ validate_atlas <- function(x) {
 #' @keywords internal
 #' @noRd
 .normalize_cmap <- function(cmap) {
-  if (is.null(cmap)) return(NULL)
-  if (is.data.frame(cmap)) return(cmap)
+  if (is.null(cmap)) {
+    return(NULL)
+  }
+  if (is.data.frame(cmap)) {
+    return(cmap)
+  }
   if (is.matrix(cmap)) {
     out <- as.data.frame(cmap, stringsAsFactors = FALSE)
     if (ncol(out) >= 3L && is.null(colnames(cmap))) {

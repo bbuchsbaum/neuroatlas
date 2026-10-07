@@ -15,9 +15,11 @@ spin_test(
 )
 }
 \arguments{
-\item{map1}{Numeric vector of parcel values (length K, aligned to atlas parcels).}
+\item{map1}{Numeric vector of parcel values (length K, aligned to atlas
+parcels).}
 
-\item{map2}{Numeric vector of parcel values (length K, aligned to atlas parcels).}
+\item{map2}{Numeric vector of parcel values (length K, aligned to atlas
+parcels).}
 
 \item{atlas}{A surface atlas object (class \code{"surfatlas"}) with
 \code{lh_atlas} and \code{rh_atlas} fields, or any atlas whose geometry
@@ -25,7 +27,8 @@ can provide sphere coordinates.}
 
 \item{n_perm}{Integer. Number of spin permutations. Default: 1000.}
 
-\item{cor_method}{Character. Correlation method passed to \code{\link[stats]{cor}}.
+\item{cor_method}{Character. Correlation method passed to
+\code{\link[stats]{cor}}.
 One of \code{"pearson"}, \code{"spearman"}, or \code{"kendall"}.
 Default: \code{"pearson"}.}
 
@@ -39,7 +42,8 @@ sphere coordinates are fetched via
 \value{
 A list of class \code{"spin_test"} with:
 \describe{
-  \item{observed}{The observed correlation between \code{map1} and \code{map2}.}
+  \item{observed}{The observed correlation between \code{map1} and
+\code{map2}.}
   \item{null_distribution}{Numeric vector of length \code{n_perm} containing
     null correlations.}
   \item{p_value}{Two-sided p-value: proportion of null correlations with
@@ -75,7 +79,7 @@ atlas <- get_schaefer_surfatlas(parcels = "100", networks = "7")
 K <- length(atlas$ids)
 map1 <- rnorm(K)
 map2 <- map1 + rnorm(K, sd = 0.5)
-res  <- spin_test(map1, map2, atlas, n_perm = 500, seed = 42)
+res <- spin_test(map1, map2, atlas, n_perm = 500, seed = 42)
 print(res)
 }
 

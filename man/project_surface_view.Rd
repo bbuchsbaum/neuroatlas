@@ -21,7 +21,8 @@ project_surface_view(
 \value{
 A list with elements:
 \describe{
-  \item{\code{xy}}{Numeric matrix (\eqn{N \times 2}) of projected coordinates.}
+  \item{\code{xy}}{Numeric matrix (\eqn{N \times 2}) of projected
+coordinates.}
   \item{\code{view_dir}}{Numeric length-3 view direction vector used for
     backface culling.}
 }
@@ -29,4 +30,9 @@ A list with elements:
 \description{
 Public wrapper for the core surface-view projection used by
 \code{\link{plot_brain}()}.
+}
+\examples{
+project_surface_view(rbind(c(0, 0, 0), c(1, 2, 3)),
+  view = "lateral", hemi = "left"
+)
 }

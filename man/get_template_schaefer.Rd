@@ -13,7 +13,8 @@ get_template_schaefer(
 )
 }
 \arguments{
-\item{name}{Character string specifying template name. Default: "MNI152NLin2009cAsym"}
+\item{name}{Character string specifying template name. Default:
+"MNI152NLin2009cAsym"}
 
 \item{resolution}{Numeric resolution in mm. Default: 1}
 
@@ -21,15 +22,18 @@ get_template_schaefer(
 
 \item{networks}{Number of networks (17 default)}
 
-\item{extension}{Character string specifying file extension. Default: ".nii.gz"}
+\item{extension}{Character string specifying file extension. Default:
+".nii.gz"}
 }
 \value{
 A NeuroVol object containing the parcellation
 }
 \description{
-\strong{DEPRECATED:} Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(atlas = "Schaefer2018",
+desc = ..., suffix = "dseg", ...)} instead.
 
-Retrieves Schaefer cortical parcellation mapped to a specified template space.
+Retrieves Schaefer cortical parcellation mapped to a specified template
+space.
 }
 \examples{
 \donttest{

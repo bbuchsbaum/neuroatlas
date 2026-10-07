@@ -1,0 +1,4 @@
+Error in dim(x) <- length(x) : 
+  invalid first argument, must be vector (list or atomic)
+Calls: transform_atlas ... apply_surface_projection -> as.array -> as.array.default
+Execution halted

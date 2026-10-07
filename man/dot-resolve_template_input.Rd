@@ -7,8 +7,10 @@
 .resolve_template_input(input, target_type = "NeuroVol", api_handle = NULL)
 }
 \arguments{
-\item{input}{The input to resolve. Can be a \code{NeuroVol}, \code{NeuroSpace},
-a TemplateFlow space string, or a named list of \code{get_template()} arguments.}
+\item{input}{The input to resolve. Can be a \code{NeuroVol},
+  \code{NeuroSpace},
+  a TemplateFlow space string, or a named list of \code{get_template()}
+arguments.}
 
 \item{target_type}{"NeuroVol" (default) or "NeuroSpace".}
 
@@ -18,7 +20,9 @@ a TemplateFlow space string, or a named list of \code{get_template()} arguments.
 An object of the specified \code{target_type}.
 }
 \description{
-Internal helper function that takes a flexible input representing a neuroimaging
-template and resolves it to either a \code{NeuroVol} or \code{NeuroSpace} object.
+Internal helper function that takes a flexible input representing a
+neuroimaging
+template and resolves it to either a \code{NeuroVol} or \code{NeuroSpace}
+object.
 }
 \keyword{internal}

@@ -7,27 +7,34 @@
 dilate_atlas(atlas, mask, radius = 4, maxn = 50)
 }
 \arguments{
-\item{atlas}{An object of class "atlas" containing the parcellation to be dilated}
+\item{atlas}{An object of class "atlas" containing the parcellation to be
+dilated}
 
-\item{mask}{A binary mask (NeuroVol object) specifying valid voxels for dilation.
-Dilation will only occur within non-zero mask values. May also be a TemplateFlow
-space identifier (string) or list of `get_template()` arguments, which will be
-resolved to a NeuroVol via `.resolve_template_input()`.}
+\item{mask}{A binary mask (NeuroVol object) specifying valid voxels for
+  dilation.
+  Dilation will only occur within non-zero mask values. May also be a
+TemplateFlow
+  space identifier (string) or list of `get_template()` arguments, which will
+be
+  resolved to a NeuroVol via `.resolve_template_input()`.}
 
-\item{radius}{Numeric. The maximum distance (in voxels) to search for neighboring
+\item{radius}{Numeric. The maximum distance (in voxels) to search for
+neighboring
 parcels when dilating. Default: 4}
 
 \item{maxn}{Integer. Maximum number of neighboring voxels to consider when
 determining parcel assignment. Default: 50}
 }
 \value{
-A \code{ClusteredNeuroVol} object containing the dilated parcellation.
+A \code{ClusteredNeuroVol} object containing the dilated
+  parcellation.
   The object maintains the original label mappings but may include additional
   voxels in existing parcels.
 }
 \description{
 Expands the boundaries of brain atlas parcels by dilating them into adjacent
-unassigned voxels within a specified mask. This is useful for filling small gaps
+unassigned voxels within a specified mask. This is useful for filling small
+gaps
 between parcels or extending parcels into neighboring regions.
 }
 \details{
@@ -36,7 +43,8 @@ The dilation process:
   \item Identifies unassigned voxels that lie within the mask
   \item For each unassigned voxel, finds assigned voxels within \code{radius}
     (Euclidean distance, in voxel units)
-  \item Assigns the voxel to a parcel by inverse-distance-weighted voting over
+  \item Assigns the voxel to a parcel by inverse-distance-weighted voting
+over
     those neighbours (up to \code{maxn} of them)
   \item Leaves a voxel unassigned when no parcel lies within \code{radius},
     so distant in-mask voxels (e.g. cerebellar grey matter for a cortical
@@ -44,7 +52,8 @@ The dilation process:
   \item Respects mask boundaries to prevent dilation into unwanted regions
 }
 
-The function uses a k-d tree implementation (via Rnanoflann) for efficient nearest
+The function uses a k-d tree implementation (via Rnanoflann) for efficient
+nearest
 neighbor searches in 3D space.
 }
 \examples{
@@ -68,5 +77,6 @@ The algorithm uses efficient k-d tree based nearest neighbor searches for
 spatial queries in 3D voxel space.
 }
 \seealso{
-\code{\link{get_template_brainmask}} for creating appropriate masks from TemplateFlow
+\code{\link{get_template_brainmask}} for creating appropriate masks from
+TemplateFlow
 }

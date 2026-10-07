@@ -64,45 +64,58 @@
 #' }
 #'
 #' @export
-plot_brain_grid <- function(surfatlas,
-                            vals_list = NULL,
-                            views = c("lateral", "medial"),
-                            hemis = c("left", "right"),
-                            ncol = NULL,
-                            shared_scale = TRUE,
-                            palette = "cork",
-                            lim = NULL,
-                            titles = NULL,
-                            colorbar = TRUE,
-                            colorbar_title = NULL,
-                            title = NULL,
-                            subtitle = NULL,
-                            caption = NULL,
-                            data = NULL,
-                            values = NULL,
-                            by = NULL,
-                            allow_partial = FALSE,
-                            ...) {
+plot_brain_grid <- function(
+  surfatlas,
+  vals_list = NULL,
+  views = c("lateral", "medial"),
+  hemis = c("left", "right"),
+  ncol = NULL,
+  shared_scale = TRUE,
+  palette = "cork",
+  lim = NULL,
+  titles = NULL,
+  colorbar = TRUE,
+  colorbar_title = NULL,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  data = NULL,
+  values = NULL,
+  by = NULL,
+  allow_partial = FALSE,
+  ...
+) {
   if (!requireNamespace("patchwork", quietly = TRUE)) {
-    stop("Package 'patchwork' is required for plot_brain_grid(). ",
-         "Install it with install.packages('patchwork').", call. = FALSE)
+    stop(
+      "Package 'patchwork' is required for plot_brain_grid(). ",
+      "Install it with install.packages('patchwork').",
+      call. = FALSE
+    )
   }
   if (!inherits(surfatlas, "surfatlas")) {
     stop("'surfatlas' must inherit from class 'surfatlas'.", call. = FALSE)
   }
-  if (!is.logical(shared_scale) || length(shared_scale) != 1L ||
-      is.na(shared_scale)) {
+  if (
+    !is.logical(shared_scale) || length(shared_scale) != 1L ||
+      is.na(shared_scale)
+  ) {
     stop("'shared_scale' must be TRUE or FALSE.", call. = FALSE)
   }
-  if (!is.null(ncol) &&
-      (!is.numeric(ncol) || length(ncol) != 1L || !is.finite(ncol) ||
-       ncol < 1 || ncol != as.integer(ncol))) {
+  if (
+    !is.null(ncol) &&
+      (
+        !is.numeric(ncol) || length(ncol) != 1L || !is.finite(ncol) ||
+          ncol < 1 || ncol != as.integer(ncol)
+      )
+  ) {
     stop("'ncol' must be NULL or a positive integer scalar.", call. = FALSE)
   }
   if (!is.null(ncol)) ncol <- as.integer(ncol)
   dots <- list(...)
-  if ("static_backend" %in% names(dots) &&
-      identical(match.arg(dots$static_backend, c("ggplot", "cpu")), "cpu")) {
+  if (
+    "static_backend" %in% names(dots) &&
+      identical(match.arg(dots$static_backend, c("ggplot", "cpu")), "cpu")
+  ) {
     cli::cli_abort(
       c(
         "{.fn plot_brain_grid} does not support the CPU backend for parcel maps.",
@@ -124,8 +137,10 @@ plot_brain_grid <- function(surfatlas,
         class = c("neuroatlas_error_parcel_value", "neuroatlas_error")
       )
     }
-    if (!is.character(values) || length(values) == 0L || anyNA(values) ||
-        any(!nzchar(values)) || anyDuplicated(values)) {
+    if (
+      !is.character(values) || length(values) == 0L || anyNA(values) ||
+        any(!nzchar(values)) || anyDuplicated(values)
+    ) {
       cli::cli_abort(
         "{.arg values} must be a non-empty character vector of unique column names.",
         class = c("neuroatlas_error_parcel_value", "neuroatlas_error")
@@ -138,13 +153,18 @@ plot_brain_grid <- function(surfatlas,
       allow_partial = allow_partial
     )
     vals_list <- stats::setNames(
-      lapply(values, function(value_col) {
-        .parcel_value_from_aligned(aligned, surfatlas, value_col)
-      }),
+      lapply(
+        values,
+        function(value_col) {
+          .parcel_value_from_aligned(aligned, surfatlas, value_col)
+        }
+      ),
       values
     )
-  } else if (!is.null(values) || !is.null(by) ||
-             !identical(allow_partial, FALSE)) {
+  } else if (
+    !is.null(values) || !is.null(by) ||
+      !identical(allow_partial, FALSE)
+  ) {
     cli::cli_abort(
       "{.arg values}, {.arg by}, and {.arg allow_partial} require {.arg data}.",
       class = c("neuroatlas_error_parcel_value", "neuroatlas_error")
@@ -152,18 +172,27 @@ plot_brain_grid <- function(surfatlas,
   }
 
   if (!is.list(vals_list) || length(vals_list) == 0) {
-    stop("'vals_list' must be a non-empty list of numeric vectors.",
-         call. = FALSE)
+    stop(
+      "'vals_list' must be a non-empty list of numeric vectors.",
+      call. = FALSE
+    )
   }
-  valid_map <- vapply(vals_list, function(x) {
-    (is.numeric(x) || is.integer(x)) &&
-      is.null(dim(x)) &&
-      length(x) == length(surfatlas$ids) &&
-      !any(is.infinite(x)) && any(is.finite(x))
-  }, logical(1))
+  valid_map <- vapply(
+    vals_list,
+    function(x) {
+      (is.numeric(x) || is.integer(x)) &&
+        is.null(dim(x)) &&
+        length(x) == length(surfatlas$ids) &&
+        !any(is.infinite(x)) && any(is.finite(x))
+    },
+    logical(1)
+  )
   if (any(!valid_map)) {
-    stop("Each map must be a numeric atlas-length vector with at least one ",
-         "finite value and no infinite values.", call. = FALSE)
+    stop(
+      "Each map must be a numeric atlas-length vector with at least one ",
+      "finite value and no infinite values.",
+      call. = FALSE
+    )
   }
   colorbar_position <- .normalize_colorbar_position(colorbar)
 
@@ -171,22 +200,32 @@ plot_brain_grid <- function(surfatlas,
 
   if (is.null(titles)) {
     titles <- names(vals_list)
-    if (is.null(titles) || length(titles) != n_panels ||
-        any(!nzchar(titles))) {
+    if (
+      is.null(titles) || length(titles) != n_panels ||
+        any(!nzchar(titles))
+    ) {
       titles <- paste("Panel", seq_len(n_panels))
     }
   }
   if (!is.character(titles) || length(titles) != n_panels || anyNA(titles)) {
-    stop("'titles' must be NULL or one character value per map.",
-         call. = FALSE)
+    stop(
+      "'titles' must be NULL or one character value per map.",
+      call. = FALSE
+    )
   }
 
   # Compute shared limits
-  if (!is.null(lim) &&
-      (!is.numeric(lim) || length(lim) != 2L || any(!is.finite(lim)) ||
-       lim[[1]] > lim[[2]])) {
-    stop("'lim' must contain two finite numeric values in increasing order.",
-         call. = FALSE)
+  if (
+    !is.null(lim) &&
+      (
+        !is.numeric(lim) || length(lim) != 2L || any(!is.finite(lim)) ||
+          lim[[1]] > lim[[2]]
+      )
+  ) {
+    stop(
+      "'lim' must contain two finite numeric values in increasing order.",
+      call. = FALSE
+    )
   }
   if (shared_scale && is.null(lim)) {
     all_vals <- unlist(vals_list, use.names = FALSE)
@@ -195,11 +234,15 @@ plot_brain_grid <- function(surfatlas,
       lim <- lim + c(-1, 1) * max(abs(lim[[1]]) * 1e-8, 1e-8)
     }
   }
-  if (!shared_scale && is.null(lim) &&
-      !identical(colorbar_position, "none")) {
-    stop("A shared colorbar is not meaningful with independent panel scales. ",
-         "Set 'colorbar = FALSE', 'shared_scale = TRUE', or provide 'lim'.",
-         call. = FALSE)
+  if (
+    !shared_scale && is.null(lim) &&
+      !identical(colorbar_position, "none")
+  ) {
+    stop(
+      "A shared colorbar is not meaningful with independent panel scales. ",
+      "Set 'colorbar = FALSE', 'shared_scale = TRUE', or provide 'lim'.",
+      call. = FALSE
+    )
   }
 
   # Build individual panels

@@ -29,7 +29,8 @@ argument).}
 \item{resolution}{Optional resolution string (TemplateFlow \code{res}
 argument), e.g., "06" for fsaverage6.}
 
-\item{...}{Additional arguments forwarded to \code{\link{get_surface_template}}.}
+\item{...}{Additional arguments forwarded to
+\code{\link{get_surface_template}}.}
 }
 \value{
 A \code{neurosurf::SurfaceGeometry} object when \code{hemi} is "L"
@@ -43,12 +44,16 @@ as a \code{neurosurf::SurfaceGeometry} object (or a left/right list).
 }
 \examples{
 \dontrun{
-  # fsaverage6 pial surface as NeuroSurface
-  lh <- load_surface_template("fsaverage", "pial", hemi = "L",
-                              density = "41k", resolution = "06")
+# fsaverage6 pial surface as NeuroSurface
+lh <- load_surface_template("fsaverage", "pial",
+  hemi = "L",
+  density = "41k", resolution = "06"
+)
 
-  # Both hemispheres of fsLR 32k inflated surface
-  both <- load_surface_template("fsLR", "inflated", hemi = "both",
-                                density = "32k")
+# Both hemispheres of fsLR 32k inflated surface
+both <- load_surface_template("fsLR", "inflated",
+  hemi = "both",
+  density = "32k"
+)
 }
 }

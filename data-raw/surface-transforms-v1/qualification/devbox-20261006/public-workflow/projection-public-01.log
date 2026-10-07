@@ -1,0 +1,2 @@
+Error: Timed out waiting for transform artifact cache lock: /work/code/neuroatlas/data-raw/surface-transforms-v1/work/public-surface-cache/.neuroatlas-cache.lock
+Execution halted

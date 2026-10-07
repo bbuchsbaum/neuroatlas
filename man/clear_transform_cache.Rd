@@ -12,7 +12,8 @@ clear_transform_cache(
 \arguments{
 \item{artifact_version}{Optional immutable artifact version to remove.}
 
-\item{cache_dir}{Transform cache directory, normally [transform_cache_path()].}
+\item{cache_dir}{Transform cache directory, normally
+[transform_cache_path()].}
 }
 \value{
 The number of artifact files removed, invisibly.
@@ -20,4 +21,10 @@ The number of artifact files removed, invisibly.
 \description{
 Removes only transform artifact files owned by neuroatlas. The cache root is
 retained, and a cache containing an active artifact lock is refused.
+}
+\examples{
+cache <- tempfile("neuroatlas-example-cache-")
+dir.create(cache)
+clear_transform_cache(cache_dir = cache)
+unlink(cache, recursive = TRUE)
 }

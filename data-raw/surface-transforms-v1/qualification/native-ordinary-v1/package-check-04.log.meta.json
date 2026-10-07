@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-27T14:01:30.666058+00:00",
+  "finished_utc": "2026-09-27T14:05:42.291708+00:00",
+  "duration_seconds": 251.624004,
+  "command": [
+    "env",
+    "LC_ALL=en_US.UTF-8",
+    "LANG=en_US.UTF-8",
+    "LC_CTYPE=en_US.UTF-8",
+    "RGL_USE_NULL=true",
+    "NOT_CRAN=false",
+    "R_LIBS=/tmp/neurotransform-surface-library",
+    "_R_CHECK_FORCE_SUGGESTS_=false",
+    "Rscript",
+    "--vanilla",
+    "-e",
+    "rcmdcheck::rcmdcheck(\"data-raw/surface-transforms-v1/work/integration-20260927/check-03/neuroatlas_0.1.0.9006.tar.gz\", args=c(\"--as-cran\", \"--no-manual\", \"--ignore-vignettes\"), error_on=\"never\", check_dir=\"data-raw/surface-transforms-v1/work/integration-20260927/check-04\")"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/Users/bbuchsbaum/code/neuroatlas/data-raw/surface-transforms-v1/work/integration-20260927/package-check-04.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 6029
+}

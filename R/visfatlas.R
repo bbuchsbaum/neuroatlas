@@ -52,9 +52,11 @@
 #' @importFrom utils unzip
 #' @importFrom assertthat assert_that
 #' @export
-get_visfatlas <- function(outspace = NULL,
-                          smooth = FALSE,
-                          use_cache = TRUE) {
+get_visfatlas <- function(
+  outspace = NULL,
+  smooth = FALSE,
+  use_cache = TRUE
+) {
   template_space <- .template_space_from_outspace(
     outspace,
     default_space = "MNI152"
@@ -207,8 +209,12 @@ get_visfatlas <- function(outspace = NULL,
   dir.create(tmp)
   on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
 
-  extracted <- utils::unzip(zip_path, files = member, exdir = tmp,
-                            junkpaths = TRUE)
+  extracted <- utils::unzip(
+    zip_path,
+    files = member,
+    exdir = tmp,
+    junkpaths = TRUE
+  )
   if (length(extracted) == 0L || !file.exists(extracted[1])) {
     cli::cli_abort(
       c(
@@ -240,23 +246,49 @@ get_visfatlas <- function(outspace = NULL,
 #' @noRd
 .visfatlas_labels <- function() {
   orig <- c(
-    "lh_mFus_faces", "lh_pFus_faces", "lh_IOG_faces", "lh_OTS_bodies",
-    "lh_ITG_bodies", "lh_MTG_bodies", "lh_LOS_bodies", "lh_pOTS_characters",
-    "lh_IOS_haracters", "lh_CoS_places", "lh_hMT_motion",
-    "lh_v1d_retinotopic", "lh_v2d_retinotopic", "lh_v3d_retinotopic",
-    "lh_v1v_retinotopic", "lh_v2v_retinotopic", "lh_v3v_retinotopic",
-    "rh_mFus_faces", "rh_pFus_faces", "rh_IOG_faces", "rh_OTS_bodies",
-    "rh_ITG_bodies", "rh_MTG_bodies", "rh_LOS_bodies", "rh_CoS_places",
-    "rh_TOS_places", "rh_hMT_motion",
-    "rh_v1d_retinotopic", "rh_v2d_retinotopic", "rh_v3d_retinotopic",
-    "rh_v1v_retinotopic", "rh_v2v_retinotopic", "rh_v3v_retinotopic"
+    "lh_mFus_faces",
+    "lh_pFus_faces",
+    "lh_IOG_faces",
+    "lh_OTS_bodies",
+    "lh_ITG_bodies",
+    "lh_MTG_bodies",
+    "lh_LOS_bodies",
+    "lh_pOTS_characters",
+    "lh_IOS_haracters",
+    "lh_CoS_places",
+    "lh_hMT_motion",
+    "lh_v1d_retinotopic",
+    "lh_v2d_retinotopic",
+    "lh_v3d_retinotopic",
+    "lh_v1v_retinotopic",
+    "lh_v2v_retinotopic",
+    "lh_v3v_retinotopic",
+    "rh_mFus_faces",
+    "rh_pFus_faces",
+    "rh_IOG_faces",
+    "rh_OTS_bodies",
+    "rh_ITG_bodies",
+    "rh_MTG_bodies",
+    "rh_LOS_bodies",
+    "rh_CoS_places",
+    "rh_TOS_places",
+    "rh_hMT_motion",
+    "rh_v1d_retinotopic",
+    "rh_v2d_retinotopic",
+    "rh_v3d_retinotopic",
+    "rh_v1v_retinotopic",
+    "rh_v2v_retinotopic",
+    "rh_v3v_retinotopic"
   )
   label <- sub("_haracters", "_characters", trimws(orig))
 
   parts <- strsplit(label, "_", fixed = TRUE)
   hemi_pref <- vapply(parts, `[[`, character(1), 1L)
-  hemi <- ifelse(hemi_pref == "lh", "left",
-                 ifelse(hemi_pref == "rh", "right", NA_character_))
+  hemi <- ifelse(
+    hemi_pref == "lh",
+    "left",
+    ifelse(hemi_pref == "rh", "right", NA_character_)
+  )
   region <- vapply(parts, `[[`, character(1), 2L)
   category <- vapply(parts, function(p) p[[length(p)]], character(1))
 

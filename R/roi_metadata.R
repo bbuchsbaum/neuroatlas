@@ -1,14 +1,16 @@
 #' @title ROI Metadata Functions
 #' @description Functions for accessing and filtering ROI (Region of Interest)
 #'   metadata in atlas objects. These functions provide a unified, discoverable
-#'   interface for working with multiple ROI attributes across different atlas types.
+#'   interface for working with multiple ROI attributes across different atlas
+#' types.
 #' @name roi_metadata
 NULL
 
 #' Get ROI Metadata for an Atlas
 #'
 #' @description
-#' Returns a tibble containing metadata for all regions of interest (ROIs) in an atlas.
+#' Returns a tibble containing metadata for all regions of interest (ROIs) in an
+#' atlas.
 #' This provides a unified, tidy interface for accessing ROI attributes across
 #' different atlas types.
 #'
@@ -21,20 +23,28 @@ NULL
 #'     \item{id}{Numeric ROI identifier}
 #'     \item{label}{Simplified region name}
 #'     \item{label_full}{Full region label. Glasser uses a shared
-#'       hemisphere-qualified key such as \code{"L_V1_ROI"} in both representations.}
+#'       hemisphere-qualified key such as \code{"L_V1_ROI"} in both
+#' representations.}
 #'     \item{area}{Glasser area name without hemisphere, e.g. \code{"V1"}.}
 #'     \item{id_convention}{Parcel ID convention, when recorded by the loader.}
 #'     \item{hemi}{Hemisphere ("left", "right", or NA for bilateral/midline)}
 #'     \item{color_r, color_g, color_b}{RGB color values (0-255)}
-#'     \item{template_space}{Template space identifier (e.g., "MNI152NLin6Asym"), when atlas_ref is available}
-#'     \item{coord_space}{Coordinate space (e.g., "MNI152", "MNI305"), when atlas_ref is available}
-#'     \item{atlas_family}{Atlas family identifier (e.g., "schaefer"), when atlas_ref is available}
-#'     \item{atlas_model}{Atlas model identifier (e.g., "Schaefer2018"), when atlas_ref is available}
-#'     \item{atlas_representation}{Representation type ("volume", "surface", or "derived"), when atlas_ref is available}
+#'     \item{template_space}{Template space identifier (e.g.,
+#' "MNI152NLin6Asym"), when atlas_ref is available}
+#'     \item{coord_space}{Coordinate space (e.g., "MNI152", "MNI305"), when
+#' atlas_ref is available}
+#'     \item{atlas_family}{Atlas family identifier (e.g., "schaefer"), when
+#' atlas_ref is available}
+#'     \item{atlas_model}{Atlas model identifier (e.g., "Schaefer2018"), when
+#' atlas_ref is available}
+#'     \item{atlas_representation}{Representation type ("volume", "surface", or
+#' "derived"), when atlas_ref is available}
 #'     \item{atlas_source}{Loader/source key, when atlas_ref is available}
-#'     \item{atlas_confidence}{Atlas provenance confidence tier, when atlas_ref is available}
+#'     \item{atlas_confidence}{Atlas provenance confidence tier, when atlas_ref
+#' is available}
 #'   }
-#'   Additional atlas-specific columns may be present (e.g., \code{network} for Schaefer atlases).
+#'   Additional atlas-specific columns may be present (e.g., \code{network} for
+#' Schaefer atlases).
 #'
 #' @examples
 #' \dontrun{
@@ -147,13 +157,15 @@ roi_metadata.atlas <- function(x, ...) {
 #' List Available ROI Attributes
 #'
 #' @description
-#' Returns the names of attributes available for ROIs in an atlas. This is useful
+#' Returns the names of attributes available for ROIs in an atlas. This is
+#' useful
 #' for discovering what metadata is available for filtering or analysis.
 #'
 #' @param x An atlas object
 #' @param ... Additional arguments passed to methods
 #'
-#' @return A character vector of attribute names that contain meaningful (non-NA)
+#' @return A character vector of attribute names that contain meaningful
+#'   (non-NA)
 #'   values. Excludes internal fields like color values and the id column.
 #'
 #' @examples
@@ -302,7 +314,13 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
   new_ids <- x$ids[keep_idx]
   new_labels <- x$labels[keep_idx]
   new_hemi <- x$hemi[keep_idx]
-  new_orig_labels <- if (!is.null(x$orig_labels)) x$orig_labels[keep_idx] else new_labels
+  new_orig_labels <- if (!is.null(x$orig_labels)) {
+    x$orig_labels[
+      keep_idx
+    ]
+  } else {
+    new_labels
+  }
   new_cmap <- if (!is.null(x$cmap)) x$cmap[keep_idx, , drop = FALSE] else NULL
   new_network <- if (!is.null(x$network)) x$network[keep_idx] else NULL
 
@@ -325,10 +343,25 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
 
   # Preserve atlas-specific per-ROI vectors (e.g., Brainnetome lobe/gyrus).
   reserved <- c(
-    "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
-    "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
-    "atlas_history", "metadata", "metadata_parameters", "metadata_processing",
-    "space", "template_space", "coord_space", "confidence"
+    "name",
+    "atlas",
+    "cmap",
+    "ids",
+    "labels",
+    "orig_labels",
+    "hemi",
+    "network",
+    "roi_metadata",
+    "atlas_ref",
+    "atlas_artifacts",
+    "atlas_history",
+    "metadata",
+    "metadata_parameters",
+    "metadata_processing",
+    "space",
+    "template_space",
+    "coord_space",
+    "confidence"
   )
   extra_names <- setdiff(names(x), reserved)
   n_old <- length(x$ids)
@@ -357,10 +390,42 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
     ret,
     action = "subset",
     representation = if (inherits(x, "surfatlas")) "surface" else "volume",
-    from_template_space = if (!is.null(x$atlas_ref)) x$atlas_ref$template_space else NA_character_,
-    to_template_space = if (!is.null(x$atlas_ref)) x$atlas_ref$template_space else NA_character_,
-    from_coord_space = if (!is.null(x$atlas_ref)) x$atlas_ref$coord_space else NA_character_,
-    to_coord_space = if (!is.null(x$atlas_ref)) x$atlas_ref$coord_space else NA_character_,
+    from_template_space = if (
+      !is.null(
+        x$atlas_ref
+      )
+    ) {
+      x$atlas_ref$template_space
+    } else {
+      NA_character_
+    },
+    to_template_space = if (
+      !is.null(
+        x$atlas_ref
+      )
+    ) {
+      x$atlas_ref$template_space
+    } else {
+      NA_character_
+    },
+    from_coord_space = if (
+      !is.null(
+        x$atlas_ref
+      )
+    ) {
+      x$atlas_ref$coord_space
+    } else {
+      NA_character_
+    },
+    to_coord_space = if (
+      !is.null(
+        x$atlas_ref
+      )
+    ) {
+      x$atlas_ref$coord_space
+    } else {
+      NA_character_
+    },
     status = "available",
     confidence = if (!is.null(x$atlas_ref)) x$atlas_ref$confidence else "uncertain",
     details = paste0("Kept ", length(new_ids), " of ", length(x$ids), " ROIs."),
@@ -400,19 +465,22 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
     new_mask_arr[mask_indices[keep_mask]] <- TRUE
 
     # Create new LogicalNeuroVol mask
-    mask_vol <- neuroim2::LogicalNeuroVol(new_mask_arr, neuroim2::space(atlas_data))
+    mask_vol <- neuroim2::LogicalNeuroVol(
+      new_mask_arr,
+      neuroim2::space(
+        atlas_data
+      )
+    )
 
     # Filter clusters to only those being kept
     new_clusters <- old_clusters[keep_mask]
 
     neuroim2::ClusteredNeuroVol(mask = mask_vol, clusters = new_clusters)
-
   } else if (methods::is(atlas_data, "NeuroVol")) {
     # For regular NeuroVol, zero out non-matching voxels
     arr <- methods::as(atlas_data, "array")
     arr[!(arr %in% keep_ids)] <- 0L
     neuroim2::NeuroVol(arr, neuroim2::space(atlas_data))
-
   } else {
     # For other types (e.g., surface), return as-is with warning
     warning("Atlas data subsetting not fully supported for class: ", class(atlas_data)[1])
@@ -462,10 +530,25 @@ filter_atlas.atlas <- function(x, ..., .dots = NULL) {
   }
 
   reserved <- c(
-    "name", "atlas", "cmap", "ids", "labels", "orig_labels", "hemi",
-    "network", "roi_metadata", "atlas_ref", "atlas_artifacts",
-    "atlas_history", "metadata", "metadata_parameters", "metadata_processing",
-    "space", "template_space", "coord_space", "confidence"
+    "name",
+    "atlas",
+    "cmap",
+    "ids",
+    "labels",
+    "orig_labels",
+    "hemi",
+    "network",
+    "roi_metadata",
+    "atlas_ref",
+    "atlas_artifacts",
+    "atlas_history",
+    "metadata",
+    "metadata_parameters",
+    "metadata_processing",
+    "space",
+    "template_space",
+    "coord_space",
+    "confidence"
   )
   extra_names <- setdiff(names(x), reserved)
   for (nm in extra_names) {

@@ -16,6 +16,9 @@
 ^_pkgdown\.yml$
 ^check_output.*\.txt$
 ^checklist.yml$
+^CONTRIBUTING\.md$
+^\.lintr$
+^\.renvignore$
 ^codecov\.yml$
 ^cran-comments\.md$
 ^data-raw$
@@ -28,6 +31,7 @@
 ^templateflow\.md$
 ^\.omc$
 ^\.mote$
+^\.dashboard$
 ^README\.html$
 ^neuroatlas_cheatsheet_v3\.md$
 ^vignettes/.*_cache$

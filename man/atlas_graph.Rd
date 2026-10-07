@@ -47,9 +47,9 @@ under the chosen connectivity scheme.
 \examples{
 \dontrun{
 atlas <- get_schaefer_atlas(100)
-adj   <- atlas_graph(atlas)
+adj <- atlas_graph(atlas)
 adj_b <- atlas_graph(atlas, include_weight = FALSE)
-el    <- atlas_graph(atlas, as = "tibble")
+el <- atlas_graph(atlas, as = "tibble")
 }
 
 }

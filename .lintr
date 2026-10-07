@@ -1,0 +1,51 @@
+linters: linters_with_defaults(
+    indentation_linter = indentation_linter(indent = 2L),
+    line_length_linter = local({
+      width <- line_length_linter(length = 80L, ignore_string_bodies = TRUE)
+      Linter(name = "project_line_length_linter", linter_level = "file",
+        function(source_expression) {
+          tokens <- source_expression$full_parsed_content
+          strings <- tokens[tokens$token == "STR_CONST" &
+            tokens$line1 == tokens$line2, ]
+          Filter(function(lint) {
+            line <- source_expression$file_lines[[lint$line_number]]
+            spans <- strings[strings$line1 == lint$line_number, ]
+            for (i in order(spans$col1, decreasing = TRUE)) {
+              line <- paste0(substr(line, 1L, spans$col1[[i]]),
+                substring(line, spans$col2[[i]]))
+            }
+            nchar(line) > 80L
+          }, width(source_expression))
+        })
+    }),
+    object_name_linter = local({
+      naming <- object_name_linter(
+        styles = c("snake_case", "UpperCamelCase", "symbols"),
+        regexes = "^MNI(152|305)_to_MNI(152|305)$"
+      )
+      Linter(name = "function_name_linter", linter_level = "file",
+        function(source_expression) {
+        xml <- source_expression$full_xml_parsed_content
+        functions <- xml2::xml_find_all(xml, paste0(
+          "//expr[(LEFT_ASSIGN or EQ_ASSIGN) and ",
+          "expr[FUNCTION or OP-LAMBDA]]/expr[1]/SYMBOL"
+        ))
+        locations <- paste(xml2::xml_attr(functions, "line1"),
+          xml2::xml_attr(functions, "col1"), sep = ":")
+        Filter(function(lint) {
+          paste(lint$line_number, lint$column_number, sep = ":") %in% locations
+        }, naming(source_expression))
+      })
+    }),
+    object_length_linter = NULL,
+    pipe_consistency_linter = NULL,
+    return_linter = NULL,
+    brace_linter = brace_linter(allow_single_line = TRUE)
+  )
+exclusions: list(
+    "renv", "packrat", "docs",
+    "data-raw/surface-transforms-v1/work",
+    "data-raw/surface-transforms-v1/qualification",
+    "data-raw/transform-artifacts-v1/work",
+    "data-raw/transform-artifacts-v1/qualification"
+  )

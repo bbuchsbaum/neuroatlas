@@ -1,0 +1,7 @@
+* checking for file ‘/tmp/neuroatlas-resume-20261006/build-ignore-probe/source/DESCRIPTION’ ... OK
+* preparing ‘neuroatlas’:
+* checking DESCRIPTION meta-information ... OK
+* checking for LF line-endings in source and make files and shell scripts
+* checking for empty or unneeded directories
+* building ‘neuroatlas_0.1.0.9006.tar.gz’
+

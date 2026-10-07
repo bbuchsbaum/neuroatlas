@@ -16,3 +16,6 @@ A character path to the transform cache directory.
 Returns the directory reserved for verified transform artifacts. This helper
 does not create the directory.
 }
+\examples{
+transform_cache_path()
+}

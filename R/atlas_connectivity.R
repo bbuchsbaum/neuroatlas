@@ -29,9 +29,14 @@
 #'   \code{\link{as_igraph.atlas_connectivity}} for graph conversion
 #'
 #' @export
-atlas_connectivity <- function(data_vol, atlas,
-                                method = c("pearson", "spearman", "partial"),
-                                threshold = NULL, stat_func = mean, ...) {
+atlas_connectivity <- function(
+  data_vol,
+  atlas,
+  method = c("pearson", "spearman", "partial"),
+  threshold = NULL,
+  stat_func = mean,
+  ...
+) {
   method <- match.arg(method)
 
   if (!methods::is(data_vol, "NeuroVec")) {
@@ -56,8 +61,10 @@ atlas_connectivity <- function(data_vol, atlas,
   # Compute correlation matrix
   if (method == "partial") {
     if (!requireNamespace("corpcor", quietly = TRUE)) {
-      stop("Package 'corpcor' is required for partial correlations. ",
-           "Install it with install.packages('corpcor')")
+      stop(
+        "Package 'corpcor' is required for partial correlations. ",
+        "Install it with install.packages('corpcor')"
+      )
     }
     # First compute regular correlation, then partial
     R <- stats::cor(ts_mat, use = "pairwise.complete.obs")
@@ -86,6 +93,13 @@ atlas_connectivity <- function(data_vol, atlas,
 #'
 #' @return Dispatches to methods.
 #'
+#' @examples
+#' if (requireNamespace("igraph", quietly = TRUE)) {
+#'   connectivity <- structure(matrix(c(0, 0.5, 0.5, 0), 2),
+#'     class = c("atlas_connectivity", "matrix", "array")
+#'   )
+#'   as_igraph(connectivity)
+#' }
 #' @export
 as_igraph <- function(x, ...) {
   UseMethod("as_igraph")
@@ -121,7 +135,13 @@ print.atlas_connectivity <- function(x, ...) {
   cat("  Regions:", dims[1], "\n")
   n_edges <- sum(x[upper.tri(x)] != 0)
   cat("  Non-zero edges:", n_edges, "\n")
-  cat("  Range: [", round(min(x[upper.tri(x)]), 3), ", ",
-      round(max(x[upper.tri(x)]), 3), "]\n", sep = "")
+  cat(
+    "  Range: [",
+    round(min(x[upper.tri(x)]), 3),
+    ", ",
+    round(max(x[upper.tri(x)]), 3),
+    "]\n",
+    sep = ""
+  )
   invisible(x)
 }

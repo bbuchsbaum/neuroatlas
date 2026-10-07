@@ -21,27 +21,37 @@ A tibble with one row per ROI and columns for each attribute.
     \item{id}{Numeric ROI identifier}
     \item{label}{Simplified region name}
     \item{label_full}{Full region label. Glasser uses a shared
-      hemisphere-qualified key such as \code{"L_V1_ROI"} in both representations.}
+      hemisphere-qualified key such as \code{"L_V1_ROI"} in both
+representations.}
     \item{area}{Glasser area name without hemisphere, e.g. \code{"V1"}.}
     \item{id_convention}{Parcel ID convention, when recorded by the loader.}
     \item{hemi}{Hemisphere ("left", "right", or NA for bilateral/midline)}
     \item{color_r, color_g, color_b}{RGB color values (0-255)}
-    \item{template_space}{Template space identifier (e.g., "MNI152NLin6Asym"), when atlas_ref is available}
-    \item{coord_space}{Coordinate space (e.g., "MNI152", "MNI305"), when atlas_ref is available}
-    \item{atlas_family}{Atlas family identifier (e.g., "schaefer"), when atlas_ref is available}
-    \item{atlas_model}{Atlas model identifier (e.g., "Schaefer2018"), when atlas_ref is available}
-    \item{atlas_representation}{Representation type ("volume", "surface", or "derived"), when atlas_ref is available}
+    \item{template_space}{Template space identifier (e.g.,
+"MNI152NLin6Asym"), when atlas_ref is available}
+    \item{coord_space}{Coordinate space (e.g., "MNI152", "MNI305"), when
+atlas_ref is available}
+    \item{atlas_family}{Atlas family identifier (e.g., "schaefer"), when
+atlas_ref is available}
+    \item{atlas_model}{Atlas model identifier (e.g., "Schaefer2018"), when
+atlas_ref is available}
+    \item{atlas_representation}{Representation type ("volume", "surface", or
+"derived"), when atlas_ref is available}
     \item{atlas_source}{Loader/source key, when atlas_ref is available}
-    \item{atlas_confidence}{Atlas provenance confidence tier, when atlas_ref is available}
+    \item{atlas_confidence}{Atlas provenance confidence tier, when atlas_ref
+is available}
   }
-  Additional atlas-specific columns may be present (e.g., \code{network} for Schaefer atlases).
+  Additional atlas-specific columns may be present (e.g., \code{network} for
+Schaefer atlases).
 }
 \description{
 Functions for accessing and filtering ROI (Region of Interest)
   metadata in atlas objects. These functions provide a unified, discoverable
-  interface for working with multiple ROI attributes across different atlas types.
+  interface for working with multiple ROI attributes across different atlas
+types.
 
-Returns a tibble containing metadata for all regions of interest (ROIs) in an atlas.
+Returns a tibble containing metadata for all regions of interest (ROIs) in an
+atlas.
 This provides a unified, tidy interface for accessing ROI attributes across
 different atlas types.
 }

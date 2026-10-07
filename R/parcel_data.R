@@ -30,14 +30,18 @@
 #'
 #' @seealso [as_parcel_data()], [write_parcel_data()], [read_parcel_data()]
 #' @export
-parcel_data <- function(parcels,
-                        atlas_id,
-                        atlas_name = atlas_id,
-                        atlas_version = NULL,
-                        atlas_space = NULL,
-                        schema_version = "1.0.0") {
-  if (missing(atlas_id) || !is.character(atlas_id) || length(atlas_id) != 1L ||
-      !nzchar(atlas_id)) {
+parcel_data <- function(
+  parcels,
+  atlas_id,
+  atlas_name = atlas_id,
+  atlas_version = NULL,
+  atlas_space = NULL,
+  schema_version = "1.0.0"
+) {
+  if (
+    missing(atlas_id) || !is.character(atlas_id) || length(atlas_id) != 1L ||
+      !nzchar(atlas_id)
+  ) {
     stop("'atlas_id' must be a non-empty character scalar")
   }
 
@@ -72,6 +76,12 @@ parcel_data <- function(parcels,
 #'   metadata consistency.
 #'
 #' @return Invisibly returns `x` if valid; otherwise throws an error.
+#' @examples
+#' x <- parcel_data(data.frame(
+#'   id = 1:2, label = c("A", "B"),
+#'   hemi = c("left", "right"), value = c(0.2, 0.7)
+#' ), atlas_id = "toy")
+#' validate_parcel_data(x)
 #' @export
 validate_parcel_data <- function(x, strict = TRUE) {
   if (!inherits(x, "parcel_data")) {
@@ -84,16 +94,20 @@ validate_parcel_data <- function(x, strict = TRUE) {
   required_top <- c("schema_version", "atlas", "parcels")
   missing_top <- setdiff(required_top, names(x))
   if (length(missing_top) > 0L) {
-    stop("Missing required fields in parcel_data: ",
-         paste(missing_top, collapse = ", "))
+    stop(
+      "Missing required fields in parcel_data: ",
+      paste(missing_top, collapse = ", ")
+    )
   }
 
   atlas <- x$atlas
   if (!is.list(atlas)) {
     stop("'x$atlas' must be a list")
   }
-  if (is.null(atlas$id) || !is.character(atlas$id) || length(atlas$id) != 1L ||
-      !nzchar(atlas$id)) {
+  if (
+    is.null(atlas$id) || !is.character(atlas$id) || length(atlas$id) != 1L ||
+      !nzchar(atlas$id)
+  ) {
     stop("'x$atlas$id' must be a non-empty character scalar")
   }
 
@@ -105,8 +119,10 @@ validate_parcel_data <- function(x, strict = TRUE) {
   required_cols <- c("id", "label", "hemi")
   missing_cols <- setdiff(required_cols, names(parcels))
   if (length(missing_cols) > 0L) {
-    stop("'x$parcels' is missing required columns: ",
-         paste(missing_cols, collapse = ", "))
+    stop(
+      "'x$parcels' is missing required columns: ",
+      paste(missing_cols, collapse = ", ")
+    )
   }
 
   if (!is.numeric(parcels$id) && !is.integer(parcels$id)) {
@@ -149,6 +165,12 @@ validate_parcel_data <- function(x, strict = TRUE) {
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return An object of class `"parcel_data"`.
+#' @examples
+#' x <- parcel_data(data.frame(
+#'   id = 1:2, label = c("A", "B"),
+#'   hemi = c("left", "right"), value = c(0.2, 0.7)
+#' ), atlas_id = "toy")
+#' as_parcel_data(x)
 #' @export
 as_parcel_data <- function(x, ...) {
   UseMethod("as_parcel_data")
@@ -181,21 +203,25 @@ as_parcel_data.parcel_data <- function(x, ...) {
 #' @param atlas_space Optional atlas space/template identifier.
 #' @param schema_version Schema version for the returned object.
 #' @details
-#' Glasser ID joins require a matching \code{id_convention} in the input table or
-#' \code{parcel_data} atlas metadata. See \code{\link{align_parcel_values}()} for safe joins
+#' Glasser ID joins require a matching \code{id_convention} in the input table
+#' or
+#' \code{parcel_data} atlas metadata. See \code{\link{align_parcel_values}()}
+#' for safe joins
 #' between Glasser volume and surface representations. Numeric vectors are
 #' positional: they must already follow the target atlas's parcel order.
 #' @export
-as_parcel_data.atlas <- function(x,
-                                 values = NULL,
-                                 value_col = "value",
-                                 by = NULL,
-                                 allow_partial = FALSE,
-                                 atlas_id = NULL,
-                                 atlas_version = NULL,
-                                 atlas_space = NULL,
-                                 schema_version = "1.0.0",
-                                 ...) {
+as_parcel_data.atlas <- function(
+  x,
+  values = NULL,
+  value_col = "value",
+  by = NULL,
+  allow_partial = FALSE,
+  atlas_id = NULL,
+  atlas_version = NULL,
+  atlas_space = NULL,
+  schema_version = "1.0.0",
+  ...
+) {
   ref <- atlas_ref(x)
 
   meta <- roi_metadata(x)
@@ -203,8 +229,10 @@ as_parcel_data.atlas <- function(x,
   needed <- c("id", "label", "hemi")
   missing_needed <- setdiff(needed, names(meta))
   if (length(missing_needed) > 0L) {
-    stop("roi_metadata(x) must include columns: ",
-         paste(needed, collapse = ", "))
+    stop(
+      "roi_metadata(x) must include columns: ",
+      paste(needed, collapse = ", ")
+    )
   }
 
   parcels <- tibble::as_tibble(meta)
@@ -216,16 +244,23 @@ as_parcel_data.atlas <- function(x,
         stop("'by' is only used when 'values' is a data frame")
       }
       if (length(values) != nrow(parcels)) {
-        stop("When 'values' is a vector, length(values) must match number of ",
-             "parcels")
+        stop(
+          "When 'values' is a vector, length(values) must match number of ",
+          "parcels"
+        )
       }
-      if (!is.character(value_col) || length(value_col) != 1L ||
-          !nzchar(value_col)) {
+      if (
+        !is.character(value_col) || length(value_col) != 1L ||
+          !nzchar(value_col)
+      ) {
         stop("'value_col' must be a non-empty character scalar")
       }
       if (value_col %in% names(parcels)) {
-        stop("'value_col' cannot overwrite atlas metadata column '",
-             value_col, "'")
+        stop(
+          "'value_col' cannot overwrite atlas metadata column '",
+          value_col,
+          "'"
+        )
       }
       parcels[[value_col]] <- values
     } else if (is.data.frame(values) || inherits(values, "parcel_data")) {
@@ -237,8 +272,10 @@ as_parcel_data.atlas <- function(x,
       )
       parcels <- aligned$parcels
     } else {
-      stop("'values' must be NULL, a numeric/integer vector, a data frame, ",
-           "or a parcel_data object")
+      stop(
+        "'values' must be NULL, a numeric/integer vector, a data frame, ",
+        "or a parcel_data object"
+      )
     }
   }
 
@@ -250,8 +287,10 @@ as_parcel_data.atlas <- function(x,
     }
   }
 
-  if (is.null(atlas_space) && !is.null(ref$template_space) &&
-      !is.na(ref$template_space) && nzchar(ref$template_space)) {
+  if (
+    is.null(atlas_space) && !is.null(ref$template_space) &&
+      !is.na(ref$template_space) && nzchar(ref$template_space)
+  ) {
     atlas_space <- ref$template_space
   }
 
@@ -293,7 +332,8 @@ as_parcel_data.atlas <- function(x,
 #'   keys and values.
 #' @param value A numeric value column, supplied as a bare name or string.
 #' @param by Parcel-key specification. Use a shared column name such as `"id"`,
-#'   or a named character vector to map an atlas metadata column to a differently
+#'   or a named character vector to map an atlas metadata column to a
+#' differently
 #'   named data column, for example `c(id = "roi_index")`. Composite keys are
 #'   supported. When `NULL`, a safe unique key is inferred.
 #' @param allow_partial Logical. If `FALSE` (default), `data` must contain every
@@ -314,7 +354,8 @@ as_parcel_data.atlas <- function(x,
 #'
 #' Glasser volume and surface IDs number opposite hemispheres first. Any
 #' Glasser join using \code{id} (including renamed or composite keys) therefore
-#' requires a matching \code{id_convention} column, or a \code{parcel_data} object
+#' requires a matching \code{id_convention} column, or a \code{parcel_data}
+#' object
 #' with a matching \code{atlas$id_convention}. The convention is
 #' \code{"hcp_R_first"} for volumes and \code{"surfatlas_L_first"} for surfaces.
 #' Only declare a convention
@@ -324,10 +365,12 @@ as_parcel_data.atlas <- function(x,
 #' To move Glasser values between representations, supply only the shared
 #' \code{label_full} key and value columns, then use \code{by = "label_full"};
 #' alternatively use \code{by = c("area", "hemi")}. For example, select
-#' \code{source$parcels[c("label_full", "value")]} from a \code{parcel_data} object.
+#' \code{source$parcels[c("label_full", "value")]} from a \code{parcel_data}
+#' object.
 #' Representation-specific IDs, labels, colours and provenance in a full
 #' source table remain consistency checks and must be omitted for such a join.
-#' A complete \code{parcel_data} object remains bound to its source representation.
+#' A complete \code{parcel_data} object remains bound to its source
+#' representation.
 #'
 #' @examples
 #' atlas <- structure(
@@ -353,11 +396,13 @@ as_parcel_data.atlas <- function(x,
 #' )
 #'
 #' @export
-align_parcel_values <- function(atlas,
-                                data,
-                                value,
-                                by = NULL,
-                                allow_partial = FALSE) {
+align_parcel_values <- function(
+  atlas,
+  data,
+  value,
+  by = NULL,
+  allow_partial = FALSE
+) {
   value_quo <- rlang::enquo(value)
   value_col <- .parcel_value_column(value_quo)
 
@@ -414,20 +459,24 @@ align_parcel_values <- function(atlas,
 #' }
 #'
 #' @export
-parcel_volume <- function(atlas,
-                          data,
-                          value,
-                          by = NULL,
-                          allow_partial = FALSE,
-                          background = NA_real_) {
+parcel_volume <- function(
+  atlas,
+  data,
+  value,
+  by = NULL,
+  allow_partial = FALSE,
+  background = NA_real_
+) {
   if (!inherits(atlas, "atlas") || inherits(atlas, "surfatlas")) {
     cli::cli_abort(
       "{.arg atlas} must be a volumetric {.cls atlas} object.",
       class = c("neuroatlas_error_parcel_volume", "neuroatlas_error")
     )
   }
-  if (!is.numeric(background) || length(background) != 1L ||
-      is.nan(background) || (!is.na(background) && !is.finite(background))) {
+  if (
+    !is.numeric(background) || length(background) != 1L ||
+      is.nan(background) || (!is.na(background) && !is.finite(background))
+  ) {
     cli::cli_abort(
       "{.arg background} must be one finite number or `NA_real_`.",
       class = c("neuroatlas_error_parcel_volume", "neuroatlas_error")
@@ -435,14 +484,17 @@ parcel_volume <- function(atlas,
   }
 
   value_quo <- rlang::enquo(value)
-  value_col <- .parcel_value_column(value_quo)
-  vals <- rlang::inject(align_parcel_values(
-    atlas = atlas,
-    data = data,
-    value = !!value_quo,
-    by = by,
-    allow_partial = allow_partial
-  ))
+  # cli interpolates this name if the selected values are invalid.
+  value_col <- .parcel_value_column(value_quo) # nolint: object_usage_linter.
+  vals <- rlang::inject(
+    align_parcel_values(
+      atlas = atlas,
+      data = data,
+      value = !!value_quo,
+      by = by,
+      allow_partial = allow_partial
+    )
+  )
 
   if (any(is.infinite(vals))) {
     cli::cli_abort(
@@ -484,7 +536,6 @@ parcel_volume <- function(atlas,
 #' @keywords internal
 #' @noRd
 .parcel_value_from_aligned <- function(aligned, atlas, value_col) {
-
   if (!value_col %in% aligned$value_cols) {
     if (value_col %in% names(aligned$parcels)) {
       cli::cli_abort(
@@ -542,18 +593,22 @@ parcel_volume <- function(atlas,
 #' Align a data frame to canonical atlas row order
 #' @keywords internal
 #' @noRd
-.align_atlas_table <- function(atlas,
-                               data,
-                               by = NULL,
-                               allow_partial = FALSE) {
+.align_atlas_table <- function(
+  atlas,
+  data,
+  by = NULL,
+  allow_partial = FALSE
+) {
   if (!inherits(atlas, "atlas")) {
     cli::cli_abort(
       "{.arg atlas} must inherit from class {.cls atlas}.",
       class = c("neuroatlas_error_parcel_key", "neuroatlas_error")
     )
   }
-  if (!is.logical(allow_partial) || length(allow_partial) != 1L ||
-      is.na(allow_partial)) {
+  if (
+    !is.logical(allow_partial) || length(allow_partial) != 1L ||
+      is.na(allow_partial)
+  ) {
     cli::cli_abort(
       "{.arg allow_partial} must be `TRUE` or `FALSE`.",
       class = c("neuroatlas_error_parcel_key", "neuroatlas_error")
@@ -596,8 +651,10 @@ parcel_volume <- function(atlas,
   }
   atlas_ids <- .normalise_parcel_id(atlas$ids, "id", "atlas")
   meta_ids <- .normalise_parcel_id(meta$id, "id", "atlas metadata")
-  if (anyDuplicated(atlas_ids) || anyDuplicated(meta_ids) ||
-      !identical(atlas_ids, meta_ids)) {
+  if (
+    anyDuplicated(atlas_ids) || anyDuplicated(meta_ids) ||
+      !identical(atlas_ids, meta_ids)
+  ) {
     cli::cli_abort(
       c(
         "{.arg atlas} has inconsistent parcel IDs.",
@@ -617,7 +674,8 @@ parcel_volume <- function(atlas,
   codes <- .parcel_key_codes(atlas_key, data_key)
   atlas_codes <- codes$atlas
   data_codes <- codes$data
-  by_text <- paste(key$atlas, collapse = ", ")
+  # cli interpolates this value from the calling environment.
+  by_text <- paste(key$atlas, collapse = ", ") # nolint: object_usage_linter.
 
   if (anyDuplicated(atlas_codes) > 0L) {
     cli::cli_abort(
@@ -637,7 +695,7 @@ parcel_volume <- function(atlas,
 
   data_to_atlas <- match(data_codes, atlas_codes)
   if (anyNA(data_to_atlas)) {
-    bad <- which(is.na(data_to_atlas))
+    bad <- which(is.na(data_to_atlas)) # nolint: object_usage_linter.
     cli::cli_abort(
       c(
         "{length(bad)} data parcel row{?s} did not match the atlas.",
@@ -707,13 +765,21 @@ parcel_volume <- function(atlas,
 #' Require explicit ID provenance for Glasser table joins
 #' @keywords internal
 #' @noRd
-.validate_parcel_id_convention <- function(atlas, data, key,
-                                           source_id_convention = NULL) {
-  if (!"id" %in% key$atlas) return(invisible(TRUE))
+.validate_parcel_id_convention <- function(
+  atlas,
+  data,
+  key,
+  source_id_convention = NULL
+) {
+  if (!"id" %in% key$atlas) {
+    return(invisible(TRUE))
+  }
   ref <- atlas_ref(atlas)
   is_glasser <- identical(ref$family, "glasser") ||
     inherits(atlas, "glasser") || inherits(atlas, "glasser_surf")
-  if (!is_glasser) return(invisible(TRUE))
+  if (!is_glasser) {
+    return(invisible(TRUE))
+  }
 
   expected <- ref$id_convention
   valid_target <- is.character(expected) && length(expected) == 1L &&
@@ -764,8 +830,10 @@ parcel_volume <- function(atlas,
 #' @noRd
 .resolve_parcel_by <- function(meta, data, by = NULL) {
   if (!is.null(by)) {
-    if (!is.character(by) || length(by) == 0L || anyNA(by) ||
-        any(!nzchar(by))) {
+    if (
+      !is.character(by) || length(by) == 0L || anyNA(by) ||
+        any(!nzchar(by))
+    ) {
       cli::cli_abort(
         "{.arg by} must be a non-empty character vector.",
         class = c("neuroatlas_error_parcel_key", "neuroatlas_error")
@@ -983,8 +1051,10 @@ parcel_volume <- function(atlas,
 #' @rdname as_parcel_data
 #' @export
 as_parcel_data.default <- function(x, ...) {
-  stop("No as_parcel_data() method for objects of class: ",
-       paste(class(x), collapse = ", "))
+  stop(
+    "No as_parcel_data() method for objects of class: ",
+    paste(class(x), collapse = ", ")
+  )
 }
 
 #' Extract Parcel Values Aligned to an Atlas
@@ -997,6 +1067,26 @@ as_parcel_data.default <- function(x, ...) {
 #' @param column Value column in `x$parcels` to extract.
 #'
 #' @return A vector with `length(atlas$ids)` elements ordered to `atlas$ids`.
+#' @examples
+#' grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+#' volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+#' atlas <- structure(
+#'   list(
+#'     atlas = volume, ids = 1:2,
+#'     labels = c("A", "B"), orig_labels = c("A", "B"),
+#'     hemi = c("left", "right"), name = "toy",
+#'     cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+#'     atlas_ref = new_atlas_ref("toy", "two-regions",
+#'       template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+#'     )
+#'   ),
+#'   class = "atlas"
+#' )
+#' x <- parcel_data(data.frame(
+#'   id = 1:2, label = c("A", "B"),
+#'   hemi = c("left", "right"), value = c(0.2, 0.7)
+#' ), atlas_id = "toy")
+#' parcel_values(x, atlas)
 #' @export
 parcel_values <- function(x, atlas, column = "value") {
   x <- as_parcel_data(x)
@@ -1027,11 +1117,22 @@ parcel_values <- function(x, atlas, column = "value") {
 #' @param pretty Logical; pretty-print JSON output when `format = "json"`.
 #'
 #' @return Invisibly returns normalized output path.
+#' @examples
+#' x <- parcel_data(data.frame(
+#'   id = 1:2, label = c("A", "B"),
+#'   hemi = c("left", "right"), value = c(0.2, 0.7)
+#' ), atlas_id = "toy")
+#' file <- tempfile(fileext = ".rds")
+#' write_parcel_data(x, file)
+#' read_parcel_data(file)
+#' unlink(file)
 #' @export
-write_parcel_data <- function(x,
-                              file,
-                              format = c("auto", "rds", "json"),
-                              pretty = TRUE) {
+write_parcel_data <- function(
+  x,
+  file,
+  format = c("auto", "rds", "json"),
+  pretty = TRUE
+) {
   x <- as_parcel_data(x)
   format <- match.arg(format)
   format <- .resolve_parcel_data_format(format, file)
@@ -1048,14 +1149,18 @@ write_parcel_data <- function(x,
       stop("Package 'jsonlite' is required for JSON serialization")
     }
     json_obj <- unclass(x)
-    json_obj$parcels <- as.data.frame(json_obj$parcels,
-                                      stringsAsFactors = FALSE)
-    jsonlite::write_json(json_obj,
-                         path = file,
-                         auto_unbox = TRUE,
-                         pretty = pretty,
-                         null = "null",
-                         na = "null")
+    json_obj$parcels <- as.data.frame(
+      json_obj$parcels,
+      stringsAsFactors = FALSE
+    )
+    jsonlite::write_json(
+      json_obj,
+      path = file,
+      auto_unbox = TRUE,
+      pretty = pretty,
+      null = "null",
+      na = "null"
+    )
   }
 
   invisible(normalizePath(file, mustWork = FALSE))
@@ -1068,10 +1173,21 @@ write_parcel_data <- function(x,
 #' @param validate Logical. If `TRUE` (default), validate after reading.
 #'
 #' @return A `parcel_data` object.
+#' @examples
+#' x <- parcel_data(data.frame(
+#'   id = 1:2, label = c("A", "B"),
+#'   hemi = c("left", "right"), value = c(0.2, 0.7)
+#' ), atlas_id = "toy")
+#' file <- tempfile(fileext = ".rds")
+#' write_parcel_data(x, file)
+#' read_parcel_data(file)
+#' unlink(file)
 #' @export
-read_parcel_data <- function(file,
-                             format = c("auto", "rds", "json"),
-                             validate = TRUE) {
+read_parcel_data <- function(
+  file,
+  format = c("auto", "rds", "json"),
+  validate = TRUE
+) {
   if (!file.exists(file)) {
     stop("File does not exist: ", file)
   }
@@ -1122,8 +1238,11 @@ read_parcel_data <- function(file,
     return("json")
   }
 
-  stop("Could not infer parcel_data format from file extension: '", ext,
-       "'. Use format = 'rds' or format = 'json'.")
+  stop(
+    "Could not infer parcel_data format from file extension: '",
+    ext,
+    "'. Use format = 'rds' or format = 'json'."
+  )
 }
 
 #' @export

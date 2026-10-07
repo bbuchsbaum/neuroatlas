@@ -15,7 +15,8 @@ get_template_legacy(
 )
 }
 \arguments{
-\item{name}{Character string specifying template name. Default: "MNI152NLin2009cAsym"}
+\item{name}{Character string specifying template name. Default:
+"MNI152NLin2009cAsym"}
 
 \item{desc}{Character string describing template variant. Default: "brain"}
 
@@ -27,7 +28,8 @@ get_template_legacy(
 
 \item{suffix}{Character string specifying image type. Default: "T1w"}
 
-\item{extension}{Character string specifying file extension. Default: ".nii.gz"}
+\item{extension}{Character string specifying file extension. Default:
+".nii.gz"}
 }
 \value{
 A NeuroVol object containing the requested template

@@ -29,7 +29,8 @@ including hippocampus and surrounding cortical areas, based on the work of
 Rosanna Olsen and colleagues.
 }
 \details{
-The atlas provides a detailed segmentation of MTL structures in MNI space at 1mm
+The atlas provides a detailed segmentation of MTL structures in MNI space at
+1mm
 resolution. It includes bilateral parcellation of:
 \itemize{
   \item Hippocampal subfields

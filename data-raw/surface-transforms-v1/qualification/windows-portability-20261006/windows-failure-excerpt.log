@@ -1,0 +1,17 @@
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8284802Z ══ Failed tests ════════════════════════════════════════════════════════════════
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8285224Z ── Error ('test-surface-transform.R:171:3'): cache rejects dangling receipt links before writing ──
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8285554Z Error in `code()`: Orphaned surface cache receipt; inspect the cache entry.
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8285657Z Backtrace:
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8285738Z      ▆
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8286049Z   1. ├─testthat::expect_error(...) at test-surface-transform.R:171:3
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8286276Z   2. │ └─testthat:::expect_condition_matching_(...)
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8286463Z   3. │   └─testthat:::quasi_capture(...)
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8286637Z   4. │     ├─testthat (local) .capture(...)
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8286836Z   5. │     │ └─base::withCallingHandlers(...)
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8287108Z   6. │     └─rlang::eval_bare(quo_get_expr(.quo), quo_get_env(.quo))
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8287359Z   7. └─neuroatlas::get_surface_transform(src, dst, root)
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8287576Z   8.   └─neuroatlas:::.surface_cached_operator(...)
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8287801Z   9.     └─neuroatlas:::.with_transform_cache_lock(...)
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8287962Z  10.       └─neuroatlas (local) code()
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8287969Z 
+windows-latest (release)	Run r-lib/actions/check-r-package@v2	2026-10-06T03:25:51.8288105Z [ FAIL 1 | WARN 42 | SKIP 12 | PASS 2479 ]

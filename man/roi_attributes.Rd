@@ -15,11 +15,13 @@ roi_attributes(x, ...)
 \item{...}{Additional arguments passed to methods}
 }
 \value{
-A character vector of attribute names that contain meaningful (non-NA)
+A character vector of attribute names that contain meaningful
+  (non-NA)
   values. Excludes internal fields like color values and the id column.
 }
 \description{
-Returns the names of attributes available for ROIs in an atlas. This is useful
+Returns the names of attributes available for ROIs in an atlas. This is
+useful
 for discovering what metadata is available for filtering or analysis.
 }
 \examples{

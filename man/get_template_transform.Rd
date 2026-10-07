@@ -15,7 +15,9 @@ get_template_transform(
 )
 }
 \arguments{
-\item{from, to}{Exact source and target template identifiers.}
+\item{from, to}{Exact template identifiers or verified `SurfaceGeometry`
+objects. Surface routes require exact geometries; broad names cannot
+establish vertex ordering or admit execution.}
 
 \item{provider}{Artifact provider, or `"auto"` for registry selection.}
 
@@ -31,12 +33,24 @@ get_template_transform(
 A `template_transform` containing the plan, files, pullback morphism,
   and artifact provenance. Its direction describes image movement; its
   morphism maps target coordinates into source coordinates for sampling.
+  Surface routes return the operator from [get_surface_transform()] or the
+  `SurfaceProjection` from [get_surface_projection()].
 }
 \description{
-Resolves an available image-space route and loads its verified artifacts.
+Resolves an available image or exact-domain surface route and loads its
+verified artifacts. Two `SurfaceGeometry` endpoints select an admitted native
+surface operator. An exact MNI identifier and a pinned surface target select
+a directed population cortical projection. Equal domains require a
+verified diagonal operator with unit weights before admission as an identity.
 Planning and fitting are separate: this function never estimates a
 registration. Nonlinear routes must have a published checksum and a passing
 qualification record in [space_transform_manifest()].
+}
+\examples{
+if (requireNamespace("neurotransform", quietly = TRUE) &&
+  requireNamespace("hdf5r", quietly = TRUE)) {
+  get_template_transform("MNI152NLin6Asym", "MNI152NLin6Asym")
+}
 }
 \seealso{
 [apply_template_transform()], [transform_atlas()]

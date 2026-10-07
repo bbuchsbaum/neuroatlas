@@ -30,6 +30,12 @@ The Brainnetome download page describes non-commercial use and attribution
 terms. This loader keeps the data outside the package source and records the
 upstream assets in \code{\link{atlas_artifacts}()}.
 }
+\examples{
+\dontrun{
+atlas <- get_brainnetome_atlas()
+atlas_ref(atlas)
+}
+}
 \references{
 Fan, L. et al. (2016). The Human Brainnetome Atlas: A New Brain Atlas Based
 on Connectional Architecture. Cerebral Cortex, 26(8), 3508-3526.

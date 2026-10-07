@@ -1,6 +1,8 @@
-.build_cluster_overlay_volume <- function(stat_map,
-                                          cluster_voxels,
-                                          selected_cluster_ids = NULL) {
+.build_cluster_overlay_volume <- function(
+  stat_map,
+  cluster_voxels,
+  selected_cluster_ids = NULL
+) {
   stat_arr <- as.array(stat_map)
   out_arr <- array(0, dim = dim(stat_arr))
 
@@ -84,8 +86,10 @@
 #' \dontrun{
 #' atlas <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
 #' stat <- neuroim2::read_vol("zstat1.nii.gz")
-#' proj <- project_cluster_overlay(stat, atlas, sampling = "thickness",
-#'                                 interpolation = "linear")
+#' proj <- project_cluster_overlay(stat, atlas,
+#'   sampling = "thickness",
+#'   interpolation = "linear"
+#' )
 #' range(proj$overlay$lh, na.rm = TRUE)
 #'
 #' # Draw exactly the projected values
@@ -94,20 +98,28 @@
 #'
 #' @seealso \code{\link{plot_brain}}, \code{neurosurf::vol_to_surf()}
 #' @export
-project_cluster_overlay <- function(cluster_vol,
-                                    surfatlas,
-                                    space_override = NULL,
-                                    density_override = NULL,
-                                    resolution_override = NULL,
-                                    fun = c("avg", "nn", "mode"),
-                                    sampling = c("midpoint", "normal_line",
-                                                 "thickness"),
-                                    interpolation = c("legacy", "nearest",
-                                                      "linear"),
-                                    aggregate = NULL,
-                                    n_samples = NULL,
-                                    depth = NULL,
-                                    surface_smooth_fwhm = 0) {
+project_cluster_overlay <- function(
+  cluster_vol,
+  surfatlas,
+  space_override = NULL,
+  density_override = NULL,
+  resolution_override = NULL,
+  fun = c("avg", "nn", "mode"),
+  sampling = c(
+    "midpoint",
+    "normal_line",
+    "thickness"
+  ),
+  interpolation = c(
+    "legacy",
+    "nearest",
+    "linear"
+  ),
+  aggregate = NULL,
+  n_samples = NULL,
+  depth = NULL,
+  surface_smooth_fwhm = 0
+) {
   if (!methods::is(cluster_vol, "NeuroVol")) {
     cli::cli_abort("{.arg cluster_vol} must be a {.cls NeuroVol}.")
   }
@@ -120,8 +132,10 @@ project_cluster_overlay <- function(cluster_vol,
   if (!requireNamespace("neurosurf", quietly = TRUE)) {
     cli::cli_abort("Package {.pkg neurosurf} is required for surface projection.")
   }
-  if (!is.numeric(surface_smooth_fwhm) || length(surface_smooth_fwhm) != 1L ||
-      is.na(surface_smooth_fwhm) || surface_smooth_fwhm < 0) {
+  if (
+    !is.numeric(surface_smooth_fwhm) || length(surface_smooth_fwhm) != 1L ||
+      is.na(surface_smooth_fwhm) || surface_smooth_fwhm < 0
+  ) {
     cli::cli_abort("{.arg surface_smooth_fwhm} must be a non-negative number.")
   }
 
@@ -143,10 +157,12 @@ project_cluster_overlay <- function(cluster_vol,
   for (hemi in names(out$meta$hemis)) {
     err <- out$meta$hemis[[hemi]]$error
     if (!is.null(err)) {
-      cli::cli_warn(c(
-        "Projection onto the {hemi} hemisphere failed; its values are all NA.",
-        "x" = "{err}"
-      ))
+      cli::cli_warn(
+        c(
+          "Projection onto the {hemi} hemisphere failed; its values are all NA.",
+          "x" = "{err}"
+        )
+      )
     }
   }
   out
@@ -155,21 +171,28 @@ project_cluster_overlay <- function(cluster_vol,
 # Internal implementation shared by plot_brain(), the CPU renderer, and the
 # cluster explorer. Kept under its historical name for callers that look it
 # up directly; new code should use project_cluster_overlay().
-.project_cluster_overlay <- function(cluster_vol,
-                                     surfatlas,
-                                     space_override = NULL,
-                                     density_override = NULL,
-                                     resolution_override = NULL,
-                                     fun = c("avg", "nn", "mode"),
-                                     sampling = c("midpoint",
-                                                  "normal_line",
-                                                  "thickness"),
-                                     interpolation = c("legacy", "nearest",
-                                                       "linear"),
-                                     aggregate = NULL,
-                                     n_samples = NULL,
-                                     depth = NULL,
-                                     surface_smooth_fwhm = 0) {
+.project_cluster_overlay <- function(
+  cluster_vol,
+  surfatlas,
+  space_override = NULL,
+  density_override = NULL,
+  resolution_override = NULL,
+  fun = c("avg", "nn", "mode"),
+  sampling = c(
+    "midpoint",
+    "normal_line",
+    "thickness"
+  ),
+  interpolation = c(
+    "legacy",
+    "nearest",
+    "linear"
+  ),
+  aggregate = NULL,
+  n_samples = NULL,
+  depth = NULL,
+  surface_smooth_fwhm = 0
+) {
   fun <- match.arg(fun)
   sampling <- match.arg(sampling)
   interpolation <- match.arg(interpolation)
@@ -226,45 +249,50 @@ project_cluster_overlay <- function(cluster_vol,
   list(overlay = out, meta = meta)
 }
 
-.overlay_projection_diagnostics <- function(cluster_vol,
-                                            projection,
-                                            threshold,
-                                            sampling,
-                                            fun) {
+.overlay_projection_diagnostics <- function(
+  cluster_vol,
+  projection,
+  threshold,
+  sampling,
+  fun
+) {
   vals <- projection$overlay
   meta <- projection$meta
   cluster_vals <- as.array(cluster_vol)
   nonzero <- sum(cluster_vals != 0, na.rm = TRUE)
 
-  hemi_stats <- lapply(c("lh", "rh"), function(h) {
-    x <- vals[[h]]
-    if (is.null(x)) {
-      data.frame(
-        hemi = h,
-        target_vertices = NA_integer_,
-        finite_vertices = 0L,
-        above_threshold = 0L,
-        finite_min = NA_real_,
-        finite_max = NA_real_,
-        stringsAsFactors = FALSE
-      )
-    } else {
-      finite <- is.finite(x)
-      data.frame(
-        hemi = h,
-        target_vertices = if (!is.null(meta$hemis[[h]]$target_vertices)) {
-          as.integer(meta$hemis[[h]]$target_vertices)
-        } else {
-          as.integer(length(x))
-        },
-        finite_vertices = as.integer(sum(finite)),
-        above_threshold = as.integer(sum(finite & abs(x) >= threshold)),
-        finite_min = if (any(finite)) min(x[finite]) else NA_real_,
-        finite_max = if (any(finite)) max(x[finite]) else NA_real_,
-        stringsAsFactors = FALSE
-      )
+  hemi_stats <- lapply(
+    c("lh", "rh"),
+    function(h) {
+      x <- vals[[h]]
+      if (is.null(x)) {
+        data.frame(
+          hemi = h,
+          target_vertices = NA_integer_,
+          finite_vertices = 0L,
+          above_threshold = 0L,
+          finite_min = NA_real_,
+          finite_max = NA_real_,
+          stringsAsFactors = FALSE
+        )
+      } else {
+        finite <- is.finite(x)
+        data.frame(
+          hemi = h,
+          target_vertices = if (!is.null(meta$hemis[[h]]$target_vertices)) {
+            as.integer(meta$hemis[[h]]$target_vertices)
+          } else {
+            as.integer(length(x))
+          },
+          finite_vertices = as.integer(sum(finite)),
+          above_threshold = as.integer(sum(finite & abs(x) >= threshold)),
+          finite_min = if (any(finite)) min(x[finite]) else NA_real_,
+          finite_max = if (any(finite)) max(x[finite]) else NA_real_,
+          stringsAsFactors = FALSE
+        )
+      }
     }
-  })
+  )
   hemi_tbl <- do.call(rbind, hemi_stats)
 
   list(
@@ -277,17 +305,19 @@ project_cluster_overlay <- function(cluster_vol,
   )
 }
 
-.project_overlay_one_hemi <- function(cluster_vol,
-                                      surf_wm,
-                                      surf_pial,
-                                      target_n,
-                                      fun,
-                                      sampling,
-                                      interpolation = "legacy",
-                                      aggregate = NULL,
-                                      n_samples = NULL,
-                                      depth = NULL,
-                                      surface_smooth_fwhm = 0) {
+.project_overlay_one_hemi <- function(
+  cluster_vol,
+  surf_wm,
+  surf_pial,
+  target_n,
+  fun,
+  sampling,
+  interpolation = "legacy",
+  aggregate = NULL,
+  n_samples = NULL,
+  depth = NULL,
+  surface_smooth_fwhm = 0
+) {
   failed <- function(reason) {
     structure(rep(NA_real_, target_n), projection_error = reason)
   }
@@ -321,23 +351,32 @@ project_cluster_overlay <- function(cluster_vol,
   }
 
   if (length(vals) != target_n) {
-    return(failed(sprintf(
-      "Projected %d vertices but the atlas hemisphere has %d.",
-      length(vals), target_n
-    )))
+    return(
+      failed(
+        sprintf(
+          "Projected %d vertices but the atlas hemisphere has %d.",
+          length(vals),
+          target_n
+        )
+      )
+    )
   }
 
   vals
 }
 
 .surface_values_to_numeric <- function(x) {
-  if (is.null(x)) return(NULL)
+  if (is.null(x)) {
+    return(NULL)
+  }
 
   vals <- tryCatch(neurosurf::values(x), error = function(e) NULL)
   if (is.null(vals)) {
     vals <- tryCatch(x@data, error = function(e) NULL)
   }
-  if (is.null(vals)) return(NULL)
+  if (is.null(vals)) {
+    return(NULL)
+  }
   as.numeric(vals)
 }
 
@@ -354,13 +393,24 @@ project_cluster_overlay <- function(cluster_vol,
 #' @keywords internal
 #' @noRd
 .repair_legacy_surface_geometry <- function(g) {
-  if (is.null(g) || !inherits(g, "SurfaceGeometry")) return(g)
-  ok <- tryCatch({ methods::validObject(g); TRUE },
-                 error = function(e) FALSE)
-  if (ok) return(g)
+  if (is.null(g) || !inherits(g, "SurfaceGeometry")) {
+    return(g)
+  }
+  ok <- tryCatch(
+    {
+      methods::validObject(g)
+      TRUE
+    },
+    error = function(e) FALSE
+  )
+  if (ok) {
+    return(g)
+  }
 
   mesh <- tryCatch(g@mesh, error = function(e) NULL)
-  if (is.null(mesh) || is.null(mesh$vb) || is.null(mesh$it)) return(g)
+  if (is.null(mesh) || is.null(mesh$vb) || is.null(mesh$it)) {
+    return(g)
+  }
 
   vert <- t(mesh$vb[1:3, , drop = FALSE])
   faces <- t(mesh$it) - 1L
@@ -374,15 +424,25 @@ project_cluster_overlay <- function(cluster_vol,
   )
 }
 
-.resolve_overlay_surface_pair <- function(surfatlas,
-                                          hemi = c("lh", "rh"),
-                                          space_override = NULL,
-                                          density_override = NULL,
-                                          resolution_override = NULL) {
+.resolve_overlay_surface_pair <- function(
+  surfatlas,
+  hemi = c("lh", "rh"),
+  space_override = NULL,
+  density_override = NULL,
+  resolution_override = NULL
+) {
   hemi <- match.arg(hemi)
   atlas_hemi <- surfatlas[[paste0(hemi, "_atlas")]]
   current_geom <- atlas_hemi@geometry
-  surf_type <- if (!is.null(surfatlas$surf_type)) surfatlas$surf_type else NA_character_
+  surf_type <- if (
+    !is.null(
+      surfatlas$surf_type
+    )
+  ) {
+    surfatlas$surf_type
+  } else {
+    NA_character_
+  }
 
   white <- if (identical(surf_type, "white")) current_geom else NULL
   pial <- if (identical(surf_type, "pial")) current_geom else NULL
@@ -428,35 +488,49 @@ project_cluster_overlay <- function(cluster_vol,
     return(list(template_id = "fsaverage", density = "41k", resolution = "06"))
   }
 
-  switch(
-    as.character(surface_space),
-    fsaverage6 = list(template_id = "fsaverage", density = "41k",
-                      resolution = "06"),
-    fsaverage5 = list(template_id = "fsaverage", density = "10k",
-                      resolution = "05"),
-    fsaverage = list(template_id = "fsaverage", density = "164k",
-                     resolution = NULL),
+  switch(as.character(surface_space),
+    fsaverage6 = list(
+      template_id = "fsaverage",
+      density = "41k",
+      resolution = "06"
+    ),
+    fsaverage5 = list(
+      template_id = "fsaverage",
+      density = "10k",
+      resolution = "05"
+    ),
+    fsaverage = list(
+      template_id = "fsaverage",
+      density = "164k",
+      resolution = NULL
+    ),
     list(template_id = surface_space, density = NULL, resolution = NULL)
   )
 }
 
-.load_overlay_surface_geometry <- function(surface_space,
-                                           surface_type = c("white", "pial"),
-                                           hemi = c("lh", "rh"),
-                                           density_override = NULL,
-                                           resolution_override = NULL) {
+.load_overlay_surface_geometry <- function(
+  surface_space,
+  surface_type = c("white", "pial"),
+  hemi = c("lh", "rh"),
+  density_override = NULL,
+  resolution_override = NULL
+) {
   surface_type <- match.arg(surface_type)
   hemi <- match.arg(hemi)
 
-  if (identical(surface_space, "fsaverage-std8") &&
-      is.null(density_override) && is.null(resolution_override)) {
+  if (
+    identical(surface_space, "fsaverage-std8") &&
+      is.null(density_override) && is.null(resolution_override)
+  ) {
     return(neurosurf::load_fsaverage_std8(surface_type)[[hemi]])
   }
 
   # Fast packaged fallback for fsaverage6 surfaces.
-  if (identical(surface_space, "fsaverage6") &&
+  if (
+    identical(surface_space, "fsaverage6") &&
       is.null(density_override) &&
-      is.null(resolution_override)) {
+      is.null(resolution_override)
+  ) {
     fsaverage <- NULL
     utils::data("fsaverage", package = "neuroatlas", envir = environment())
     if (exists("fsaverage", envir = environment(), inherits = FALSE)) {
@@ -469,7 +543,15 @@ project_cluster_overlay <- function(cluster_vol,
   }
 
   defaults <- .surface_template_defaults(surface_space)
-  density <- if (!is.null(density_override)) density_override else defaults$density
+  density <- if (
+    !is.null(
+      density_override
+    )
+  ) {
+    density_override
+  } else {
+    defaults$density
+  }
   resolution <- if (!is.null(resolution_override)) {
     resolution_override
   } else {

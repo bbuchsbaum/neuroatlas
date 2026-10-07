@@ -43,5 +43,6 @@ verts_mni152 <- transform_vertices_to_volume(verts, "fsaverage", "MNI152")
 
 }
 \seealso{
-\code{\link{transform_coords}}, \code{\link{get_surface_coordinate_space}}
+\code{\link{transform_coords}},
+  \code{\link{get_surface_coordinate_space}}
 }

@@ -48,16 +48,22 @@ NULL
 #' @keywords internal
 #' @noRd
 .is_lfs_pointer <- function(path) {
-  if (!file.exists(path)) return(FALSE)
+  if (!file.exists(path)) {
+    return(FALSE)
+  }
   size_ok <- file.info(path)$size < 1024L
-  if (!size_ok) return(FALSE)
+  if (!size_ok) {
+    return(FALSE)
+  }
   hdr <- tryCatch(
     readLines(path, n = 1L, warn = FALSE),
     error = function(e) ""
   )
   length(hdr) > 0L &&
-    (identical(hdr, "version https://git-lfs.github.com/spec/v1") ||
-       grepl("^\\.git/annex/objects/", hdr))
+    (
+      identical(hdr, "version https://git-lfs.github.com/spec/v1") ||
+        grepl("^\\.git/annex/objects/", hdr)
+    )
 }
 
 
@@ -76,12 +82,14 @@ NULL
 #'
 #' @return The destination path (invisibly on success).
 #' @keywords internal
-.neuroatlas_download <- function(url,
-                                 dest = NULL,
-                                 mode = "wb",
-                                 quiet = TRUE,
-                                 min_size = 1024L,
-                                 description = "atlas asset") {
+.neuroatlas_download <- function(
+  url,
+  dest = NULL,
+  mode = "wb",
+  quiet = TRUE,
+  min_size = 1024L,
+  description = "atlas asset"
+) {
   if (is.null(dest)) {
     dest <- file.path(tempdir(), basename(url))
   }
@@ -122,9 +130,11 @@ NULL
         "i" = "URL:  {.url {url}}",
         "i" = "The upstream mirror may be serving an unresolved pointer."
       ),
-      class = c("neuroatlas_error_lfs_pointer",
-                "neuroatlas_error_download",
-                "neuroatlas_error")
+      class = c(
+        "neuroatlas_error_lfs_pointer",
+        "neuroatlas_error_download",
+        "neuroatlas_error"
+      )
     )
   }
 
@@ -156,17 +166,23 @@ NULL
 #'   * `lfs_pointer`: `TRUE` if the file looked like a Git LFS/git-annex
 #'     pointer stub.
 #' @keywords internal
-.neuroatlas_try_download <- function(url,
-                                     dest = NULL,
-                                     mode = "wb",
-                                     quiet = TRUE,
-                                     min_size = 1024L,
-                                     description = "atlas asset") {
+.neuroatlas_try_download <- function(
+  url,
+  dest = NULL,
+  mode = "wb",
+  quiet = TRUE,
+  min_size = 1024L,
+  description = "atlas asset"
+) {
   result <- tryCatch(
     {
       path <- .neuroatlas_download(
-        url = url, dest = dest, mode = mode, quiet = quiet,
-        min_size = min_size, description = description
+        url = url,
+        dest = dest,
+        mode = mode,
+        quiet = quiet,
+        min_size = min_size,
+        description = description
       )
       list(ok = TRUE, path = path, error = NULL, lfs_pointer = FALSE)
     },

@@ -1,0 +1,150 @@
+{
+  "MNI152NLin6Asym-1": {
+    "template": "MNI152NLin6Asym",
+    "resolution": 1,
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_desc-brain_mask.nii.gz",
+    "sha256": "6d540075dac093fa5070a929dc5ea52795d54cc9ab57fe1272086dc70314b428",
+    "shape": [
+      182,
+      218,
+      182
+    ],
+    "affine": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -91.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -126.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -72.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "MNI152NLin6Asym-2": {
+    "template": "MNI152NLin6Asym",
+    "resolution": 2,
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_mask.nii.gz",
+    "sha256": "e4e2b284170271afdafe26ac0997b2af5a0f5ddac35e28a7e796b52e8bc5adb1",
+    "shape": [
+      91,
+      109,
+      91
+    ],
+    "affine": [
+      [
+        2.0,
+        0.0,
+        0.0,
+        -90.0
+      ],
+      [
+        0.0,
+        2.0,
+        0.0,
+        -126.0
+      ],
+      [
+        0.0,
+        0.0,
+        2.0,
+        -72.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "MNI152NLin2009cAsym-1": {
+    "template": "MNI152NLin2009cAsym",
+    "resolution": 1,
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz",
+    "sha256": "e40bb1816736504d4c25abc243c1c8503df1d308f64c048318aa4b829e09a7ae",
+    "shape": [
+      193,
+      229,
+      193
+    ],
+    "affine": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -96.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -132.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -78.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "MNI152NLin2009cAsym-2": {
+    "template": "MNI152NLin2009cAsym",
+    "resolution": 2,
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-brain_mask.nii.gz",
+    "sha256": "7a71e9ce99d2af7b68bb5c163908c8e25f4c7a198806fb0893a5c1759b480ecd",
+    "shape": [
+      97,
+      115,
+      97
+    ],
+    "affine": [
+      [
+        2.0,
+        0.0,
+        0.0,
+        -96.5
+      ],
+      [
+        0.0,
+        2.0,
+        0.0,
+        -132.5
+      ],
+      [
+        0.0,
+        0.0,
+        2.0,
+        -78.5
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  }
+}

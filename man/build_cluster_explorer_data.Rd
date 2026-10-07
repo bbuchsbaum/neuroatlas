@@ -89,3 +89,28 @@ Compute sign-aware volumetric connected components from a statistic map,
 annotate them with atlas parcels, and extract cluster-level 4D signal
 summaries aligned to sample rows.
 }
+\examples{
+grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+atlas <- structure(
+  list(
+    atlas = volume, ids = 1:2,
+    labels = c("A", "B"), orig_labels = c("A", "B"),
+    hemi = c("left", "right"), name = "toy",
+    cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+    atlas_ref = new_atlas_ref("toy", "two-regions",
+      template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+    )
+  ),
+  class = "atlas"
+)
+samples <- array(rep(c(0.2, 0.7), 3), c(2, 1, 1, 3))
+data_source <- neuroim2::NeuroVec(
+  samples, neuroim2::NeuroSpace(dim(samples))
+)
+stat_map <- neuroim2::NeuroVol(array(c(4, 5), c(2, 1, 1)), grid)
+clusters <- build_cluster_explorer_data(data_source, atlas, stat_map,
+  threshold = 3, min_cluster_size = 1, tail = "positive"
+)
+clusters$cluster_table
+}

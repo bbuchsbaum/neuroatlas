@@ -20,16 +20,19 @@ reduce_atlas(atlas, data_vol, stat_func, ..., format = NULL)
 \arguments{
 \item{atlas}{An atlas object or another object for which a method is defined.}
 
-\item{data_vol}{A \code{NeuroVol} (3D) or \code{NeuroVec} (4D) with the data to be summarized.
-When a 3D volume is supplied the result contains a single row; 4D inputs yield one
-row per time point.}
+\item{data_vol}{A \code{NeuroVol} (3D) or \code{NeuroVec} (4D) with the data
+  to be summarized.
+  When a 3D volume is supplied the result contains a single row; 4D inputs
+yield one
+  row per time point.}
 
-\item{stat_func}{The function to apply to the data within each ROI (e.g., \code{mean},
+\item{stat_func}{The function to apply to the data within each ROI (e.g.,
+\code{mean},
 \code{sd}, \code{sum}).}
 
 \item{...}{Additional arguments passed to \code{stat_func}.}
 
-\item{format}{Character string specifying output format: "wide" or "long". 
+\item{format}{Character string specifying output format: "wide" or "long".
 If NULL (default), uses "long" for NeuroVol and "wide" for NeuroVec.}
 
 \item{level}{Optional grouping level used by methods.}
@@ -39,8 +42,10 @@ If NULL (default), uses "long" for NeuroVol and "wide" for NeuroVec.}
 \value{
 A \code{tibble} with format depending on the \code{format} parameter:
   \itemize{
-    \item \code{"wide"}: Regions as columns. For NeuroVec, rows are time points.
-    \item \code{"long"}: Columns are \code{region} and \code{value} (NeuroVol) or 
+    \item \code{"wide"}: Regions as columns. For NeuroVec, rows are time
+points.
+    \item \code{"long"}: Columns are \code{region} and \code{value}
+(NeuroVol) or
           \code{time}, \code{region}, and \code{value} (NeuroVec).
   }
 }
@@ -61,7 +66,8 @@ atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
 
 # Create example data (random values in brain space)
 brain_data <- neuroim2::NeuroVol(rnorm(prod(dim(atlas$atlas))),
-                                 space = space(atlas$atlas))
+  space = space(atlas$atlas)
+)
 
 # Compute mean values within each atlas region
 region_means <- reduce_atlas(atlas, brain_data, mean)

@@ -87,7 +87,8 @@ overlay surface loading.}
 
 \item{overlay_fun}{Reduction used by \code{neurosurf::vol_to_surf()}.}
 
-\item{overlay_sampling}{Sampling strategy for \code{neurosurf::vol_to_surf()}.}
+\item{overlay_sampling}{Sampling strategy for
+\code{neurosurf::vol_to_surf()}.}
 
 \item{prefetch}{Logical default for eager cluster signal prefetch.}
 
@@ -139,4 +140,10 @@ design-aware signal plots. Clusters are formed volumetrically from
 \details{
 Calling \code{cluster_explorer()} with no arguments launches a synthetic demo
 dataset so the UI can be explored immediately.
+}
+\examples{
+\dontrun{
+app <- cluster_explorer()
+# Start the interactive viewer with shiny::runApp(app).
+}
 }

@@ -10,96 +10,121 @@ make_palette_test_rois <- function() {
   )
 }
 
-test_that("roi_colors_maximin_view produces deterministic palette", {
-  rois <- make_palette_test_rois()
-  args <- list(
-    rois = rois,
-    hemi_col = "hemi",
-    network_col = "network",
-    pair_col = "pair_id",
-    seed = 123,
-    k = 4,
-    sigma_xy = 20,
-    sigma_slice = 8
-  )
-  pal <- do.call(roi_colors_maximin_view, args)
-  pal_again <- do.call(roi_colors_maximin_view, args)
-  expect_equal(names(pal), c("roi", "color"))
-  expect_equal(nrow(pal), nrow(rois))
-  expect_true(all(nchar(pal$color) == 7))
-  expect_true(all(grepl("^#[0-9A-Fa-f]{6}$", pal$color)))
-  # Exact hex values can differ across platforms due to floating-point
-  # Lab distance ordering; keep a same-seed determinism gate instead.
-  expect_equal(pal, pal_again)
-  # Paired ROIs share a colour under pair_col.
-  expect_equal(pal$color[c(1, 3, 5, 7, 9, 11)], pal$color[c(2, 4, 6, 8, 10, 12)])
-})
+test_that(
+  "roi_colors_maximin_view produces deterministic palette",
+  {
+    rois <- make_palette_test_rois()
+    args <- list(
+      rois = rois,
+      hemi_col = "hemi",
+      network_col = "network",
+      pair_col = "pair_id",
+      seed = 123,
+      k = 4,
+      sigma_xy = 20,
+      sigma_slice = 8
+    )
+    pal <- do.call(roi_colors_maximin_view, args)
+    pal_again <- do.call(roi_colors_maximin_view, args)
+    expect_equal(names(pal), c("roi", "color"))
+    expect_equal(nrow(pal), nrow(rois))
+    expect_true(all(nchar(pal$color) == 7))
+    expect_true(all(grepl("^#[0-9A-Fa-f]{6}$", pal$color)))
+    # Exact hex values can differ across platforms due to floating-point
+    # Lab distance ordering; keep a same-seed determinism gate instead.
+    expect_equal(pal, pal_again)
+    # Paired ROIs share a colour under pair_col.
+    expect_equal(
+      pal$color[c(1, 3, 5, 7, 9, 11)],
+      pal$color[c(
+        2,
+        4,
+        6,
+        8,
+        10,
+        12
+      )]
+    )
+  }
+)
 
-test_that("roi_colors_network_harmony organizes by network", {
-  rois <- make_palette_test_rois()
-  args <- list(
-    rois = rois,
-    network_col = "network",
-    hemi_col = "hemi",
-    seed = 42,
-    k = 4,
-    sigma_xy = 20,
-    sigma_slice = 8,
-    candidate_multiplier = 1.1,
-    hue_width = 40
-  )
-  pal <- do.call(roi_colors_network_harmony, args)
-  pal_again <- do.call(roi_colors_network_harmony, args)
-  expect_equal(nrow(pal), nrow(rois))
-  expect_equal(names(pal), c("roi", "color"))
-  expect_true(all(grepl("^#[0-9A-Fa-f]{6}$", pal$color)))
-  expect_equal(pal, pal_again)
-})
+test_that(
+  "roi_colors_network_harmony organizes by network",
+  {
+    rois <- make_palette_test_rois()
+    args <- list(
+      rois = rois,
+      network_col = "network",
+      hemi_col = "hemi",
+      seed = 42,
+      k = 4,
+      sigma_xy = 20,
+      sigma_slice = 8,
+      candidate_multiplier = 1.1,
+      hue_width = 40
+    )
+    pal <- do.call(roi_colors_network_harmony, args)
+    pal_again <- do.call(roi_colors_network_harmony, args)
+    expect_equal(nrow(pal), nrow(rois))
+    expect_equal(names(pal), c("roi", "color"))
+    expect_true(all(grepl("^#[0-9A-Fa-f]{6}$", pal$color)))
+    expect_equal(pal, pal_again)
+  }
+)
 
-test_that("roi_colors_rule_hcl honours hemisphere luminance", {
-  rois <- make_palette_test_rois()
-  pal <- roi_colors_rule_hcl(
-    rois,
-    network_col = "network",
-    hemi_col = "hemi",
-    hue_width = 25,
-    C = 65,
-    L_L = 75,
-    L_R = 58
-  )
-  expect_true(all(substr(pal$color, 1, 1) == "#"))
-  expect_snapshot_value(pal, style = "json2")
-})
+test_that(
+  "roi_colors_rule_hcl honours hemisphere luminance",
+  {
+    rois <- make_palette_test_rois()
+    pal <- roi_colors_rule_hcl(
+      rois,
+      network_col = "network",
+      hemi_col = "hemi",
+      hue_width = 25,
+      C = 65,
+      L_L = 75,
+      L_R = 58
+    )
+    expect_true(all(substr(pal$color, 1, 1) == "#"))
+    expect_snapshot_value(pal, style = "json2")
+  }
+)
 
-test_that("roi_colors_embedding maps structured hues", {
-  rois <- make_palette_test_rois()
-  pal <- roi_colors_embedding(
-    rois,
-    feature_cols = c("x", "y", "z", "network", "hemi"),
-    hemi_col = "hemi",
-    method = "pca",
-    seed = 7,
-    C_range = c(40, 70),
-    L = 60
-  )
-  expect_equal(nrow(pal), nrow(rois))
-  expect_snapshot_value(pal, style = "json2")
-})
+test_that(
+  "roi_colors_embedding maps structured hues",
+  {
+    rois <- make_palette_test_rois()
+    pal <- roi_colors_embedding(
+      rois,
+      feature_cols = c("x", "y", "z", "network", "hemi"),
+      hemi_col = "hemi",
+      method = "pca",
+      seed = 7,
+      C_range = c(40, 70),
+      L = 60
+    )
+    expect_equal(nrow(pal), nrow(rois))
+    expect_snapshot_value(pal, style = "json2")
+  }
+)
 
-test_that("PCA score canonicalization removes component sign ambiguity", {
-  scores <- matrix(c(-2, -1, 1, 2, 3, 2, -2, -3), ncol = 2)
-  rotation <- matrix(
-    c(0, 0.8, -0.2, 0, -0.6, 0.4),
-    nrow = 3,
-    ncol = 2
-  )
-  signs <- c(-1, 1)
+test_that(
+  "PCA score canonicalization removes component sign ambiguity",
+  {
+    scores <- matrix(c(-2, -1, 1, 2, 3, 2, -2, -3), ncol = 2)
+    rotation <- matrix(
+      c(0, 0.8, -0.2, 0, -0.6, 0.4),
+      nrow = 3,
+      ncol = 2
+    )
+    signs <- c(-1, 1)
 
-  expected <- neuroatlas:::.canonicalize_pca_scores(scores, rotation)
-  observed <- neuroatlas:::.canonicalize_pca_scores(
-    sweep(scores, 2, signs, `*`),
-    sweep(rotation, 2, signs, `*`)
-  )
+    expected <- neuroatlas:::.canonicalize_pca_scores(scores, rotation)
+    observed <- neuroatlas:::.canonicalize_pca_scores(
+      sweep(scores, 2, signs, `*`),
+      sweep(rotation, 2, signs, `*`)
+    )
 
-  expect_identical(observed, expected)
-})
+    expect_identical(observed, expected)
+  }
+)

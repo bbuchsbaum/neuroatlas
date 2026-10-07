@@ -10,7 +10,8 @@ Source-specific links are recorded in \code{atlas_ref(atlas)$provenance}.
 get_glasser_atlas(outspace = NULL, source = c("xcpengine", "mni2009c"))
 }
 \arguments{
-\item{outspace}{Optional \code{NeuroSpace} object specifying desired output space.
+\item{outspace}{Optional \code{NeuroSpace} object specifying desired output
+space.
 If provided, the atlas will be resampled to this space. Default: NULL}
 
 \item{source}{Volume source to use. One of \code{"xcpengine"} (default) or

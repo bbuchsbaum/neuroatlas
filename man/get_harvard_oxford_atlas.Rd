@@ -55,3 +55,9 @@ Loads Harvard-Oxford cortical, subcortical, or combined cortical/subcortical
 parcellations. By default this uses TemplateFlow, which does not require a
 local FSL installation. Set `source = "fsl"` to read from `$FSLDIR`.
 }
+\examples{
+\dontrun{
+atlas <- get_harvard_oxford_atlas("cortical", threshold = 25)
+atlas_ref(atlas)
+}
+}

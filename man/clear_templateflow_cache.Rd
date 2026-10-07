@@ -7,17 +7,19 @@
 clear_templateflow_cache(confirm = TRUE)
 }
 \arguments{
-\item{confirm}{Logical. If `TRUE` (the default), asks for interactive confirmation.}
+\item{confirm}{Logical. If `TRUE` (the default), asks for interactive
+confirmation.}
 }
 \value{
-Invisibly returns `TRUE` if the cache was cleared, `FALSE` if aborted.
+Invisibly returns `TRUE` if the cache was cleared, `FALSE` if
+  aborted.
 }
 \description{
 Removes cached files and clears in-memory memoisation.
 }
 \examples{
 \dontrun{
-  clear_templateflow_cache()
-  clear_templateflow_cache(confirm = FALSE)
+clear_templateflow_cache()
+clear_templateflow_cache(confirm = FALSE)
 }
 }

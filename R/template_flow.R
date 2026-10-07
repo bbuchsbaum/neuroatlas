@@ -61,13 +61,16 @@ NULL
   if (!requireNamespace("templateflow", quietly = TRUE)) {
     return(FALSE)
   }
-  tryCatch({
-    spaces <- templateflow::tf_templates()
-    length(spaces) > 0
-  }, error = function(e) {
-    message("TemplateFlow appears to be unreachable: ", e$message)
-    FALSE
-  })
+  tryCatch(
+    {
+      spaces <- templateflow::tf_templates()
+      length(spaces) > 0
+    },
+    error = function(e) {
+      message("TemplateFlow appears to be unreachable: ", e$message)
+      FALSE
+    }
+  )
 }
 
 # ---- TemplateFlow S3 Object (Deprecated) ----
@@ -87,11 +90,16 @@ NULL
 #' @export
 #' @examples
 #' \dontrun{
-#'   # Deprecated. Use get_template(), tflow_spaces(), etc. directly.
+#' # Deprecated. Use get_template(), tflow_spaces(), etc. directly.
 #' }
-create_templateflow <- function(cache_dir = NULL, verbosity = 0, default_template = NULL) {
+create_templateflow <- function(
+  cache_dir = NULL,
+  verbosity = 0,
+  default_template = NULL
+) {
   lifecycle::deprecate_warn(
-    "0.2.0", "create_templateflow()",
+    "0.2.0",
+    "create_templateflow()",
     details = paste(
       "TemplateFlow is now accessed via the pure R 'templateflow' package.",
       "No initialization is needed.",
@@ -100,7 +108,15 @@ create_templateflow <- function(cache_dir = NULL, verbosity = 0, default_templat
   )
   .ensure_templateflow()
   obj <- list(
-    cache_path = if (!is.null(cache_dir)) cache_dir else .neuroatlas_cache_dir("templateflow"),
+    cache_path = if (
+      !is.null(
+        cache_dir
+      )
+    ) {
+      cache_dir
+    } else {
+      .neuroatlas_cache_dir("templateflow")
+    },
     options = list(verbosity = verbosity, default_template = default_template)
   )
   class(obj) <- "templateflow"
@@ -114,23 +130,33 @@ create_templateflow <- function(cache_dir = NULL, verbosity = 0, default_templat
 #' @param x An object of class \code{templateflow}.
 #' @param ... Additional arguments (unused).
 #' @return The input object \code{x}, returned invisibly.
+#' @examples
+#' \dontrun{
+#' interface <- create_templateflow()
+#' print(interface)
+#' }
 #' @export
 print.templateflow <- function(x, ...) {
   cat("<neuroatlas TemplateFlow Interface (R backend)>\n")
   cat("  Cache Path: ", x[["cache_path"]], "\n")
-  tryCatch({
-    .ensure_templateflow()
-    spaces <- templateflow::tf_templates()
-    cat("  Available Templates (Examples): ",
-        paste(utils::head(spaces, 5), collapse = ", "))
-    if (length(spaces) > 5) {
-      cat(", ... (Total: ", length(spaces), ")\n", sep = "")
-    } else {
-      cat(" (Total: ", length(spaces), ")\n", sep = "")
+  tryCatch(
+    {
+      .ensure_templateflow()
+      spaces <- templateflow::tf_templates()
+      cat(
+        "  Available Templates (Examples): ",
+        paste(utils::head(spaces, 5), collapse = ", ")
+      )
+      if (length(spaces) > 5) {
+        cat(", ... (Total: ", length(spaces), ")\n", sep = "")
+      } else {
+        cat(" (Total: ", length(spaces), ")\n", sep = "")
+      }
+    },
+    error = function(e) {
+      cat("  Available Templates: Error retrieving list - ", e$message, "\n")
     }
-  }, error = function(e) {
-    cat("  Available Templates: Error retrieving list - ", e$message, "\n")
-  })
+  )
   invisible(x)
 }
 
@@ -176,25 +202,38 @@ names.templateflow <- function(x) {
 #' Unified function to retrieve neuroimaging templates and related files from
 #' the TemplateFlow repository via the pure R \code{templateflow} package.
 #'
-#' @param space Character string. The primary TemplateFlow identifier for the template space
-#'   (e.g., \code{"MNI152NLin2009cAsym"}). Default: \code{"MNI152NLin2009cAsym"}.
-#' @param variant Character string. A high-level descriptor for common template types.
-#'   Supported: \code{"brain"} (default), \code{"head"}, \code{"mask"}, \code{"probseg"}, \code{"dseg"}.
-#'   This is used to infer \code{desc} and sometimes \code{suffix} if they are not explicitly provided.
-#' @param modality Character string. The imaging modality or primary suffix for the template file.
+#' @param space Character string. The primary TemplateFlow identifier for the
+#'   template space
+#'   (e.g., \code{"MNI152NLin2009cAsym"}). Default:
+#' \code{"MNI152NLin2009cAsym"}.
+#' @param variant Character string. A high-level descriptor for common template
+#'   types.
+#'   Supported: \code{"brain"} (default), \code{"head"}, \code{"mask"},
+#' \code{"probseg"}, \code{"dseg"}.
+#'   This is used to infer \code{desc} and sometimes \code{suffix} if they are
+#' not explicitly provided.
+#' @param modality Character string. The imaging modality or primary suffix for
+#'   the template file.
 #'   Supported: \code{"T1w"} (default), \code{"T2w"}, \code{"mask"}.
 #'   This is used to infer \code{suffix} if not explicitly provided.
-#' @param resolution Numeric or character. The resolution of the template in mm (e.g., \code{1}, \code{2}). Default: \code{1}.
+#' @param resolution Numeric or character. The resolution of the template in mm
+#'   (e.g., \code{1}, \code{2}). Default: \code{1}.
 #' @param cohort Character string. Optional cohort identifier.
-#' @param desc Character string. Specific TemplateFlow \code{desc} field. Defaults to \code{"brain"}.
-#' @param label Character string. Specific TemplateFlow \code{label} field (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"}).
-#' @param atlas Character string. Specific TemplateFlow \code{atlas} field (e.g., \code{"Schaefer2018"}).
-#' @param suffix Character string. Specific TemplateFlow \code{suffix} field. Overrides
+#' @param desc Character string. Specific TemplateFlow \code{desc} field.
+#'   Defaults to \code{"brain"}.
+#' @param label Character string. Specific TemplateFlow \code{label} field
+#'   (e.g., \code{"GM"}, \code{"WM"}, \code{"CSF"}).
+#' @param atlas Character string. Specific TemplateFlow \code{atlas} field
+#'   (e.g., \code{"Schaefer2018"}).
+#' @param suffix Character string. Specific TemplateFlow \code{suffix} field.
+#'   Overrides
 #'   any \code{suffix} inferred from \code{modality} or \code{variant}.
-#' @param extension Character string. The file extension. Default: \code{".nii.gz"}.
+#' @param extension Character string. The file extension. Default:
+#'   \code{".nii.gz"}.
 #' @param path_only Logical. If \code{TRUE}, returns the file path as a string
 #'   instead of loading as a \code{NeuroVol}. Default: \code{FALSE}.
-#' @param use_cache Logical. If \code{TRUE} (default), uses memoised NeuroVol loading.
+#' @param use_cache Logical. If \code{TRUE} (default), uses memoised NeuroVol
+#'   loading.
 #' @param api_handle Deprecated and ignored. Kept for backward compatibility.
 #' @param ... Additional arguments passed to the TemplateFlow query
 #'   (e.g., \code{hemi}, \code{density}).
@@ -209,38 +248,41 @@ names.templateflow <- function(x) {
 #'   - \code{NeuroVol} loading is memoised at the R session level to avoid
 #'     re-reading large NIfTI files.
 #'
-#' @return If any of \code{space}, \code{variant}, \code{modality}, \code{resolution},
-#'   or \code{label} are vectors of length > 1, a named list of results is returned.
+#' @return If any of \code{space}, \code{variant}, \code{modality},
+#'   \code{resolution},
+#'   or \code{label} are vectors of length > 1, a named list of results is
+#' returned.
 #'   Otherwise a single \code{neuroim2::NeuroVol} or file path string.
 #'
 #' @importFrom neuroim2 NeuroVol
 #' @export
 #' @examples
 #' \dontrun{
-#'   # Get default MNI T1w brain template
-#'   mni_brain <- get_template()
+#' # Get default MNI T1w brain template
+#' mni_brain <- get_template()
 #'
-#'   # Vectorized: Get MNI brain and mask variants
-#'   mni_variants <- get_template(variant = c("brain", "mask"))
+#' # Vectorized: Get MNI brain and mask variants
+#' mni_variants <- get_template(variant = c("brain", "mask"))
 #'
-#'   # Path only
-#'   path <- get_template(path_only = TRUE)
+#' # Path only
+#' path <- get_template(path_only = TRUE)
 #' }
-get_template <- function(space = "MNI152NLin2009cAsym",
-                         variant = "brain",
-                         modality = "T1w",
-                         resolution = 1,
-                         cohort = NULL,
-                         desc = "brain",
-                         label = NULL,
-                         atlas = NULL,
-                         suffix = NULL,
-                         extension = ".nii.gz",
-                         path_only = FALSE,
-                         use_cache = TRUE,
-                         api_handle = NULL,
-                         ...) {
-
+get_template <- function(
+  space = "MNI152NLin2009cAsym",
+  variant = "brain",
+  modality = "T1w",
+  resolution = 1,
+  cohort = NULL,
+  desc = "brain",
+  label = NULL,
+  atlas = NULL,
+  suffix = NULL,
+  extension = ".nii.gz",
+  path_only = FALSE,
+  use_cache = TRUE,
+  api_handle = NULL,
+  ...
+) {
   desc_missing <- missing(desc)
 
   # --- Vectorized Argument Handling ---
@@ -256,8 +298,10 @@ get_template <- function(space = "MNI152NLin2009cAsym",
   num_vectorized <- sum(is_vectorized)
 
   if (num_vectorized > 1) {
-    stop("Vectorization is supported for only one parameter at a time. ",
-         "Use lapply() or purrr::map() for multiple parameters.")
+    stop(
+      "Vectorization is supported for only one parameter at a time. ",
+      "Use lapply() or purrr::map() for multiple parameters."
+    )
   }
 
   if (num_vectorized == 1) {
@@ -268,26 +312,29 @@ get_template <- function(space = "MNI152NLin2009cAsym",
     extra_args <- list(...)
 
     # Build results list by calling scalar version
-    results_list <- lapply(vec_values, function(val) {
-      args <- list(
-        space = if (vec_param_name == "space") val else space[1],
-        variant = if (vec_param_name == "variant") val else variant[1],
-        modality = if (vec_param_name == "modality") val else modality[1],
-        resolution = if (vec_param_name == "resolution") val else resolution[1],
-        label = if (vec_param_name == "label") val else label[1],
-        cohort = cohort,
-        desc = desc,
-        desc_missing = desc_missing,
-        atlas = atlas,
-        suffix = suffix,
-        extension = extension,
-        path_only = path_only,
-        use_cache = use_cache,
-        api_handle = api_handle
-      )
-      args <- c(args, extra_args)
-      do.call(.get_template_scalar, args)
-    })
+    results_list <- lapply(
+      vec_values,
+      function(val) {
+        args <- list(
+          space = if (vec_param_name == "space") val else space[1],
+          variant = if (vec_param_name == "variant") val else variant[1],
+          modality = if (vec_param_name == "modality") val else modality[1],
+          resolution = if (vec_param_name == "resolution") val else resolution[1],
+          label = if (vec_param_name == "label") val else label[1],
+          cohort = cohort,
+          desc = desc,
+          desc_missing = desc_missing,
+          atlas = atlas,
+          suffix = suffix,
+          extension = extension,
+          path_only = path_only,
+          use_cache = use_cache,
+          api_handle = api_handle
+        )
+        args <- c(args, extra_args)
+        do.call(.get_template_scalar, args)
+      }
+    )
 
     names(results_list) <- as.character(vec_values)
     return(results_list)
@@ -314,10 +361,23 @@ get_template <- function(space = "MNI152NLin2009cAsym",
 }
 
 # Internal scalar implementation
-.get_template_scalar <- function(space, variant, modality, resolution,
-                                label, cohort, desc, atlas, suffix,
-                                extension, path_only, use_cache,
-                                api_handle, desc_missing = FALSE, ...) {
+.get_template_scalar <- function(
+  space,
+  variant,
+  modality,
+  resolution,
+  label,
+  cohort,
+  desc,
+  atlas,
+  suffix,
+  extension,
+  path_only,
+  use_cache,
+  api_handle,
+  desc_missing = FALSE,
+  ...
+) {
   .ensure_templateflow()
 
   # Validate template space
@@ -352,37 +412,67 @@ get_template <- function(space = "MNI152NLin2009cAsym",
   )
 
   # Fetch template path via R templateflow package
-  file_path <- tryCatch({
-    do.call(templateflow::tf_get, query_args)
-  }, error = function(e) {
-    stop(structure(
-      list(message = paste0("TemplateFlow error: ", conditionMessage(e),
-                            "\nQuery args: ",
-                            paste(names(query_args), query_args,
-                                  sep = "=", collapse = ", ")),
-           call = NULL,
-           query_args = query_args),
-      class = c("templateflow_api_error", "error", "condition")
-    ))
-  })
+  file_path <- tryCatch(
+    {
+      do.call(templateflow::tf_get, query_args)
+    },
+    error = function(e) {
+      stop(
+        structure(
+          list(
+            message = paste0(
+              "TemplateFlow error: ",
+              conditionMessage(e),
+              "\nQuery args: ",
+              paste(
+                names(query_args),
+                query_args,
+                sep = "=",
+                collapse = ", "
+              )
+            ),
+            call = NULL,
+            query_args = query_args
+          ),
+          class = c("templateflow_api_error", "error", "condition")
+        )
+      )
+    }
+  )
 
-  if (length(file_path) == 0 ||
-      (length(file_path) == 1 && !nzchar(file_path))) {
-    stop(structure(
-      list(message = paste0("TemplateFlow found no files for the given query.",
-                            "\nQuery args: ",
-                            paste(names(query_args), query_args,
-                                  sep = "=", collapse = ", ")),
-           call = NULL,
-           query_args = query_args),
-      class = c("templateflow_no_files_error", "error", "condition")
-    ))
+  if (
+    length(file_path) == 0 ||
+      (length(file_path) == 1 && !nzchar(file_path))
+  ) {
+    stop(
+      structure(
+        list(
+          message = paste0(
+            "TemplateFlow found no files for the given query.",
+            "\nQuery args: ",
+            paste(
+              names(query_args),
+              query_args,
+              sep = "=",
+              collapse = ", "
+            )
+          ),
+          call = NULL,
+          query_args = query_args
+        ),
+        class = c("templateflow_no_files_error", "error", "condition")
+      )
+    )
   }
 
   if (length(file_path) > 1) {
-    warning("TemplateFlow returned multiple files (",
-            length(file_path), ") for the query, using the first one: ",
-            file_path[1], call. = FALSE)
+    warning(
+      "TemplateFlow returned multiple files (",
+      length(file_path),
+      ") for the query, using the first one: ",
+      file_path[1],
+      call. = FALSE
+    )
     file_path <- file_path[1]
   }
 
@@ -390,14 +480,24 @@ get_template <- function(space = "MNI152NLin2009cAsym",
     return(file_path)
   } else {
     if (grepl("\\.surf\\.gii$", file_path)) {
-      return(.attach_template_metadata(
-        .read_surface_template_geometry(file_path, hemi = query_args$hemi),
-        file_path, space, query_args, representation = "surface"
-      ))
+      return(
+        .attach_template_metadata(
+          .read_surface_template_geometry(file_path, hemi = query_args$hemi),
+          file_path,
+          space,
+          query_args,
+          representation = "surface"
+        )
+      )
     }
-    return(.attach_template_metadata(
-      as_neurovol(file_path), file_path, space, query_args
-    ))
+    return(
+      .attach_template_metadata(
+        as_neurovol(file_path),
+        file_path,
+        space,
+        query_args
+      )
+    )
   }
 }
 
@@ -418,11 +518,14 @@ get_template <- function(space = "MNI152NLin2009cAsym",
   if (!file.exists(file_path)) {
     stop("Resolved file path does not exist: ", file_path)
   }
-  tryCatch({
-    neuroim2::read_vol(file_path)
-  }, error = function(e) {
-    stop("Failed to read NIfTI file (", file_path, ") into NeuroVol: ", e$message)
-  })
+  tryCatch(
+    {
+      neuroim2::read_vol(file_path)
+    },
+    error = function(e) {
+      stop("Failed to read NIfTI file (", file_path, ") into NeuroVol: ", e$message)
+    }
+  )
 }
 
 #' Memoised version of .as_neurovol_unmemoised
@@ -439,13 +542,15 @@ as_neurovol <- memoise::memoise(.as_neurovol_unmemoised)
 #' \code{\link{get_template}} function which offers a more comprehensive
 #' and R-native interface.
 #'
-#' @param name Character string specifying template name. Default: "MNI152NLin2009cAsym"
+#' @param name Character string specifying template name. Default:
+#'   "MNI152NLin2009cAsym"
 #' @param desc Character string describing template variant. Default: "brain"
 #' @param resolution Numeric resolution in mm. Default: 1
 #' @param label Character string specifying tissue label for probability maps
 #' @param atlas Character string specifying atlas name
 #' @param suffix Character string specifying image type. Default: "T1w"
-#' @param extension Character string specifying file extension. Default: ".nii.gz"
+#' @param extension Character string specifying file extension. Default:
+#'   ".nii.gz"
 #'
 #' @return A NeuroVol object containing the requested template
 #'
@@ -460,9 +565,15 @@ as_neurovol <- memoise::memoise(.as_neurovol_unmemoised)
 #' }
 #' @export
 #' @rdname get_template_legacy
-get_template_legacy <- function(name="MNI152NLin2009cAsym", desc="brain", resolution=1,
-                               label=NULL, atlas=NULL, suffix="T1w",
-                               extension=".nii.gz") {
+get_template_legacy <- function(
+  name = "MNI152NLin2009cAsym",
+  desc = "brain",
+  resolution = 1,
+  label = NULL,
+  atlas = NULL,
+  suffix = "T1w",
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template(name)",
@@ -472,27 +583,33 @@ get_template_legacy <- function(name="MNI152NLin2009cAsym", desc="brain", resolu
       "Please use the new signature: get_template(space, variant, modality, resolution, ...)."
     )
   )
-  neuroatlas::get_template(space = name,
-                           desc = desc,
-                           resolution = resolution,
-                           label = label,
-                           atlas = atlas,
-                           suffix = suffix,
-                           extension = extension,
-                           variant = NULL,
-                           modality = NULL)
+  neuroatlas::get_template(
+    space = name,
+    desc = desc,
+    resolution = resolution,
+    label = label,
+    atlas = atlas,
+    suffix = suffix,
+    extension = extension,
+    variant = NULL,
+    modality = NULL
+  )
 }
 
 #' Get Brain Mask from Template (DEPRECATED)
 #'
 #' @description
-#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "mask", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "mask", ...)}
+#' instead.
 #'
-#' Convenience function to retrieve a binary brain mask for a specified template.
+#' Convenience function to retrieve a binary brain mask for a specified
+#' template.
 #'
-#' @param name Character string specifying template name. Default: "MNI152NLin2009cAsym"
+#' @param name Character string specifying template name. Default:
+#'   "MNI152NLin2009cAsym"
 #' @param resolution Numeric resolution in mm. Default: 1
-#' @param extension Character string specifying file extension. Default: ".nii.gz"
+#' @param extension Character string specifying file extension. Default:
+#'   ".nii.gz"
 #' @return A NeuroVol object containing the binary brain mask
 #' @seealso The new \code{\link{get_template}}
 #' @md
@@ -504,26 +621,35 @@ get_template_legacy <- function(name="MNI152NLin2009cAsym", desc="brain", resolu
 #' }
 #' }
 #' @export
-get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
-                                  extension=".nii.gz") {
+get_template_brainmask <- function(
+  name = "MNI152NLin2009cAsym",
+  resolution = 1,
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template_brainmask(name)",
     with = "get_template()"
   )
-  neuroatlas::get_template(space = name, variant = "mask", resolution = resolution,
-                           extension = extension)
+  neuroatlas::get_template(
+    space = name,
+    variant = "mask",
+    resolution = resolution,
+    extension = extension
+  )
 }
 
 #' Get Tissue Probability Map from Template (DEPRECATED)
 #'
 #' @description
-#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = ..., ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg",
+#' label = ..., ...)} instead.
 #'
 #' Retrieves probability maps for different tissue types (GM, WM, CSF).
 #'
 #' @inheritParams get_template_brainmask
-#' @param label Character string specifying tissue type ("GM", "WM", or "CSF"). Default: "GM"
+#' @param label Character string specifying tissue type ("GM", "WM", or "CSF").
+#'   Default: "GM"
 #' @return A NeuroVol object containing the probability map
 #' @seealso The new \code{\link{get_template}}
 #' @md
@@ -535,23 +661,34 @@ get_template_brainmask <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' }
 #' }
 #' @export
-get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
-                                resolution=1, extension=".nii.gz") {
+get_template_probseg <- function(
+  name = "MNI152NLin2009cAsym",
+  label = "GM",
+  resolution = 1,
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template_probseg(name)",
     with = "get_template()"
   )
-  neuroatlas::get_template(space = name, variant = "probseg", label = label,
-                           resolution = resolution, extension = extension)
+  neuroatlas::get_template(
+    space = name,
+    variant = "probseg",
+    label = label,
+    resolution = resolution,
+    extension = extension
+  )
 }
 
 #' Get Schaefer Parcellation in Template Space (DEPRECATED)
 #'
 #' @description
-#' **DEPRECATED:** Please use \code{\link{get_template}(atlas = "Schaefer2018", desc = ..., suffix = "dseg", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(atlas = "Schaefer2018",
+#' desc = ..., suffix = "dseg", ...)} instead.
 #'
-#' Retrieves Schaefer cortical parcellation mapped to a specified template space.
+#' Retrieves Schaefer cortical parcellation mapped to a specified template
+#' space.
 #'
 #' @inheritParams get_template_brainmask
 #' @param parcels Number of parcels (400 default)
@@ -567,16 +704,27 @@ get_template_probseg <- function(name="MNI152NLin2009cAsym", label="GM",
 #' }
 #' }
 #' @export
-get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
-                                 parcels=400, networks=17, extension=".nii.gz") {
+get_template_schaefer <- function(
+  name = "MNI152NLin2009cAsym",
+  resolution = 1,
+  parcels = 400,
+  networks = 17,
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template_schaefer(name)",
     with = "get_template()"
   )
   desc_str <- paste0(parcels, "Parcels", networks, "Networks")
-  neuroatlas::get_template(space = name, desc = desc_str, atlas = "Schaefer2018",
-                           suffix = "dseg", resolution = resolution, extension = extension)
+  neuroatlas::get_template(
+    space = name,
+    desc = desc_str,
+    atlas = "Schaefer2018",
+    suffix = "dseg",
+    resolution = resolution,
+    extension = extension
+  )
 }
 
 #' List Available Templates
@@ -588,8 +736,13 @@ get_template_schaefer <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @examples
 #' \donttest{
 #' if (requireNamespace("templateflow", quietly = TRUE)) {
-#'   tryCatch({available <- templates(); head(available)},
-#'     error = function(e) NULL)
+#'   tryCatch(
+#'     {
+#'       available <- templates()
+#'       head(available)
+#'     },
+#'     error = function(e) NULL
+#'   )
 #' }
 #' }
 #' @export
@@ -606,7 +759,8 @@ templates <- function() {
 #' Get Template Head Image (DEPRECATED)
 #'
 #' @description
-#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "head", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "head", ...)}
+#' instead.
 #'
 #' Convenience function to get the full head (non-brain-extracted) template.
 #'
@@ -622,21 +776,29 @@ templates <- function() {
 #' }
 #' }
 #' @export
-get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
-                            extension=".nii.gz") {
+get_template_head <- function(
+  name = "MNI152NLin2009cAsym",
+  resolution = 1,
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template_head(name)",
     with = "get_template()"
   )
-  neuroatlas::get_template(space = name, variant = "head", resolution = resolution,
-                           extension = extension)
+  neuroatlas::get_template(
+    space = name,
+    variant = "head",
+    resolution = resolution,
+    extension = extension
+  )
 }
 
 #' Get CSF Probability Map (DEPRECATED)
 #'
 #' @description
-#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = "CSF", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg",
+#' label = "CSF", ...)} instead.
 #'
 #' Convenience function to get CSF probability map.
 #'
@@ -652,21 +814,30 @@ get_template_head <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' }
 #' }
 #' @export
-get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
-                            extension=".nii.gz") {
+get_template_csf <- function(
+  name = "MNI152NLin2009cAsym",
+  resolution = 1,
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template_csf(name)",
     with = "get_template()"
   )
-  neuroatlas::get_template(space = name, variant = "probseg", label = "CSF",
-                           resolution = resolution, extension = extension)
+  neuroatlas::get_template(
+    space = name,
+    variant = "probseg",
+    label = "CSF",
+    resolution = resolution,
+    extension = extension
+  )
 }
 
 #' Get Gray Matter Probability Map (DEPRECATED)
 #'
 #' @description
-#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = "GM", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg",
+#' label = "GM", ...)} instead.
 #'
 #' Convenience function to get gray matter probability map.
 #'
@@ -682,21 +853,30 @@ get_template_csf <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' }
 #' }
 #' @export
-get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
-                           extension=".nii.gz") {
+get_template_gm <- function(
+  name = "MNI152NLin2009cAsym",
+  resolution = 1,
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template_gm(name)",
     with = "get_template()"
   )
-  neuroatlas::get_template(space = name, variant = "probseg", label = "GM",
-                           resolution = resolution, extension = extension)
+  neuroatlas::get_template(
+    space = name,
+    variant = "probseg",
+    label = "GM",
+    resolution = resolution,
+    extension = extension
+  )
 }
 
 #' Get White Matter Probability Map (DEPRECATED)
 #'
 #' @description
-#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg", label = "WM", ...)} instead.
+#' **DEPRECATED:** Please use \code{\link{get_template}(variant = "probseg",
+#' label = "WM", ...)} instead.
 #'
 #' Convenience function to get white matter probability map.
 #'
@@ -712,31 +892,45 @@ get_template_gm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' }
 #' }
 #' @export
-get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
-                           extension=".nii.gz") {
+get_template_wm <- function(
+  name = "MNI152NLin2009cAsym",
+  resolution = 1,
+  extension = ".nii.gz"
+) {
   lifecycle::deprecate_warn(
     when = "0.10.0",
     what = "get_template_wm(name)",
     with = "get_template()"
   )
-  neuroatlas::get_template(space = name, variant = "probseg", label = "WM",
-                           resolution = resolution, extension = extension)
+  neuroatlas::get_template(
+    space = name,
+    variant = "probseg",
+    label = "WM",
+    resolution = resolution,
+    extension = extension
+  )
 }
 
 # ---- Surface Template Functions ----
 
 #' @rdname get_template
 #' @param template_id The main TemplateFlow template identifier for the surface
-#'        (e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to `get_template`.
-#' @param surface_type A character string indicating the type of surface to retrieve.
-#'        Common values include: "pial", "white", "inflated", "midthickness", "sphere".
+#'        (e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to
+#' `get_template`.
+#' @param surface_type A character string indicating the type of surface to
+#'   retrieve.
+#'        Common values include: "pial", "white", "inflated", "midthickness",
+#' "sphere".
 #'        This is passed as the `suffix` argument to `get_template`.
-#' @param hemi Character string, "L" for left hemisphere or "R" for right hemisphere.
+#' @param hemi Character string, "L" for left hemisphere or "R" for right
+#'   hemisphere.
 #'        Passed as `hemi` to `get_template`.
 #' @param density (Optional) Character string specifying the surface density
-#'        (e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to TemplateFlow
+#'        (e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to
+#' TemplateFlow
 #'        as `density`.
-#' @param resolution (Optional) Character string specifying the resolution, primarily for
+#' @param resolution (Optional) Character string specifying the resolution,
+#'   primarily for
 #'        fsaverage variants (e.g., "06" for fsaverage6).
 #' @param load_as_path Logical, whether to return only the path to the file.
 #'        Defaults to `TRUE`.
@@ -746,16 +940,22 @@ get_template_wm <- function(name="MNI152NLin2009cAsym", resolution=1,
 #' @export
 #' @examples
 #' \donttest{
-#'   # Get the pial surface for the left hemisphere of fsLR 32k template (as path)
-#'   # fslr_pial_L_path <- get_surface_template(template_id = "fsLR", surface_type = "pial",
-#'   #                                        hemi = "L", density = "32k")
-#'   # print(fslr_pial_L_path)
+#' # Get the pial surface for the left hemisphere of fsLR 32k template (as path)
+#' # fslr_pial_L_path <- get_surface_template(
+#' #   template_id = "fsLR", surface_type = "pial",
+#' #   hemi = "L", density = "32k"
+#' # )
+#' # print(fslr_pial_L_path)
 #' }
-get_surface_template <- function(template_id, surface_type, hemi,
-                                 density = NULL, resolution = NULL,
-                                 ...,
-                                 load_as_path = TRUE) {
-
+get_surface_template <- function(
+  template_id,
+  surface_type,
+  hemi,
+  density = NULL,
+  resolution = NULL,
+  ...,
+  load_as_path = TRUE
+) {
   if (!is.character(template_id) || length(template_id) != 1) {
     stop("'template_id' must be a single character string.")
   }
@@ -811,7 +1011,8 @@ get_surface_template <- function(template_id, surface_type, hemi,
 #'   argument).
 #' @param resolution Optional resolution string (TemplateFlow \code{res}
 #'   argument), e.g., "06" for fsaverage6.
-#' @param ... Additional arguments forwarded to \code{\link{get_surface_template}}.
+#' @param ... Additional arguments forwarded to
+#'   \code{\link{get_surface_template}}.
 #'
 #' @return A \code{neurosurf::SurfaceGeometry} object when \code{hemi} is "L"
 #'   or "R"; a named list of two \code{SurfaceGeometry} objects when
@@ -819,20 +1020,27 @@ get_surface_template <- function(template_id, surface_type, hemi,
 #'
 #' @examples
 #' \dontrun{
-#'   # fsaverage6 pial surface as NeuroSurface
-#'   lh <- load_surface_template("fsaverage", "pial", hemi = "L",
-#'                               density = "41k", resolution = "06")
+#' # fsaverage6 pial surface as NeuroSurface
+#' lh <- load_surface_template("fsaverage", "pial",
+#'   hemi = "L",
+#'   density = "41k", resolution = "06"
+#' )
 #'
-#'   # Both hemispheres of fsLR 32k inflated surface
-#'   both <- load_surface_template("fsLR", "inflated", hemi = "both",
-#'                                 density = "32k")
+#' # Both hemispheres of fsLR 32k inflated surface
+#' both <- load_surface_template("fsLR", "inflated",
+#'   hemi = "both",
+#'   density = "32k"
+#' )
 #' }
 #' @export
-load_surface_template <- function(template_id, surface_type,
-                                  hemi = c("L", "R", "both"),
-                                  density = NULL,
-                                  resolution = NULL,
-                                  ...) {
+load_surface_template <- function(
+  template_id,
+  surface_type,
+  hemi = c("L", "R", "both"),
+  density = NULL,
+  resolution = NULL,
+  ...
+) {
   hemi <- match.arg(hemi)
 
   fetch_one <- function(h) {
@@ -848,9 +1056,17 @@ load_surface_template <- function(template_id, surface_type,
 
     .attach_template_metadata(
       .read_surface_template_geometry(surf_path, hemi = h),
-      surf_path, template_id,
-      query = c(list(suffix = surface_type, hemi = h, density = density,
-                      resolution = resolution), list(...)),
+      surf_path,
+      template_id,
+      query = c(
+        list(
+          suffix = surface_type,
+          hemi = h,
+          density = density,
+          resolution = resolution
+        ),
+        list(...)
+      ),
       representation = "surface"
     )
   }
@@ -864,10 +1080,12 @@ load_surface_template <- function(template_id, surface_type,
   fetch_one(hemi)
 }
 
-.read_surface_template_geometry <- function(surf_path,
-                                            hemi,
-                                            geometry_reader = neurosurf::read_surf_geometry,
-                                            gifti_reader = NULL) {
+.read_surface_template_geometry <- function(
+  surf_path,
+  hemi,
+  geometry_reader = neurosurf::read_surf_geometry,
+  gifti_reader = NULL
+) {
   primary <- tryCatch(
     geometry_reader(surf_path),
     error = function(e) e
@@ -940,8 +1158,7 @@ load_surface_template <- function(template_id, surface_type,
 }
 
 .surface_template_hemi_label <- function(hemi) {
-  switch(
-    as.character(hemi),
+  switch(as.character(hemi),
     L = "left",
     LH = "left",
     lh = "left",
@@ -960,13 +1177,15 @@ load_surface_template <- function(template_id, surface_type,
 #'
 #' Removes cached files and clears in-memory memoisation.
 #'
-#' @param confirm Logical. If `TRUE` (the default), asks for interactive confirmation.
-#' @return Invisibly returns `TRUE` if the cache was cleared, `FALSE` if aborted.
+#' @param confirm Logical. If `TRUE` (the default), asks for interactive
+#'   confirmation.
+#' @return Invisibly returns `TRUE` if the cache was cleared, `FALSE` if
+#'   aborted.
 #' @export
 #' @examples
 #' \dontrun{
-#'   clear_templateflow_cache()
-#'   clear_templateflow_cache(confirm = FALSE)
+#' clear_templateflow_cache()
+#' clear_templateflow_cache(confirm = FALSE)
 #' }
 clear_templateflow_cache <- function(confirm = TRUE) {
   proceed <- FALSE
@@ -989,18 +1208,26 @@ clear_templateflow_cache <- function(confirm = TRUE) {
 
   # Clear the templateflow R package cache if available
   if (requireNamespace("templateflow", quietly = TRUE)) {
-    tryCatch({
-      templateflow::tf_cache_wipe()
-      message("Successfully cleared templateflow disk cache.")
-    }, error = function(e) {
-      message("Could not clear templateflow cache: ", e$message)
-    })
+    tryCatch(
+      {
+        templateflow::tf_cache_wipe()
+        message("Successfully cleared templateflow disk cache.")
+      },
+      error = function(e) {
+        message("Could not clear templateflow cache: ", e$message)
+      }
+    )
   }
 
   # Also clear the neuroatlas-specific cache dir (legacy)
   tf_cache_dir <- .neuroatlas_cache_dir("templateflow")
   if (dir.exists(tf_cache_dir)) {
-    items_to_delete <- list.files(tf_cache_dir, all.files = TRUE, no.. = TRUE, full.names = TRUE)
+    items_to_delete <- list.files(
+      tf_cache_dir,
+      all.files = TRUE,
+      no.. = TRUE,
+      full.names = TRUE
+    )
     if (length(items_to_delete) > 0) {
       unlink(items_to_delete, recursive = TRUE, force = TRUE)
       message("Cleared legacy neuroatlas cache: ", tf_cache_dir)
@@ -1008,12 +1235,15 @@ clear_templateflow_cache <- function(confirm = TRUE) {
   }
 
   # Clear NeuroVol memoisation
-  tryCatch({
-    memoise::forget(as_neurovol)
-    message("Cleared in-memory memoisation cache for NeuroVol loading.")
-  }, error = function(e) {
-    # Ignore - memoise cache may not exist yet
-  })
+  tryCatch(
+    {
+      memoise::forget(as_neurovol)
+      message("Cleared in-memory memoisation cache for NeuroVol loading.")
+    },
+    error = function(e) {
+      # Ignore - memoise cache may not exist yet
+    }
+  )
 
   invisible(TRUE)
 }
@@ -1023,18 +1253,26 @@ clear_templateflow_cache <- function(confirm = TRUE) {
 #' Returns the path to the TemplateFlow cache directory. With the pure R
 #' \code{templateflow} package, this is the \code{TEMPLATEFLOW_HOME} directory.
 #'
-#' @return A character string representing the path to the TemplateFlow cache directory.
+#' @return A character string representing the path to the TemplateFlow cache
+#'   directory.
 #' @export
 #' @examples
+#' \donttest{
 #' cat("TemplateFlow cache is at:", show_templateflow_cache_path(), "\n")
+#' }
 show_templateflow_cache_path <- function() {
   if (requireNamespace("templateflow", quietly = TRUE)) {
-    cache_path <- tryCatch({
-      client <- templateflow::tf_client()
-      client$cache$config$root
-    }, error = function(e) NULL)
-    if (is.character(cache_path) && length(cache_path) == 1L &&
-        !is.na(cache_path) && nzchar(cache_path)) {
+    cache_path <- tryCatch(
+      {
+        client <- templateflow::tf_client()
+        client$cache$config$root
+      },
+      error = function(e) NULL
+    )
+    if (
+      is.character(cache_path) && length(cache_path) == 1L &&
+        !is.na(cache_path) && nzchar(cache_path)
+    ) {
       return(cache_path)
     }
   }
@@ -1046,10 +1284,12 @@ show_templateflow_cache_path <- function() {
 
 #' List Available TemplateFlow Template Spaces
 #'
-#' Retrieves a list of all available template space identifiers from the TemplateFlow archive.
+#' Retrieves a list of all available template space identifiers from the
+#' TemplateFlow archive.
 #'
 #' @param pattern (Optional) A character string containing a regular expression
-#'   to filter the template space names. If `NULL` (default), all names are returned.
+#'   to filter the template space names. If `NULL` (default), all names are
+#' returned.
 #' @param api_handle Deprecated and ignored.
 #' @param ... Additional arguments passed to `grep` if `pattern` is specified
 #'   (e.g., `ignore.case = TRUE`).
@@ -1057,21 +1297,24 @@ show_templateflow_cache_path <- function() {
 #' @export
 #' @examples
 #' \donttest{
-#'   # List all template spaces
-#'   # all_spaces <- tflow_spaces()
+#' # List all template spaces
+#' # all_spaces <- tflow_spaces()
 #'
-#'   # List template spaces containing "MNI"
-#'   # mni_spaces <- tflow_spaces(pattern = "MNI")
+#' # List template spaces containing "MNI"
+#' # mni_spaces <- tflow_spaces(pattern = "MNI")
 #' }
 tflow_spaces <- function(pattern = NULL, api_handle = NULL, ...) {
   .ensure_templateflow()
 
-  available <- tryCatch({
-    templateflow::tf_templates()
-  }, error = function(e) {
-    warning("Could not retrieve available TemplateFlow template spaces: ", e$message)
-    return(NULL)
-  })
+  available <- tryCatch(
+    {
+      templateflow::tf_templates()
+    },
+    error = function(e) {
+      warning("Could not retrieve available TemplateFlow template spaces: ", e$message)
+      return(NULL)
+    }
+  )
 
   if (is.null(available)) {
     return(NULL)
@@ -1095,16 +1338,17 @@ tflow_spaces <- function(pattern = NULL, api_handle = NULL, ...) {
 #' @param space Character string. The TemplateFlow identifier for the template
 #'   space (e.g., "MNI152NLin2009cAsym").
 #' @param query_args (Optional) A named list of additional query parameters to
-#'   filter the results (e.g., `list(suffix = "T1w", resolution = 1, desc = "brain")`).
+#'   filter the results (e.g., `list(suffix = "T1w", resolution = 1, desc =
+#' "brain")`).
 #' @param api_handle Deprecated and ignored.
 #' @return A character vector of file paths matching the query. Returns an empty
 #'   vector if no files match.
 #' @export
 #' @examples
 #' \donttest{
-#'   # List all T1w files for MNI152NLin2009cAsym template
-#'   # mni_t1w_files <- tflow_files("MNI152NLin2009cAsym",
-#'   #                              query_args = list(suffix = "T1w"))
+#' # List all T1w files for MNI152NLin2009cAsym template
+#' # mni_t1w_files <- tflow_files("MNI152NLin2009cAsym",
+#' #                              query_args = list(suffix = "T1w"))
 #' }
 tflow_files <- function(space, query_args = list(), api_handle = NULL) {
   .ensure_templateflow()
@@ -1119,29 +1363,40 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
   # Build the arguments for tf_ls
   args <- c(list(template = space), query_args)
 
-  tryCatch({
-    do.call(templateflow::tf_ls, args)
-  }, error = function(e) {
-    warning("TemplateFlow query error: ", e$message)
-    character(0)
-  })
+  tryCatch(
+    {
+      do.call(templateflow::tf_ls, args)
+    },
+    error = function(e) {
+      warning("TemplateFlow query error: ", e$message)
+      character(0)
+    }
+  )
 }
 
 # ---- Inter-package Integration Helpers ----
 
 #' Resolve Template Input to NeuroVol or NeuroSpace
 #'
-#' Internal helper function that takes a flexible input representing a neuroimaging
-#' template and resolves it to either a \code{NeuroVol} or \code{NeuroSpace} object.
+#' Internal helper function that takes a flexible input representing a
+#' neuroimaging
+#' template and resolves it to either a \code{NeuroVol} or \code{NeuroSpace}
+#' object.
 #'
-#' @param input The input to resolve. Can be a \code{NeuroVol}, \code{NeuroSpace},
-#'   a TemplateFlow space string, or a named list of \code{get_template()} arguments.
+#' @param input The input to resolve. Can be a \code{NeuroVol},
+#'   \code{NeuroSpace},
+#'   a TemplateFlow space string, or a named list of \code{get_template()}
+#' arguments.
 #' @param target_type "NeuroVol" (default) or "NeuroSpace".
 #' @param api_handle Deprecated and ignored.
 #' @return An object of the specified \code{target_type}.
 #' @keywords internal
 #' @importFrom neuroim2 space
-.resolve_template_input <- function(input, target_type = "NeuroVol", api_handle = NULL) {
+.resolve_template_input <- function(
+  input,
+  target_type = "NeuroVol",
+  api_handle = NULL
+) {
   if (!target_type %in% c("NeuroVol", "NeuroSpace")) {
     stop("'target_type' must be either 'NeuroVol' or 'NeuroSpace'.")
   }
@@ -1154,29 +1409,48 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
     if (target_type == "NeuroSpace") {
       return(input)
     } else {
-      stop("Input is a NeuroSpace, but target_type is NeuroVol. ",
-           "Cannot convert NeuroSpace to NeuroVol without more information.")
+      stop(
+        "Input is a NeuroSpace, but target_type is NeuroVol. ",
+        "Cannot convert NeuroSpace to NeuroVol without more information."
+      )
     }
   } else if (is.character(input) && length(input) == 1) {
-    message("Resolving template input string '", input,
-            "' as a TemplateFlow space ID with default parameters.")
-    resolved_vol <- tryCatch({
-      get_template(space = input)
-    }, error = function(e) {
-      stop("Failed to resolve template string '", input,
-           "' via get_template(): ", conditionMessage(e))
-    })
+    message(
+      "Resolving template input string '",
+      input,
+      "' as a TemplateFlow space ID with default parameters."
+    )
+    resolved_vol <- tryCatch(
+      {
+        get_template(space = input)
+      },
+      error = function(e) {
+        stop(
+          "Failed to resolve template string '",
+          input,
+          "' via get_template(): ",
+          conditionMessage(e)
+        )
+      }
+    )
   } else if (is.list(input)) {
     message("Resolving template input list via do.call(get_template, ...).")
-    resolved_vol <- tryCatch({
-      do.call(get_template, input)
-    }, error = function(e) {
-      stop("Failed to resolve template list via get_template(): ",
-           conditionMessage(e))
-    })
+    resolved_vol <- tryCatch(
+      {
+        do.call(get_template, input)
+      },
+      error = function(e) {
+        stop(
+          "Failed to resolve template list via get_template(): ",
+          conditionMessage(e)
+        )
+      }
+    )
   } else {
-    stop("Invalid 'input' type. Must be a NeuroVol, NeuroSpace, ",
-         "template name (string), or list of get_template() arguments.")
+    stop(
+      "Invalid 'input' type. Must be a NeuroVol, NeuroSpace, ",
+      "template name (string), or list of get_template() arguments."
+    )
   }
 
   if (is.null(resolved_vol)) {
@@ -1199,16 +1473,24 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 # Helper: Validate template space
 .validate_template_space <- function(space) {
   .ensure_templateflow()
-  available <- tryCatch({
-    templateflow::tf_templates()
-  }, error = function(e) {
-    warning("Could not retrieve available templates: ", e$message)
-    return(NULL)
-  })
+  available <- tryCatch(
+    {
+      templateflow::tf_templates()
+    },
+    error = function(e) {
+      warning("Could not retrieve available templates: ", e$message)
+      return(NULL)
+    }
+  )
 
   if (!is.null(available) && !(space %in% available)) {
-    stop("Template space '", space, "' not found. ",
-         "Available: ", paste(available, collapse = ", "))
+    stop(
+      "Template space '",
+      space,
+      "' not found. ",
+      "Available: ",
+      paste(available, collapse = ", ")
+    )
   }
 }
 
@@ -1217,22 +1499,43 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
   .ensure_templateflow()
 
   # Check if any files exist for this space+resolution combo
-  files <- tryCatch({
-    templateflow::tf_ls(template = space, resolution = as.integer(resolution))
-  }, error = function(e) NULL)
+  files <- tryCatch(
+    {
+      templateflow::tf_ls(template = space, resolution = as.integer(resolution))
+    },
+    error = function(e) NULL
+  )
 
   if (!is.null(files) && length(files) == 0) {
     # Try to find what resolutions ARE available
-    all_files <- tryCatch({
-      templateflow::tf_ls(template = space, as_df = TRUE)
-    }, error = function(e) NULL)
+    all_files <- tryCatch(
+      {
+        templateflow::tf_ls(template = space, as_df = TRUE)
+      },
+      error = function(e) NULL
+    )
 
-    if (!is.null(all_files) && is.data.frame(all_files) &&
-        nrow(all_files) > 0 && "resolution" %in% names(all_files)) {
-      avail_res <- sort(unique(all_files$resolution[!is.na(all_files$resolution)]))
+    if (
+      !is.null(all_files) && is.data.frame(all_files) &&
+        nrow(all_files) > 0 && "resolution" %in% names(all_files)
+    ) {
+      avail_res <- sort(
+        unique(
+          all_files$resolution[!is.na(
+            all_files$resolution
+          )]
+        )
+      )
       if (length(avail_res) > 0) {
-        stop("Resolution '", resolution, "' not available for ", space, ". ",
-             "Available: ", paste(avail_res, collapse = ", "))
+        stop(
+          "Resolution '",
+          resolution,
+          "' not available for ",
+          space,
+          ". ",
+          "Available: ",
+          paste(avail_res, collapse = ", ")
+        )
       }
     }
   }
@@ -1242,8 +1545,14 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 
 # ---- Parameter Inference Helpers ----
 
-.infer_template_params <- function(variant, modality, desc, suffix, label,
-                                  desc_missing = FALSE) {
+.infer_template_params <- function(
+  variant,
+  modality,
+  desc,
+  suffix,
+  label,
+  desc_missing = FALSE
+) {
   # Variant to desc mapping
   desc_map <- c(
     brain = "brain",
@@ -1274,8 +1583,10 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
       final_desc <- NULL
     } else if (!is.null(variant) && variant %in% names(desc_map)) {
       final_desc <- unname(desc_map[variant])
-    } else if (!is.null(suffix) &&
-               suffix %in% c("probseg", "dseg", "mask", surface_suffixes)) {
+    } else if (
+      !is.null(suffix) &&
+        suffix %in% c("probseg", "dseg", "mask", surface_suffixes)
+    ) {
       final_desc <- NULL
     } else if (is.null(variant)) {
       # Default volumetric desc when nothing else is specified
@@ -1299,7 +1610,14 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 
   # Validate we have required parameters
   if (is.null(final_desc)) {
-    if (!is.null(final_suffix) && final_suffix %in% c("probseg", "dseg", "mask", surface_suffixes)) {
+    if (
+      !is.null(final_suffix) && final_suffix %in% c(
+        "probseg",
+        "dseg",
+        "mask",
+        surface_suffixes
+      )
+    ) {
       # OK: these file types are fully determined by suffix
     } else {
       stop("Could not determine 'desc'. Provide explicitly or use a supported variant.")
@@ -1318,8 +1636,17 @@ tflow_files <- function(space, query_args = list(), api_handle = NULL) {
 }
 
 # Helper: Build query arguments for templateflow::tf_get()
-.build_query_args <- function(space, resolution, desc, suffix,
-                             label, atlas, cohort, extension, ...) {
+.build_query_args <- function(
+  space,
+  resolution,
+  desc,
+  suffix,
+  label,
+  atlas,
+  cohort,
+  extension,
+  ...
+) {
   args <- list(
     template = space,
     desc = desc,

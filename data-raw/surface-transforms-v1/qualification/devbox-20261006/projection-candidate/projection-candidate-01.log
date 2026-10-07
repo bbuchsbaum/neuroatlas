@@ -1,0 +1,3 @@
+Error in cbind(index, 1) %*% t(affine) : 
+  requires numeric/complex matrix/vector arguments
+Execution halted

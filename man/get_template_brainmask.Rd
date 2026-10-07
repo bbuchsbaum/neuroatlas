@@ -11,19 +11,23 @@ get_template_brainmask(
 )
 }
 \arguments{
-\item{name}{Character string specifying template name. Default: "MNI152NLin2009cAsym"}
+\item{name}{Character string specifying template name. Default:
+"MNI152NLin2009cAsym"}
 
 \item{resolution}{Numeric resolution in mm. Default: 1}
 
-\item{extension}{Character string specifying file extension. Default: ".nii.gz"}
+\item{extension}{Character string specifying file extension. Default:
+".nii.gz"}
 }
 \value{
 A NeuroVol object containing the binary brain mask
 }
 \description{
-\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "mask", ...)} instead.
+\strong{DEPRECATED:} Please use \code{\link{get_template}(variant = "mask", ...)}
+instead.
 
-Convenience function to retrieve a binary brain mask for a specified template.
+Convenience function to retrieve a binary brain mask for a specified
+template.
 }
 \examples{
 \donttest{

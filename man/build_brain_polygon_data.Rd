@@ -13,7 +13,8 @@ build_brain_polygon_data(
 )
 }
 \arguments{
-\item{surfatlas}{A surfatlas object (e.g. from \code{\link{schaefer_surf}()}).}
+\item{surfatlas}{A surfatlas object (e.g. from
+\code{\link{schaefer_surf}()}).}
 
 \item{views}{Character vector of views to render
 (e.g. \code{c("lateral", "medial")}).}
@@ -40,4 +41,13 @@ A list with two elements:
 Projects surface atlas geometry into 2D polygon panels for each
 hemisphere and view. Results are memoised so repeated calls with
 identical arguments return cached data.
+}
+\examples{
+\dontrun{
+atlas <- get_schaefer_surfatlas(100)
+polygons <- build_brain_polygon_data(atlas,
+  views = "lateral",
+  surface = "inflated"
+)
+}
 }

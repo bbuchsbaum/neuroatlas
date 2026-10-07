@@ -1,4 +1,28 @@
-# neuroatlas 0.1.0.9006
+# neuroatlas 0.2.0
+
+* `get_surface_geometry()` fetches checksum-locked fsaverage 164k and fsLR 32k
+  registration geometry, masks and vertex areas. Exact domains admit directed
+  native surface routes through `get_template_transform()` and
+  `apply_template_transform()`; broad surface aliases remain planned.
+
+* `get_surface_projection()` adds population cortical projection from exact
+  MNI152NLin6Asym and MNI152NLin2009cAsym templates. `transform_atlas()` accepts
+  an exact cortical destination and retains source atlas identity and labels.
+  Probability channels keep partial mass; unsupported samples remain missing.
+  `ribbon_projection()` provides separate caller-aligned white/pial sampling.
+  Numerical qualification is scoped to pinned inputs, methods and grids.
+
+* Verified surface inputs reuse the transform cache with checksum validation,
+  offline replay and selective cleanup. The native engine is pinned to its
+  qualified revision; neuroim2 >= 0.19.0 is now required.
+
+* Generic MNI305/MNI152 coordinate affines are described as approximate family
+  transforms rather than exact template correspondence.
+
+* Package CI uses neuroatlas's coding conventions, generated documentation,
+  package checks, website builds and coverage measurement. Complexity review
+  and rOpenSci recommendations remain advisory. The unused eco-atlas workflow
+  runs only on explicit request.
 
 * `query_point()` gains `nearest = TRUE`, which returns one row per point and
   atlas: the containing region at distance 0, otherwise the closest labelled

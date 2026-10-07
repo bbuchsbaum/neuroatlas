@@ -15,3 +15,9 @@ Invisibly returns `x` when valid.
 \description{
 Validate an Atlas Reference
 }
+\examples{
+ref <- new_atlas_ref("toy", "two-regions",
+  template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+)
+validate_atlas_ref(ref)
+}

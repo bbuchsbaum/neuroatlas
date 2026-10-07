@@ -1,0 +1,142 @@
+{
+  "status": "PASS",
+  "contract_sha256": "fa352ef22bcad2a7ad23c3cc9fd1fc1245594c61775f639c2fb04e66800c0de4",
+  "consumer_receipt_sha256": "22e949c1bad6bbdfc8bc0a66d7af7fd195195e20d36a1a13f2d07a8a6a8946db",
+  "reference_driver_sha256": "80e9a90e301a936a2c0fc1cf27be7a3bb574860d661d51c1e6a834272914be92",
+  "workbench_version": "Connectome Workbench\nType: Command Line Application\nVersion: 1.5.0\nQt Compiled Version: 5.15.12\nQt Runtime Version: 5.15.13\nCommit: unknown\nCommit Date: unknown\nCompiled with OpenMP: YES\nCompiler: c++ (/usr/bin)\nCompiler Version: 13.2.0\nCompiled Debug: NO\nOperating System: Linux\n",
+  "simpleitk_version": "2.5.3",
+  "workbench_binary_sha256": "145dd934dfba4a5d0c7e5d754580d66ab7135c23d999d93f1aa63860dcce1ec9",
+  "projection_cases": [
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-L-continuous",
+      "points": 163842,
+      "included": 149955,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 7.651913619399764e-08,
+      "reference_metric_sha256": "6516922841b6092584782025408066035f6f1f5235349820753cd57bcf08f697"
+    },
+    {
+      "name": "MNI152NLin6Asym-1-fsaverage-R-continuous",
+      "points": 163842,
+      "included": 149926,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 8.147524560575548e-08,
+      "reference_metric_sha256": "ee760b05ab43cf868cc1e361ee28cc5d2ad2d45fb5a3f06335c1fbc54b022904"
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-L-continuous",
+      "points": 163842,
+      "included": 149955,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 7.70578448272552e-08,
+      "reference_metric_sha256": "88ff58a9a803669ae407da8d92afd49874b054e4dab2e79434a6bfa71c7764a4"
+    },
+    {
+      "name": "MNI152NLin6Asym-2-fsaverage-R-continuous",
+      "points": 163842,
+      "included": 149926,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 8.49454461770982e-08,
+      "reference_metric_sha256": "c7152cb610c5e513ecf32a67c360407962ef6e5bc4928566c0af3a5a5427c345"
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-L-continuous",
+      "points": 163842,
+      "included": 149955,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 7.67108758181756e-08,
+      "reference_metric_sha256": "284853bb7deff48f7e935feba37323e6504fe8a153dac7ae47b64b776b8ca073"
+    },
+    {
+      "name": "MNI152NLin2009cAsym-1-fsaverage-R-continuous",
+      "points": 163842,
+      "included": 149926,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 8.097004994267465e-08,
+      "reference_metric_sha256": "6405e730fb3c71ea0bad343aeb5c51b3f7ba789cfaabf276d02befe4653e5fb2"
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-L-continuous",
+      "points": 163842,
+      "included": 149955,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 7.683137059899536e-08,
+      "reference_metric_sha256": "de8af53fa25ce7fb93ecfc982dfb3a1b14ec34a83060ab85948807cc9dd655b4"
+    },
+    {
+      "name": "MNI152NLin2009cAsym-2-fsaverage-R-continuous",
+      "points": 163842,
+      "included": 149926,
+      "maximum_point_error_mm": 0.0,
+      "workbench_maximum_scalar_error": 8.72968317078282e-08,
+      "reference_metric_sha256": "07af730d0be3f14d914db30ce5b874c84ff3b93e9b822562eacfd1574a8890f4"
+    }
+  ],
+  "target_ordering_audit": [
+    {
+      "hemisphere": "L",
+      "upstream_sha256": "9bf5b673cc1c4738b1137ac53ff724ff0ef45e12f5550448efa2da50bb521c32",
+      "pinned_sha256": "3b9219cb95973baa491f0663562d78c3a1f5cf8d2da87294e3bcabb8bb0ad24c",
+      "ordered_triangles_equal": true,
+      "nearest_vertex_index_mismatches": 0,
+      "maximum_coordinate_difference": 0.0064849853515625,
+      "maximum_matched_vertex_distance": 0.008032683675449409
+    },
+    {
+      "hemisphere": "R",
+      "upstream_sha256": "a2fada23394286212f38cd44303bce0b3252759e09fe693f92d463286ca28b45",
+      "pinned_sha256": "76fdf4066dd52e867e1d768f059caf1342bd4c957b3f016eab5774e9701d30fb",
+      "ordered_triangles_equal": true,
+      "nearest_vertex_index_mismatches": 0,
+      "maximum_coordinate_difference": 0.0064849853515625,
+      "maximum_matched_vertex_distance": 0.008032683675449409
+    }
+  ],
+  "source_frame_audit": {
+    "canonical_shape": [
+      182,
+      218,
+      182
+    ],
+    "canonical_affine": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -91.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -126.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -72.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "changed_whole_volume_voxels": 38359,
+    "limitation": "Whole volumes differ; equivalence is restricted to sampled cortical support",
+    "hemispheres": [
+      {
+        "hemisphere": "L",
+        "sampled_cortical_vertices": 149955,
+        "maximum_sampled_reference_image_difference": 0.0
+      },
+      {
+        "hemisphere": "R",
+        "sampled_cortical_vertices": 149926,
+        "maximum_sampled_reference_image_difference": 0.0
+      }
+    ]
+  }
+}

@@ -7,12 +7,15 @@
 show_templateflow_cache_path()
 }
 \value{
-A character string representing the path to the TemplateFlow cache directory.
+A character string representing the path to the TemplateFlow cache
+  directory.
 }
 \description{
 Returns the path to the TemplateFlow cache directory. With the pure R
 \code{templateflow} package, this is the \code{TEMPLATEFLOW_HOME} directory.
 }
 \examples{
+\donttest{
 cat("TemplateFlow cache is at:", show_templateflow_cache_path(), "\n")
+}
 }

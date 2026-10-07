@@ -1,0 +1,1 @@
+{"actor":"codex-gcloud-devbox","entity":"bd-01M3CCBG9346NRV3WEVH5YNBCQ","kind":"reserve_open","mode":"exclusive","op":"20261006T210352.768165Z-p182365-c0000-r26d3-hb40c86","paths":["tests/testthat/test-surface-domain.R"],"reservation_id":"rv-01M49GFBE09B47S4ZMR8H6TJZY","ts":"2026-10-06T21:03:52.768165Z","ttl_s":28800,"v":2}

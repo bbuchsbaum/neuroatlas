@@ -19,10 +19,12 @@ map_atlas(x, vals, thresh, ...)
 \arguments{
 \item{x}{An atlas object to map values onto}
 
-\item{vals}{Numeric vector of values to map to atlas regions. Length should match
+\item{vals}{Numeric vector of values to map to atlas regions. Length should
+match
 the number of regions in the atlas}
 
-\item{thresh}{Optional numeric vector of length 2 specifying (min, max) thresholds
+\item{thresh}{Optional numeric vector of length 2 specifying (min, max)
+thresholds
 for the mapped values. Values outside this range will be clamped.}
 
 \item{...}{Additional arguments passed to methods}

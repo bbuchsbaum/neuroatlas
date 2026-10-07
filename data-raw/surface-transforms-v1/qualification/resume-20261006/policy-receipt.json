@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "cases": {
+    "fsaverage-164k-L_to_fsLR-32k-L": {
+      "full_rows": 32492,
+      "all_source_pass": true,
+      "full_masked_continuous_max_error": 2.2204460492503131e-16
+    },
+    "fsLR-32k-L_to_fsaverage-164k-L": {
+      "full_rows": 163842,
+      "all_source_pass": true,
+      "full_masked_continuous_max_error": 3.3306690738754696e-16
+    },
+    "fsaverage-164k-R_to_fsLR-32k-R": {
+      "full_rows": 32492,
+      "all_source_pass": true,
+      "full_masked_continuous_max_error": 2.2204460492503131e-16
+    },
+    "fsLR-32k-R_to_fsaverage-164k-R": {
+      "full_rows": 163842,
+      "all_source_pass": true,
+      "full_masked_continuous_max_error": 3.3306690738754696e-16
+    }
+  },
+  "script_sha256": "1dbf48427188e07af3dbea23124c9b827a1c29ca226aa90716c015b59c063273"
+}

@@ -6,8 +6,10 @@
 #' assessing correspondence between atlases, or mapping regions from one atlas
 #' to another.
 #'
-#' @param atlas1 An atlas object (with \code{$atlas}, \code{$ids}, \code{$labels}).
-#' @param atlas2 An atlas object (with \code{$atlas}, \code{$ids}, \code{$labels}).
+#' @param atlas1 An atlas object (with \code{$atlas}, \code{$ids},
+#'   \code{$labels}).
+#' @param atlas2 An atlas object (with \code{$atlas}, \code{$ids},
+#'   \code{$labels}).
 #' @param metrics Character vector of overlap metrics to compute. One or more of
 #'   \code{"dice"} and \code{"jaccard"}. Default is both.
 #' @param min_overlap Integer. Minimum number of overlapping voxels for a pair
@@ -40,9 +42,12 @@
 #' @importFrom methods is
 #' @importFrom tibble tibble
 #' @export
-atlas_overlap <- function(atlas1, atlas2,
-                          metrics = c("dice", "jaccard"),
-                          min_overlap = 0) {
+atlas_overlap <- function(
+  atlas1,
+  atlas2,
+  metrics = c("dice", "jaccard"),
+  min_overlap = 0
+) {
   metrics <- match.arg(metrics, c("dice", "jaccard"), several.ok = TRUE)
   min_overlap <- as.integer(min_overlap)
 
@@ -54,9 +59,11 @@ atlas_overlap <- function(atlas1, atlas2,
   dims2 <- dim(vol2)[1:3]
   if (!all(dims1 == dims2)) {
     # Try resampling atlas2 into atlas1's space
-    if (requireNamespace("neuroim2", quietly = TRUE) &&
+    if (
+      requireNamespace("neuroim2", quietly = TRUE) &&
         !is.null(tryCatch(neuroim2::space(vol1), error = function(e) NULL)) &&
-        !is.null(tryCatch(neuroim2::space(vol2), error = function(e) NULL))) {
+        !is.null(tryCatch(neuroim2::space(vol2), error = function(e) NULL))
+    ) {
       vol2 <- tryCatch(
         neuroim2::resample(vol2, neuroim2::space(vol1)),
         error = function(e) NULL
@@ -65,10 +72,13 @@ atlas_overlap <- function(atlas1, atlas2,
       vol2 <- NULL
     }
     if (is.null(vol2)) {
-      stop("Atlas dimensions do not match (",
-           paste(dims1, collapse = "x"), " vs ",
-           paste(dims2, collapse = "x"),
-           ") and resampling failed.")
+      stop(
+        "Atlas dimensions do not match (",
+        paste(dims1, collapse = "x"),
+        " vs ",
+        paste(dims2, collapse = "x"),
+        ") and resampling failed."
+      )
     }
   }
 
@@ -84,7 +94,7 @@ atlas_overlap <- function(atlas1, atlas2,
   n2_map <- as.integer(tab2)
   names(n2_map) <- names(tab2)
 
- # Co-occurrence counting (vectorised)
+  # Co-occurrence counting (vectorised)
   mask <- arr1 != 0L & arr2 != 0L
   if (!any(mask)) {
     # No overlap at all: return empty tibble
@@ -119,8 +129,18 @@ atlas_overlap <- function(atlas1, atlas2,
   n_atlas2 <- n2_map[as.character(id2)]
 
   # Build label lookup
-  label1_map <- stats::setNames(as.character(atlas1$labels), as.character(atlas1$ids))
-  label2_map <- stats::setNames(as.character(atlas2$labels), as.character(atlas2$ids))
+  label1_map <- stats::setNames(
+    as.character(atlas1$labels),
+    as.character(
+      atlas1$ids
+    )
+  )
+  label2_map <- stats::setNames(
+    as.character(atlas2$labels),
+    as.character(
+      atlas2$ids
+    )
+  )
   atlas1_label <- unname(label1_map[as.character(id1)])
   atlas2_label <- unname(label2_map[as.character(id2)])
 
@@ -136,7 +156,11 @@ atlas_overlap <- function(atlas1, atlas2,
     result$dice <- 2 * n_overlap / (as.numeric(n_atlas1) + as.numeric(n_atlas2))
   }
   if ("jaccard" %in% metrics) {
-    result$jaccard <- n_overlap / (as.numeric(n_atlas1) + as.numeric(n_atlas2) - n_overlap)
+    result$jaccard <- n_overlap / (
+      as.numeric(n_atlas1) + as.numeric(
+        n_atlas2
+      ) - n_overlap
+    )
   }
 
   result$n_overlap <- as.integer(n_overlap)

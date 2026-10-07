@@ -50,3 +50,10 @@ Build 2D projected polygon/boundary data from a \code{surfatlas} for custom
 rendering workflows. This exposes the mesh-projection data pipeline used
 internally by \code{\link{plot_brain}()}.
 }
+\examples{
+\dontrun{
+atlas <- get_schaefer_surfatlas(100)
+polygons <- build_surface_polygon_data(atlas, views = "lateral")
+head(polygons$polygons)
+}
+}

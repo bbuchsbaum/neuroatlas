@@ -14,10 +14,14 @@
 #'
 #' @section Main Functions:
 #' \describe{
-#'   \item{\code{\link{get_schaefer_atlas}}}{Access Schaefer cortical parcellations}
-#'   \item{\code{\link{get_glasser_atlas}}}{Access Glasser multi-modal parcellation}
-#'   \item{\code{\link{get_aseg_atlas}}}{Access FreeSurfer subcortical segmentation}
-#'   \item{\code{\link{get_harvard_oxford_atlas}}}{Access Harvard-Oxford structural atlases}
+#'   \item{\code{\link{get_schaefer_atlas}}}{Access Schaefer cortical
+#' parcellations}
+#'   \item{\code{\link{get_glasser_atlas}}}{Access Glasser multi-modal
+#' parcellation}
+#'   \item{\code{\link{get_aseg_atlas}}}{Access FreeSurfer subcortical
+#' segmentation}
+#'   \item{\code{\link{get_harvard_oxford_atlas}}}{Access Harvard-Oxford
+#' structural atlases}
 #'   \item{\code{\link{get_fsl_atlas}}}{Access FSL XML-described atlases}
 #'   \item{\code{\link{get_olsen_mtl}}}{Access Olsen medial temporal lobe atlas}
 #'   \item{\code{\link{get_template}}}{Fetch templates from TemplateFlow}
@@ -29,7 +33,8 @@
 #'   \item{\code{\link{map_atlas}}}{Map values to atlas regions}
 #'   \item{\code{\link{reduce_atlas}}}{Combine regions within an atlas}
 #'   \item{\code{\link{merge_atlases}}}{Combine multiple atlases}
-#'   \item{\code{\link{dilate_atlas}}}{Expand atlas regions into unassigned voxels}
+#'   \item{\code{\link{dilate_atlas}}}{Expand atlas regions into unassigned
+#' voxels}
 #' }
 #'
 #' @section Visualization:

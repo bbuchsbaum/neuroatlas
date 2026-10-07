@@ -21,3 +21,13 @@ Invisibly returns normalized output path.
 \description{
 Write a `parcel_data` Object to Disk
 }
+\examples{
+x <- parcel_data(data.frame(
+  id = 1:2, label = c("A", "B"),
+  hemi = c("left", "right"), value = c(0.2, 0.7)
+), atlas_id = "toy")
+file <- tempfile(fileext = ".rds")
+write_parcel_data(x, file)
+read_parcel_data(file)
+unlink(file)
+}

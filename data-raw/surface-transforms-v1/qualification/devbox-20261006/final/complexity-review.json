@@ -1,0 +1,632 @@
+[
+  {
+    "file": "alignment_registry.R",
+    "line": 29,
+    "message": "Reduce the cyclomatic complexity of this expression from 29 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "atlas_alignment <- function(x, y) {"
+  },
+  {
+    "file": "atlas_brainnetome.R",
+    "line": 525,
+    "message": "Reduce the cyclomatic complexity of this expression from 23 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".xlsx_sheet_matrix <- function(path, shared, ncol) {"
+  },
+  {
+    "file": "atlas_colors.R",
+    "line": 84,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "atlas_roi_colors <- function(atlas, method = \"rule_hcl\", ...) {"
+  },
+  {
+    "file": "atlas_metadata.R",
+    "line": 92,
+    "message": "Reduce the cyclomatic complexity of this expression from 109 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "validate_resource_metadata <- function(x) {"
+  },
+  {
+    "file": "atlas_metadata.R",
+    "line": 230,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "print.NeuroResourceMetadata <- function(x, ...) {"
+  },
+  {
+    "file": "atlas_metadata.R",
+    "line": 401,
+    "message": "Reduce the cyclomatic complexity of this expression from 39 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_atlas_metadata <- function(x, legacy = FALSE) {"
+  },
+  {
+    "file": "atlas_metadata.R",
+    "line": 590,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".enrich_atlas_metadata <- function(meta, inputs) {"
+  },
+  {
+    "file": "atlas_methods.R",
+    "line": 57,
+    "message": "Reduce the cyclomatic complexity of this expression from 35 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "plot.atlas <- function("
+  },
+  {
+    "file": "atlas_overlap.R",
+    "line": 45,
+    "message": "Reduce the cyclomatic complexity of this expression from 17 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "atlas_overlap <- function("
+  },
+  {
+    "file": "atlas_ref.R",
+    "line": 82,
+    "message": "Reduce the cyclomatic complexity of this expression from 19 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "validate_atlas_ref <- function(x) {"
+  },
+  {
+    "file": "atlas_ref.R",
+    "line": 338,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".template_space_from_outspace <- function(outspace, default_space) {"
+  },
+  {
+    "file": "atlas_registry.R",
+    "line": 45,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "register_atlas <- function("
+  },
+  {
+    "file": "atlas.R",
+    "line": 110,
+    "message": "Reduce the cyclomatic complexity of this expression from 23 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "merge_atlases <- function(atlas1, atlas2) {"
+  },
+  {
+    "file": "atlas.R",
+    "line": 290,
+    "message": "Reduce the cyclomatic complexity of this expression from 29 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".merge_region_fields <- function(atlas1, atlas2) {"
+  },
+  {
+    "file": "atlas.R",
+    "line": 485,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "get_roi.surfatlas <- function(x, label = NULL, id = NULL, hemi = NULL) {"
+  },
+  {
+    "file": "atlas.R",
+    "line": 611,
+    "message": "Reduce the cyclomatic complexity of this expression from 19 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "sub_atlas.atlas <- function("
+  },
+  {
+    "file": "atlas.R",
+    "line": 680,
+    "message": "Reduce the cyclomatic complexity of this expression from 43 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "reduce_atlas.atlas <- function("
+  },
+  {
+    "file": "batch_reduce.R",
+    "line": 47,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "batch_reduce <- function("
+  },
+  {
+    "file": "ce_atlas.R",
+    "line": 71,
+    "message": "Reduce the cyclomatic complexity of this expression from 41 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".infer_surfatlas_from_atlas <- function(atlas) {"
+  },
+  {
+    "file": "ce_atlas.R",
+    "line": 193,
+    "message": "Reduce the cyclomatic complexity of this expression from 24 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".harmonize_cluster_explorer_atlas <- function(atlas, stat_map) {"
+  },
+  {
+    "file": "ce_compute.R",
+    "line": 344,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".extract_stat_clusters <- function("
+  },
+  {
+    "file": "ce_compute.R",
+    "line": 473,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".annotate_clusters_with_atlas <- function("
+  },
+  {
+    "file": "ce_overlay.R",
+    "line": 101,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "project_cluster_overlay <- function("
+  },
+  {
+    "file": "ce_overlay.R",
+    "line": 395,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".repair_legacy_surface_geometry <- function(g) {"
+  },
+  {
+    "file": "ce_overlay.R",
+    "line": 511,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".load_overlay_surface_geometry <- function("
+  },
+  {
+    "file": "ce_picking.R",
+    "line": 96,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".surface_pick_lookup_from_polygons <- function(poly, panel_ctx, stat_map) {"
+  },
+  {
+    "file": "ce_picking.R",
+    "line": 180,
+    "message": "Reduce the cyclomatic complexity of this expression from 17 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_plot_brain_surface_pick_lookup <- function("
+  },
+  {
+    "file": "ce_picking.R",
+    "line": 245,
+    "message": "Reduce the cyclomatic complexity of this expression from 31 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".clusters_for_grid_centers <- function("
+  },
+  {
+    "file": "ce_plugins.R",
+    "line": 12,
+    "message": "Reduce the cyclomatic complexity of this expression from 19 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "infer_design_var_type <- function(x) {"
+  },
+  {
+    "file": "ce_plugins.R",
+    "line": 209,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".run_analysis_plugin <- function("
+  },
+  {
+    "file": "ce_selection.R",
+    "line": 248,
+    "message": "Reduce the cyclomatic complexity of this expression from 25 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_sphere_selection_data <- function("
+  },
+  {
+    "file": "ce_selection.R",
+    "line": 389,
+    "message": "Reduce the cyclomatic complexity of this expression from 36 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_selection_data_from_voxels <- function("
+  },
+  {
+    "file": "cluster_explorer.R",
+    "line": 24,
+    "message": "Reduce the cyclomatic complexity of this expression from 95 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".cluster_explorer_server <- function("
+  },
+  {
+    "file": "cluster_explorer.R",
+    "line": 907,
+    "message": "Reduce the cyclomatic complexity of this expression from 34 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "cluster_explorer <- function("
+  },
+  {
+    "file": "coordinate_spaces.R",
+    "line": 173,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "get_space_transform <- function(from, to) {"
+  },
+  {
+    "file": "coordinate_spaces.R",
+    "line": 283,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "transform_coords <- function("
+  },
+  {
+    "file": "dilate_parcels.R",
+    "line": 75,
+    "message": "Reduce the cyclomatic complexity of this expression from 30 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "dilate_atlas <- function(atlas, mask, radius = 4, maxn = 50) {"
+  },
+  {
+    "file": "fsl_atlas.R",
+    "line": 38,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "get_fsl_atlas <- function("
+  },
+  {
+    "file": "fsl_atlas.R",
+    "line": 599,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".resolve_fsl_xml <- function(name, spec, fsl_dir = Sys.getenv(\"FSLDIR\")) {"
+  },
+  {
+    "file": "ggschaefer.R",
+    "line": 334,
+    "message": "Reduce the cyclomatic complexity of this expression from 28 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".ggseg_atlas_xy_data <- function(gg_atlas) {"
+  },
+  {
+    "file": "glasser.R",
+    "line": 78,
+    "message": "Reduce the cyclomatic complexity of this expression from 17 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "get_glasser_atlas <- function("
+  },
+  {
+    "file": "glasser.R",
+    "line": 672,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".glasser_figshare_annot_path <- function(hemi, use_cache = TRUE) {"
+  },
+  {
+    "file": "hcpex.R",
+    "line": 202,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".hcpex_asset_path <- function(info, use_cache = TRUE) {"
+  },
+  {
+    "file": "hcpex.R",
+    "line": 260,
+    "message": "Reduce the cyclomatic complexity of this expression from 28 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".hcpex_read_labels <- function(label_path, color_path) {"
+  },
+  {
+    "file": "parcel_data.R",
+    "line": 86,
+    "message": "Reduce the cyclomatic complexity of this expression from 50 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "validate_parcel_data <- function(x, strict = TRUE) {"
+  },
+  {
+    "file": "parcel_data.R",
+    "line": 213,
+    "message": "Reduce the cyclomatic complexity of this expression from 36 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "as_parcel_data.atlas <- function("
+  },
+  {
+    "file": "parcel_data.R",
+    "line": 462,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "parcel_volume <- function("
+  },
+  {
+    "file": "parcel_data.R",
+    "line": 596,
+    "message": "Reduce the cyclomatic complexity of this expression from 31 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".align_atlas_table <- function("
+  },
+  {
+    "file": "parcel_data.R",
+    "line": 768,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".validate_parcel_id_convention <- function("
+  },
+  {
+    "file": "parcel_data.R",
+    "line": 831,
+    "message": "Reduce the cyclomatic complexity of this expression from 43 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".resolve_parcel_by <- function(meta, data, by = NULL) {"
+  },
+  {
+    "file": "parcel_data.R",
+    "line": 1023,
+    "message": "Reduce the cyclomatic complexity of this expression from 36 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".validate_parcel_atlas_identity <- function(data, atlas) {"
+  },
+  {
+    "file": "plot_brain_grid.R",
+    "line": 67,
+    "message": "Reduce the cyclomatic complexity of this expression from 114 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "plot_brain_grid <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 120,
+    "message": "Reduce the cyclomatic complexity of this expression from 51 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".depth_cull_faces <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 348,
+    "message": "Reduce the cyclomatic complexity of this expression from 39 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".boundary_edges_to_paths <- function(edges) {"
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 512,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".chaikin_smooth_xy <- function(x, y, n_iter = 1L) {"
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 636,
+    "message": "Reduce the cyclomatic complexity of this expression from 45 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".merge_parcel_polygons <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 811,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_merged_polygon_data <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 948,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_surface_silhouette_data <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 1157,
+    "message": "Reduce the cyclomatic complexity of this expression from 17 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".project_view <- function(verts, view, hemi) {"
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 1200,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".mesh_vertex_neighbors <- function(faces, n_vertices) {"
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 1246,
+    "message": "Reduce the cyclomatic complexity of this expression from 35 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".smooth_projected_xy <- function(xy, neighbors, n_iter = 1L, lambda = 0.35) {"
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 1359,
+    "message": "Reduce the cyclomatic complexity of this expression from 17 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_brain_polygon_data <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 1540,
+    "message": "Reduce the cyclomatic complexity of this expression from 38 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "build_surface_polygon_data <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 1618,
+    "message": "Reduce the cyclomatic complexity of this expression from 23 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_overlay_polygon_data <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 1747,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".overlay_alpha_values <- function("
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 2006,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".normalize_colorbar_position <- function(colorbar, default = \"right\") {"
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 2050,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".colorbar_break_values <- function(lim, threshold = NULL) {"
+  },
+  {
+    "file": "plot_brain.R",
+    "line": 2529,
+    "message": "Reduce the cyclomatic complexity of this expression from 382 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "plot_brain <- function("
+  },
+  {
+    "file": "query_point.R",
+    "line": 96,
+    "message": "Reduce the cyclomatic complexity of this expression from 25 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "query_point <- function("
+  },
+  {
+    "file": "query_point.R",
+    "line": 428,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".query_nearest <- function("
+  },
+  {
+    "file": "render_parcel_surface.R",
+    "line": 90,
+    "message": "Reduce the cyclomatic complexity of this expression from 27 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".plot_brain_cpu_parcels <- function("
+  },
+  {
+    "file": "render_parcel_surface.R",
+    "line": 433,
+    "message": "Reduce the cyclomatic complexity of this expression from 42 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "makeContent.parcel_brain_figure <- function(x) {"
+  },
+  {
+    "file": "render_stat_surface.R",
+    "line": 78,
+    "message": "Reduce the cyclomatic complexity of this expression from 25 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".resolve_surface_anatomy <- function("
+  },
+  {
+    "file": "render_stat_surface.R",
+    "line": 264,
+    "message": "Reduce the cyclomatic complexity of this expression from 22 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".plot_brain_cpu <- function("
+  },
+  {
+    "file": "roi_colors.R",
+    "line": 162,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "build_conflict_edges <- function("
+  },
+  {
+    "file": "roi_colors.R",
+    "line": 296,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "greedy_assign_colors <- function("
+  },
+  {
+    "file": "roi_colors.R",
+    "line": 609,
+    "message": "Reduce the cyclomatic complexity of this expression from 17 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "roi_colors_maximin_view <- function("
+  },
+  {
+    "file": "roi_metadata.R",
+    "line": 70,
+    "message": "Reduce the cyclomatic complexity of this expression from 26 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "roi_metadata.atlas <- function(x, ...) {"
+  },
+  {
+    "file": "roi_metadata.R",
+    "line": 309,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".subset_atlas <- function(x, keep_ids) {"
+  },
+  {
+    "file": "roi_metadata.R",
+    "line": 498,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".build_roi_metadata <- function(x) {"
+  },
+  {
+    "file": "schaefer.R",
+    "line": 15,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".schaefer_cache_dir <- function(cache_dir = NULL, create = TRUE) {"
+  },
+  {
+    "file": "schaefer.R",
+    "line": 116,
+    "message": "Reduce the cyclomatic complexity of this expression from 21 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "resample <- function("
+  },
+  {
+    "file": "schaefer.R",
+    "line": 564,
+    "message": "Reduce the cyclomatic complexity of this expression from 35 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "get_schaefer_atlas <- function("
+  },
+  {
+    "file": "subcortical_atlases.R",
+    "line": 411,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".read_label_table <- function(label_path, ids) {"
+  },
+  {
+    "file": "surface_assets.R",
+    "line": 169,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".surface_tar_member <- function(path, member) {"
+  },
+  {
+    "file": "surface_projection.R",
+    "line": 52,
+    "message": "Reduce the cyclomatic complexity of this expression from 20 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".registration_fusion_projection <- function("
+  },
+  {
+    "file": "surface_projection.R",
+    "line": 325,
+    "message": "Reduce the cyclomatic complexity of this expression from 80 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "apply_surface_projection <- function("
+  },
+  {
+    "file": "surface_projection.R",
+    "line": 547,
+    "message": "Reduce the cyclomatic complexity of this expression from 22 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".validate_projection_affine <- function(affine) {"
+  },
+  {
+    "file": "surface_projection.R",
+    "line": 640,
+    "message": "Reduce the cyclomatic complexity of this expression from 53 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".read_cbig_ras <- function(path, n_vertices) {"
+  },
+  {
+    "file": "surface_transform.R",
+    "line": 123,
+    "message": "Reduce the cyclomatic complexity of this expression from 52 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "surface_data <- function("
+  },
+  {
+    "file": "surface_transform.R",
+    "line": 454,
+    "message": "Reduce the cyclomatic complexity of this expression from 30 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".surface_engine_revision_verified <- function(revision) {"
+  },
+  {
+    "file": "surface_transform.R",
+    "line": 548,
+    "message": "Reduce the cyclomatic complexity of this expression from 108 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".validate_surface_transform <- function(x) {"
+  },
+  {
+    "file": "surface_transform.R",
+    "line": 681,
+    "message": "Reduce the cyclomatic complexity of this expression from 23 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".surface_cached_operator <- function("
+  },
+  {
+    "file": "template_flow.R",
+    "line": 1546,
+    "message": "Reduce the cyclomatic complexity of this expression from 28 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".infer_template_params <- function("
+  },
+  {
+    "file": "template_transform.R",
+    "line": 32,
+    "message": "Reduce the cyclomatic complexity of this expression from 40 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "get_template_transform <- function("
+  },
+  {
+    "file": "template_transform.R",
+    "line": 280,
+    "message": "Reduce the cyclomatic complexity of this expression from 98 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "apply_template_transform <- function("
+  },
+  {
+    "file": "template_transform.R",
+    "line": 714,
+    "message": "Reduce the cyclomatic complexity of this expression from 16 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "transform_atlas <- function("
+  },
+  {
+    "file": "transform_cache.R",
+    "line": 57,
+    "message": "Reduce the cyclomatic complexity of this expression from 27 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".clear_transform_cache_unlocked <- function(artifact_version, root) {"
+  },
+  {
+    "file": "transform_cache.R",
+    "line": 172,
+    "message": "Reduce the cyclomatic complexity of this expression from 22 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".fetch_transform_artifact_unlocked <- function("
+  },
+  {
+    "file": "transform_cache.R",
+    "line": 296,
+    "message": "Reduce the cyclomatic complexity of this expression from 41 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".validate_transform_artifact <- function(artifact) {"
+  },
+  {
+    "file": "transform_cache.R",
+    "line": 409,
+    "message": "Reduce the cyclomatic complexity of this expression from 23 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".with_transform_cache_lock <- function(lock, artifact, target, code) {"
+  },
+  {
+    "file": "transform_cache.R",
+    "line": 445,
+    "message": "Reduce the cyclomatic complexity of this expression from 17 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".transform_cache_root <- function(cache_dir) {"
+  },
+  {
+    "file": "transform_registry.R",
+    "line": 86,
+    "message": "Reduce the cyclomatic complexity of this expression from 67 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "atlas_transform_plan <- function("
+  },
+  {
+    "file": "wang_atlas.R",
+    "line": 520,
+    "message": "Reduce the cyclomatic complexity of this expression from 29 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": "get_wang_prob_atlas <- function("
+  },
+  {
+    "file": "wang_atlas.R",
+    "line": 998,
+    "message": "Reduce the cyclomatic complexity of this expression from 18 to at most 15. Consider replacing high-complexity sections like loops and branches with helper functions.",
+    "text": ".wang_prob_cache_seed <- function(file_paths) {"
+  }
+]

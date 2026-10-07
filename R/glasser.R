@@ -35,7 +35,8 @@
 #' ID-keyed tables must declare a matching \code{id_convention} column; see
 #' \code{\link{align_parcel_values}()}.
 #'
-#' @param outspace Optional \code{NeuroSpace} object specifying desired output space.
+#' @param outspace Optional \code{NeuroSpace} object specifying desired output
+#'   space.
 #'   If provided, the atlas will be resampled to this space. Default: NULL
 #' @param source Volume source to use. One of \code{"xcpengine"} (default) or
 #'   \code{"mni2009c"}.
@@ -74,8 +75,10 @@
 #' @importFrom utils read.table
 #' @importFrom grDevices col2rgb rainbow
 #' @export
-get_glasser_atlas <- function(outspace=NULL,
-                              source = c("xcpengine", "mni2009c")) {
+get_glasser_atlas <- function(
+  outspace = NULL,
+  source = c("xcpengine", "mni2009c")
+) {
   source <- match.arg(source)
   requested_source <- source
   source_info <- .glasser_volume_source_info(source)
@@ -128,12 +131,12 @@ get_glasser_atlas <- function(outspace=NULL,
   )
 
   vol <- neuroim2::read_vol(vol_path)
-  
+
   if (!is.null(outspace)) {
     vol <- resample(vol, outspace)
   }
   processing <- attr(vol, "neuroatlas_processing")
-  
+
   # Download and process labels
   label_name <- "glasser360NodeNames.txt"
   label_path <- .neuroatlas_download(
@@ -147,18 +150,20 @@ get_glasser_atlas <- function(outspace=NULL,
   cols <- t(col2rgb(rainbow(nrow(labels))))
   colnames(cols) <- c("red", "green", "blue")
   cols <- as.data.frame(cols)
-  hemi <- tolower(sapply(strsplit(labels[,1], "_"), "[[", 1))
-  region <- sapply(strsplit(labels[,1], "_"), "[[", 2)
-  orig_labels <- labels[,1]
-  
+  hemi <- tolower(sapply(strsplit(labels[, 1], "_"), "[[", 1))
+  region <- sapply(strsplit(labels[, 1], "_"), "[[", 2)
+  orig_labels <- labels[, 1]
+
   # Create label mapping
-  cids <- 1:nrow(labels)
+  cids <- seq_len(nrow(labels))
   label_map <- as.list(cids)
   names(label_map) <- region
-  
-  vol <- neuroim2::ClusteredNeuroVol(as.logical(vol),
-                                    clusters=vol[vol!=0],
-                                    label_map=label_map)
+
+  vol <- neuroim2::ClusteredNeuroVol(
+    as.logical(vol),
+    clusters = vol[vol != 0],
+    label_map = label_map
+  )
 
   n <- nrow(labels)
 
@@ -296,13 +301,15 @@ map_atlas.glasser <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
 #'
 #' @param x A Glasser atlas object
 #' @param y Ignored (required for compatibility with generic plot method)
-#' @param vals Numeric vector of values to visualize. If NULL (default), all regions
+#' @param vals Numeric vector of values to visualize. If NULL (default), all
+#'   regions
 #'   will be assigned a value of 1, creating a uniform visualization
 #' @param thresh Numeric vector of length 2 for thresholding values
 #' @param pos Logical. If TRUE, uses raw values for thresholding
 #' @rdname plot-methods
 #' @param palette Character. Name of scico color palette
-#' @param lim Numeric vector of length 2 for color scale limits. If NULL, will be
+#' @param lim Numeric vector of length 2 for color scale limits. If NULL, will
+#'   be
 #'   set to range of vals
 #' @param ... Additional arguments passed to methods
 #' @return A ggplot2 or ggiraph object
@@ -314,8 +321,16 @@ map_atlas.glasser <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
 #' @importFrom ggplot2 aes
 #' @importFrom scico scale_fill_scico
 #' @export
-plot.glasser <- function(x, y, vals = NULL, thresh = c(0, 0), pos = FALSE,
-                         palette = "cork", lim = NULL, ...) {
+plot.glasser <- function(
+  x,
+  y,
+  vals = NULL,
+  thresh = c(0, 0),
+  pos = FALSE,
+  palette = "cork",
+  lim = NULL,
+  ...
+) {
   if (inherits(x, "surfatlas")) {
     plot_brain(x, vals = vals, palette = palette, lim = lim, ...)
   } else {
@@ -354,7 +369,8 @@ print.glasser <- function(x, ...) {
 #' }
 #' Annotation downloads are checked against the file sizes and MD5 checksums
 #' published by Figshare before they enter or leave the neuroatlas cache.
-#' Currently only the \code{"fsaverage"} surface space is supported. TemplateFlow
+#' Currently only the \code{"fsaverage"} surface space is supported.
+#' TemplateFlow
 #' provides \code{"pial"}, \code{"white"}, and \code{"midthickness"} geometry
 #' at the required 164k density; it does not provide an \code{"inflated"}
 #' fsaverage surface.
@@ -364,7 +380,8 @@ print.glasser <- function(x, ...) {
 #' Use the shared \code{label_full} or \code{c("area", "hemi")} keys from
 #' \code{\link{roi_metadata}()} when moving
 #' parcel values between representations. ID-keyed tables must declare a
-#' matching \code{id_convention} column; see \code{\link{align_parcel_values}()}.
+#' matching \code{id_convention} column; see
+#' \code{\link{align_parcel_values}()}.
 #'
 #' @param space Surface space / mesh template. Only \code{"fsaverage"} is
 #'   supported at present.
@@ -392,9 +409,11 @@ print.glasser <- function(x, ...) {
 #' }
 #'
 #' @export
-glasser_surf <- function(space = "fsaverage",
-                         surf = c("pial", "white", "midthickness"),
-                         use_cache = TRUE) {
+glasser_surf <- function(
+  space = "fsaverage",
+  surf = c("pial", "white", "midthickness"),
+  use_cache = TRUE
+) {
   space <- match.arg(space, c("fsaverage", "fsaverage5", "fsaverage6"))
   surf <- match.arg(surf, c("pial", "white", "midthickness"))
 
@@ -558,26 +577,28 @@ glasser_surf <- function(space = "fsaverage",
 #' @noRd
 .glasser_volume_source_info <- function(source) {
   if (identical(source, "mni2009c")) {
-    return(list(
-      fname = "MMP_in_MNI_corr.nii.gz",
-      volume_url = paste0(
-        "https://raw.githubusercontent.com/Raj-Lab-UCSF/",
-        "Human_Brain_Atlases-glasser/master/MMP_in_MNI_corr.nii.gz"
-      ),
-      label_url = paste0(
-        "https://raw.githubusercontent.com/PennLINC/xcpEngine/master/atlas/",
-        "glasser360/glasser360NodeNames.txt"
-      ),
-      provenance = paste(
-        "MNI2009c volume (MMP_in_MNI_corr) mirrored at",
-        "https://github.com/Raj-Lab-UCSF/Human_Brain_Atlases-glasser"
-      ),
-      lineage = "Surface reconstruction/projection to MNI152NLin2009cAsym volume.",
-      notes = paste(
-        "Opt-in source with explicit 2009c provenance.",
-        "Some mirrors may serve only a git-annex pointer stub."
+    return(
+      list(
+        fname = "MMP_in_MNI_corr.nii.gz",
+        volume_url = paste0(
+          "https://raw.githubusercontent.com/Raj-Lab-UCSF/",
+          "Human_Brain_Atlases-glasser/master/MMP_in_MNI_corr.nii.gz"
+        ),
+        label_url = paste0(
+          "https://raw.githubusercontent.com/PennLINC/xcpEngine/master/atlas/",
+          "glasser360/glasser360NodeNames.txt"
+        ),
+        provenance = paste(
+          "MNI2009c volume (MMP_in_MNI_corr) mirrored at",
+          "https://github.com/Raj-Lab-UCSF/Human_Brain_Atlases-glasser"
+        ),
+        lineage = "Surface reconstruction/projection to MNI152NLin2009cAsym volume.",
+        notes = paste(
+          "Opt-in source with explicit 2009c provenance.",
+          "Some mirrors may serve only a git-annex pointer stub."
+        )
       )
-    ))
+    )
   }
 
   list(
@@ -612,12 +633,14 @@ glasser_surf <- function(space = "fsaverage",
   hemi <- match.arg(hemi, c("lh", "rh"))
 
   if (identical(hemi, "lh")) {
-    return(list(
-      fname = "lh.HCP-MMP1.annot",
-      file_id = 5528816L,
-      size = 1316983,
-      md5 = "46a102b59b2fb1bb4bd62d51bf02e975"
-    ))
+    return(
+      list(
+        fname = "lh.HCP-MMP1.annot",
+        file_id = 5528816L,
+        size = 1316983,
+        md5 = "46a102b59b2fb1bb4bd62d51bf02e975"
+      )
+    )
   }
 
   list(
@@ -634,8 +657,10 @@ glasser_surf <- function(space = "fsaverage",
 #' @keywords internal
 #' @noRd
 .glasser_annot_is_valid <- function(path, info) {
-  if (!file.exists(path) || is.na(file.info(path)$size) ||
-      file.info(path)$size != info$size) {
+  if (
+    !file.exists(path) || is.na(file.info(path)$size) ||
+      file.info(path)$size != info$size
+  ) {
     return(FALSE)
   }
 
@@ -719,9 +744,11 @@ glasser_surf <- function(space = "fsaverage",
 #'
 #' @keywords internal
 #' @noRd
-.glasser_fsaverage_geometry <- function(hemi,
-                                        surf,
-                                        template_loader = load_surface_template) {
+.glasser_fsaverage_geometry <- function(
+  hemi,
+  surf,
+  template_loader = load_surface_template
+) {
   hemi <- match.arg(hemi, c("lh", "rh"))
   hemi_tf <- if (hemi == "lh") "L" else "R"
 
@@ -738,8 +765,11 @@ glasser_surf <- function(space = "fsaverage",
           "Could not obtain fsaverage (164k) geometry for the Glasser atlas.",
           "x" = conditionMessage(e),
           "i" = paste0(
-            "Required asset: tpl-fsaverage_hemi-", hemi_tf,
-            "_den-164k_", surf, ".surf.gii"
+            "Required asset: tpl-fsaverage_hemi-",
+            hemi_tf,
+            "_den-164k_",
+            surf,
+            ".surf.gii"
           ),
           "i" = "Check the TemplateFlow cache and network access, then retry."
         ),
@@ -755,9 +785,11 @@ glasser_surf <- function(space = "fsaverage",
 
 
 #' @keywords internal
-.glasser_fsaverage_surface_hemi <- function(hemi,
-                                            surf = c("pial", "white", "midthickness"),
-                                            use_cache = TRUE) {
+.glasser_fsaverage_surface_hemi <- function(
+  hemi,
+  surf = c("pial", "white", "midthickness"),
+  use_cache = TRUE
+) {
   hemi <- match.arg(hemi, c("lh", "rh"))
   surf <- match.arg(surf, c("pial", "white", "midthickness"))
 
@@ -793,8 +825,11 @@ glasser_surf <- function(space = "fsaverage",
       c(
         "Vertex mismatch between Glasser annotation and fsaverage geometry.",
         "x" = paste0(
-          "Annotation has ", length(annot@data), " vertices; geometry has ",
-          n_vertices, "."
+          "Annotation has ",
+          length(annot@data),
+          " vertices; geometry has ",
+          n_vertices,
+          "."
         ),
         "i" = "Glasser requires fsaverage 164k geometry (163842 vertices)."
       ),

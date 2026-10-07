@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-06T02:56:18.552894+00:00",
+  "finished_utc": "2026-10-06T02:56:25.903822+00:00",
+  "duration_seconds": 7.346956,
+  "command": [
+    "Rscript",
+    "data-raw/surface-transforms-v1/qualify-native-policies.R",
+    "/tmp/neuroatlas-resume-20261006/native-final"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/tmp/neuroatlas-resume-20261006/policies-final.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 300.0,
+  "log_bytes": 253
+}

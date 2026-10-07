@@ -26,9 +26,9 @@ grids differ within the same coordinate system (use [needs_template_warp()]
 for that).
 }
 \examples{
-needs_coord_transform("fsaverage", "MNI152NLin6Asym")  # TRUE
-needs_coord_transform("fsaverage", "MNI305")            # FALSE
-needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # FALSE
+needs_coord_transform("fsaverage", "MNI152NLin6Asym") # TRUE
+needs_coord_transform("fsaverage", "MNI305") # FALSE
+needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym") # FALSE
 
 }
 \seealso{

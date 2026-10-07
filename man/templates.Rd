@@ -15,8 +15,13 @@ Returns a list of all available templates in the Templateflow repository.
 \examples{
 \donttest{
 if (requireNamespace("templateflow", quietly = TRUE)) {
-  tryCatch({available <- templates(); head(available)},
-    error = function(e) NULL)
+  tryCatch(
+    {
+      available <- templates()
+      head(available)
+    },
+    error = function(e) NULL
+  )
 }
 }
 }

@@ -50,7 +50,8 @@ This function uses:
 }
 Annotation downloads are checked against the file sizes and MD5 checksums
 published by Figshare before they enter or leave the neuroatlas cache.
-Currently only the \code{"fsaverage"} surface space is supported. TemplateFlow
+Currently only the \code{"fsaverage"} surface space is supported.
+TemplateFlow
 provides \code{"pial"}, \code{"white"}, and \code{"midthickness"} geometry
 at the required 164k density; it does not provide an \code{"inflated"}
 fsaverage surface.
@@ -60,7 +61,8 @@ Surface IDs 1--180 are left hemisphere and 181--360 are right hemisphere
 Use the shared \code{label_full} or \code{c("area", "hemi")} keys from
 \code{\link{roi_metadata}()} when moving
 parcel values between representations. ID-keyed tables must declare a
-matching \code{id_convention} column; see \code{\link{align_parcel_values}()}.
+matching \code{id_convention} column; see
+\code{\link{align_parcel_values}()}.
 }
 \examples{
 \dontrun{

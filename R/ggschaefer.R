@@ -25,7 +25,8 @@ utils::globalVariables(c("hemi", "orig_label", "hemi.x", "hemi.y", "x", "y", "gr
 #' @export
 get_ggseg_atlas <- function(atlas) {
   lifecycle::deprecate_warn(
-    "0.2.0", "get_ggseg_atlas()",
+    "0.2.0",
+    "get_ggseg_atlas()",
     "plot_brain()",
     details = "Use schaefer_surf() + plot_brain() for surface visualisation."
   )
@@ -39,7 +40,11 @@ get_ggseg_atlas <- function(atlas) {
     )
   }
 
-  if (is.null(atlas$name) || !is.character(atlas$name) || length(atlas$name) != 1) {
+  if (
+    is.null(atlas$name) || !is.character(atlas$name) || length(
+      atlas$name
+    ) != 1
+  ) {
     stop("'atlas$name' must be a single character string.", call. = FALSE)
   }
 
@@ -103,7 +108,8 @@ map_atlas.schaefer <- function(x, vals, thresh = NULL, pos = FALSE, ...) {
 #' @export
 map_to_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE) {
   lifecycle::deprecate_warn(
-    "0.2.0", "map_to_schaefer()",
+    "0.2.0",
+    "map_to_schaefer()",
     "map_atlas()",
     details = "map_atlas() now works for all atlas types including Schaefer."
   )
@@ -125,8 +131,10 @@ map_to_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE) {
 #' @param vals Numeric vector of values to visualize on the atlas
 #' @param thresh Numeric vector of length 2 specifying (min, max) thresholds.
 #' @param pos Logical. If TRUE, uses raw values for thresholding.
-#' @param palette Character string specifying the color palette. Default: "Spectral"
-#' @param interactive Logical. If TRUE, creates an interactive plot. Default: TRUE
+#' @param palette Character string specifying the color palette. Default:
+#'   "Spectral"
+#' @param interactive Logical. If TRUE, creates an interactive plot. Default:
+#'   TRUE
 #' @param lim Numeric vector of length 2 specifying the range for color mapping.
 #'
 #' @return A ggplot2 or ggiraph object.
@@ -137,20 +145,30 @@ map_to_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE) {
 #' }
 #'
 #' @importFrom ggplot2 aes scale_fill_distiller ggplot theme_void coord_fixed
-#' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection geom_polygon_interactive
+#' @importFrom ggiraph girafe opts_tooltip opts_hover opts_selection
+#'   geom_polygon_interactive
 #' @importFrom scales squish
 #' @export
-ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
-                           palette = "Spectral", interactive = TRUE,
-                           lim = range(vals)) {
+ggseg_schaefer <- function(
+  atlas,
+  vals,
+  thresh = NULL,
+  pos = FALSE,
+  palette = "Spectral",
+  interactive = TRUE,
+  lim = range(vals)
+) {
   lifecycle::deprecate_warn(
-    "0.2.0", "ggseg_schaefer()",
+    "0.2.0",
+    "ggseg_schaefer()",
     "plot_brain()",
     details = "Use plot_brain(schaefer_surf(...), vals = ...) instead."
   )
 
-  if (!requireNamespace("ggseg", quietly = TRUE) ||
-      !requireNamespace("ggsegSchaefer", quietly = TRUE)) {
+  if (
+    !requireNamespace("ggseg", quietly = TRUE) ||
+      !requireNamespace("ggsegSchaefer", quietly = TRUE)
+  ) {
     stop(
       "Packages 'ggseg' and 'ggsegSchaefer' are required for this ",
       "deprecated function.\n",
@@ -222,7 +240,9 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
   mapped_non_keys <- setdiff(names(mapped_data), join_by)
   overlapping <- intersect(mapped_non_keys, names(ggseg_data))
   if (length(overlapping) > 0) {
-    ggseg_data <- ggseg_data[, !names(ggseg_data) %in% overlapping, drop = FALSE]
+    ggseg_data <- ggseg_data[, !names(ggseg_data) %in% overlapping,
+      drop = FALSE
+    ]
   }
 
   dplyr::left_join(ggseg_data, mapped_data, by = join_by)
@@ -231,9 +251,12 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
 #' Load a ggsegSchaefer atlas object with namespace and data() fallback
 #' @keywords internal
 #' @noRd
-.load_ggseg_schaefer_atlas <- function(atlas_string, pkg = "ggsegSchaefer",
-                                       namespace_env = NULL,
-                                       data_loader = utils::data) {
+.load_ggseg_schaefer_atlas <- function(
+  atlas_string,
+  pkg = "ggsegSchaefer",
+  namespace_env = NULL,
+  data_loader = utils::data
+) {
   if (is.null(namespace_env)) {
     namespace_env <- asNamespace(pkg)
   }
@@ -264,9 +287,11 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
   )
 
   if (exists(atlas_string, envir = data_env, inherits = FALSE)) {
-    return(.resolve_ggseg_atlas_object(
-      get(atlas_string, envir = data_env, inherits = FALSE)
-    ))
+    return(
+      .resolve_ggseg_atlas_object(
+        get(atlas_string, envir = data_env, inherits = FALSE)
+      )
+    )
   }
 
   if (is.null(data_error)) {
@@ -274,9 +299,17 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
   }
 
   stop(
-    "Failed to load atlas '", atlas_string, "' from ", pkg, ": ",
-    "namespace lookup error [", namespace_error, "]; ",
-    "data() fallback error [", data_error, "]",
+    "Failed to load atlas '",
+    atlas_string,
+    "' from ",
+    pkg,
+    ": ",
+    "namespace lookup error [",
+    namespace_error,
+    "]; ",
+    "data() fallback error [",
+    data_error,
+    "]",
     call. = FALSE
   )
 }
@@ -308,23 +341,28 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
     }
     if (!all(c("x", "y") %in% names(out)) && inherits(data_obj, "sf")) {
       geoms <- sf::st_geometry(data_obj)
-      parts <- lapply(seq_along(geoms), function(i) {
-        xy <- sf::st_coordinates(geoms[[i]])
-        if (!nrow(xy)) {
-          return(NULL)
+      parts <- lapply(
+        seq_along(geoms),
+        function(i) {
+          xy <- sf::st_coordinates(geoms[[i]])
+          if (!nrow(xy)) {
+            return(NULL)
+          }
+          data.frame(
+            x = xy[, "X"],
+            y = xy[, "Y"],
+            hemi = if ("hemi" %in% names(out)) out$hemi[[i]] else NA_character_,
+            view = if ("view" %in% names(out)) out$view[[i]] else NA_character_,
+            stringsAsFactors = FALSE
+          )
         }
-        data.frame(
-          x = xy[, "X"],
-          y = xy[, "Y"],
-          hemi = if ("hemi" %in% names(out)) out$hemi[[i]] else NA_character_,
-          view = if ("view" %in% names(out)) out$view[[i]] else NA_character_,
-          stringsAsFactors = FALSE
-        )
-      })
+      )
       expanded <- dplyr::bind_rows(parts)
       if (!nrow(expanded)) {
-        stop("ggseg sf atlas geometry contained no polygon vertices",
-             call. = FALSE)
+        stop(
+          "ggseg sf atlas geometry contained no polygon vertices",
+          call. = FALSE
+        )
       }
       return(expanded)
     }
@@ -333,23 +371,26 @@ ggseg_schaefer <- function(atlas, vals, thresh = NULL, pos = FALSE,
 
   if (is.list(data_obj) && !is.null(data_obj$geom)) {
     geom <- data_obj$geom
-    parts <- lapply(seq_len(nrow(geom)), function(i) {
-      label <- as.character(geom$label[[i]])
-      pts <- geom$geometry[[i]]
-      if (!is.data.frame(pts) || !nrow(pts)) {
-        return(NULL)
+    parts <- lapply(
+      seq_len(nrow(geom)),
+      function(i) {
+        label <- as.character(geom$label[[i]])
+        pts <- geom$geometry[[i]]
+        if (!is.data.frame(pts) || !nrow(pts)) {
+          return(NULL)
+        }
+        hemi <- if (grepl("^lh[_.]", label)) {
+          "left"
+        } else if (grepl("^rh[_.]", label)) {
+          "right"
+        } else {
+          NA_character_
+        }
+        pts$hemi <- hemi
+        pts$label <- label
+        pts
       }
-      hemi <- if (grepl("^lh[_.]", label)) {
-        "left"
-      } else if (grepl("^rh[_.]", label)) {
-        "right"
-      } else {
-        NA_character_
-      }
-      pts$hemi <- hemi
-      pts$label <- label
-      pts
-    })
+    )
     out <- dplyr::bind_rows(parts)
     if (!nrow(out)) {
       stop("ggseg atlas geometry contained no polygon vertices", call. = FALSE)

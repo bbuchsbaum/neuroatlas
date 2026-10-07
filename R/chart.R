@@ -1,4 +1,3 @@
-
 #' Plot Glasser Atlas Values
 #'
 #' @description
@@ -28,7 +27,8 @@
 #' @export
 plot_glasser <- function(vals = NULL, value_col = "value", position = "dispersed") {
   lifecycle::deprecate_stop(
-    "0.2.0", "plot_glasser()",
+    "0.2.0",
+    "plot_glasser()",
     "plot_brain()",
     details = "Use plot_brain(glasser_surf(), vals = ...) instead."
   )

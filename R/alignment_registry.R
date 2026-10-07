@@ -30,30 +30,36 @@ atlas_alignment <- function(x, y) {
   from_ref <- atlas_ref(x)
   to_ref <- atlas_ref(y)
 
-  if (identical(from_ref$family, to_ref$family) &&
+  if (
+    identical(from_ref$family, to_ref$family) &&
       identical(from_ref$model, to_ref$model) &&
       identical(from_ref$representation, to_ref$representation) &&
-      identical(from_ref$template_space, to_ref$template_space)) {
-    return(structure(
-      list(
-        from = from_ref,
-        to = to_ref,
-        compatible = TRUE,
-        relation = "identical",
-        method = "identity",
-        confidence = "exact",
-        status = "available",
-        requires_transform = FALSE,
-        notes = "Same family/model/representation/template."
-      ),
-      class = c("atlas_alignment", "list")
-    ))
+      identical(from_ref$template_space, to_ref$template_space)
+  ) {
+    return(
+      structure(
+        list(
+          from = from_ref,
+          to = to_ref,
+          compatible = TRUE,
+          relation = "identical",
+          method = "identity",
+          confidence = "exact",
+          status = "available",
+          requires_transform = FALSE,
+          notes = "Same family/model/representation/template."
+        ),
+        class = c("atlas_alignment", "list")
+      )
+    )
   }
 
-  if (identical(from_ref$family, to_ref$family) &&
+  if (
+    identical(from_ref$family, to_ref$family) &&
       identical(from_ref$model, to_ref$model) &&
       identical(from_ref$representation, to_ref$representation) &&
-      !identical(from_ref$template_space, to_ref$template_space)) {
+      !identical(from_ref$template_space, to_ref$template_space)
+  ) {
     route <- NULL
     if (!is.na(from_ref$template_space) && !is.na(to_ref$template_space)) {
       route <- .find_direct_space_route(
@@ -75,20 +81,22 @@ atlas_alignment <- function(x, y) {
       route_notes <- route$notes[[1]]
     }
 
-    return(structure(
-      list(
-        from = from_ref,
-        to = to_ref,
-        compatible = TRUE,
-        relation = "same_representation_different_template",
-        method = route_method,
-        confidence = route_conf,
-        status = route_status,
-        requires_transform = TRUE,
-        notes = route_notes
-      ),
-      class = c("atlas_alignment", "list")
-    ))
+    return(
+      structure(
+        list(
+          from = from_ref,
+          to = to_ref,
+          compatible = TRUE,
+          relation = "same_representation_different_template",
+          method = route_method,
+          confidence = route_conf,
+          status = route_status,
+          requires_transform = TRUE,
+          notes = route_notes
+        ),
+        class = c("atlas_alignment", "list")
+      )
+    )
   }
 
   reg <- .alignment_registry_table()
@@ -96,27 +104,28 @@ atlas_alignment <- function(x, y) {
     reg$family == from_ref$family &
       reg$model == from_ref$model &
       reg$from_representation == from_ref$representation &
-      reg$to_representation == to_ref$representation,
-    ,
+      reg$to_representation == to_ref$representation, ,
     drop = FALSE
   ]
 
   if (nrow(hit) > 0L) {
     row <- hit[1, , drop = FALSE]
-    return(structure(
-      list(
-        from = from_ref,
-        to = to_ref,
-        compatible = TRUE,
-        relation = row$relation[[1]],
-        method = row$method[[1]],
-        confidence = row$confidence[[1]],
-        status = row$status[[1]],
-        requires_transform = !identical(row$method[[1]], "identity"),
-        notes = row$notes[[1]]
-      ),
-      class = c("atlas_alignment", "list")
-    ))
+    return(
+      structure(
+        list(
+          from = from_ref,
+          to = to_ref,
+          compatible = TRUE,
+          relation = row$relation[[1]],
+          method = row$method[[1]],
+          confidence = row$confidence[[1]],
+          status = row$status[[1]],
+          requires_transform = !identical(row$method[[1]], "identity"),
+          notes = row$notes[[1]]
+        ),
+        class = c("atlas_alignment", "list")
+      )
+    )
   }
 
   structure(
@@ -203,24 +212,36 @@ print.atlas_alignment <- function(x, ...) {
 .alignment_registry_table <- function() {
   tibble::tibble(
     family = c(
-      "schaefer", "schaefer",
-      "glasser", "glasser",
-      "subcortical", "subcortical"
+      "schaefer",
+      "schaefer",
+      "glasser",
+      "glasser",
+      "subcortical",
+      "subcortical"
     ),
     model = c(
-      "Schaefer2018", "Schaefer2018",
-      "HCP-MMP1.0", "HCP-MMP1.0",
-      "CIT168", "CIT168"
+      "Schaefer2018",
+      "Schaefer2018",
+      "HCP-MMP1.0",
+      "HCP-MMP1.0",
+      "CIT168",
+      "CIT168"
     ),
     from_representation = c(
-      "volume", "surface",
-      "volume", "surface",
-      "volume", "volume"
+      "volume",
+      "surface",
+      "volume",
+      "surface",
+      "volume",
+      "volume"
     ),
     to_representation = c(
-      "surface", "volume",
-      "surface", "volume",
-      "volume", "volume"
+      "surface",
+      "volume",
+      "surface",
+      "volume",
+      "volume",
+      "volume"
     ),
     relation = c(
       "same_model_projected",

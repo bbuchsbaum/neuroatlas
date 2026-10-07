@@ -27,7 +27,7 @@
 #' # data_vol: a NeuroVec with matching spatial dimensions
 #' # mask:     a brain mask NeuroVol
 #' cvec <- reduce_atlas_vec(atlas, data_vol, mask)
-#' ts_mat <- as.matrix(cvec)   # T x K cluster time-series
+#' ts_mat <- as.matrix(cvec) # T x K cluster time-series
 #' }
 #'
 #' @importFrom neuroim2 ClusteredNeuroVec ClusteredNeuroVol LogicalNeuroVol
@@ -35,49 +35,73 @@
 #' @importFrom assertthat assert_that
 #' @export
 #' @method reduce_atlas_vec atlas
-reduce_atlas_vec.atlas <- function(atlas, data_vol, mask,
-                                   stat_func = mean,
-                                   dilate = FALSE,
-                                   radius = 4, maxn = 50, ...) {
-
+reduce_atlas_vec.atlas <- function(
+  atlas,
+  data_vol,
+  mask,
+  stat_func = mean,
+  dilate = FALSE,
+  radius = 4,
+  maxn = 50,
+  ...
+) {
   # --- Input validation -------------------------------------------------------
-  assert_that(inherits(atlas, "atlas"),
-              msg = "'atlas' must be an atlas object")
-  assert_that(methods::is(data_vol, "NeuroVec"),
-              msg = "'data_vol' must be a NeuroVec (4D) object")
-  assert_that(methods::is(mask, "NeuroVol") || methods::is(mask, "LogicalNeuroVol"),
-              msg = "'mask' must be a NeuroVol or LogicalNeuroVol")
+  assert_that(
+    inherits(atlas, "atlas"),
+    msg = "'atlas' must be an atlas object"
+  )
+  assert_that(
+    methods::is(data_vol, "NeuroVec"),
+    msg = "'data_vol' must be a NeuroVec (4D) object"
+  )
+  assert_that(
+    methods::is(mask, "NeuroVol") || methods::is(mask, "LogicalNeuroVol"),
+    msg = "'mask' must be a NeuroVol or LogicalNeuroVol"
+  )
 
   atlas_dims <- dim(.get_atlas_volume(atlas))[1:3]
-  data_dims  <- dim(data_vol)[1:3]
-  mask_dims  <- dim(mask)[1:3]
+  data_dims <- dim(data_vol)[1:3]
+  mask_dims <- dim(mask)[1:3]
 
-  assert_that(all(atlas_dims == data_dims),
-              msg = sprintf("Spatial dimensions of atlas (%s) and data_vol (%s) must match",
-                            paste(atlas_dims, collapse = "x"),
-                            paste(data_dims, collapse = "x")))
-  assert_that(all(atlas_dims == mask_dims),
-              msg = sprintf("Spatial dimensions of atlas (%s) and mask (%s) must match",
-                            paste(atlas_dims, collapse = "x"),
-                            paste(mask_dims, collapse = "x")))
+  assert_that(
+    all(atlas_dims == data_dims),
+    msg = sprintf(
+      "Spatial dimensions of atlas (%s) and data_vol (%s) must match",
+      paste(atlas_dims, collapse = "x"),
+      paste(data_dims, collapse = "x")
+    )
+  )
+  assert_that(
+    all(atlas_dims == mask_dims),
+    msg = sprintf(
+      "Spatial dimensions of atlas (%s) and mask (%s) must match",
+      paste(atlas_dims, collapse = "x"),
+      paste(mask_dims, collapse = "x")
+    )
+  )
 
-  # --- Coerce mask to logical --------------------------------------------------
+  # --- Coerce mask to logical
+  # --------------------------------------------------
   if (!methods::is(mask, "LogicalNeuroVol")) {
-    mask <- neuroim2::LogicalNeuroVol(as.array(mask) != 0,
-                                      space = neuroim2::space(mask))
+    mask <- neuroim2::LogicalNeuroVol(
+      as.array(mask) != 0,
+      space = neuroim2::space(mask)
+    )
   }
 
-  # --- Optional dilation -------------------------------------------------------
+  # --- Optional dilation
+  # -------------------------------------------------------
   working_atlas <- atlas
   if (isTRUE(dilate)) {
     working_atlas <- dilate_atlas(atlas, mask, radius = radius, maxn = maxn)
   }
 
-  # --- Densify atlas volume ----------------------------------------------------
+  # --- Densify atlas volume
+  # ----------------------------------------------------
   atlas_vol <- .get_atlas_volume(working_atlas)
   if (methods::is(atlas_vol, "ClusteredNeuroVol")) {
     atlas_arr <- array(0L, dim = dim(atlas_vol))
-    mask_idx  <- which(atlas_vol@mask)
+    mask_idx <- which(atlas_vol@mask)
     atlas_arr[mask_idx] <- as.integer(atlas_vol@clusters)
   } else {
     atlas_arr <- as.integer(as.array(atlas_vol))
@@ -90,11 +114,11 @@ reduce_atlas_vec.atlas <- function(atlas, data_vol, mask,
   atlas_arr[!mask_logical] <- 0L
 
   # --- Identify present / missing clusters ------------------------------------
-  orig_ids       <- atlas$ids
-  present_ids    <- sort(unique(atlas_arr[atlas_arr != 0L]))
-  missing_ids    <- setdiff(orig_ids, present_ids)
+  orig_ids <- atlas$ids
+  present_ids <- sort(unique(atlas_arr[atlas_arr != 0L]))
+  missing_ids <- setdiff(orig_ids, present_ids)
   all_ids_sorted <- sort(orig_ids)
-  K              <- length(all_ids_sorted)
+  K <- length(all_ids_sorted)
 
   if (K == 0L) {
     stop("Atlas has no region IDs")
@@ -102,7 +126,12 @@ reduce_atlas_vec.atlas <- function(atlas, data_vol, mask,
 
   # --- Remap cluster IDs to contiguous 1:K ------------------------------------
   # Build lookup:  original_id  ->  column index (1..K)
-  id_to_col <- stats::setNames(seq_along(all_ids_sorted), as.character(all_ids_sorted))
+  id_to_col <- stats::setNames(
+    seq_along(all_ids_sorted),
+    as.character(
+      all_ids_sorted
+    )
+  )
 
   # Remap the masked atlas array
   remapped_arr <- array(0L, dim = dim(atlas_arr))
@@ -127,18 +156,27 @@ reduce_atlas_vec.atlas <- function(atlas, data_vol, mask,
 
   full_remapped <- array(0L, dim = dim(full_arr))
   full_nz <- which(full_arr != 0L)
-  full_remapped[full_nz] <- as.integer(id_to_col[as.character(full_arr[full_nz])])
+  full_remapped[full_nz] <- as.integer(
+    id_to_col[as.character(
+      full_arr[
+        full_nz
+      ]
+    )]
+  )
 
   sp3 <- neuroim2::space(full_atlas_vol)
 
   full_mask_vol <- neuroim2::LogicalNeuroVol(full_remapped != 0L, space = sp3)
   full_cvol <- neuroim2::ClusteredNeuroVol(
-    mask     = full_mask_vol,
+    mask = full_mask_vol,
     clusters = as.integer(full_remapped[full_remapped != 0L]),
     label_map = stats::setNames(
       as.list(seq_len(K)),
-      if (!is.null(atlas$labels)) atlas$labels[match(all_ids_sorted, orig_ids)]
-      else as.character(all_ids_sorted)
+      if (!is.null(atlas$labels)) {
+        atlas$labels[match(all_ids_sorted, orig_ids)]
+      } else {
+        as.character(all_ids_sorted)
+      }
     )
   )
 
@@ -147,16 +185,22 @@ reduce_atlas_vec.atlas <- function(atlas, data_vol, mask,
 
   if (length(present_ids) > 0L) {
     # Build a masked ClusteredNeuroVol (only present clusters) for aggregation
-    masked_mask_vol <- neuroim2::LogicalNeuroVol(remapped_arr != 0L, space = sp3)
+    masked_mask_vol <- neuroim2::LogicalNeuroVol(
+      remapped_arr != 0L,
+      space = sp3
+    )
     masked_cvol <- neuroim2::ClusteredNeuroVol(
       mask     = masked_mask_vol,
       clusters = as.integer(remapped_arr[remapped_arr != 0L])
     )
 
     # Let ClusteredNeuroVec aggregate the NeuroVec for present clusters
-    partial <- neuroim2::ClusteredNeuroVec(x = data_vol, cvol = masked_cvol,
-                                           FUN = stat_func)
-    partial_ts <- partial@ts  # T x n_present matrix
+    partial <- neuroim2::ClusteredNeuroVec(
+      x = data_vol,
+      cvol = masked_cvol,
+      FUN = stat_func
+    )
+    partial_ts <- partial@ts # T x n_present matrix
   }
 
   # --- Assemble full T x K matrix with NA for missing clusters ----------------

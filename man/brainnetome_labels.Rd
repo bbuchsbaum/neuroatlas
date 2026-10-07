@@ -26,3 +26,9 @@ Brainnetome assets are downloaded on demand and cached locally. They are not
 bundled with neuroatlas; use is governed by the legal agreement on the
 Brainnetome download page.
 }
+\examples{
+\dontrun{
+labels <- brainnetome_labels()
+head(labels)
+}
+}

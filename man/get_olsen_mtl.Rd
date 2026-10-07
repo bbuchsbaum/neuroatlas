@@ -7,7 +7,8 @@
 get_olsen_mtl(outspace = NULL)
 }
 \arguments{
-\item{outspace}{Optional \code{NeuroSpace} object specifying desired output space.
+\item{outspace}{Optional \code{NeuroSpace} object specifying desired output
+space.
 If NULL (default), returns atlas in native 1mm MNI space.}
 }
 \value{

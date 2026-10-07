@@ -18,3 +18,10 @@ Invisibly returns `x` if valid; otherwise throws an error.
 \description{
 Validate structure and key invariants for `parcel_data` objects.
 }
+\examples{
+x <- parcel_data(data.frame(
+  id = 1:2, label = c("A", "B"),
+  hemi = c("left", "right"), value = c(0.2, 0.7)
+), atlas_id = "toy")
+validate_parcel_data(x)
+}

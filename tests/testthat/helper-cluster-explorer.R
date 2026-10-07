@@ -1,7 +1,10 @@
 make_toy_cluster_explorer_inputs <- function(n_time = 4) {
   dims <- c(5, 5, 5)
-  sp3 <- neuroim2::NeuroSpace(dim = dims, spacing = c(1, 1, 1),
-                              origin = c(0, 0, 0))
+  sp3 <- neuroim2::NeuroSpace(
+    dim = dims,
+    spacing = c(1, 1, 1),
+    origin = c(0, 0, 0)
+  )
 
   atlas_arr <- array(0L, dim = dims)
   atlas_arr[1:2, 1:2, 1:2] <- 1L

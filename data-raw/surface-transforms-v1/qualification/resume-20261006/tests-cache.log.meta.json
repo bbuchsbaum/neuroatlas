@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-06T02:47:53.778648+00:00",
+  "finished_utc": "2026-10-06T02:52:19.379912+00:00",
+  "duration_seconds": 265.600239,
+  "command": [
+    "Rscript",
+    "-e",
+    "devtools::test(stop_on_failure = TRUE)"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/neuroatlas",
+  "log": "/tmp/neuroatlas-resume-20261006/tests-cache.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 372968
+}
