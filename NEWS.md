@@ -1,5 +1,9 @@
 # neuroatlas 0.2.0.9000
 
+* Accept neurosurf's `0.1.0` CRAN-preparation version and pin its tested GitHub
+  revision. This fixes CI dependency resolution after upstream release numbering
+  replaced the higher-numbered development version.
+
 * Exact pinned fsaverage 164k surfaces support directed native resampling to
   and from fsaverage6 (41k) and fsaverage5 (10k), separately for each hemisphere.
   New input manifests preserve released domain identities. Qualification covers

@@ -57,7 +57,7 @@ Suggests:
     jsonlite,
     knitr,
     mockery,
-    neurosurf (>= 0.1.0.9002),
+    neurosurf (>= 0.1.0),
     neurotransform (>= 0.2.0),
     patchwork,
     png,
@@ -77,7 +77,7 @@ VignetteBuilder:
     knitr
 Remotes:
     bbuchsbaum/neuroim2,
-    bbuchsbaum/neurosurf,
+    bbuchsbaum/neurosurf@b8bb05d01dcf7360141850ad56b173d7df2f8079,
     bbuchsbaum/neurotransform@933edddda462593941e167726e8aaa7168ff103a,
     bbuchsbaum/albersdown,
     bbuchsbaum/templateflow,

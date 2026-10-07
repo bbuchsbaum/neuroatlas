@@ -1,0 +1,1 @@
+{"actor":"codex-ci-dependencies","entity":"bd-01M4BQTVMVAFQFNK5MEWWJPPEP","kind":"reserve_open","mode":"exclusive","op":"20261007T175133.690500Z-p657283-c0000-r9a41-he47c58","paths":["DESCRIPTION","NEWS.md","tests/testthat/test-dependency-metadata.R"],"reservation_id":"rv-01M4BQVXSTDYHE8JTPC1RS0D8Y","ts":"2026-10-07T17:51:33.690500Z","ttl_s":3600,"v":2}
