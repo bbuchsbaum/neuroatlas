@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/check_on_different_r_os.yml/badge.svg)](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/check_on_different_r_os.yml)
+[![test-coverage](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/bbuchsbaum/neuroatlas/actions/workflows/test-coverage.yaml)
+[![Codecov test coverage](https://codecov.io/gh/bbuchsbaum/neuroatlas/branch/master/graph/badge.svg)](https://app.codecov.io/gh/bbuchsbaum/neuroatlas?branch=master)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
