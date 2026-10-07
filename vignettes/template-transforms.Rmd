@@ -102,6 +102,49 @@ parcellations equivalent. After alignment, use `atlas_overlap()` to inspect
 spatial relationships. `map_atlas()` retains its original role of mapping
 supplied regional values onto an atlas.
 
+## Inspect population cortical projection coverage
+
+Volume-to-cortex projection can discard parcels even when interpolation is
+implemented correctly. Inspect each map and each stage with
+`projection_diagnostics()`. The summary reports missing source parcels, parcels
+lost during subsequent surface resampling, and wrong-hemisphere output counts.
+The label table retains source voxel, sampled surface vertex, and final surface
+vertex counts separately; these counts are not interchangeable measures of area
+or volume.
+
+```{r projection-coverage, eval=FALSE}
+atlas <- get_schaefer_atlas(parcels = 200, networks = 7, resolution = 2)
+surface <- get_surface_geometry("fsLR", "32k", "L")
+projection <- get_surface_projection("MNI152NLin6Asym", surface)
+projected <- apply_surface_projection(atlas, projection)
+qa <- projection_diagnostics(projected)
+qa$summary
+subset(qa$labels, lost_at_sampling | lost_at_resampling)
+subset(qa$labels, hemisphere_mismatch)
+```
+
+`not_sampled` identifies a source key with no supported first-stage sample;
+`lost_resampling` identifies a key that survives sampling but has no final
+surface vertex. Declared keys absent from the input are `absent_source`.
+Supported key zero is counted separately. Masked or unavailable vertices never
+contribute to label counts, and remain visible in the existing coverage fields.
+
+Atlas inputs supply their declared hemisphere metadata. For bare volumes,
+provide a `label_table` with an optional `hemisphere` column (`L`, `R`, `both`,
+or `NA`). Opposite-hemisphere source keys are excluded from expected parcel-loss
+totals, while any output vertices carrying them are reported. Without those
+declarations, diagnostics report `unchecked_labels`; they do not infer hemisphere
+from region names or numeric key ranges. The diagnostics preserve projected
+values and expose issues for review.
+
+The pinned Schaefer1000 quality campaign found three source parcels absent from
+fsLR output (keys 214, 710 and 903), with loss localized to surface resampling.
+Key 903 is also absent from the published fsLR reference. This limitation is
+retained in the [quality report](https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/transform-quality-v1/README.md);
+agreement with a published atlas is diagnostic compatibility, not independent
+anatomical validation. Where the required atlas is already published on the
+target surface, its native labels avoid adding another population projection.
+
 ## Route availability and nonlinear artifacts
 
 The manifest distinguishes available and planned routes. Only available routes

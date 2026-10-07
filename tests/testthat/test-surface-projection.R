@@ -40,6 +40,138 @@ make_toy_projection_ramp <- function() {
   array(indices[, 1] + 2 * indices[, 2] + 4 * indices[, 3], c(4L, 4L, 4L))
 }
 
+test_that("diagnostics separate map loss, absent keys and hemisphere declarations", {
+  skip_if_not_installed("neurotransform", "0.2.0")
+  coords <- matrix(rep(c(0, 0, 0), 6), ncol = 3, byrow = TRUE)
+  values <- array(0, c(4, 4, 4, 2))
+  values[2, 1, 1, 1] <- 9
+  values[1, 1, 1, 2] <- 9
+  values[3, 1, 1, ] <- 17
+  table <- data.frame(
+    key = c(0, 9, 17, 99), name = c("zero", "nine", "right", "absent"),
+    hemisphere = c(NA, "left", "RH", "L")
+  )
+  result <- apply_surface_projection(
+    values, make_toy_projection(coords), "toy-RAS", diag(4), "label",
+    label_table = table
+  )
+  qa <- projection_diagnostics(result)
+  expect_equal(qa$summary$not_sampled_labels, c(1, 0))
+  expect_equal(qa$summary$lost_resampling_labels, c(0, 0))
+  expect_equal(qa$summary$target_available_vertices, c(6, 6))
+  nine <- subset(qa$labels, key == 9)
+  expect_equal(nine$source_voxels, c(1, 1))
+  expect_equal(nine$sampled_vertices, c(0, 6))
+  expect_equal(nine$target_vertices, c(0, 6))
+  expect_equal(nine$status, c("not_sampled", "represented"))
+  expect_true(all(subset(qa$labels, key == 99)$status == "absent_source"))
+  expect_true(all(subset(qa$labels, key == 17)$status == "other_hemisphere"))
+  expect_false(any(subset(qa$labels, key == 17)$lost_at_sampling))
+  expect_false(any(subset(qa$labels, key == 0)$lost_at_sampling))
+  expect_identical(result$label_table, table)
+  # Overall-key provenance remains available; map 1 loss is now explicit.
+  expect_false(9 %in% result$provenance$lost_label_keys)
+  result$values[1, 1] <- 99
+  expect_error(projection_diagnostics(result), "unmodified")
+})
+
+test_that("diagnostics expose hemisphere leakage without changing supported values", {
+  skip_if_not_installed("neurotransform", "0.2.0")
+  coords <- matrix(rep(c(0, 0, 0), 6), ncol = 3, byrow = TRUE)
+  table <- data.frame(key = 7, name = "custom", hemisphere = "R")
+  result <- apply_surface_projection(
+    array(7, c(4, 4, 4)), make_toy_projection(coords), "toy-RAS", diag(4),
+    "label", label_table = table
+  )
+  expect_equal(result$values, rep(7, 6))
+  qa <- projection_diagnostics(result)
+  expect_equal(qa$summary$hemisphere_mismatch_vertices, 6)
+  expect_true(qa$labels$hemisphere_mismatch)
+  expect_equal(qa$summary$not_sampled_labels, 0)
+  table$hemisphere <- NULL
+  table$name <- "RH_this_name_does_not_declare_a_hemisphere"
+  unchecked <- apply_surface_projection(
+    array(7, c(4, 4, 4)), make_toy_projection(coords), "toy-RAS", diag(4),
+    "label", label_table = table
+  )
+  expect_equal(projection_diagnostics(unchecked)$summary$unchecked_labels, 1)
+  expect_equal(
+    projection_diagnostics(unchecked)$summary$hemisphere_mismatch_vertices, 0
+  )
+  table$hemisphere <- "infer_from_name"
+  expect_error(apply_surface_projection(
+    array(7, c(4, 4, 4)), make_toy_projection(coords), "toy-RAS", diag(4),
+    "label", label_table = table
+  ), "hemisphere")
+})
+
+test_that("diagnostics localize categorical voting loss in a composed surface stage", {
+  skip_if_not_installed("neurotransform", "0.2.0")
+  coords <- rbind(c(0, 0, 0), c(1, 0, 0), matrix(0, 4, 3))
+  projection <- make_toy_projection(coords)
+  # Rotate the target sphere so each target receives a vote from three sources.
+  sphere <- rbind(
+    c(1, 0, 0), c(-1, 0, 0), c(0, 1, 0), c(0, -1, 0),
+    c(0, 0, 1), c(0, 0, -1)
+  )
+  faces <- rbind(
+    c(0, 2, 4), c(2, 1, 4), c(1, 3, 4), c(3, 0, 4),
+    c(2, 0, 5), c(1, 2, 5), c(3, 1, 5), c(0, 3, 5)
+  )
+  base <- surface_geometry(
+    projection$specification$target, sphere, faces, rep(TRUE, 6)
+  )
+  rotation <- rbind(
+    c(1, 1, 1) / sqrt(3), c(1, -1, 0) / sqrt(2), c(1, 1, -2) / sqrt(6)
+  )
+  target_sphere <- sphere %*% rotation
+  mask <- c(FALSE, rep(TRUE, 5))
+  target_domain <- surface_domain(
+    "toy", "L", "6v", target_sphere, faces, mask, "analytic", "projection-test"
+  )
+  target <- surface_geometry(target_domain, target_sphere, faces, mask)
+  projection$specification$target <- target$domain
+  projection$surface_operator <- get_surface_transform(base, target, NULL)
+  projection$id <- neuroatlas:::.surface_projection_id(projection)
+  values <- array(4, c(4, 4, 4))
+  values[2, 1, 1] <- 9
+  result <- apply_surface_projection(
+    values, projection, "toy-RAS", diag(4), "label",
+    label_table = data.frame(key = c(4, 9), hemisphere = "L")
+  )
+  qa <- projection_diagnostics(result)
+  nine <- subset(qa$labels, key == 9)
+  expect_equal(nine$source_voxels, 1)
+  expect_equal(nine$sampled_vertices, 1)
+  expect_equal(nine$target_vertices, 0)
+  expect_identical(nine$status, "lost_resampling")
+  expect_equal(qa$summary$lost_resampling_labels, 1)
+  expect_equal(qa$summary$target_cortex_vertices, 5)
+  expect_equal(qa$summary$target_available_vertices, 5)
+  expect_true(is.na(result$values[1]))
+})
+
+test_that("noncategorical and missing-only diagnostics keep coverage distinct", {
+  skip_if_not_installed("neurotransform", "0.2.0")
+  coords <- matrix(rep(c(0, 0, 0), 6), ncol = 3, byrow = TRUE)
+  projection <- make_toy_projection(coords, c(rep(TRUE, 4), rep(FALSE, 2)))
+  result <- apply_surface_projection(
+    array(NA_real_, c(4, 4, 4)), projection, "toy-RAS", diag(4), "continuous"
+  )
+  qa <- projection_diagnostics(result)
+  expect_null(qa$labels)
+  expect_equal(qa$summary$sampled_cortex_vertices, 4)
+  expect_equal(qa$summary$sampled_available_vertices, 0)
+  expect_equal(qa$summary$source_finite_voxels, 0)
+  result <- apply_surface_projection(
+    array(NA_real_, c(4, 4, 4)), projection, "toy-RAS", diag(4), "label"
+  )
+  expect_equal(nrow(projection_diagnostics(result)$labels), 0)
+  expect_equal(projection_diagnostics(result)$summary$not_sampled_labels, 0)
+  unprojected <- surface_data(rep(1, 6), projection$specification$target)
+  expect_error(projection_diagnostics(unprojected), "diagnostics")
+})
+
 test_that(
   "projection preserves ramps, valid zero, bounds and cortical masks",
   {

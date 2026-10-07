@@ -310,17 +310,24 @@ ribbon_projection <- function(
 #'   or `"error"` for a missing positive contributor in included cortical
 #' support.
 #'   Outside-grid samples remain unsupported under every policy.
-#' @param label_table Optional key/name/color table preserved on output.
+#' @param label_table Optional key/name/color table preserved on output. An
+#'   optional `hemisphere` column declares `"L"`, `"R"`, `"both"`, or `NA`
+#'   (unknown); left/right and LH/RH aliases are accepted. Hemisphere checks
+#'   use these declarations, never label names or numeric key ranges.
 #' @return `SurfaceData` with values, exact target domain, per-map availability,
 #'   finite source-weight mass, geometric sampling coverage, lost labels and
 #'   directed projection provenance. Ribbon omission normalizes all finite
 #'   voxel/node weights together; categorical nodes vote with smallest-key ties.
+#'   [projection_diagnostics()] exposes per-map coverage and per-key counts at
+#'   the source, sampled surface and final surface. These are representation
+#'   counts, not anatomical accuracy or conservation across dimensions.
 #' @examples
 #' \dontrun{
 #' result <- apply_surface_projection(volume, projection,
 #'   source_space = "MNI152NLin6Asym", data_type = "probability"
 #' )
 #' }
+#' @md
 #' @export
 apply_surface_projection <- function(
   x,
@@ -381,8 +388,15 @@ apply_surface_projection <- function(
   if (is_atlas) {
     if (is.null(label_table) && data_type == "label") {
       label_table <- data.frame(key = x$ids, name = x$labels)
+      if (length(x$hemi) == length(x$ids)) {
+        label_table$hemisphere <- as.character(x$hemi)
+      }
       if (!0 %in% label_table$key) {
-        label_table <- rbind(data.frame(key = 0, name = "background"), label_table)
+        background <- label_table[1L, , drop = FALSE]
+        background[1L, ] <- NA
+        background$key <- 0
+        background$name <- "background"
+        label_table <- rbind(background, label_table)
       }
     }
     x <- .get_atlas_volume(x)
@@ -424,6 +438,7 @@ apply_surface_projection <- function(
   ) {
     stop("label_table must contain unique keys covering every input label.")
   }
+  if (data_type == "label") .projection_label_hemisphere(label_table)
   n <- s$sampling_domain$n_vertices
   maps <- if (length(dim(x)) == 4L) dim(x)[[4L]] else 1L
   interpolation <- if (data_type == "label") "nearest" else "linear"
@@ -500,6 +515,8 @@ apply_surface_projection <- function(
   status[!projection$cortex, ] <- "target_masked"
   output$coverage$status <- status
   sampling_coverage <- output$coverage
+  sampled_values <- output$values
+  target_cortex <- projection$cortex
   if (!is.null(projection$surface_operator)) {
     output <- apply_surface_transform(
       output,
@@ -507,6 +524,7 @@ apply_surface_projection <- function(
       na_policy = if (na_policy == "error") "propagate" else na_policy,
       label_method = "aggregate"
     )
+    target_cortex <- projection$surface_operator$plan$target_mask
   }
   output$provenance <- list(
     method = s$method,
@@ -541,7 +559,156 @@ apply_surface_projection <- function(
       NULL
     }
   )
+  output$diagnostics <- .projection_diagnostics(
+    x, sampled_values, sampling_coverage, output, target_cortex
+  )
   output
+}
+
+#' Inspect Coverage and Label Loss in a Cortical Projection
+#'
+#' Returns diagnostics computed by [apply_surface_projection()]. Label counts
+#' are separated by map and stage, so a key surviving another map cannot hide
+#' loss. `not_sampled` means a source key has no supported sampled vertex;
+#' `lost_resampling` means it survives sampling but disappears during surface
+#' resampling. Declared keys absent from the source have status `absent_source`.
+#' Opposite-hemisphere keys have status `other_hemisphere` and are excluded from
+#' expected parcel-loss totals; any supported output vertices carrying those
+#' keys are still counted as hemisphere mismatches. Without explicit hemisphere
+#' metadata, keys remain unchecked and no hemisphere is inferred. Key zero is
+#' counted separately and excluded from parcel-loss totals; supported zero is
+#' still a valid value. Diagnostics never mask, relabel or repair values.
+#'
+#' @param x A `SurfaceData` result from [apply_surface_projection()].
+#' @return A list with `summary`, a per-map coverage/count tibble, and `labels`,
+#'   a per-map/per-key tibble for label data (`NULL` for other data types).
+#'   Label rows contain source voxel counts, supported sampled and target vertex
+#'   counts, hemisphere declarations, loss flags and stage status. Vertex and
+#'   voxel counts are not interchangeable area or volume measures. Missing and
+#'   masked vertices are excluded from label counts and retained in coverage.
+#' @examples
+#' \dontrun{
+#' qa <- projection_diagnostics(projected_atlas)
+#' qa$summary
+#' subset(qa$labels,
+#'   lost_at_sampling | lost_at_resampling | hemisphere_mismatch
+#' )
+#' }
+#' @md
+#' @export
+projection_diagnostics <- function(x) {
+  if (
+    !inherits(x, "SurfaceData") || !identical(x$id, .surface_data_id(x)) ||
+      is.null(x$diagnostics)
+  ) {
+    stop("Supply an unmodified apply_surface_projection() result with diagnostics.")
+  }
+  x$diagnostics
+}
+
+#' @keywords internal
+#' @noRd
+.projection_label_hemisphere <- function(label_table) {
+  if (is.null(label_table) || !"hemisphere" %in% names(label_table)) return(NULL)
+  values <- tolower(as.character(label_table$hemisphere))
+  values[!is.na(values) & values == ""] <- NA_character_
+  aliases <- c(
+    l = "L", left = "L", lh = "L", r = "R", right = "R", rh = "R",
+    both = "both", bilateral = "both", bilat = "both", midline = "both",
+    unknown = NA_character_, none = NA_character_
+  )
+  if (any(!is.na(values) & !values %in% names(aliases))) {
+    stop("label_table hemisphere must declare L, R, both or unknown.")
+  }
+  unname(aliases[values])
+}
+
+#' @keywords internal
+#' @noRd
+.projection_diagnostics <- function(
+  source, sampled_values, sampled_coverage, output, target_cortex
+) {
+  maps <- NCOL(output$values)
+  source <- matrix(source, ncol = maps)
+  sampled_values <- matrix(sampled_values, ncol = maps)
+  target_values <- matrix(output$values, ncol = maps)
+  sampled_available <- matrix(sampled_coverage$available, ncol = maps)
+  target_available <- matrix(output$coverage$available, ncol = maps)
+  summary <- tibble::tibble(
+    map = seq_len(maps),
+    source_finite_voxels = colSums(is.finite(source)),
+    sampled_cortex_vertices = sum(sampled_coverage$target_cortex),
+    sampled_available_vertices = colSums(sampled_available),
+    target_cortex_vertices = sum(target_cortex),
+    target_available_vertices = colSums(target_available)
+  )
+  if (output$data_type != "label") return(list(summary = summary, labels = NULL))
+  table <- output$label_table
+  keys <- sort(unique(c(table$key, source[is.finite(source)])))
+  names <- if (is.null(table$name)) {
+    rep(NA_character_, length(keys))
+  } else {
+    as.character(table$name[match(keys, table$key)])
+  }
+  declared <- .projection_label_hemisphere(table)
+  hemisphere <- if (is.null(declared)) {
+    rep(NA_character_, length(keys))
+  } else {
+    declared[match(keys, table$key)]
+  }
+  other <- !is.na(hemisphere) & hemisphere != "both" &
+    hemisphere != output$domain$hemisphere
+  count <- function(values, available = rep(TRUE, length(values))) {
+    tabulate(match(values[available & is.finite(values)], keys), length(keys))
+  }
+  labels <- lapply(seq_len(maps), function(map) {
+    src <- count(source[, map])
+    sampled <- count(sampled_values[, map], sampled_available[, map])
+    target <- count(target_values[, map], target_available[, map])
+    lost_sampling <- src > 0L & sampled == 0L & !other & keys != 0
+    lost_resampling <- sampled > 0L & target == 0L & !other & keys != 0
+    status <- rep("represented", length(keys))
+    status[lost_resampling] <- "lost_resampling"
+    status[lost_sampling] <- "not_sampled"
+    status[src == 0L] <- "absent_source"
+    status[other] <- "other_hemisphere"
+    status[keys == 0] <- "zero_key"
+    tibble::tibble(
+      map = map, key = keys, name = names, hemisphere = hemisphere,
+      source_voxels = src, sampled_vertices = sampled, target_vertices = target,
+      expected_in_hemisphere = !other, lost_at_sampling = lost_sampling,
+      lost_at_resampling = lost_resampling,
+      hemisphere_mismatch = other & target > 0L, status = status
+    )
+  })
+  labels <- do.call(rbind, labels)
+  summary$not_sampled_labels <- vapply(seq_len(maps), function(map) {
+    sum(
+      labels$map == map & labels$key != 0 & labels$expected_in_hemisphere &
+        labels$lost_at_sampling
+    )
+  }, integer(1))
+  summary$lost_resampling_labels <- vapply(seq_len(maps), function(map) {
+    sum(
+      labels$map == map & labels$key != 0 & labels$expected_in_hemisphere &
+        labels$lost_at_resampling
+    )
+  }, integer(1))
+  summary$hemisphere_mismatch_vertices <- vapply(seq_len(maps), function(map) {
+    sum(labels$target_vertices[labels$map == map & labels$hemisphere_mismatch])
+  }, integer(1))
+  summary$unchecked_labels <- vapply(seq_len(maps), function(map) {
+    sum(
+      labels$map == map & labels$key != 0 & labels$source_voxels > 0L &
+        is.na(labels$hemisphere)
+    )
+  }, integer(1))
+  first <- c(
+    "map", "not_sampled_labels", "lost_resampling_labels",
+    "hemisphere_mismatch_vertices", "unchecked_labels"
+  )
+  summary <- summary[c(first, setdiff(names(summary), first))]
+  list(summary = summary, labels = labels)
 }
 
 .validate_projection_affine <- function(affine) {

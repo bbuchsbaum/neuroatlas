@@ -15,39 +15,45 @@ apply_surface_projection(
 )
 }
 \arguments{
-\item{x}{A 3D/4D numeric array, `NeuroVol`, `NeuroVec`, or volumetric atlas.}
+\item{x}{A 3D/4D numeric array, \code{NeuroVol}, \code{NeuroVec}, or volumetric atlas.}
 
-\item{projection}{A `SurfaceProjection` from [get_surface_projection()] or
-[ribbon_projection()].}
+\item{projection}{A \code{SurfaceProjection} from \code{\link[=get_surface_projection]{get_surface_projection()}} or
+\code{\link[=ribbon_projection]{ribbon_projection()}}.}
 
 \item{source_space}{Exact frame identifier. Required for unannotated input;
 an explicit value must agree with attached metadata and the projection.}
 
 \item{affine}{For arrays, a finite nonsingular 4-by-4 matrix mapping
-  zero-based
-  voxel indices to RAS millimetres. Neuroimaging objects supply their own
+zero-based
+voxel indices to RAS millimetres. Neuroimaging objects supply their own
 affine.}
 
-\item{data_type}{`"auto"`, `"continuous"`, `"label"`, or `"probability"`.
+\item{data_type}{\code{"auto"}, \code{"continuous"}, \code{"label"}, or \code{"probability"}.
 Unannotated input requires an explicit type.}
 
-\item{na_policy}{`"propagate"`, `"omit"` with finite-weight normalization,
-  or `"error"` for a missing positive contributor in included cortical
+\item{na_policy}{\code{"propagate"}, \code{"omit"} with finite-weight normalization,
+or \code{"error"} for a missing positive contributor in included cortical
 support.
-  Outside-grid samples remain unsupported under every policy.}
+Outside-grid samples remain unsupported under every policy.}
 
-\item{label_table}{Optional key/name/color table preserved on output.}
+\item{label_table}{Optional key/name/color table preserved on output. An
+optional \code{hemisphere} column declares \code{"L"}, \code{"R"}, \code{"both"}, or \code{NA}
+(unknown); left/right and LH/RH aliases are accepted. Hemisphere checks
+use these declarations, never label names or numeric key ranges.}
 }
 \value{
-`SurfaceData` with values, exact target domain, per-map availability,
-  finite source-weight mass, geometric sampling coverage, lost labels and
-  directed projection provenance. Ribbon omission normalizes all finite
-  voxel/node weights together; categorical nodes vote with smallest-key ties.
+\code{SurfaceData} with values, exact target domain, per-map availability,
+finite source-weight mass, geometric sampling coverage, lost labels and
+directed projection provenance. Ribbon omission normalizes all finite
+voxel/node weights together; categorical nodes vote with smallest-key ties.
+\code{\link[=projection_diagnostics]{projection_diagnostics()}} exposes per-map coverage and per-key counts at
+the source, sampled surface and final surface. These are representation
+counts, not anatomical accuracy or conservation across dimensions.
 }
 \description{
 Scalar and probability data use trilinear interpolation; labels use nearest
 voxel centers with lower-index half-voxel ties. Sampling is restricted to the
-closed voxel-center box; unsupported values are `NA`, and supported zero is
+closed voxel-center box; unsupported values are \code{NA}, and supported zero is
 preserved. Probability channels retain partial mass and are not normalized
 across maps. Missingness considers strictly positive contributors only.
 fsLR composition resolves sampling missingness on fsaverage first, then
