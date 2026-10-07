@@ -1,0 +1,77 @@
+{
+  "post_hoc": true,
+  "reason": "Posterior STG concordance falls markedly at 2 mm; audit within-template consistency",
+  "script_sha256": "62dcc6d865407ebaa19e459e3e8192fc6b7983289ed39a2159fc1a180a66b6b2",
+  "cross_tabs": [
+    {
+      "template": "MNI152NLin6Asym",
+      "native_2mm_key": 10,
+      "downsampled_1mm_keys": {
+        "0": 764,
+        "9": 14,
+        "10": 809,
+        "11": 4,
+        "12": 189,
+        "20": 18,
+        "46": 32
+      }
+    },
+    {
+      "template": "MNI152NLin2009cAsym",
+      "native_2mm_key": 10,
+      "downsampled_1mm_keys": {
+        "0": 102,
+        "10": 729,
+        "46": 18
+      }
+    }
+  ],
+  "public_API_against_SimpleITK": [
+    {
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "kind": "T1w",
+      "max_abs": 0.0,
+      "different_voxels": 0,
+      "values": 1082035,
+      "R_output_sha256": "293f599fe5702a1a2402c09ae3182b0ffe383186ceafa7be2fd3de056b2b0bf1",
+      "SimpleITK_output_sha256": "1c363454471c8e77446b4bca97f0e9e94e58a6d892b874e1129cb2acdbe90060"
+    },
+    {
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "kind": "HOCPA",
+      "max_abs": 0.0,
+      "different_voxels": 0,
+      "values": 1082035,
+      "R_output_sha256": "1608ef9e8e7cc89090bef9c8fa6c0b5fd43d6c84c602345317609560638185d3",
+      "SimpleITK_output_sha256": "3a680e11d14ce27d6c7412de1dbd678848e288f4ba4a22697a77b49b546118eb"
+    },
+    {
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "kind": "T1w",
+      "max_abs": 0.0,
+      "different_voxels": 0,
+      "values": 902629,
+      "R_output_sha256": "01de6d470b53642e87dca32cbe3d58d2f356273855a6a87581948f887bc74f5b",
+      "SimpleITK_output_sha256": "a13150fce876eb92177c8a4ff6fe7c665d303706eeedf004414acdefc51c5fe8"
+    },
+    {
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "kind": "HOCPA",
+      "max_abs": 0.0,
+      "different_voxels": 0,
+      "values": 902629,
+      "R_output_sha256": "efdc09987a55ea8a86224ad0dd9e819f393d8bc665894a8cfc495f41f4c985d3",
+      "SimpleITK_output_sha256": "546042e71967173ac84322c68c1923e48e4e5c0b9cf1d6a62987c54f71f01ab2"
+    }
+  ],
+  "files": {
+    "1mm-source-to-2mm-sensitivity.csv": "35b3fb5d8b4ad391af94e483bb7900bff28ef1888a49c77ced0369010d776ccc",
+    "within-template-resolution.csv": "4b2e69339c7c6ccc9ab6ca8b5e4d4e426bcf35452f201030622782c5726882ee",
+    "MNI152NLin6Asym-STG.png": "46fc352f439886d1e4068fba07ea95b9fe68373c0dea29af4c0fd9caaeb0977f",
+    "MNI152NLin2009cAsym-STG.png": "702d7abf6312f1d93afd212b52bf9fbb023b332b4b59857487c4aef9a8b93e39"
+  }
+}

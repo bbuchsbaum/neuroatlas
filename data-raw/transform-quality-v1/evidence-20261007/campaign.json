@@ -1,0 +1,61 @@
+{
+  "schema": "neuroatlas.transform-quality-campaign.v1",
+  "measurement_status": "completed_with_limitations",
+  "anatomical_ground_truth": "not_established",
+  "projection_no_label_loss": "FAIL",
+  "source_commit": "c1dc2a4e5e63f2b3af384b3107dd24026b9eef14",
+  "protocol_frozen_utc": "2026-10-07T10:33:47Z",
+  "protocol_sha256": "f751cb0518e8cf8aa9caf46eade2b17af7c096da5517312619dd3ab4c2514f24",
+  "work_directory": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007",
+  "python_packages": {
+    "numpy": "2.4.3",
+    "nibabel": "5.4.2",
+    "SimpleITK": "2.5.3",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2"
+  },
+  "scripts": {
+    "test-metrics.py": "dc422b7f57ad20203d7c197473ea6dd2f2378e1d000ed865ea38575470ad6e78",
+    "mask-boundary-audit.py": "daf9b94d61c66e5744b0df144fda5838420d54e2ff6d69160918395a68ac956e",
+    "fetch-inputs.py": "933e5a315b5bc3d5d765b5af48a0b6c927009705294ebceaa2df00575ada2738",
+    "fetch-cbig-volumes.py": "967195a4fd01181a53ce770cd1669a3ea14dc8b70c59f50dbe3a9ad560bec402",
+    "prepare-surfaces.py": "08e55c617bbeb32a354c1bffac2f92a920cb2c893989fa34c5a562630cc0c61d",
+    "surface-quality.py": "e11271acea5794b4cd02b41f275388c7ce30a817c1953e6ac887ec63e57f64bc",
+    "record-checks.R": "670b14515dbd5621c6c639b7f82b8da599db0486d36ca36b38d4fee1a8ba321b",
+    "build-report.py": "88ce0a88b079307ba5e072a1c15dbafcb037760c29075640c66db9167f96ecfd",
+    "verify-evidence.py": "4a0eb70ba2482f353e950fa90bb6c55c6f54e0fbfe711eec8dedbd7937585ee6",
+    "diagnose-resolution.py": "62dcc6d865407ebaa19e459e3e8192fc6b7983289ed39a2159fc1a180a66b6b2",
+    "volume-quality.py": "2b9c522b72ab059e9a6f5070d4fa23fb1e212f0b663a075c40bf748832420b88",
+    "finalize-evidence.py": "d27da0ef46285bbe07bc8ffb90beee6ecbe9a134f7559162d770ff644bafa527",
+    "t2-quality.py": "4e4747e6cbe5f9a60c4ade7dc1dac6b2c8c8d44e813ecf9d3f75df69cfa50107",
+    "projection-stages.R": "f104bb4c47bd6e6cfc728e4981f0572a14926ddfbab025d11940991a33435556",
+    "public-api.R": "73243e3cbaca92aaf515017e19587fbd3a6e766261d0ef0f371be2f4f0d35cf9"
+  },
+  "source_manifests": {
+    "inst/extdata/transform_registry.csv": "d9a5cbba2fab6bcd07be61fe2f317f830a61957687f51d06b04a05258aa0f46b",
+    "inst/extdata/surface-inputs-v1.json": "efcd4d03f1361ff3be350f5fa2f640b146677de5cd780ae2a5b523c6151c97e0",
+    "inst/extdata/projection-inputs-v1.json": "02e62afdab4f561a42e9a40745f73e39a8be02294f9a89e3d80f4c8ac1dc813a"
+  },
+  "verification": "Verified 264 raw/input/packet hashes, exact script and protocol bindings; numerical repeat identical",
+  "human_expert_review": "pending",
+  "package_checks": {
+    "tests": {
+      "failed": 0,
+      "error": 0,
+      "warning": 43,
+      "skipped": 2,
+      "passed": 2770
+    },
+    "test_console_summary": "[ FAIL 0 | WARN 44 | SKIP 2 | PASS 2770 ]",
+    "check": {
+      "errors": [],
+      "warnings": [],
+      "notes": [
+        "checking installed package size ... NOTE\n  installed size is 30.0Mb\n  sub-directories of 1Mb or more:\n    data  19.5Mb\n    doc    8.2Mb\n    R      1.2Mb",
+        "checking for future file timestamps ... NOTE\nunable to verify current time"
+      ]
+    },
+    "tests_log_sha256": "515cb98f8a4c0483041f8d038df662a496e8116307fc540cd2ad1003109236fb",
+    "check_log_sha256": "d2eeba5928e5c15ab9567e31a1c18a26224e6630c9daf3441b12a9d7a596173b"
+  }
+}

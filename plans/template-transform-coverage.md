@@ -2,7 +2,7 @@
 
 Assessment date: 2026-09-25.
 Implementation tracker: `bd-01M3CCBG9346NRV3WEVH5YNBCQ`.
-Updated: 2026-10-06, after the 0.2.0 release. The initial cortical coverage
+Updated: 2026-10-07, after the transform quality campaign. The initial cortical coverage
 is released; the full density matrix and later mixed/specialist coverage remain
 unfinished. CIFTI development is locally qualified and is not yet released.
 
@@ -50,6 +50,17 @@ still running; it is not part of the published release.
 | CIFTI subcortical remapping and surface -> volume | Planned; no qualified executor |
 | CIVET correspondence | Planned; no qualified routes |
 | Other MNI variants, cerebellar and age-specific routes | Planned; no additional qualified routes |
+
+The [2026-10-07 quality campaign](../data-raw/transform-quality-v1/README.md)
+adds dense volume checks, all-region boundary/overlap reports, an additional
+T2 contrast, real-parcel Workbench comparisons, and a visual review packet.
+Volume checks find no sampled folds and a maximum dense round-trip error of
+0.174 mm; real surface labels agree exactly with Workbench BARYCENTRIC in
+12 cases. Fine-parcel population projection fails the campaign's no-label-loss
+criterion: three source Schaefer1000 parcels disappear, and disagreement with
+published fsLR labels reaches 35-37% of cortical vertices. Reference-resolution
+and mask-definition inconsistencies are documented without removing adverse
+results. These findings do not change the frozen release gates.
 
 Strict historical Workbench surface agreement still fails in three of four
 ordinary cases. Held-out anatomical validation and human visual review have not

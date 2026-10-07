@@ -1,0 +1,44 @@
+[
+  {
+    "path": "Schaefer2018_100Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/Schaefer2018_100Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 233605,
+    "sha256": "23d54226fc7fe5a1b20844a1c8f8d8e23b59888f6442d7590eb983dd8e682e9a"
+  },
+  {
+    "path": "Schaefer2018_100Parcels_7Networks_order.txt",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/freeview_lut/Schaefer2018_100Parcels_7Networks_order.txt",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 4169,
+    "sha256": "ca212790d0103949c8cfa0f7689f5935cad0d1fbfc06506f1fdf7986bee72786"
+  },
+  {
+    "path": "Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 295901,
+    "sha256": "abb8032840af30603995fd59634fd6bcd816088870de9061bbf90ad42c408d4d"
+  },
+  {
+    "path": "Schaefer2018_400Parcels_7Networks_order.txt",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/freeview_lut/Schaefer2018_400Parcels_7Networks_order.txt",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 17152,
+    "sha256": "f62cdc9de9696e11bda9fe1cd51fc013b1da27ba180d2dcead8f3fd94bf3cbc1"
+  },
+  {
+    "path": "Schaefer2018_1000Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/Schaefer2018_1000Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 361365,
+    "sha256": "c656b627c745255aa3fdfb2aa8027085bcfdb715a639bacfab0c652a6c2832df"
+  },
+  {
+    "path": "Schaefer2018_1000Parcels_7Networks_order.txt",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/MNI/freeview_lut/Schaefer2018_1000Parcels_7Networks_order.txt",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 43241,
+    "sha256": "7badc134a11bdcac50cb2cd5d2543c9301d3f9e5a10bd595493931e8eae68463"
+  }
+]
