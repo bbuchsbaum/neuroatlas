@@ -1,14 +1,17 @@
 # Resume neuroatlas on another machine
 
-Updated 2026-10-06. Working branch: `feat/native-surface-transforms`.
-Release candidate: **0.2.0**. This handoff records local validation; consult Mote
-and GitHub for subsequent hosted checks, merge and publication status.
+Updated 2026-10-06. Working branch: `master`.
+Released: **[0.2.0](https://github.com/bbuchsbaum/neuroatlas/releases/tag/v0.2.0)**.
+[PR #39](https://github.com/bbuchsbaum/neuroatlas/pull/39) is merged as
+`fb2384a77f6905313f67247abafe14e2759cfb66`; `v0.2.0` points to that exact commit.
+Publication was verified at 2026-10-07 00:46 UTC after all required checks passed.
+Subsequent handoff/Mote changes do not change the released package code.
 The broader transform Mote remains open for later coverage.
 
 ## Start from GitHub
 
 ```sh
-git clone --branch feat/native-surface-transforms \
+git clone --branch master \
   https://github.com/bbuchsbaum/neuroatlas.git
 cd neuroatlas
 git status --short --branch
@@ -122,13 +125,34 @@ installed size, time verification and unavailable optional HTML validation.
 A documentation-only follow-up verifies the slow cache example's `donttest`
 annotation; all executable R expressions match the full-check snapshot.
 The website build and project lint gate pass. Workflow syntax and seven offline
-release-guard tests pass. Exact-SHA hosted verification remains a separate step.
+release-guard tests pass. Candidate `63a4334` passes hosted project, OS and
+website checks. The merged tree is identical to that validated candidate.
+Exact-SHA default-branch verification at `fb2384a` also passes:
+
+- [Project checks and authenticated coverage delivery](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37550526551).
+- [OS matrix](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37550526258):
+  Windows, macOS, R-devel and R-oldrel all report `Status: OK`.
+- [Website build and deployment](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37550526317).
+- [Guarded publication](https://github.com/bbuchsbaum/neuroatlas/actions/runs/37553675097).
+
+Codecov project and patch statuses succeed on the same merge commit. The live
+[website](https://bbuchsbaum.github.io/neuroatlas/) and projection reference page
+serve version 0.2.0. A fresh GitHub clone verifies 202 pre-closeout Mote operations,
+all 54 retained evidence files, and each scientific receipt's 73 source bindings.
+Final closeout operations are committed with this handoff; reconstruct the latest
+board rather than treating that pre-closeout operation count as current.
 
 The owner selected neuroatlas conventions for `.lintr`, with complexity reviewed
 [separately](complexity-review.md). Mandatory project CI checks documentation,
 lint, package behavior, website building and coverage measurement. rOpenSci
 reports remain visible and advisory. Eco-atlas is unused and manual-only; its
 old API-key failure is not a current package gate.
+
+Code coverage delivery uses Codecov OIDC authentication and fails CI on upload
+errors. This replaces the unauthenticated upload at `dfe103e`, whose rejection
+was hidden by the action's default behavior. The corrected candidate's and
+merged commit's coverage reports were accepted for processing. Coverage artifacts
+are also retained in GitHub Actions, independently of the external dashboard.
 
 The release workflow can publish only approved version 0.2.0 from the current
 default-branch commit after exact-SHA project, OS and website checks pass. It
@@ -146,5 +170,7 @@ are not established.
 CIFTI with preserved subcortex, directed surface-to-volume rasterization, other
 surface densities, CIVET, specialist templates and further anatomical validation
 remain separate work under `bd-01M3CCBG9346NRV3WEVH5YNBCQ`. The quality-workflow
-Mote is `bd-01M47HZ11AWSD23BCAB6NXNXGY`; consult its latest state and hosted run
-links. Do not reuse active leases from another machine.
+Mote `bd-01M47HZ11AWSD23BCAB6NXNXGY` is closed after exact-SHA verification and
+publication. The broad transform Mote remains open for the work listed above.
+This devbox's claims, reservations and session are released at closeout.
+Do not reuse leases from another machine.
