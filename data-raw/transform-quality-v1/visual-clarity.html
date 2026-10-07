@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transform alignment: enlarged comparisons</title>
+<style>
+body{font:17px system-ui,sans-serif;background:#131923;color:#ecf0f7;margin:28px auto;padding:0 20px;max-width:1150px;line-height:1.5}
+h1{font-size:29px}p{max-width:1000px}select,button,input{font:inherit;padding:8px;border-radius:5px}button{cursor:pointer}select{max-width:100%}.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0}.panels{display:grid;grid-template-columns:1fr 1fr;gap:20px}.frame{background:black;position:relative}.frame img{width:100%;display:block;image-rendering:pixelated}.ends{display:flex;justify-content:space-between;padding:0 10px;background:black}.muted{color:#bbc7d9}h2{font-size:21px;margin-bottom:8px}#legend{min-height:3em}#phase{font-weight:bold;color:#ffe098}#bar{width:280px;height:16px}a{color:#acd6ff}@media(max-width:650px){body{padding:0 10px}.panels{gap:8px}h2{font-size:16px}}
+</style>
+<h1>Does the anatomy line up?</h1>
+<p>Compare each source image with the same stationary target. In blink mode,
+watch the ventricular walls and cortical folds: less movement between frames
+means better local correspondence. Use <b>Toggle target/source</b> to compare
+without animation.</p>
+<label for="view">Transform and anatomical view</label><br><select id="view"></select>
+<div class="controls">
+<label>Display <select id="mode"><option value="blink">Blink against target</option><option value="overlays">Magenta / green overlay</option><option value="residuals">Absolute difference</option></select></label>
+<button id="play" type="button">Start blink</button>
+<button id="step" type="button">Toggle target/source</button>
+<label>Interval <select id="speed"><option value="800">0.8 seconds</option><option value="1200">1.2 seconds</option><option value="500">0.5 seconds</option></select></label>
+</div>
+<p id="phase" aria-live="off"></p>
+<div class="panels">
+<section><h2>Before: identity resampling</h2><div class="frame"><img id="before" alt="Source before alignment, compared with the target"></div><div class="ends"><span class="left"></span><span class="right"></span></div><p id="beforemetric"></p></section>
+<section><h2>After: released transform</h2><div class="frame"><img id="after" alt="Source after alignment, compared with the target"></div><div class="ends"><span class="left"></span><span class="right"></span></div><p id="aftermetric"></p></section>
+</div>
+<p id="legend"></p><div id="scale" hidden><canvas id="bar" width="280" height="16"></canvas><div>0 &nbsp;&nbsp;&nbsp;&nbsp; Absolute normalized T1 difference &nbsp;&nbsp;&nbsp;&nbsp; 0.30+</div></div>
+<p class="muted">Both panels blink in sync. The target frame is identical on both
+sides. Views use fixed anatomical coordinates in both directions at 1 and 2 mm;
+they were not selected by improvement. Left hemisphere is on the left in axial
+and coronal views; sagittal views run posterior to anterior.</p>
+<p class="muted">Each volume is divided by its own 99th-percentile intensity
+inside the target brain mask, following the original campaign. Grayscale is
+fixed at 0&ndash;1 and differences at 0&ndash;0.30 across all views. No local
+contrast enhancement or display smoothing. Mean residuals use only target-mask
+pixels in the displayed crop. The full crop is shown, including mask boundaries.</p>
+<p><b>Interpretation:</b> color fringes and blinking show both geometric and
+intensity differences. Residuals are not anatomical error in millimeters;
+interpolation and template contrast can also change them. Better-looking
+alignment does not replace independent anatomical review.</p>
+<p class="muted">Visual supplement to the frozen 7 October 2026 campaign.
+Original numerical results and adverse findings remain unchanged. This file
+works offline; no server or external assets are needed.</p>
+<script>
+const panels = __PANELS__;
+const byId = id => document.getElementById(id);
+let timer = null, target = false;
+panels.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p.label;byId('view').append(o)});
+function stop(){clearInterval(timer);timer=null;byId('play').textContent='Start blink'}
+function draw(){
+ const p=panels[Number(byId('view').value)], mode=byId('mode').value;
+ const blink=mode==='blink';
+ byId('before').src=blink?(target?p.reference:p.before):p[mode][0];
+ byId('after').src=blink?(target?p.reference:p.after):p[mode][1];
+ byId('phase').textContent=blink?(target?'TARGET: same reference in both panels':'SOURCE: before alignment / after alignment'):(mode==='overlays'?'OVERLAY: target and source together':'DIFFERENCE: same intensity scale in both panels');
+ for(const [i,id] of ['beforemetric','aftermetric'].entries())byId(id).textContent='Mean absolute residual in crop: '+p.errors[i].toFixed(3);
+ document.querySelectorAll('.left').forEach(el=>el.textContent=p.ends[0]);
+ document.querySelectorAll('.right').forEach(el=>el.textContent=p.ends[1]);
+ byId('legend').textContent=mode==='overlays'?'Magenta = target; green = source. Equal intensities appear gray. Look for paired magenta/green fringes along anatomical edges.':mode==='residuals'?'Darker means a smaller intensity difference. Bright areas can reflect misalignment, contrast differences, or differing brain masks.':'Watch the anatomy move as the target and source alternate. Compare the amount of movement in the two panels.';
+ byId('scale').hidden=mode!=='residuals';
+ byId('play').disabled=!blink;byId('step').disabled=!blink;byId('speed').disabled=!blink;
+}
+byId('play').onclick=()=>{if(timer){stop();return}timer=setInterval(()=>{target=!target;draw()},Number(byId('speed').value));byId('play').textContent='Pause blink'};
+byId('step').onclick=()=>{stop();target=!target;draw()};
+byId('view').onchange=()=>{target=false;draw()};
+byId('mode').onchange=()=>{stop();target=false;draw()};
+byId('speed').onchange=()=>{if(timer){stop();byId('play').click()}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
+// Extract the exact magma colors from an embedded, generated colorbar below.
+const barImage=new Image();barImage.onload=()=>byId('bar').getContext('2d').drawImage(barImage,0,0,280,16);barImage.src='__COLORBAR__';
+draw();
+</script></html>

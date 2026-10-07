@@ -2,3 +2,4 @@
 evidence-20261007/** -text
 # Python CSV exports use standard CRLF record terminators.
 evidence-20261007/*.csv whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+visuals-20261007/** -text

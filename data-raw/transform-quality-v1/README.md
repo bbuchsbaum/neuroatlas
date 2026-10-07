@@ -12,6 +12,18 @@ give an independently established anatomical error bound.
 [All volume regions](evidence-20261007/volume-02-regions.csv) |
 [All surface parcels](evidence-20261007/surface-02-parcels.csv)
 
+[Enlarged interactive comparisons](visuals-20261007/index.html) add synchronized
+blinking, magenta/green overlays and fixed-scale intensity differences. Download
+and open the HTML locally; it is self-contained. Four fixed anatomical views
+cover both directions at both resolutions, including the midline/brainstem.
+The target frame is identical in the two blink panels. Animation starts only
+when requested. Static ventricular detail figures and a separate provenance
+receipt are in the same directory. This visual supplement preserves the frozen
+campaign results; intensity residuals are not anatomical error in millimeters.
+
+Reproduce with `visual-clarity.py WORK FRESH_OUTPUT_DIRECTORY`; run
+`test-visual-clarity.py` for synthetic orientation and overlay controls.
+
 The ten worst regions per volume cell and ten worst parcels per surface case
 are also listed in [volume](evidence-20261007/worst-volume-regions.csv) and
 [surface](evidence-20261007/worst-surface-parcels.csv) review tables.

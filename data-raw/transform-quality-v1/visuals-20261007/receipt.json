@@ -1,0 +1,482 @@
+{
+  "purpose": "Post hoc visual supplement; no new qualification gate",
+  "source_receipt_sha256": "dce108ab96fbabe76dcb3271ea476f0bddacca3504b04c8fb3f66e1268c4e904",
+  "script_sha256": "f03f03efb1dd95ad601204e859204e1d107048bd8b788ee240efe17439a5af06",
+  "html_template_sha256": "f946f9d7021fff80ef0933e1b7567e814223d163c31b1bc2a65f84c70d062afb",
+  "inputs": [
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin2009cAsym_res-01_desc-brain_T1w.nii.gz",
+      "sha256": "97cee2cf7f51388d76d7b3632c8375d688d0fa171e1bede81fcef23726bb3d73"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz",
+      "sha256": "e40bb1816736504d4c25abc243c1c8503df1d308f64c048318aa4b829e09a7ae"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-identity-T1w.nii.gz",
+      "sha256": "f4edeab5fa5500d9b66e120b7e108ec360affca347919d03aa5b3d32aaeccedd"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-warp-T1w.nii.gz",
+      "sha256": "2b2238e5b3b75a32714a506a0d42f394b9d5d310974136454ee231375aef6dfc"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin2009cAsym_res-02_desc-brain_T1w.nii.gz",
+      "sha256": "7b168153a9508f5f116ac37d33835fa44dd168ba7a9ae31a3b33e6f63bd23292"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin2009cAsym_res-02_desc-brain_mask.nii.gz",
+      "sha256": "7a71e9ce99d2af7b68bb5c163908c8e25f4c7a198806fb0893a5c1759b480ecd"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-identity-T1w.nii.gz",
+      "sha256": "520c39f522fc60f3c99678143c4609352de2118b59b136f4c55be53b0cb525da"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-warp-T1w.nii.gz",
+      "sha256": "1c363454471c8e77446b4bca97f0e9e94e58a6d892b874e1129cb2acdbe90060"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin6Asym_res-01_desc-brain_T1w.nii.gz",
+      "sha256": "72f8edc99d7e696da7717db20b73897d8da5909d7f30b1c9a7e2a79e9f64ff2f"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin6Asym_res-01_desc-brain_mask.nii.gz",
+      "sha256": "6d540075dac093fa5070a929dc5ea52795d54cc9ab57fe1272086dc70314b428"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-identity-T1w.nii.gz",
+      "sha256": "48a2449c8609dfe77fca397fd185c9446bac3c534571b94bee049ffbbfee4e21"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-warp-T1w.nii.gz",
+      "sha256": "4469e11afcaa5797613e4d9937bdcaaa6a313e15b186ef7dba10eefe9f3cf4a5"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin6Asym_res-02_desc-brain_T1w.nii.gz",
+      "sha256": "d61f82b5b17ff0fffb19ddc1566da398cbc7dd335d97e7410f09e9caa0f7b0af"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/inputs/tpl-MNI152NLin6Asym_res-02_desc-brain_mask.nii.gz",
+      "sha256": "e4e2b284170271afdafe26ac0997b2af5a0f5ddac35e28a7e796b52e8bc5adb1"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-identity-T1w.nii.gz",
+      "sha256": "dadf946d6d3163588a1ee68450e46cdff8a698cb503fc14a8df55d024d7f2b90"
+    },
+    {
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/volume-02/MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-warp-T1w.nii.gz",
+      "sha256": "a13150fce876eb92177c8a4ff6fe7c665d303706eeedf004414acdefc51c5fe8"
+    }
+  ],
+  "crops": [
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01",
+      "view": "Ventricles / deep gray",
+      "coordinate": "z = 10 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -45,
+          45
+        ],
+        [
+          -55,
+          40
+        ]
+      ],
+      "target_mask_pixels": 8736,
+      "mean_absolute_residual": {
+        "identity": 0.04654651236657216,
+        "warp": 0.0367219675083611
+      },
+      "normalization_p99": {
+        "target": 9224.0,
+        "identity": 7970.0,
+        "warp": 7958.836767578125
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01",
+      "view": "Superior cortex",
+      "coordinate": "z = 30 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -110,
+          80
+        ]
+      ],
+      "target_mask_pixels": 18029,
+      "mean_absolute_residual": {
+        "identity": 0.06633381004907528,
+        "warp": 0.0319654654613487
+      },
+      "normalization_p99": {
+        "target": 9224.0,
+        "identity": 7970.0,
+        "warp": 7958.836767578125
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01",
+      "view": "Coronal overview",
+      "coordinate": "y = -20 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -55,
+          85
+        ]
+      ],
+      "target_mask_pixels": 14913,
+      "mean_absolute_residual": {
+        "identity": 0.08302119397210943,
+        "warp": 0.04506737733142501
+      },
+      "normalization_p99": {
+        "target": 9224.0,
+        "identity": 7970.0,
+        "warp": 7958.836767578125
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01",
+      "view": "Midline / brainstem",
+      "coordinate": "x = 0 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -80,
+          45
+        ],
+        [
+          -60,
+          75
+        ]
+      ],
+      "target_mask_pixels": 13581,
+      "mean_absolute_residual": {
+        "identity": 0.07912615401177431,
+        "warp": 0.0672046487657484
+      },
+      "normalization_p99": {
+        "target": 9224.0,
+        "identity": 7970.0,
+        "warp": 7958.836767578125
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02",
+      "view": "Ventricles / deep gray",
+      "coordinate": "z = 9.5 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -45,
+          45
+        ],
+        [
+          -55,
+          40
+        ]
+      ],
+      "target_mask_pixels": 2160,
+      "mean_absolute_residual": {
+        "identity": 0.04279576142657188,
+        "warp": 0.03659502823777165
+      },
+      "normalization_p99": {
+        "target": 9183.0,
+        "identity": 7918.21265625,
+        "warp": 7918.791323242186
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02",
+      "view": "Superior cortex",
+      "coordinate": "z = 29.5 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -110,
+          80
+        ]
+      ],
+      "target_mask_pixels": 4503,
+      "mean_absolute_residual": {
+        "identity": 0.06230782191827017,
+        "warp": 0.03144531136825313
+      },
+      "normalization_p99": {
+        "target": 9183.0,
+        "identity": 7918.21265625,
+        "warp": 7918.791323242186
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02",
+      "view": "Coronal overview",
+      "coordinate": "y = -20.5 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -55,
+          85
+        ]
+      ],
+      "target_mask_pixels": 3728,
+      "mean_absolute_residual": {
+        "identity": 0.08016410351791953,
+        "warp": 0.044933808337548946
+      },
+      "normalization_p99": {
+        "target": 9183.0,
+        "identity": 7918.21265625,
+        "warp": 7918.791323242186
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02",
+      "view": "Midline / brainstem",
+      "coordinate": "x = -0.5 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -80,
+          45
+        ],
+        [
+          -60,
+          75
+        ]
+      ],
+      "target_mask_pixels": 3339,
+      "mean_absolute_residual": {
+        "identity": 0.07647934637344628,
+        "warp": 0.054246080318549474
+      },
+      "normalization_p99": {
+        "target": 9183.0,
+        "identity": 7918.21265625,
+        "warp": 7918.791323242186
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01",
+      "view": "Ventricles / deep gray",
+      "coordinate": "z = 10 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -45,
+          45
+        ],
+        [
+          -55,
+          40
+        ]
+      ],
+      "target_mask_pixels": 8466,
+      "mean_absolute_residual": {
+        "identity": 0.038568472659210803,
+        "warp": 0.025125777934972403
+      },
+      "normalization_p99": {
+        "target": 7975.0,
+        "identity": 9228.0,
+        "warp": 9194.495800781251
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01",
+      "view": "Superior cortex",
+      "coordinate": "z = 30 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -110,
+          80
+        ]
+      ],
+      "target_mask_pixels": 17696,
+      "mean_absolute_residual": {
+        "identity": 0.058303534137826137,
+        "warp": 0.033796077502717126
+      },
+      "normalization_p99": {
+        "target": 7975.0,
+        "identity": 9228.0,
+        "warp": 9194.495800781251
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01",
+      "view": "Coronal overview",
+      "coordinate": "y = -20 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -55,
+          85
+        ]
+      ],
+      "target_mask_pixels": 14443,
+      "mean_absolute_residual": {
+        "identity": 0.07060510373588043,
+        "warp": 0.047617402318534716
+      },
+      "normalization_p99": {
+        "target": 7975.0,
+        "identity": 9228.0,
+        "warp": 9194.495800781251
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01",
+      "view": "Midline / brainstem",
+      "coordinate": "x = 0 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -80,
+          45
+        ],
+        [
+          -60,
+          75
+        ]
+      ],
+      "target_mask_pixels": 13562,
+      "mean_absolute_residual": {
+        "identity": 0.08535230616740912,
+        "warp": 0.05698775060164699
+      },
+      "normalization_p99": {
+        "target": 7975.0,
+        "identity": 9228.0,
+        "warp": 9194.495800781251
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02",
+      "view": "Ventricles / deep gray",
+      "coordinate": "z = 10 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -45,
+          45
+        ],
+        [
+          -55,
+          40
+        ]
+      ],
+      "target_mask_pixels": 2101,
+      "mean_absolute_residual": {
+        "identity": 0.031332289033229196,
+        "warp": 0.024008080272524355
+      },
+      "normalization_p99": {
+        "target": 7959.0,
+        "identity": 9122.349375,
+        "warp": 9123.2978515625
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02",
+      "view": "Superior cortex",
+      "coordinate": "z = 30 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -110,
+          80
+        ]
+      ],
+      "target_mask_pixels": 4422,
+      "mean_absolute_residual": {
+        "identity": 0.0501213178116864,
+        "warp": 0.034095620841888975
+      },
+      "normalization_p99": {
+        "target": 7959.0,
+        "identity": 9122.349375,
+        "warp": 9123.2978515625
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02",
+      "view": "Coronal overview",
+      "coordinate": "y = -20 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -85,
+          85
+        ],
+        [
+          -55,
+          85
+        ]
+      ],
+      "target_mask_pixels": 3603,
+      "mean_absolute_residual": {
+        "identity": 0.06257857979709211,
+        "warp": 0.04833691302895505
+      },
+      "normalization_p99": {
+        "target": 7959.0,
+        "identity": 9122.349375,
+        "warp": 9123.2978515625
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02",
+      "view": "Midline / brainstem",
+      "coordinate": "x = 0 mm (RAS)",
+      "crop_bounds_mm": [
+        [
+          -80,
+          45
+        ],
+        [
+          -60,
+          75
+        ]
+      ],
+      "target_mask_pixels": 3401,
+      "mean_absolute_residual": {
+        "identity": 0.05713884636251092,
+        "warp": 0.05556502644655093
+      },
+      "normalization_p99": {
+        "target": 7959.0,
+        "identity": 9122.349375,
+        "warp": 9123.2978515625
+      }
+    }
+  ],
+  "interpretation": "Intensity residuals are not anatomical error in mm. Normalization follows the existing campaign: each image divided by its own p99 within the target brain mask. Display scales are fixed across cases; no local contrast enhancement or smoothing.",
+  "outputs": {
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-detail.png": "99179bfc271f60c60a9bbd6cc9c00d50802d70badb148c017cbbad1ca341df4e",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-detail.png": "7ce483243fb858b1746a25a8a62dcf9a8a4352f9d80466e59026619312936859",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-detail.png": "29b56c30b3919b01d1d5a7cd01433b6da1b500d74fe518646ea3076b8c49eee8",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-detail.png": "e5648a7dd614f22c122bedb05d2c82a8f966102e2256fa079538b8afb2ed1f79",
+    "index.html": "527ebf1a2d12a9e0e6155d1c519e3d264ccb5ba93aa75ee6c01860bd29acddc9"
+  }
+}
