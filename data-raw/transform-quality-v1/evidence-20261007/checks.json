@@ -1,0 +1,17 @@
+{
+  "tests": {
+    "failed": 0,
+    "error": 0,
+    "warning": 43,
+    "skipped": 2,
+    "passed": 2770
+  },
+  "test_console_summary": "[ FAIL 0 | WARN 44 | SKIP 2 | PASS 2770 ]",
+  "check": {
+    "errors": [],
+    "warnings": [],
+    "notes": ["checking installed package size ... NOTE\n  installed size is 30.0Mb\n  sub-directories of 1Mb or more:\n    data  19.5Mb\n    doc    8.2Mb\n    R      1.2Mb", "checking for future file timestamps ... NOTE\nunable to verify current time"]
+  },
+  "tests_log_sha256": "515cb98f8a4c0483041f8d038df662a496e8116307fc540cd2ad1003109236fb",
+  "check_log_sha256": "d2eeba5928e5c15ab9567e31a1c18a26224e6630c9daf3441b12a9d7a596173b"
+}

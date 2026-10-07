@@ -1,0 +1,311 @@
+[
+  {
+    "path": "tpl-MNI152NLin6Asym_res-01_desc-brain_T1w.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_desc-brain_T1w.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s3293998--c1c90ea94864dbc7a0aedac6142e364e",
+    "bytes": 3293998,
+    "sha256": "72f8edc99d7e696da7717db20b73897d8da5909d7f30b1c9a7e2a79e9f64ff2f"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-01_desc-brain_mask.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_desc-brain_mask.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s149930--f74c778d0bac6b6132d510cedb1a6efa",
+    "bytes": 149930,
+    "sha256": "6d540075dac093fa5070a929dc5ea52795d54cc9ab57fe1272086dc70314b428"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s266805--5b298eac5f5200449a5a2e209785d814",
+    "bytes": 266805,
+    "sha256": "1b4d9cb8b7ae0c9734d01af39a6977aa27c88d6c645d85bcef2fb803734d67c5"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-01_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s258131--29f2e55ff7cd899768407e5644e953e8",
+    "bytes": 258131,
+    "sha256": "4a8c9c8036c10c637d46b2c2a8e63d64c26ccd57e0b8ed236b7f875985981a7e"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-02_desc-brain_T1w.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_T1w.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s428989--6071a87fd702e99ffc0347b0b1a1f796",
+    "bytes": 428989,
+    "sha256": "d61f82b5b17ff0fffb19ddc1566da398cbc7dd335d97e7410f09e9caa0f7b0af"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-02_desc-brain_mask.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_mask.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s28557--0bb024a75b8529860417c57ea806a0e2",
+    "bytes": 28557,
+    "sha256": "e4e2b284170271afdafe26ac0997b2af5a0f5ddac35e28a7e796b52e8bc5adb1"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-02_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s50120--11689967d462ade92d8dc41c4c24b062",
+    "bytes": 50120,
+    "sha256": "b34746e73c87de08ca92503d5bf2aaee2b1e481925a271397c63686237a16b41"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-02_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s47599--d8aba302207a7de434ea029f03b3ad2d",
+    "bytes": 47599,
+    "sha256": "29fb7de1c25210a7c51a750c9f18cf45fbdf34b7d50b289a1d2b6401d2d15500"
+  },
+  {
+    "path": "MNI152NLin6Asym-template_description.json",
+    "url": "https://raw.githubusercontent.com/templateflow/tpl-MNI152NLin6Asym/c906e8d808a34719e5024a4bde61f03a4e411ddd/template_description.json",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": null,
+    "bytes": 1850,
+    "sha256": "4ae55cb140b6f3c38f5e48d50931d599c3bec49750173d8e2a589104e15acb07"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-01_desc-brain_T1w.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_T1w.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s3472309--ed4c3780e65f38ed87ffd85da3acb46c",
+    "bytes": 3472309,
+    "sha256": "97cee2cf7f51388d76d7b3632c8375d688d0fa171e1bede81fcef23726bb3d73"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_desc-brain_mask.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s159538--dc727a2781ca720df0385f9501ace07d",
+    "bytes": 159538,
+    "sha256": "e40bb1816736504d4c25abc243c1c8503df1d308f64c048318aa4b829e09a7ae"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s278168--5366d6b3bff40ae3740f5153ecf6f347",
+    "bytes": 278168,
+    "sha256": "ace9462a9a132851b73b92882d040ffee968ba5399b5154345571ad4c1a6da2d"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-01_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s276673--511b471b6c99b164f00c5f0fd621e636",
+    "bytes": 276673,
+    "sha256": "294160208c98f93a8e1cf282282df4e9bae7979cb846a49d91335a7ee09fe7ee"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-02_desc-brain_T1w.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-brain_T1w.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s451810--97adb4a6fc71850495e11d832a5e4e90",
+    "bytes": 451810,
+    "sha256": "7b168153a9508f5f116ac37d33835fa44dd168ba7a9ae31a3b33e6f63bd23292"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-02_desc-brain_mask.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_desc-brain_mask.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s29576--5c1bbc73a04d9dd5b84330d712ffd760",
+    "bytes": 29576,
+    "sha256": "7a71e9ce99d2af7b68bb5c163908c8e25f4c7a198806fb0893a5c1759b480ecd"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-02_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_atlas-HOCPA_desc-th25_dseg.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s53430--a27d9b02eda4901803d7080241275f44",
+    "bytes": 53430,
+    "sha256": "aca7a8d1b1893892f46f9bdf90dbd49d6b65ce11ffc4e4f5db0c92526255f224"
+  },
+  {
+    "path": "tpl-MNI152NLin2009cAsym_res-02_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-02_atlas-HOSPA_desc-th25_dseg.nii.gz",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": "MD5E-s52039--5929dc8feee4d1bfc5a1d32468e85861",
+    "bytes": 52039,
+    "sha256": "e6c3fa32721b0cb68f53c04dffc95c4cac49b0bffbf3b96ce35c1f3512098767"
+  },
+  {
+    "path": "MNI152NLin2009cAsym-template_description.json",
+    "url": "https://raw.githubusercontent.com/templateflow/tpl-MNI152NLin2009cAsym/15d7c02160f79f5218d2545b4febebeecc11531d/template_description.json",
+    "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+    "annex": null,
+    "bytes": 1551,
+    "sha256": "6b1b199ecc5fce65967e820f9a6a73247103ed6aa47b9df904d85a0d0c817571"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_atlas-HOCPA_dseg.tsv",
+    "url": "https://raw.githubusercontent.com/templateflow/tpl-MNI152NLin6Asym/c906e8d808a34719e5024a4bde61f03a4e411ddd/tpl-MNI152NLin6Asym_atlas-HOCPA_dseg.tsv",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": null,
+    "bytes": 1608,
+    "sha256": "5419f44f2002f7ecfe6051342cb8080ca3c7590b42cabe9aa69723cbb84596e1"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_atlas-HOSPA_dseg.tsv",
+    "url": "https://raw.githubusercontent.com/templateflow/tpl-MNI152NLin6Asym/c906e8d808a34719e5024a4bde61f03a4e411ddd/tpl-MNI152NLin6Asym_atlas-HOSPA_dseg.tsv",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": null,
+    "bytes": 678,
+    "sha256": "0503599182be67d206deb8b6c6d3288fa9eecba3e1a158008c649d1836573d25"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-L_den-164k_atlas-Schaefer2018_seg-7n_scale-100_dseg.label.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-164k_atlas-Schaefer2018_seg-7n_scale-100_dseg.label.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s42046--12cab302edd03062335a74f6f19c2e4e",
+    "bytes": 42046,
+    "sha256": "0109b3e4460d3256f767252b1a43d3f7ba2be431f0fcc0683b11ff916853b235"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-L_den-164k_atlas-Schaefer2018_seg-7n_scale-400_dseg.label.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-164k_atlas-Schaefer2018_seg-7n_scale-400_dseg.label.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s83434--faf73340d3ebca3236ee0fc8fe8fa41b",
+    "bytes": 83434,
+    "sha256": "03d7cbba9526d0b46714ffa9e54c126dd7a8759a2a604f0128c575998a469bb7"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-L_den-164k_atlas-Schaefer2018_seg-7n_scale-1000_dseg.label.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-164k_atlas-Schaefer2018_seg-7n_scale-1000_dseg.label.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s141472--8428362ef1028d290fefb1b2679ad9a9",
+    "bytes": 141472,
+    "sha256": "31e59ad86f03569e93e9252ce59c7e9de4fcb96652b64302f113eaf3fda8e246"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-L_den-164k_sulc.shape.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-164k_sulc.shape.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s811357--45161c0dc4661d43512118c7857cd0d6",
+    "bytes": 811357,
+    "sha256": "1f2cd7840ec3ac643df5acfd255aba90e4afa6a6ea366cd90d7307d556582416"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-L_den-164k_curv.shape.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-164k_curv.shape.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s811153--ed876aa305da85c91fa35d8c49dfb36b",
+    "bytes": 811153,
+    "sha256": "daca78df0c6858cd70c12928e59944519f7ca979a050b7bc7265c41f6e90cfeb"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-R_den-164k_atlas-Schaefer2018_seg-7n_scale-100_dseg.label.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-164k_atlas-Schaefer2018_seg-7n_scale-100_dseg.label.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s42811--de4f0e799188799a9a33aebdee4faea6",
+    "bytes": 42811,
+    "sha256": "dc58ed6d4862ffbda49f825da02a41a6c049d5a0c4c96743866f37f4ecaabe65"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-R_den-164k_atlas-Schaefer2018_seg-7n_scale-400_dseg.label.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-164k_atlas-Schaefer2018_seg-7n_scale-400_dseg.label.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s83775--2a50d77794762865c6ade582928dcc9f",
+    "bytes": 83775,
+    "sha256": "f0110a4b98cf6ceec1a5847d4bc7d52c4b19003b65c65996e5e89de4fb46df27"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-R_den-164k_atlas-Schaefer2018_seg-7n_scale-1000_dseg.label.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-164k_atlas-Schaefer2018_seg-7n_scale-1000_dseg.label.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s142934--dcee310e7218a4c0a3095cec0b7a7cea",
+    "bytes": 142934,
+    "sha256": "c0942931e64321b0eaf90ed9519a04de2b4b74a8c27e34b06ed54fd7fbca79e1"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-R_den-164k_sulc.shape.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-164k_sulc.shape.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s811205--efb2e86bf464ed23e1c3e22ab9acf612",
+    "bytes": 811205,
+    "sha256": "52bc40e401fa939bc23f902d578f53028d9a462a7661864d991e956e46c032d4"
+  },
+  {
+    "path": "tpl-fsaverage_hemi-R_den-164k_curv.shape.gii",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-164k_curv.shape.gii",
+    "revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "annex": "MD5E-s811477--e684614139b76c8cfde07f26ba8dae4a",
+    "bytes": 811477,
+    "sha256": "c530b269b281770460d4b50ae9a9e17d45cf524fdfc2e6c9c78fe078d8fff3b6"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-01_atlas-Schaefer2018_desc-100Parcels7Networks_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-Schaefer2018_desc-100Parcels7Networks_dseg.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s390177--9de61cdbe081339f9a9f9c668cef7ea8",
+    "bytes": 390177,
+    "sha256": "7e62c043a1e83fac0ac8fc5fa8741d4c548ee0a83183a2a108c2735a81573a7e"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_atlas-Schaefer2018_desc-100Parcels7Networks_dseg.tsv",
+    "url": "https://raw.githubusercontent.com/templateflow/tpl-MNI152NLin6Asym/c906e8d808a34719e5024a4bde61f03a4e411ddd/tpl-MNI152NLin6Asym_atlas-Schaefer2018_desc-100Parcels7Networks_dseg.tsv",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": null,
+    "bytes": 3701,
+    "sha256": "a81a63f67fdaffd7b2b4b6c7df05f75b16899cba70100f464bbccba0a257cc6c"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-01_atlas-Schaefer2018_desc-400Parcels7Networks_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-Schaefer2018_desc-400Parcels7Networks_dseg.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s452948--b1f215cf0894e6d0c5a1d6ff068e2c8b",
+    "bytes": 452948,
+    "sha256": "be867aa83f37834d9f3f6ab37288d8ac10cd69ee7e85a60e3d583342751f9e76"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_atlas-Schaefer2018_desc-400Parcels7Networks_dseg.tsv",
+    "url": "https://raw.githubusercontent.com/templateflow/tpl-MNI152NLin6Asym/c906e8d808a34719e5024a4bde61f03a4e411ddd/tpl-MNI152NLin6Asym_atlas-Schaefer2018_desc-400Parcels7Networks_dseg.tsv",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": null,
+    "bytes": 15164,
+    "sha256": "91fe503df22267bb6c9ab3b9e9e82eec0e08f496d4f9dcb9661e67d1abb14f07"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_res-01_atlas-Schaefer2018_desc-1000Parcels7Networks_dseg.nii.gz",
+    "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-01_atlas-Schaefer2018_desc-1000Parcels7Networks_dseg.nii.gz",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": "MD5E-s513737--fa20f1886404e78c4fbe3eedad465cc1",
+    "bytes": 513737,
+    "sha256": "bfc26efd6af2c0b3e3e06a86c2e0b7659c479a0db8212fdf8411eb2cf1dfa07a"
+  },
+  {
+    "path": "tpl-MNI152NLin6Asym_atlas-Schaefer2018_desc-1000Parcels7Networks_dseg.tsv",
+    "url": "https://raw.githubusercontent.com/templateflow/tpl-MNI152NLin6Asym/c906e8d808a34719e5024a4bde61f03a4e411ddd/tpl-MNI152NLin6Asym_atlas-Schaefer2018_desc-1000Parcels7Networks_dseg.tsv",
+    "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+    "annex": null,
+    "bytes": 38231,
+    "sha256": "f0fe4a0db6bac7dce520ef0ff7550ae3960a651b499f2b464f8d761da3a533e2"
+  },
+  {
+    "path": "Schaefer2018_100Parcels_7Networks_order.dlabel.nii",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/HCP/fslr32k/cifti/Schaefer2018_100Parcels_7Networks_order.dlabel.nii",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 643520,
+    "sha256": "8b25c527d3d507bdc2d74c6cca57ceca9edc2eb210cbc980a7238db42ed1cae6"
+  },
+  {
+    "path": "Schaefer2018_400Parcels_7Networks_order.dlabel.nii",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/HCP/fslr32k/cifti/Schaefer2018_400Parcels_7Networks_order.dlabel.nii",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 682288,
+    "sha256": "a567348a2ac3fb344eead6ae1768f889ebb98327985db67b9493476cd3d390d0"
+  },
+  {
+    "path": "Schaefer2018_1000Parcels_7Networks_order.dlabel.nii",
+    "url": "https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations/HCP/fslr32k/cifti/Schaefer2018_1000Parcels_7Networks_order.dlabel.nii",
+    "revision": "634f676630929a71297852d01dd92a287103e861",
+    "bytes": 759968,
+    "sha256": "8ab538bf88b4c3226fd95cee06cf76af7a8c55f6fd4a28d7540cd34353fb86ab"
+  }
+]

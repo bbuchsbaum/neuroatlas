@@ -1,0 +1,4 @@
+# Preserve the exact bytes bound by the evidence receipts on every checkout.
+evidence-20261007/** -text
+# Python CSV exports use standard CRLF record terminators.
+evidence-20261007/*.csv whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

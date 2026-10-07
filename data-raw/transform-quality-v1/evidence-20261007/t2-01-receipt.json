@@ -1,0 +1,22 @@
+{
+  "inputs": [
+    {
+      "path": "tpl-MNI152NLin6Asym_res-04_T2w.nii.gz",
+      "revision": "c906e8d808a34719e5024a4bde61f03a4e411ddd",
+      "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-04_T2w.nii.gz",
+      "sha256": "8b90e1a80ffc84e108ff7688a76b3cb42a78be4f5415078ce16f1fd9d97855b9"
+    },
+    {
+      "path": "tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz",
+      "revision": "15d7c02160f79f5218d2545b4febebeecc11531d",
+      "url": "https://templateflow.s3.amazonaws.com/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T2w.nii.gz",
+      "sha256": "6e39951e4478ff041f1290d31935dc05aa5425f9fd3f20ed57d4646f0d5be0ff"
+    }
+  ],
+  "protocol_sha256": "2867fce10cec02113ea83bcf7bb2db794dc9901f2e16d2caaa10472c439252d9",
+  "script_sha256": "4e4747e6cbe5f9a60c4ade7dc1dac6b2c8c8d44e813ecf9d3f75df69cfa50107",
+  "interpretation": "Additional contrast; anatomical independence unestablished",
+  "files": {
+    "T2-correlations.csv": "3a50d091df33677e7df40c011f37da278ffa70728430abdc389840b552dc0953"
+  }
+}

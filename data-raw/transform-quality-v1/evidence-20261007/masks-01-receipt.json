@@ -1,0 +1,144 @@
+{
+  "post_hoc": true,
+  "reason": "Forward mask HD95 worsens despite higher Dice; separate enclosed holes",
+  "interpretation": "Supplementary hole-filled diagnostic; original unfilled mask results remain primary",
+  "script_sha256": "daf9b94d61c66e5744b0df144fda5838420d54e2ff6d69160918395a68ac956e",
+  "cases": [
+    {
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 1,
+      "method": "identity",
+      "source_enclosed_hole_voxels": 10714,
+      "target_enclosed_hole_voxels": 0,
+      "hole_filled_boundary": {
+        "reference_voxels": 1886574,
+        "moving_voxels": 1837957,
+        "dice": 0.970675234009329,
+        "volume_bias_percent": -2.576999364986478,
+        "mean_boundary_mm": 1.2580398710147986,
+        "hd95_mm": 2.449489742783178,
+        "centroid_mm": 1.2636707608978888
+      }
+    },
+    {
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 1,
+      "method": "warp",
+      "source_enclosed_hole_voxels": 10714,
+      "target_enclosed_hole_voxels": 0,
+      "hole_filled_boundary": {
+        "reference_voxels": 1886574,
+        "moving_voxels": 1931506,
+        "dice": 0.982443008004023,
+        "volume_bias_percent": 2.38167174995521,
+        "mean_boundary_mm": 0.7996010977590476,
+        "hd95_mm": 2.0,
+        "centroid_mm": 0.7616087061278453
+      }
+    },
+    {
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 2,
+      "method": "identity",
+      "source_enclosed_hole_voxels": 1241,
+      "target_enclosed_hole_voxels": 0,
+      "hole_filled_boundary": {
+        "reference_voxels": 235840,
+        "moving_voxels": 229724,
+        "dice": 0.9707236813842994,
+        "volume_bias_percent": -2.593283582089552,
+        "mean_boundary_mm": 1.37979749949507,
+        "hd95_mm": 2.8284271247461903,
+        "centroid_mm": 1.2704622225390425
+      }
+    },
+    {
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 2,
+      "method": "warp",
+      "source_enclosed_hole_voxels": 1241,
+      "target_enclosed_hole_voxels": 0,
+      "hole_filled_boundary": {
+        "reference_voxels": 235840,
+        "moving_voxels": 241125,
+        "dice": 0.9737611774448859,
+        "volume_bias_percent": 2.24092605156038,
+        "mean_boundary_mm": 1.2420060829344388,
+        "hd95_mm": 2.8284271247461903,
+        "centroid_mm": 1.7386401382080672
+      }
+    },
+    {
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 1,
+      "method": "identity",
+      "source_enclosed_hole_voxels": 0,
+      "target_enclosed_hole_voxels": 10714,
+      "hole_filled_boundary": {
+        "reference_voxels": 1837957,
+        "moving_voxels": 1886574,
+        "dice": 0.970675234009329,
+        "volume_bias_percent": 2.6451652568585664,
+        "mean_boundary_mm": 1.2580398710147986,
+        "hd95_mm": 2.449489742783178,
+        "centroid_mm": 1.2636707608978888
+      }
+    },
+    {
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 1,
+      "method": "warp",
+      "source_enclosed_hole_voxels": 0,
+      "target_enclosed_hole_voxels": 10714,
+      "hole_filled_boundary": {
+        "reference_voxels": 1837957,
+        "moving_voxels": 1791604,
+        "dice": 0.9816498469098605,
+        "volume_bias_percent": -2.5219850083543847,
+        "mean_boundary_mm": 0.8187227114861129,
+        "hd95_mm": 2.23606797749979,
+        "centroid_mm": 0.7853400551147928
+      }
+    },
+    {
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 2,
+      "method": "identity",
+      "source_enclosed_hole_voxels": 0,
+      "target_enclosed_hole_voxels": 1241,
+      "hole_filled_boundary": {
+        "reference_voxels": 229724,
+        "moving_voxels": 235840,
+        "dice": 0.9707236813842994,
+        "volume_bias_percent": 2.662325225052672,
+        "mean_boundary_mm": 1.3797974994950697,
+        "hd95_mm": 2.8284271247461903,
+        "centroid_mm": 1.2704622225390425
+      }
+    },
+    {
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 2,
+      "method": "warp",
+      "source_enclosed_hole_voxels": 0,
+      "target_enclosed_hole_voxels": 1241,
+      "hole_filled_boundary": {
+        "reference_voxels": 229724,
+        "moving_voxels": 224199,
+        "dice": 0.9732575789285848,
+        "volume_bias_percent": -2.4050599850255088,
+        "mean_boundary_mm": 1.2502600318236339,
+        "hd95_mm": 2.8284271247461903,
+        "centroid_mm": 1.7478604730018183
+      }
+    }
+  ]
+}

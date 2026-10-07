@@ -1,0 +1,488 @@
+{
+  "protocol_sha256": "f751cb0518e8cf8aa9caf46eade2b17af7c096da5517312619dd3ab4c2514f24",
+  "script_sha256": "2b9c522b72ab059e9a6f5070d4fa23fb1e212f0b663a075c40bf748832420b88",
+  "python": "3.12.3",
+  "SimpleITK": "2.5.3",
+  "numpy": "2.4.3",
+  "inputs_manifest_sha256": "102b9d2f840d32b4a29c429752ff616366a98c4acf704d1bd2f5afcba9b73b0b",
+  "transforms": [
+    {
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/cache/transform-artifacts-v1/tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5",
+      "sha256": "8275d687c4230f56fcc45d7c6ac603e0f8b6685ae95beeeae9434df3e552909c"
+    },
+    {
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/quality-20261007/cache/transform-artifacts-v1/tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5",
+      "sha256": "ac0bf960d3674c13d24450aa43573cfc3605dc5ac251635c2b345dd4d446246d"
+    }
+  ],
+  "cases": [
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01",
+      "method": "identity",
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 1,
+      "correlation": 0.7650550460291874,
+      "mask": {
+        "reference_voxels": 1886574,
+        "moving_voxels": 1827243,
+        "dice": 0.9677251194660372,
+        "volume_bias_percent": -3.144907117346046,
+        "mean_boundary_mm": 2.6141602188822906,
+        "hd95_mm": 5.0990195135927845,
+        "centroid_mm": 1.277167019584195
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01",
+      "method": "warp",
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 1,
+      "correlation": 0.923534790018537,
+      "mask": {
+        "reference_voxels": 1886574,
+        "moving_voxels": 1918765,
+        "dice": 0.9790765027767565,
+        "volume_bias_percent": 1.7063205577941813,
+        "mean_boundary_mm": 2.3125233759217,
+        "hd95_mm": 6.4031242374328485,
+        "centroid_mm": 0.7773535102230839
+      },
+      "deformation": {
+        "brain": {
+          "jacobian": {
+            "min": 0.4256306335726703,
+            "p01": 0.630743691342249,
+            "p05": 0.7593149556005467,
+            "median": 0.9459726846561155,
+            "p95": 1.1513972806422277,
+            "p99": 1.3284613564419208,
+            "max": 2.074887149467396,
+            "n": 1886574,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.007584199256004934,
+            "p01": 0.29785841343182456,
+            "p05": 0.6082069255252331,
+            "median": 1.6899771150510752,
+            "p95": 3.78905087335127,
+            "p99": 5.006521612899574,
+            "max": 6.914718697008027,
+            "n": 1886574,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 1.0543413431456295e-05,
+            "p01": 0.00040500364738658534,
+            "p05": 0.0008167249877031301,
+            "median": 0.004156049945941645,
+            "p95": 0.018790940660663506,
+            "p99": 0.03111133771027246,
+            "max": 0.17372232219656386,
+            "n": 1886574,
+            "nonfinite": 0
+          }
+        },
+        "exterior_shell_3mm": {
+          "jacobian": {
+            "min": 0.4988657917172154,
+            "p01": 0.7607534746736931,
+            "p05": 0.8346930650817397,
+            "median": 0.9451873289795439,
+            "p95": 1.124738988515552,
+            "p99": 1.2419316380170333,
+            "max": 1.6567244052296346,
+            "n": 261552,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.03646142717932599,
+            "p01": 0.5333975255806015,
+            "p05": 0.9725680467494561,
+            "median": 2.0606156988280193,
+            "p95": 3.238370770366734,
+            "p99": 3.8124292987166077,
+            "max": 5.479712010190218,
+            "n": 261552,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 1.1824821210944245e-05,
+            "p01": 0.0002211007785248265,
+            "p05": 0.0004957360267316919,
+            "median": 0.003280228894495564,
+            "p95": 0.015046473270169622,
+            "p99": 0.026014985055261227,
+            "max": 0.10901308639525208,
+            "n": 261552,
+            "nonfinite": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02",
+      "method": "identity",
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 2,
+      "correlation": 0.81022899451146,
+      "mask": {
+        "reference_voxels": 235840,
+        "moving_voxels": 228483,
+        "dice": 0.9679813405754184,
+        "volume_bias_percent": -3.119487788331072,
+        "mean_boundary_mm": 2.669389615141685,
+        "hd95_mm": 4.47213595499958,
+        "centroid_mm": 1.2823390209615306
+      }
+    },
+    {
+      "case": "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02",
+      "method": "warp",
+      "source": "MNI152NLin6Asym",
+      "target": "MNI152NLin2009cAsym",
+      "resolution_mm": 2,
+      "correlation": 0.9298790701032474,
+      "mask": {
+        "reference_voxels": 235840,
+        "moving_voxels": 239697,
+        "dice": 0.9706878749708224,
+        "volume_bias_percent": 1.635430800542741,
+        "mean_boundary_mm": 2.6694002878555207,
+        "hd95_mm": 5.656854249492381,
+        "centroid_mm": 1.7531517951529776
+      },
+      "deformation": {
+        "brain": {
+          "jacobian": {
+            "min": 0.44858789465470333,
+            "p01": 0.6400279758341674,
+            "p05": 0.7674254599455224,
+            "median": 0.9457519453213992,
+            "p95": 1.1416070308409678,
+            "p99": 1.3074511418286208,
+            "max": 1.9432753336290463,
+            "n": 235840,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.013724585784032399,
+            "p01": 0.2982721878537107,
+            "p05": 0.6091031960822487,
+            "median": 1.690760898793738,
+            "p95": 3.768545764913632,
+            "p99": 4.993118187548691,
+            "max": 6.873369023976694,
+            "n": 235840,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 1.4207015139496383e-05,
+            "p01": 0.00016068854262040188,
+            "p05": 0.0003237877037741867,
+            "median": 0.0018351284496519334,
+            "p95": 0.009743616108628474,
+            "p99": 0.01744530029994832,
+            "max": 0.15398492300929004,
+            "n": 235840,
+            "nonfinite": 0
+          }
+        },
+        "exterior_shell_3mm": {
+          "jacobian": {
+            "min": 0.5619248028411882,
+            "p01": 0.7570309128271796,
+            "p05": 0.836295900400523,
+            "median": 0.947765494496946,
+            "p95": 1.1281620362451137,
+            "p99": 1.2394309857856074,
+            "max": 1.6081912223753,
+            "n": 28891,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.15818817167330898,
+            "p01": 0.5703667415998414,
+            "p05": 1.0125661208620138,
+            "median": 2.0770549324210204,
+            "p95": 3.3208938757012927,
+            "p99": 3.9245070751200726,
+            "max": 5.4893139110654765,
+            "n": 28891,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 2.2108833544196298e-05,
+            "p01": 0.0001232542292094971,
+            "p05": 0.00029978187125318976,
+            "median": 0.0020638856297851517,
+            "p95": 0.010363966679045369,
+            "p99": 0.01901136469055386,
+            "max": 0.05573841661113212,
+            "n": 28891,
+            "nonfinite": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01",
+      "method": "identity",
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 1,
+      "correlation": 0.7454401249572812,
+      "mask": {
+        "reference_voxels": 1827243,
+        "moving_voxels": 1886574,
+        "dice": 0.9677251194660372,
+        "volume_bias_percent": 3.247022973955845,
+        "mean_boundary_mm": 2.6141602188822906,
+        "hd95_mm": 5.0990195135927845,
+        "centroid_mm": 1.277167019584195
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01",
+      "method": "warp",
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 1,
+      "correlation": 0.893311360935342,
+      "mask": {
+        "reference_voxels": 1827243,
+        "moving_voxels": 1791599,
+        "dice": 0.978674393631996,
+        "volume_bias_percent": -1.9506984019093245,
+        "mean_boundary_mm": 2.16216894534761,
+        "hd95_mm": 4.898979485566356,
+        "centroid_mm": 0.8016126094763412
+      },
+      "deformation": {
+        "brain": {
+          "jacobian": {
+            "min": 0.4870821336424621,
+            "p01": 0.7257153841392702,
+            "p05": 0.8438935303234495,
+            "median": 1.0441474447057222,
+            "p95": 1.2727759178679554,
+            "p99": 1.495222643533548,
+            "max": 2.2766282113085916,
+            "n": 1827243,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.00742781206827137,
+            "p01": 0.2991211901437415,
+            "p05": 0.6141947326314866,
+            "median": 1.707149604080595,
+            "p95": 3.7826386120857056,
+            "p99": 4.990758876576993,
+            "max": 6.879626019917133,
+            "n": 1827243,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 3.035673922809572e-06,
+            "p01": 0.00018986802556414858,
+            "p05": 0.00039929744616139945,
+            "median": 0.002291131752820311,
+            "p95": 0.010507007118291391,
+            "p99": 0.0182259314030369,
+            "max": 0.1276416591948484,
+            "n": 1827243,
+            "nonfinite": 0
+          }
+        },
+        "exterior_shell_3mm": {
+          "jacobian": {
+            "min": 0.7057671482500769,
+            "p01": 0.8535631224388478,
+            "p05": 0.9227461308339919,
+            "median": 1.0663906373797767,
+            "p95": 1.2039308733106224,
+            "p99": 1.2876653475837838,
+            "max": 1.8058452930653723,
+            "n": 266819,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.030904073333778797,
+            "p01": 0.48333389727727,
+            "p05": 0.8289582448843581,
+            "median": 2.0111843929946054,
+            "p95": 3.1130381652921826,
+            "p99": 3.604868172406378,
+            "max": 4.873613432937385,
+            "n": 266819,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 6.057474070332358e-07,
+            "p01": 0.00015795679570408647,
+            "p05": 0.00032725670652885815,
+            "median": 0.0017677339801785777,
+            "p95": 0.007736761613083709,
+            "p99": 0.013313092305609658,
+            "max": 0.052241344398307306,
+            "n": 266819,
+            "nonfinite": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02",
+      "method": "identity",
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 2,
+      "correlation": 0.798013172190062,
+      "mask": {
+        "reference_voxels": 228483,
+        "moving_voxels": 235840,
+        "dice": 0.9679813405754184,
+        "volume_bias_percent": 3.2199332116612616,
+        "mean_boundary_mm": 2.669389615141685,
+        "hd95_mm": 4.47213595499958,
+        "centroid_mm": 1.2823390209615306
+      }
+    },
+    {
+      "case": "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02",
+      "method": "warp",
+      "source": "MNI152NLin2009cAsym",
+      "target": "MNI152NLin6Asym",
+      "resolution_mm": 2,
+      "correlation": 0.8911926348942536,
+      "mask": {
+        "reference_voxels": 228483,
+        "moving_voxels": 224199,
+        "dice": 0.9704472455277656,
+        "volume_bias_percent": -1.8749753811005634,
+        "mean_boundary_mm": 2.54381333139046,
+        "hd95_mm": 4.47213595499958,
+        "centroid_mm": 1.76208869731276
+      },
+      "deformation": {
+        "brain": {
+          "jacobian": {
+            "min": 0.501498678698604,
+            "p01": 0.7346900639913311,
+            "p05": 0.8498861495303506,
+            "median": 1.0450943279645752,
+            "p95": 1.2657022658076602,
+            "p99": 1.4787823786854817,
+            "max": 2.168129233500946,
+            "n": 228483,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.026872491115626975,
+            "p01": 0.2984945802265874,
+            "p05": 0.6128058372688173,
+            "median": 1.706486883785829,
+            "p95": 3.778244191270103,
+            "p99": 4.990865919121774,
+            "max": 6.846942200564467,
+            "n": 228483,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 4.432508244708195e-06,
+            "p01": 0.00019039626034251093,
+            "p05": 0.0004002970855842017,
+            "median": 0.002296948351290517,
+            "p95": 0.010513499378360327,
+            "p99": 0.01826418073289424,
+            "max": 0.10310115393865019,
+            "n": 228483,
+            "nonfinite": 0
+          }
+        },
+        "exterior_shell_3mm": {
+          "jacobian": {
+            "min": 0.7228224747826975,
+            "p01": 0.8561057574047757,
+            "p05": 0.9229861009148034,
+            "median": 1.0638944181808792,
+            "p95": 1.199998329852036,
+            "p99": 1.2821521969009237,
+            "max": 1.6273302575350441,
+            "n": 29276,
+            "nonfinite": 0
+          },
+          "nonpositive_jacobians": 0,
+          "displacement_mm": {
+            "min": 0.07787295373879914,
+            "p01": 0.4840458741794825,
+            "p05": 0.8475835080263989,
+            "median": 2.0133560680878926,
+            "p95": 3.1302642149233475,
+            "p99": 3.629248244180265,
+            "max": 4.63794401838596,
+            "n": 29276,
+            "nonfinite": 0
+          },
+          "inverse_consistency_mm": {
+            "min": 2.2162532660908076e-05,
+            "p01": 0.00017043418008503143,
+            "p05": 0.00034727733677074806,
+            "median": 0.0018594280747434022,
+            "p95": 0.007971944736491585,
+            "p99": 0.013711526057281117,
+            "max": 0.0449005086124569,
+            "n": 29276,
+            "nonfinite": 0
+          }
+        }
+      }
+    }
+  ],
+  "interpretation": "Dependent anatomical diagnostics; no ground-truth accuracy claim",
+  "files": {
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01.png": "e2632ad090836fe78eac213603c12517aed907508b37965e4a033d8c33d92436",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02.png": "8cebaf23d6e06a2b45a1bad0c38a1b744fc89e015a53251b5a41884d906fbcf6",
+    "regions.csv": "826756273b1d3ff3d85a099d5594b3c8db955e05a62b3ae92e26eff2ba0d5b7b",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02.png": "56d85487276fdf8c54e2eb5d0930854a4933ff80b9e77fc825f8e9355b870583",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-identity-HOSPA.nii.gz": "25187fa0e0c8f4b6f9b50f95939e935526945eb3344d8ea5420ac24692854b3b",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-identity-HOCPA.nii.gz": "29d6941c5b525a258c6718c094279ea88bdb2879fe7cf928c24b9f9735604189",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-warp-HOSPA.nii.gz": "2abac847160319d66428304475b16e72f2ba25addd73eae9ec9efc2afc4f84c5",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-warp-T1w.nii.gz": "a13150fce876eb92177c8a4ff6fe7c665d303706eeedf004414acdefc51c5fe8",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-warp-HOSPA.nii.gz": "a0512129f8c0e34123cb721f9e41476be79642564cc3220c3097a526f7a0eedf",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-identity-T1w.nii.gz": "48a2449c8609dfe77fca397fd185c9446bac3c534571b94bee049ffbbfee4e21",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-identity-HOCPA.nii.gz": "691f9cbfa63fe48b8df3742ddbec152d8de4a999fd0fbfafef0243cc8c15d9f0",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01.png": "bc99bf5e806239d9e9d588bfbc002b5f5d89afc3f3d9dee6f7c1dc2fc7e7eabd",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-warp-HOCPA.nii.gz": "3a680e11d14ce27d6c7412de1dbd678848e288f4ba4a22697a77b49b546118eb",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-warp-T1w.nii.gz": "1c363454471c8e77446b4bca97f0e9e94e58a6d892b874e1129cb2acdbe90060",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-warp-HOCPA.nii.gz": "4eecacfb9f23bf0f30de1d8e151b5e156a92bffecbc696f9654bb06b7149ca55",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-identity-HOSPA.nii.gz": "d7734c1a7358014908932ac222abd95209336defb5cc89d703c3b331611b96d5",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-identity-HOSPA.nii.gz": "3f12347439d39d722a268467b440b063a37c556d1b5694e327ec747f646a1183",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-identity-HOCPA.nii.gz": "16d485aa71ec5e57e26d7de30e4d18568baa567878de016dd3184edafa25ebed",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-warp-HOSPA.nii.gz": "b106a4a3f7c4efd67414ccdd4c151f3b6546cc48d18b1fcdec842347aa804d98",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-warp-T1w.nii.gz": "2b2238e5b3b75a32714a506a0d42f394b9d5d310974136454ee231375aef6dfc",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-warp-HOSPA.nii.gz": "994c2b43d0ed9b50fdcac04081b2ad53cde584bf8216b4c4d11b69a71dc5ed10",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-identity-HOCPA.nii.gz": "99300019c2fd4469cdcbd7b9c2deae41a62f432f0fdb78c0d6209660141afa8b",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-identity-T1w.nii.gz": "520c39f522fc60f3c99678143c4609352de2118b59b136f4c55be53b0cb525da",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-warp-HOCPA.nii.gz": "e1e442bd449c547300b7262959d715494a3b5b7702319066631bde10e7ad2c33",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-warp-HOCPA.nii.gz": "546042e71967173ac84322c68c1923e48e4e5c0b9cf1d6a62987c54f71f01ab2",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-01-warp-T1w.nii.gz": "4469e11afcaa5797613e4d9937bdcaaa6a313e15b186ef7dba10eefe9f3cf4a5",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-02-identity-HOSPA.nii.gz": "40e121a8a7fb6145c4eb8db022a7e8862fcae0aaa68475012c335cc7f193573f",
+    "MNI152NLin2009cAsym_to_MNI152NLin6Asym_res-02-identity-T1w.nii.gz": "dadf946d6d3163588a1ee68450e46cdff8a698cb503fc14a8df55d024d7f2b90",
+    "MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-identity-T1w.nii.gz": "f4edeab5fa5500d9b66e120b7e108ec360affca347919d03aa5b3d32aaeccedd"
+  }
+}
