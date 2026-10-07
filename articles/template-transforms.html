@@ -211,6 +211,77 @@ vignette.</p>
 <span><span class="va">schaefer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schaefer_atlas.html">get_schaefer_atlas</a></span><span class="op">(</span>parcels <span class="op">=</span> <span class="fl">200</span>, networks <span class="op">=</span> <span class="fl">7</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">target</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span><span class="st">"MNI152NLin2009cAsym"</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">aligned</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apply_template_transform.html">apply_template_transform</a></span><span class="op">(</span><span class="va">schaefer</span>, <span class="va">nonlinear</span>, <span class="va">target</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="inspect-alignment-before-and-after">Inspect alignment before and after<a class="anchor" aria-label="anchor" href="#inspect-alignment-before-and-after"></a>
+</h3>
+<p>To inspect the same warp, apply it to the source template’s
+T1-weighted anatomy with continuous sampling. A checkerboard alternates
+target and source tiles: look for discontinuities in the brain outline,
+ventricles, and cortical folds where neighbouring tiles meet. After the
+transform, these structures should line up more closely. Brightness can
+still differ between templates, so inspect anatomical boundaries rather
+than expecting identical intensities. This illustrates template
+alignment; it does not measure individual-subject accuracy or establish
+the correctness of every atlas label.</p>
+<p>The top row below resamples the source onto the target grid for
+display without applying an anatomical transform. The bottom row applies
+<code>nonlinear</code>, the same released transform used for
+<code>aligned</code> above. Both rows use the same target, axial
+positions, tile size, crop, and intensity limits. Intensity matching is
+disabled so it cannot change the comparison between rows.</p>
+<div class="figure">
+<img src="figures/template-transform-before-after.png" class="r-plt" alt="Two rows of three axial brain checkerboards. Before transformation, the source and target outlines and internal structures break across tile boundaries. After transformation, the structures align more closely." width="100%"><p class="caption">
+MNI6 to MNI2009c alignment at 2 mm: before (top) and after (bottom) the
+nonlinear transform. Alternating tiles show target and source anatomy at
+the same three axial positions.
+</p>
+</div>
+<p>The figure is precomputed from the released transform and cached
+TemplateFlow brain templates; building this vignette does not download
+or apply the warp. Run the download example above and then this plotting
+code to reproduce it.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"patchwork"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Install patchwork to compose the checkerboard panels."</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">source_t1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span><span class="st">"MNI152NLin6Asym"</span>, variant <span class="op">=</span> <span class="st">"brain"</span>, resolution <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">target_t1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_template.html">get_template</a></span><span class="op">(</span></span>
+<span>  <span class="st">"MNI152NLin2009cAsym"</span>, variant <span class="op">=</span> <span class="st">"brain"</span>, resolution <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Match voxel grids for display only: no anatomical warp is applied here.</span></span>
+<span><span class="va">before</span> <span class="op">&lt;-</span> <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/resample-methods.html" class="external-link">resample</a></span><span class="op">(</span><span class="va">source_t1</span>, <span class="va">target_t1</span>, interpolation <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span>
+<span><span class="va">after</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apply_template_transform.html">apply_template_transform</a></span><span class="op">(</span></span>
+<span>  <span class="va">source_t1</span>, <span class="va">nonlinear</span>, <span class="va">target_t1</span>, data_type <span class="op">=</span> <span class="st">"continuous"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Fix each template's grayscale limits across both rows.</span></span>
+<span><span class="va">brain_range</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">vol</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">vol</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">values</span><span class="op">[</span><span class="va">values</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="fl">0.98</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">target_range</span> <span class="op">&lt;-</span> <span class="fu">brain_range</span><span class="op">(</span><span class="va">target_t1</span><span class="op">)</span></span>
+<span><span class="va">source_range</span> <span class="op">&lt;-</span> <span class="fu">brain_range</span><span class="op">(</span><span class="va">source_t1</span><span class="op">)</span></span>
+<span><span class="va">checkerboard</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">vol</span>, <span class="va">title</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">neuroim2</span><span class="fu">::</span><span class="fu"><a href="https://bbuchsbaum.github.io/neuroim2/reference/plot_checkerboard.html" class="external-link">plot_checkerboard</a></span><span class="op">(</span></span>
+<span>    <span class="va">target_t1</span>, <span class="va">vol</span>, zlevels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">12</span>, <span class="fl">20</span>, <span class="fl">52</span><span class="op">)</span>, unit <span class="op">=</span> <span class="st">"mm"</span>, tile <span class="op">=</span> <span class="fl">8L</span>,</span>
+<span>    bg_range <span class="op">=</span> <span class="va">target_range</span>, ov_range <span class="op">=</span> <span class="va">source_range</span>,</span>
+<span>    match_intensity <span class="op">=</span> <span class="cn">FALSE</span>, focus_brain <span class="op">=</span> <span class="cn">FALSE</span>, interpolate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"target"</span>, <span class="st">"source"</span><span class="op">)</span>,</span>
+<span>    title <span class="op">=</span> <span class="va">title</span>, style <span class="op">=</span> <span class="st">"report"</span>, canvas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">4.2</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">panels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu">checkerboard</span><span class="op">(</span><span class="va">before</span>, <span class="st">"Before: grid resampling only"</span><span class="op">)</span>,</span>
+<span>  <span class="fu">checkerboard</span><span class="op">(</span><span class="va">after</span>, <span class="st">"After: released nonlinear transform"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">figure</span> <span class="op">&lt;-</span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">panels</span>, <span class="kw">function</span><span class="op">(</span><span class="va">panel</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_elements.html" class="external-link">wrap_elements</a></span><span class="op">(</span>full <span class="op">=</span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/patchworkGrob.html" class="external-link">patchworkGrob</a></span><span class="op">(</span><span class="va">panel</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">figure</span><span class="op">)</span></span></code></pre></div>
 <p>Qualification covers both directions on the native 1 mm and 2 mm
 target grids, with independent ANTs application, repeated builds,
 numerical coverage probes, and review of all 24 visual panels. The
@@ -226,6 +297,7 @@ the full measurements, reviews, and failed earlier attempts. See its <a href="ht
 conditions</a> for template/evidence terms, including FSL commercial-use
 restrictions.</p>
 </div>
+</div>
 <div class="section level2">
 <h2 id="work-with-the-verified-cache">Work with the verified cache<a class="anchor" aria-label="anchor" href="#work-with-the-verified-cache"></a>
 </h2>
@@ -236,7 +308,7 @@ be disabled; a corrupt cache entry fails rather than being used
 silently.</p>
 <p>Use <code>offline = TRUE</code> when an analysis may use only already
 verified artifacts:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_template_transform.html">get_template_transform</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MNI152NLin6Asym"</span>, <span class="st">"MNI152NLin2009cAsym"</span>, provider <span class="op">=</span> <span class="st">"neuroatlas"</span>,</span>
 <span>  cache_dir <span class="op">=</span> <span class="fu"><a href="../reference/transform_cache_path.html">transform_cache_path</a></span><span class="op">(</span><span class="op">)</span>, offline <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -244,7 +316,7 @@ verified artifacts:</p>
 <p><code><a href="../reference/clear_transform_cache.html">clear_transform_cache()</a></code> removes only entries neuroatlas
 recognizes as its own, refuses active locks, and does not clear a
 TemplateFlow cache.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/clear_transform_cache.html">clear_transform_cache</a></span><span class="op">(</span>artifact_version <span class="op">=</span> <span class="st">"released-artifact-version"</span><span class="op">)</span></span></code></pre></div>
 <p>Keep the <code>neuroatlas_transform</code> receipt with analysis
 output. It records the route, artifact checksums, grids, interpolation,
