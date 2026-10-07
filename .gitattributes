@@ -6,3 +6,7 @@ data-raw/surface-transforms-v1/qualification/** -text
 data-raw/surface-transforms-v1/qualification/**/*.log -whitespace
 data-raw/surface-transforms-v1/qualification/**/*.Rout -whitespace
 data-raw/surface-transforms-v1/*.json -text
+
+# Keep new installed density manifest identities stable across checkouts.
+inst/extdata/surface-density-inputs-v1.json -text
+inst/extdata/surface-density-domains-v1.json -text

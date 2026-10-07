@@ -1,5 +1,13 @@
 # neuroatlas 0.2.0.9000
 
+* Exact pinned fsaverage 164k surfaces support directed native resampling to
+  and from fsaverage6 (41k) and fsaverage5 (10k), separately for each hemisphere.
+  New input manifests preserve released domain identities. Qualification covers
+  numerical interpolation and data policies; resampling remains lossy and does
+  not establish anatomical accuracy, area conservation or an inverse.
+  `space_transform_manifest()` exposes route scope and surface densities, and
+  the transform vignette separates executable routes from roadmap placeholders.
+
 * `projection_diagnostics()` reports per-map cortical coverage and per-key
   source, sampled-surface and target counts. It distinguishes absent source
   keys, sampling loss and surface-resampling loss. Explicit atlas or label-table

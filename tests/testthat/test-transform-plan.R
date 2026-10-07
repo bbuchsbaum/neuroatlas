@@ -309,7 +309,7 @@ test_that(
     expect_false(any(registry$executable[broad]))
     exact <- surface & !broad
     native <- exact & registry$transform_type == "sphere_resample"
-    expect_equal(sum(native), 4L)
+    expect_equal(sum(native), 12L)
     expect_true(all(registry$qualification[native] == "passed"))
     expect_true(all(registry$method[native] == "native_closest_barycentric"))
     expect_false(any(registry$reversible[surface]))

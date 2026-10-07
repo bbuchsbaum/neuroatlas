@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "contract_sha256": "c674b785c5b8ba204386e500aa42e9c89581d123f10ac438f30f8ea56a047a22",
+  "consumer_receipt_sha256": "2737fc67b173d85af5af900a71bfbe11934514a8ed4f9dd415a46e713e3143cd",
+  "script_sha256": "e4c38b81dcf657e673e1ce0300f37ba1891f87d517e09cdca1a459a64284bfb4",
+  "routes": {
+    "fsaverage-164k-L_to_fsaverage-41k-L": {
+      "all_source_rows": 40962,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 1,
+      "propagate_omit_error_pass": true
+    },
+    "fsaverage-41k-L_to_fsaverage-164k-L": {
+      "all_source_rows": 163842,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 10,
+      "propagate_omit_error_pass": true
+    },
+    "fsaverage-164k-L_to_fsaverage-10k-L": {
+      "all_source_rows": 10242,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 1,
+      "propagate_omit_error_pass": true
+    },
+    "fsaverage-10k-L_to_fsaverage-164k-L": {
+      "all_source_rows": 163842,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 40,
+      "propagate_omit_error_pass": true
+    },
+    "fsaverage-164k-R_to_fsaverage-41k-R": {
+      "all_source_rows": 40962,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 1,
+      "propagate_omit_error_pass": true
+    },
+    "fsaverage-41k-R_to_fsaverage-164k-R": {
+      "all_source_rows": 163842,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 10,
+      "propagate_omit_error_pass": true
+    },
+    "fsaverage-164k-R_to_fsaverage-10k-R": {
+      "all_source_rows": 10242,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 1,
+      "propagate_omit_error_pass": true
+    },
+    "fsaverage-10k-R_to_fsaverage-164k-R": {
+      "all_source_rows": 163842,
+      "supported_zero_pass": true,
+      "missing_column": 1,
+      "affected_rows": 40,
+      "propagate_omit_error_pass": true
+    }
+  }
+}

@@ -95,7 +95,7 @@ test_that(
       .neuroatlas_download = function(...) stop("network used"),
       .package = "neuroatlas"
     )
-    expect_error(get_surface_geometry("fsaverage", "10k", "L"), "No pinned")
+    expect_error(get_surface_geometry("fsaverage", "59k", "L"), "No pinned")
     expect_error(get_surface_geometry("fsLR", "32k", "both"), "No pinned")
   }
 )

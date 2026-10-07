@@ -1,0 +1,98 @@
+{
+  "schema": "neuroatlas.surface-domain-assets.v1",
+  "input_lock_sha256": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+  "domains": {
+    "fsaverage-10k-L": {
+      "domain": {
+        "schema": "neuroatlas.surface-domain.v1",
+        "template": "fsaverage",
+        "hemisphere": "L",
+        "density": "10k",
+        "registration": "fsaverage",
+        "revision": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+        "n_vertices": 10242,
+        "n_triangles": 20480,
+        "coordinates_sha256": "b1ff2f0a6a7af8a2be990b5c2976c6d2c973c711a5341cd605d0f69213c8ccf2",
+        "topology_sha256": "190a5f3f846d2a64095587c7ebc6264432ca2ba904603debeb848c286282a01d",
+        "cortex_sha256": "8766835fba04960c5ec8632767a9302395e087e9e7b0d582073f84a4ad37d7cd",
+        "area_sha256": "d918b646063baceeed5d0bc46c9be62304a8172dc4407958bf27646eba80a662",
+        "area_units": "mm2",
+        "id": "ff5d8ec2786e876b70b054de0a901fb4e2da007654c50c56bc5eab7533059fef"
+      },
+      "assets": {
+        "sphere": "tpl-fsaverage_hemi-L_den-10k_sphere.surf.gii",
+        "mask": "tpl-fsaverage_den-10k_hemi-L_desc-nomedialwall_dparc.label.gii",
+        "area": "tpl-fsaverage_den-10k_hemi-L_desc-vaavg_midthickness.shape.gii"
+      }
+    },
+    "fsaverage-10k-R": {
+      "domain": {
+        "schema": "neuroatlas.surface-domain.v1",
+        "template": "fsaverage",
+        "hemisphere": "R",
+        "density": "10k",
+        "registration": "fsaverage",
+        "revision": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+        "n_vertices": 10242,
+        "n_triangles": 20480,
+        "coordinates_sha256": "b1ff2f0a6a7af8a2be990b5c2976c6d2c973c711a5341cd605d0f69213c8ccf2",
+        "topology_sha256": "190a5f3f846d2a64095587c7ebc6264432ca2ba904603debeb848c286282a01d",
+        "cortex_sha256": "fe9c97064098ad21253586f5d2dc0b4778bfdd3a9a7d0324bb2d954d3556c8ad",
+        "area_sha256": "d012246a7df2c8bcb7540c64c629baaf8d8544d26b7332554e25de3223158ad9",
+        "area_units": "mm2",
+        "id": "b7b3bcc512196287d49330bd29bee95ee03d11326d13310ad646ddafdd72cba0"
+      },
+      "assets": {
+        "sphere": "tpl-fsaverage_hemi-R_den-10k_sphere.surf.gii",
+        "mask": "tpl-fsaverage_den-10k_hemi-R_desc-nomedialwall_dparc.label.gii",
+        "area": "tpl-fsaverage_den-10k_hemi-R_desc-vaavg_midthickness.shape.gii"
+      }
+    },
+    "fsaverage-41k-L": {
+      "domain": {
+        "schema": "neuroatlas.surface-domain.v1",
+        "template": "fsaverage",
+        "hemisphere": "L",
+        "density": "41k",
+        "registration": "fsaverage",
+        "revision": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+        "n_vertices": 40962,
+        "n_triangles": 81920,
+        "coordinates_sha256": "962182d0aa5a5cf59ca6df9369c5f79fa9e66a66443462ac02db6e414fa020c9",
+        "topology_sha256": "aedeee238a28dc7fdb5d1d226373d985fdcd3f306257766bd4bca8c252d6094c",
+        "cortex_sha256": "6dd41e8e87dfa67179be5575c9fbaec74a8d396e7fa04ff6b32982e6d79a3bd4",
+        "area_sha256": "0037e461dc5cc08bf36f73d5ef8c20dfba875fd25a2c3ab0c15de602e7cb3743",
+        "area_units": "mm2",
+        "id": "133a93188fd112c5cd57c84e47a58bbd50c73cdfdd6c09c001e2a9e1a32562ac"
+      },
+      "assets": {
+        "sphere": "tpl-fsaverage_hemi-L_den-41k_sphere.surf.gii",
+        "mask": "tpl-fsaverage_den-41k_hemi-L_desc-nomedialwall_dparc.label.gii",
+        "area": "tpl-fsaverage_den-41k_hemi-L_desc-vaavg_midthickness.shape.gii"
+      }
+    },
+    "fsaverage-41k-R": {
+      "domain": {
+        "schema": "neuroatlas.surface-domain.v1",
+        "template": "fsaverage",
+        "hemisphere": "R",
+        "density": "41k",
+        "registration": "fsaverage",
+        "revision": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+        "n_vertices": 40962,
+        "n_triangles": 81920,
+        "coordinates_sha256": "962182d0aa5a5cf59ca6df9369c5f79fa9e66a66443462ac02db6e414fa020c9",
+        "topology_sha256": "aedeee238a28dc7fdb5d1d226373d985fdcd3f306257766bd4bca8c252d6094c",
+        "cortex_sha256": "7d80216266123ab9d9a32f7ece7cf48138ac5a602d1d7e9f5f9de736c83fb611",
+        "area_sha256": "dc3497d4c0ca646a71e575cc7f015734df2bb84cb572e3aa46ee1812f93228ae",
+        "area_units": "mm2",
+        "id": "90dde6a72a443647fe43b84960657f8ad36b600786973b2009cc39e90840b7eb"
+      },
+      "assets": {
+        "sphere": "tpl-fsaverage_hemi-R_den-41k_sphere.surf.gii",
+        "mask": "tpl-fsaverage_den-41k_hemi-R_desc-nomedialwall_dparc.label.gii",
+        "area": "tpl-fsaverage_den-41k_hemi-R_desc-vaavg_midthickness.shape.gii"
+      }
+    }
+  }
+}

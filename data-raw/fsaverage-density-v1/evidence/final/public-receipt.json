@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "script_sha256": "f39190e5a168a1a924c9ebc941f7636f64685d30122d832fc491ffe7e8b742a5",
+  "registry_sha256": "243c0c60cb00074df19b8a73ea9d24f253428f85295f796474ccc0a29b7fd65b",
+  "consumer_receipt_sha256": "2737fc67b173d85af5af900a71bfbe11934514a8ed4f9dd415a46e713e3143cd",
+  "routes": {
+    "fsaverage-164k-L_to_fsaverage-41k-L": {
+      "operator_id": "7332cdfe64137e18235787608b0e39b62668e4be66bd822df4aef8b6dd3db28d",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    },
+    "fsaverage-41k-L_to_fsaverage-164k-L": {
+      "operator_id": "4580e1a359eb6bb844ce7ee0483718c166839261b6a39640280e0dde3bb885a7",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    },
+    "fsaverage-164k-L_to_fsaverage-10k-L": {
+      "operator_id": "f887e808747d7987a06374d2a504ae2e12dcb2f0150f4ced775a83ec1fb3facb",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    },
+    "fsaverage-10k-L_to_fsaverage-164k-L": {
+      "operator_id": "5b79819868cd8b93e3c049bc23d5685c0248a670a3190a2ab51ad14a2da149a8",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    },
+    "fsaverage-164k-R_to_fsaverage-41k-R": {
+      "operator_id": "b12728db50342f482c3fbbbfd238990740684a1745e3cdf95e6d9e23d1583d70",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    },
+    "fsaverage-41k-R_to_fsaverage-164k-R": {
+      "operator_id": "5abae376a523993c0c34991ab85c16b3051fc5806d95c2407f8acec4453ac294",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    },
+    "fsaverage-164k-R_to_fsaverage-10k-R": {
+      "operator_id": "431225d8aff08655c21c27044c61a5a784cca6578217f8e1160bdf9c7e48a411",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    },
+    "fsaverage-10k-R_to_fsaverage-164k-R": {
+      "operator_id": "3f0d3d5173f525499056cff7a54f1b97997b41ac8ffbcd96cc73e50ef13ec04f",
+      "exact_candidate_coefficients_equal": true,
+      "offline_replay_equal": true,
+      "public_application_equal": true,
+      "qualification": "passed"
+    }
+  }
+}

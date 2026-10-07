@@ -1,0 +1,11 @@
+{
+  "schema": "neuroatlas.exhaustive-oracle-precision.v1",
+  "frozen": "2026-10-07",
+  "reason": "Float64 squared-distance arithmetic selected an edge over an interior projection with a true distance advantage of 6.24e-17. Retain failure and refine independent reference arithmetic for every query; no native weights or acceptance tolerances change.",
+  "decimal_digits": [80, 100],
+  "precision_stability_tolerance": 1e-20,
+  "exhaustive_float64_envelope": "4096 * machine_epsilon * (norm(query) + maximum_source_radius)^2",
+  "maximum_triangle_condition_number": 10,
+  "selection": "Evaluate every triangle interior and every closed segment in float64. Re-evaluate all faces containing any primitive within the roundoff envelope of the global minimum at both precisions. Compare native output to the resulting global minimum under the original contract.",
+  "excluded": "No spatial tree, production candidate search, tolerance widening, failure whitelist or omitted sampled target. Exact query/vertex equality has an exact unit basis response."
+}

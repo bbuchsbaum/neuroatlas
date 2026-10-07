@@ -1,13 +1,14 @@
 #' Fetch Exact Pinned Surface Registration Geometry
 #'
 #' Downloads checksum-locked registration spheres, cortical masks and vertex
-#' areas from their original providers. Only the pinned fsaverage 164k and fsLR
-#' 32k domains are supported. The fsLR sphere is in fsaverage correspondence.
+#' areas from their original providers. Pinned fsaverage 164k, 41k (fsaverage6),
+#' 10k (fsaverage5), and fsLR 32k domains are supported. The fsLR sphere is in
+#' fsaverage correspondence.
 #' Inputs retain their upstream licenses, independently of neuroatlas's license;
 #' see `extdata/surface-assets-LICENSES.md` in the installed package.
 #'
 #' @param template Exact family, `"fsaverage"` or `"fsLR"`.
-#' @param density `"164k"` for fsaverage or `"32k"` for fsLR.
+#' @param density `"164k"`, `"41k"`, or `"10k"` for fsaverage; `"32k"` for fsLR.
 #' @param hemisphere `"L"` or `"R"`.
 #' @param cache_dir Dedicated transform cache directory.
 #' @param download Allow downloads from pinned upstream URLs.
@@ -48,12 +49,18 @@ get_surface_geometry <- function(
   catalog <- .surface_input_json("surface-domains-v1.json")
   name <- paste(template, density, hemisphere, sep = "-")
   entry <- catalog$domains[[name]]
+  lock_file <- "surface-inputs-v1.json"
+  if (is.null(entry)) {
+    catalog <- .surface_input_json("surface-density-domains-v1.json")
+    entry <- catalog$domains[[name]]
+    lock_file <- "surface-density-inputs-v1.json"
+  }
   if (is.null(entry)) stop("No pinned exact surface domain: ", name)
-  lock <- .surface_input_json("surface-inputs-v1.json")
+  lock <- .surface_input_json(lock_file)
   if (
     !identical(
       digest::digest(
-        file = .surface_input_path("surface-inputs-v1.json"),
+        file = .surface_input_path(lock_file),
         algo = "sha256"
       ),
       catalog$input_lock_sha256
@@ -120,6 +127,11 @@ get_surface_geometry <- function(
 }
 
 .read_locked_surface_input <- function(a, lock, cache_dir, download, offline) {
+  version <- if (is.null(lock$artifact_version)) {
+    "surface-inputs-v1"
+  } else {
+    lock$artifact_version
+  }
   parse <- function(path) {
     g <- gifti::readgii(path)
     if (!is.null(a$hemisphere)) {
@@ -134,7 +146,7 @@ get_surface_geometry <- function(
   if (is.null(a$archive)) {
     return(
       .fetch_transform_artifact(
-        .locked_surface_artifact(a, "surface_gifti"),
+        .locked_surface_artifact(a, "surface_gifti", version),
         cache_dir,
         download,
         offline,
@@ -145,7 +157,7 @@ get_surface_geometry <- function(
   archives <- Filter(function(x) identical(x$id, a$archive), lock$archives)
   if (length(archives) != 1L) stop("Missing or ambiguous pinned archive.")
   .fetch_transform_artifact(
-    .locked_surface_artifact(archives[[1L]], "surface_tar"),
+    .locked_surface_artifact(archives[[1L]], "surface_tar", version),
     cache_dir,
     download,
     offline,

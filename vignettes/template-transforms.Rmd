@@ -148,12 +148,66 @@ target surface, its native labels avoid adding another population projection.
 
 ## Route availability and nonlinear artifacts
 
-The manifest distinguishes available and planned routes. Only available routes
-are resolved by `get_template_transform()`.
+The manifest includes executable routes and broad roadmap placeholders.
+`executable` means that the API supports a registered route when its required
+dependencies and verified inputs are present; it is not a local installation
+check. Surface routes require the recorded exact domains, hemisphere and method.
+The legacy MNI305/MNI152 affine describes a coordinate family, rather than a
+qualified exact template pair.
 
 ```{r manifest}
-space_transform_manifest()[, c("from_space", "to_space", "backend", "status")]
+manifest <- space_transform_manifest()
+manifest[manifest$executable, c(
+  "from_space", "to_space", "hemisphere", "from_density", "to_density",
+  "backend", "route_scope"
+)]
 ```
+
+Planned rows describe proposed methods with no executable contract. They can
+share family names with an admitted exact route: a planned `sphere_nn` or
+Workbench method is a separate proposal from qualified native barycentric
+resampling. A family name alone does not identify an ordered surface mesh.
+
+```{r roadmap}
+manifest[manifest$route_scope == "roadmap_placeholder", c(
+  "from_space", "to_space", "backend", "status", "executable"
+)]
+```
+
+### Change fsaverage surface density
+
+The pinned fsaverage spheres support **164k ↔ 41k (fsaverage6)** and
+**164k ↔ 10k (fsaverage5)** for each hemisphere. Load the `"fsaverage"` family
+with the desired density, then pass its exact geometry to the template API.
+The following example is not run during vignette builds because it downloads
+upstream geometry on first use and requires the qualified native engine.
+
+```{r fsaverage-density, eval=FALSE}
+high <- get_surface_geometry("fsaverage", "164k", "L")
+low <- get_surface_geometry("fsaverage", "41k", "L") # fsaverage6
+# Use density = "10k" for fsaverage5; hemisphere = "R" for the right side.
+
+down <- get_template_transform(high, low)
+x <- surface_data(high$sphere[, 1] / 100, high$domain)
+y <- apply_template_transform(x, down)
+c(source_vertices = high$domain$n_vertices,
+  target_vertices = y$domain$n_vertices)
+
+up <- get_template_transform(low, high) # separately qualified direction
+resampled <- apply_template_transform(y, up)
+```
+
+The directions have independent operators. Upsampling interpolates values onto
+more vertices; it cannot recover detail lost through downsampling. Source cortex
+masks exclude contributors before row normalization, and target medial-wall
+vertices remain unavailable. Label data use discrete voting (`"aggregate"` or
+`"largest"`), so small parcels can disappear at lower density; compare retained
+keys and coverage for your data. Continuous interpolation is not an area
+conservation operation. The [density qualification report](https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/fsaverage-density-v1/README.md)
+records the pinned inputs, independent geometry checks and data-policy scope;
+these checks do not establish anatomical accuracy or an inverse.
+
+### Nonlinear volume routes
 
 Both directions between MNI152NLin6Asym and MNI152NLin2009cAsym are available
 from the [immutable artifact release](https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1).

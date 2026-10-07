@@ -1,0 +1,228 @@
+{
+  "schema": "neuroatlas.surface-inputs.v1",
+  "artifact_version": "surface-density-inputs-v1",
+  "qualification": "checksum_locked_inputs_only",
+  "redistribution": "upstream_download_only",
+  "upstream_revisions": {
+    "fsaverage": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+    "neuromaps": "ffcc2e0f657943ce00a1b6a968396f32250e495c"
+  },
+  "archives": [
+    {
+      "id": "neuromaps-fsaverage10k",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684ab9096b7021b63cf6b",
+      "size_bytes": 1655212,
+      "sha256": "b35676be4ee5df8d06069aa33e8a08e776a06bf9d6610fa2849386a48efeaefd",
+      "upstream_md5": "c61384c271ee2e6b5449222281137414",
+      "upstream_revision": "ffcc2e0f657943ce00a1b6a968396f32250e495c",
+      "upstream_manifest": "https://raw.githubusercontent.com/netneurolab/neuromaps/ffcc2e0f657943ce00a1b6a968396f32250e495c/neuromaps/datasets/data/osf.json"
+    },
+    {
+      "id": "neuromaps-fsaverage41k",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684aecb2a5e01fc68b7e1",
+      "size_bytes": 6550379,
+      "sha256": "932a25a1c8621560d8d95611066fb2ef48c836fc3e166765b17f75450b14181f",
+      "upstream_md5": "0cc48e9d5d5bb0216502888c954805fd",
+      "upstream_revision": "ffcc2e0f657943ce00a1b6a968396f32250e495c",
+      "upstream_manifest": "https://raw.githubusercontent.com/netneurolab/neuromaps/ffcc2e0f657943ce00a1b6a968396f32250e495c/neuromaps/datasets/data/osf.json"
+    }
+  ],
+  "assets": [
+    {
+      "path": "tpl-fsaverage_hemi-L_den-10k_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "L",
+      "role": "sphere",
+      "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-10k_sphere.surf.gii",
+      "upstream_revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+      "upstream_annex_key": "MD5E-s204444--12133ca89c3aaa7cc1def12d27e5a855.surf.gii",
+      "upstream_md5": "12133ca89c3aaa7cc1def12d27e5a855",
+      "size_bytes": 204444,
+      "sha256": "421d73e12a9cdce3224327601b73b0bf475943665854b4dc61869a8d93f23a8d"
+    },
+    {
+      "path": "tpl-fsaverage_den-10k_hemi-L_desc-nomedialwall_dparc.label.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "L",
+      "role": "mask",
+      "archive": "neuromaps-fsaverage10k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-10k_hemi-L_desc-nomedialwall_dparc.label.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684ab9096b7021b63cf6b",
+      "size_bytes": 1408,
+      "sha256": "9c6568b6861f00f5c89f5f50b906feb329c4f2a21e892b7ef87fb708b8e3c55e"
+    },
+    {
+      "path": "tpl-fsaverage_den-10k_hemi-L_desc-vaavg_midthickness.shape.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "L",
+      "role": "area",
+      "archive": "neuromaps-fsaverage10k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-10k_hemi-L_desc-vaavg_midthickness.shape.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684ab9096b7021b63cf6b",
+      "size_bytes": 49219,
+      "sha256": "d3c03ce6efe36e0bc85d85a6f24bdfcc51da7427b19e28b79783ae8062e88e02"
+    },
+    {
+      "path": "tpl-fsaverage_den-10k_hemi-L_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "L",
+      "role": "ordering_reference",
+      "archive": "neuromaps-fsaverage10k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-10k_hemi-L_sphere.surf.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684ab9096b7021b63cf6b",
+      "size_bytes": 204473,
+      "sha256": "96eee9ea13f4373d97e6edcc117147a7f5655eb6cc4833c33b44a56058759969"
+    },
+    {
+      "path": "tpl-fsaverage_hemi-R_den-10k_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "R",
+      "role": "sphere",
+      "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-10k_sphere.surf.gii",
+      "upstream_revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+      "upstream_annex_key": "MD5E-s204445--c59f9b4958349e1d978df2c3deef5bea.surf.gii",
+      "upstream_md5": "c59f9b4958349e1d978df2c3deef5bea",
+      "size_bytes": 204445,
+      "sha256": "b92a57bafc8239f2fdbb64fbedc0e9d787e3860c08b5a4321ebbe3f9c2df480f"
+    },
+    {
+      "path": "tpl-fsaverage_den-10k_hemi-R_desc-nomedialwall_dparc.label.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "R",
+      "role": "mask",
+      "archive": "neuromaps-fsaverage10k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-10k_hemi-R_desc-nomedialwall_dparc.label.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684ab9096b7021b63cf6b",
+      "size_bytes": 1416,
+      "sha256": "40ea0f85e75837f2f5c6f7ccc238436d2137c28a92baca194fd0db4113fd924d"
+    },
+    {
+      "path": "tpl-fsaverage_den-10k_hemi-R_desc-vaavg_midthickness.shape.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "R",
+      "role": "area",
+      "archive": "neuromaps-fsaverage10k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-10k_hemi-R_desc-vaavg_midthickness.shape.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684ab9096b7021b63cf6b",
+      "size_bytes": 49228,
+      "sha256": "c039f3035e0730feb49774f8956c80ecd85288ad0a9fbc2706c538dc73ddde8a"
+    },
+    {
+      "path": "tpl-fsaverage_den-10k_hemi-R_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "10k",
+      "hemisphere": "R",
+      "role": "ordering_reference",
+      "archive": "neuromaps-fsaverage10k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-10k_hemi-R_sphere.surf.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684ab9096b7021b63cf6b",
+      "size_bytes": 204474,
+      "sha256": "33f4c8c98ebb3ac0272a1bcbf5ad46a845b879ab72ab92eb3321fb22e11e24ce"
+    },
+    {
+      "path": "tpl-fsaverage_hemi-L_den-41k_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "L",
+      "role": "sphere",
+      "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-L_den-41k_sphere.surf.gii",
+      "upstream_revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+      "upstream_annex_key": "MD5E-s839168--2af0c9e2e5e5bc73f812f7a0f7c93483.surf.gii",
+      "upstream_md5": "2af0c9e2e5e5bc73f812f7a0f7c93483",
+      "size_bytes": 839168,
+      "sha256": "f3826fb34c273ad26844d922853e7cf0121d5ed1594f79c2a3cd525a88239d66"
+    },
+    {
+      "path": "tpl-fsaverage_den-41k_hemi-L_desc-nomedialwall_dparc.label.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "L",
+      "role": "mask",
+      "archive": "neuromaps-fsaverage41k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-41k_hemi-L_desc-nomedialwall_dparc.label.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684aecb2a5e01fc68b7e1",
+      "size_bytes": 2256,
+      "sha256": "5744f02fda52c1e1ced813862631f48fd3e653b1762b445d64f41646bcc0b9b5"
+    },
+    {
+      "path": "tpl-fsaverage_den-41k_hemi-L_desc-vaavg_midthickness.shape.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "L",
+      "role": "area",
+      "archive": "neuromaps-fsaverage41k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-41k_hemi-L_desc-vaavg_midthickness.shape.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684aecb2a5e01fc68b7e1",
+      "size_bytes": 193823,
+      "sha256": "0b757ddcb61fa9570220a655977a3c3eaab53eee323331c832bec979ad35add4"
+    },
+    {
+      "path": "tpl-fsaverage_den-41k_hemi-L_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "L",
+      "role": "ordering_reference",
+      "archive": "neuromaps-fsaverage41k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-41k_hemi-L_sphere.surf.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684aecb2a5e01fc68b7e1",
+      "size_bytes": 839197,
+      "sha256": "9dc01c38c254b3db1704e12c0f89a3c6fd842dea69f54558a2c1c2108aa4a79a"
+    },
+    {
+      "path": "tpl-fsaverage_hemi-R_den-41k_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "R",
+      "role": "sphere",
+      "url": "https://templateflow.s3.amazonaws.com/tpl-fsaverage/tpl-fsaverage_hemi-R_den-41k_sphere.surf.gii",
+      "upstream_revision": "8e53ba4f2e438758f69d11436fe0cd291a28bec6",
+      "upstream_annex_key": "MD5E-s839169--dd84f143c1993446954dbf1ac41ef92f.surf.gii",
+      "upstream_md5": "dd84f143c1993446954dbf1ac41ef92f",
+      "size_bytes": 839169,
+      "sha256": "80558deca8e7efe1f092345effb1f099c0e5adfb48ca5e064145debceec780c2"
+    },
+    {
+      "path": "tpl-fsaverage_den-41k_hemi-R_desc-nomedialwall_dparc.label.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "R",
+      "role": "mask",
+      "archive": "neuromaps-fsaverage41k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-41k_hemi-R_desc-nomedialwall_dparc.label.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684aecb2a5e01fc68b7e1",
+      "size_bytes": 2288,
+      "sha256": "36243569538b273e50d4b732730f972688ed153c9f443769200c30d5ef752928"
+    },
+    {
+      "path": "tpl-fsaverage_den-41k_hemi-R_desc-vaavg_midthickness.shape.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "R",
+      "role": "area",
+      "archive": "neuromaps-fsaverage41k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-41k_hemi-R_desc-vaavg_midthickness.shape.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684aecb2a5e01fc68b7e1",
+      "size_bytes": 193800,
+      "sha256": "56495d5114d9b31c0a58bddfd5a961ed51c974c96ca745afeb119406aca18384"
+    },
+    {
+      "path": "tpl-fsaverage_den-41k_hemi-R_sphere.surf.gii",
+      "template": "fsaverage",
+      "density": "41k",
+      "hemisphere": "R",
+      "role": "ordering_reference",
+      "archive": "neuromaps-fsaverage41k",
+      "member": "atlases/fsaverage/tpl-fsaverage_den-41k_hemi-R_sphere.surf.gii",
+      "url": "https://files.osf.io/v1/resources/4mw3a/providers/osfstorage/60b684aecb2a5e01fc68b7e1",
+      "size_bytes": 839198,
+      "sha256": "ec20d04587587d513dc66cf0072202202ad2d46ca1462bf3c25ca845d29b5d32"
+    }
+  ]
+}
