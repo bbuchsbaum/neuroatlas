@@ -11,6 +11,7 @@ resource_files:
 - albers.css
 - albers-header.html
 - fonts
+- figures/template-transform-before-after.png
 vignette: |
   %\VignetteIndexEntry{Verified Template Transforms}
   %\VignetteEngine{knitr::rmarkdown}
@@ -123,6 +124,75 @@ nonlinear <- get_template_transform(
 schaefer <- get_schaefer_atlas(parcels = 200, networks = 7, resolution = 2)
 target <- get_template("MNI152NLin2009cAsym", resolution = 2)
 aligned <- apply_template_transform(schaefer, nonlinear, target)
+```
+
+### Inspect alignment before and after
+
+To inspect the same warp, apply it to the source template's T1-weighted anatomy
+with continuous sampling. A checkerboard alternates target and source tiles:
+look for discontinuities in the brain outline, ventricles, and cortical folds
+where neighbouring tiles meet. After the transform, these structures should
+line up more closely. Brightness can still differ between templates, so inspect
+anatomical boundaries rather than expecting identical intensities. This
+illustrates template alignment; it does not measure individual-subject accuracy
+or establish the correctness of every atlas label.
+
+The top row below resamples the source onto the target grid for display without
+applying an anatomical transform. The bottom row applies `nonlinear`, the same
+released transform used for `aligned` above. Both rows use the same target,
+axial positions, tile size, crop, and intensity limits. Intensity matching is
+disabled so it cannot change the comparison between rows.
+
+```{r nonlinear-visual, echo=FALSE, out.width="100%", fig.cap="MNI6 to MNI2009c alignment at 2 mm: before (top) and after (bottom) the nonlinear transform. Alternating tiles show target and source anatomy at the same three axial positions.", fig.alt="Two rows of three axial brain checkerboards. Before transformation, the source and target outlines and internal structures break across tile boundaries. After transformation, the structures align more closely."}
+knitr::include_graphics("figures/template-transform-before-after.png")
+```
+
+The figure is precomputed from the released transform and cached TemplateFlow
+brain templates; building this vignette does not download or apply the warp.
+Run the download example above and then this plotting code to reproduce it.
+
+```{r nonlinear-visual-code, eval=FALSE}
+if (!requireNamespace("patchwork", quietly = TRUE)) {
+  stop("Install patchwork to compose the checkerboard panels.")
+}
+source_t1 <- get_template("MNI152NLin6Asym", variant = "brain", resolution = 2)
+target_t1 <- get_template(
+  "MNI152NLin2009cAsym", variant = "brain", resolution = 2
+)
+
+# Match voxel grids for display only: no anatomical warp is applied here.
+before <- neuroim2::resample(source_t1, target_t1, interpolation = 1L)
+after <- apply_template_transform(
+  source_t1, nonlinear, target_t1, data_type = "continuous"
+)
+
+# Fix each template's grayscale limits across both rows.
+brain_range <- function(vol) {
+  values <- as.vector(vol)
+  as.numeric(stats::quantile(values[values > 0], c(0.02, 0.98)))
+}
+target_range <- brain_range(target_t1)
+source_range <- brain_range(source_t1)
+checkerboard <- function(vol, title) {
+  neuroim2::plot_checkerboard(
+    target_t1, vol, zlevels = c(-12, 20, 52), unit = "mm", tile = 8L,
+    bg_range = target_range, ov_range = source_range,
+    match_intensity = FALSE, focus_brain = FALSE, interpolate = FALSE,
+    labels = c("target", "source"),
+    title = title, style = "report", canvas = c(10, 4.2)
+  )
+}
+panels <- list(
+  checkerboard(before, "Before: grid resampling only"),
+  checkerboard(after, "After: released nonlinear transform")
+)
+figure <- patchwork::wrap_plots(
+  lapply(panels, function(panel) {
+    patchwork::wrap_elements(full = patchwork::patchworkGrob(panel))
+  }),
+  ncol = 1
+)
+print(figure)
 ```
 
 Qualification covers both directions on the native 1 mm and 2 mm target grids,
