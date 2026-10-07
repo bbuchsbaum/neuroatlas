@@ -12,6 +12,7 @@ resource_files:
 - albers-header.html
 - fonts
 - figures/template-transform-before-after.png
+- figures/template-transform-blink.gif
 vignette: |
   %\VignetteIndexEntry{Verified Template Transforms}
   %\VignetteEngine{knitr::rmarkdown}
@@ -190,8 +191,32 @@ disabled so it cannot change the comparison between rows.
 knitr::include_graphics("figures/template-transform-before-after.png")
 ```
 
-The figure is precomputed from the released transform and cached TemplateFlow
-brain templates; building this vignette does not download or apply the warp.
+For a closer view, the compact animation below alternates once per second
+between the **same target in both panels** and the **source before and after
+alignment**. Watch the ventricular walls: less movement against the target
+indicates closer local alignment. This is a 1 mm crop at axial z = 10 mm;
+it supplements the 2 mm checkerboards above.
+
+![Synchronized blink comparison of ventricular anatomy: left is before alignment, right is after the released transform. Both panels alternate with the same stationary target.](figures/template-transform-blink.gif)
+
+The GIF is about 104 KiB (598 by 438 pixels, two frames), with a fixed 64-level
+grayscale palette and no dithering. It uses the visual quality campaign's
+normalization: each volume is divided by its own 99th-percentile intensity
+inside the target brain mask, with the same 0--1 display range. Contrast and
+interpolation differences can also cause flicker; this is not an anatomical
+error measurement. The crop is enlarged with nearest-neighbour display.
+
+For manual stepping, pausing, other anatomical views and both transform
+directions, [download the interactive viewer](https://raw.githubusercontent.com/bbuchsbaum/neuroatlas/master/data-raw/transform-quality-v1/visuals-20261007/index.html)
+and open it locally. Animation starts only when requested in that viewer.
+A [static overlay and difference figure](https://github.com/bbuchsbaum/neuroatlas/blob/master/data-raw/transform-quality-v1/visuals-20261007/MNI152NLin6Asym_to_MNI152NLin2009cAsym_res-01-detail.png)
+is also available. The GIF can be regenerated from the checked-in viewer with
+`data-raw/transform-quality-v1/make-vignette-blink.py`; its input and output hashes
+are recorded in the adjacent `vignette-blink-receipt.json`.
+
+The checkerboard figure is precomputed from the released transform and cached
+TemplateFlow brain templates; building this vignette does not download or apply
+the warp.
 Run the download example above and then this plotting code to reproduce it.
 
 ```{r nonlinear-visual-code, eval=FALSE}

@@ -45,6 +45,7 @@ renv/library
 .rcmdcheck_result.rds
 tmp/
 vignettes/figures/*
+!vignettes/figures/template-transform-blink.gif
 !vignettes/figures/dilation-radius-rois.png
 !vignettes/figures/glasser-surface-parcellation.png
 !vignettes/figures/surface-panel-continuous.png
