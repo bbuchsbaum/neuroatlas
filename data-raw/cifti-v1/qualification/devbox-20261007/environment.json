@@ -1,0 +1,40 @@
+{
+  "R": "R version 4.3.3 (2024-02-29)",
+  "platform": "x86_64-pc-linux-gnu",
+  "packages": {
+    "RNifti": "1.10.0",
+    "xml2": "1.6.0",
+    "neurotransform": "0.2.0",
+    "neuroim2": "0.19.1"
+  },
+  "artifacts": {
+    "RNifti": {
+      "help/RNifti.rdb": "e90a02a6ce8ffb70a66f8b68369717d07b5673762fcc2925188cffd0a3d93ac2",
+      "help/RNifti.rdx": "e02f46cce069eea3d85d1f5c54c25f7f913f496c5a6a9d56a70e34bc4d7d485e",
+      "libs/RNifti.so": "757fb3c105567332c31582731c5b01b9bf0b89b5da83abb92c82f7efe5fe50f7",
+      "R/RNifti.rdb": "dbb1d58d30931ebe9a618f419e5064113e3b0696bfc308452d03d5a84a59f7b3",
+      "R/RNifti.rdx": "a92950d0c19751e22d6ca96452ab7500ab8a6c9eb81da80eb69225bcb7ea22b4"
+    },
+    "xml2": {
+      "help/xml2.rdb": "88ff019f03d616b1e0842d3e3196ea656d4f377431cf957e040805e0b7bbcbe2",
+      "help/xml2.rdx": "7a2e153df5ad363cc8470a19a034259958ba2107a1cac7a35b0ffd1a305b9508",
+      "libs/xml2.so": "7c323ed2b054a1b6efa96dd0c1ef686adb36f81e4f4a9e5a1d40d223a39f4963",
+      "R/xml2.rdb": "53db7c0ee2e9cfc23ded94f269cd5ef2df26661fef0be6130dd4348584a7103a",
+      "R/xml2.rdx": "75ee25ee20fe593eea19eae20f42bd4079ede20fa51589ecc740103f9e7ad8b1"
+    },
+    "neurotransform": {
+      "help/neurotransform.rdb": "296f72089bad1fa091097782307a7b18e08df55def043f00048813aac1ccedde",
+      "help/neurotransform.rdx": "fe8b17e44af3b7e9a1caecfd34f0fe4ba43b4a05662e5915c2f85a69b57e9887",
+      "libs/neurotransform.so": "55bb6bf8a4cc31e1d6fe8427bcbe10f45da423b5f5c7b751ff78f2c3f754795f",
+      "R/neurotransform.rdb": "475924b145eddef553fe47a41153a9ae54183de5e301eb3e97937bfff67f0af5",
+      "R/neurotransform.rdx": "1dfdf503e67c92516000170280a2eede7680a7f08d9de0417dc671b04fe406f9"
+    },
+    "neuroim2": {
+      "help/neuroim2.rdb": "a27b54ccb8c882e81aec438eb0af227663808fda3c5cbf1b6097c19b2f80917e",
+      "help/neuroim2.rdx": "b966136433e87b5d4bf637bf21e81fb61c67abfa230eba3768bbcda4a0c54e6e",
+      "libs/neuroim2.so": "94e1fb9408481ef6944fea3dbc2203704daaeae4b93722a1f915f7db51478be0",
+      "R/neuroim2.rdb": "53f24472306643d9509506b968c6b7abbf14a78501a1815a3d4d345e7eb89308",
+      "R/neuroim2.rdx": "637dc7e64dc879a41fe81e1736e39f18b9a365807b3baa88e2e91df85b4e1bb5"
+    }
+  }
+}

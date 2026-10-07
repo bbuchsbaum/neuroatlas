@@ -1,0 +1,28 @@
+ℹ Loading neuroatlas
+scalar-axis0-maps1-le.dscalar.nii roundtrip written
+scalar-axis0-maps1-be.dscalar.nii roundtrip written
+scalar-axis0-maps2-le.dscalar.nii roundtrip written
+scalar-axis0-maps2-be.dscalar.nii roundtrip written
+scalar-axis1-maps1-le.dscalar.nii roundtrip written
+scalar-axis1-maps1-be.dscalar.nii roundtrip written
+scalar-axis1-maps2-le.dscalar.nii roundtrip written
+scalar-axis1-maps2-be.dscalar.nii roundtrip written
+label-axis0-maps1-le.dlabel.nii roundtrip written
+label-axis0-maps1-be.dlabel.nii roundtrip written
+label-axis0-maps2-le.dlabel.nii roundtrip written
+label-axis0-maps2-be.dlabel.nii roundtrip written
+label-axis1-maps1-le.dlabel.nii roundtrip written
+label-axis1-maps1-be.dlabel.nii roundtrip written
+label-axis1-maps2-le.dlabel.nii roundtrip written
+label-axis1-maps2-be.dlabel.nii roundtrip written
+scalar-scaled.dscalar.nii roundtrip written
+/work/code/neuroatlas/data-raw/surface-transforms-v1/work/python/lib/python3.12/site-packages/nibabel/cifti2/cifti2.py:1491: UserWarning: Dataobj shape (9,) does not match shape expected from CIFTI-2 header (9, 1)
+  warn(
+Traceback (most recent call last):
+  File "/work/code/neuroatlas-cifti/data-raw/cifti-v1/io-oracle.py", line 97, in <module>
+    generate(args.directory) if args.action == 'generate' else verify(args.directory)
+                                                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/code/neuroatlas-cifti/data-raw/cifti-v1/io-oracle.py", line 78, in verify
+    assert a.shape == b.shape, (name, a.shape, b.shape)
+           ^^^^^^^^^^^^^^^^^^
+AssertionError: ('scalar-axis0-maps1-le.dscalar.nii', (9, 1), (9,))

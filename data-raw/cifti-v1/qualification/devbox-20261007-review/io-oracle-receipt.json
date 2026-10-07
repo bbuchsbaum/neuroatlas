@@ -1,0 +1,143 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "file": "scalar-axis0-maps1-le.dscalar.nii",
+      "shape": [
+        9,
+        1
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-axis0-maps1-be.dscalar.nii",
+      "shape": [
+        9,
+        1
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-axis0-maps2-le.dscalar.nii",
+      "shape": [
+        9,
+        2
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-axis0-maps2-be.dscalar.nii",
+      "shape": [
+        9,
+        2
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-axis1-maps1-le.dscalar.nii",
+      "shape": [
+        1,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-axis1-maps1-be.dscalar.nii",
+      "shape": [
+        1,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-axis1-maps2-le.dscalar.nii",
+      "shape": [
+        2,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-axis1-maps2-be.dscalar.nii",
+      "shape": [
+        2,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis0-maps1-le.dlabel.nii",
+      "shape": [
+        9,
+        1
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis0-maps1-be.dlabel.nii",
+      "shape": [
+        9,
+        1
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis0-maps2-le.dlabel.nii",
+      "shape": [
+        9,
+        2
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis0-maps2-be.dlabel.nii",
+      "shape": [
+        9,
+        2
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis1-maps1-le.dlabel.nii",
+      "shape": [
+        1,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis1-maps1-be.dlabel.nii",
+      "shape": [
+        1,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis1-maps2-le.dlabel.nii",
+      "shape": [
+        2,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "label-axis1-maps2-be.dlabel.nii",
+      "shape": [
+        2,
+        9
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "file": "scalar-scaled.dscalar.nii",
+      "shape": [
+        9,
+        1
+      ],
+      "max_abs_error": 0
+    }
+  ],
+  "nibabel_version": "5.4.2",
+  "numpy_version": "2.4.3"
+}

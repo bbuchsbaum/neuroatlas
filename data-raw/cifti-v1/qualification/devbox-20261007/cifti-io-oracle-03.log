@@ -1,0 +1,19 @@
+ℹ Loading neuroatlas
+scalar-axis0-maps1-le.dscalar.nii roundtrip written
+scalar-axis0-maps1-be.dscalar.nii roundtrip written
+scalar-axis0-maps2-le.dscalar.nii roundtrip written
+scalar-axis0-maps2-be.dscalar.nii roundtrip written
+scalar-axis1-maps1-le.dscalar.nii roundtrip written
+scalar-axis1-maps1-be.dscalar.nii roundtrip written
+scalar-axis1-maps2-le.dscalar.nii roundtrip written
+scalar-axis1-maps2-be.dscalar.nii roundtrip written
+label-axis0-maps1-le.dlabel.nii roundtrip written
+label-axis0-maps1-be.dlabel.nii roundtrip written
+label-axis0-maps2-le.dlabel.nii roundtrip written
+label-axis0-maps2-be.dlabel.nii roundtrip written
+label-axis1-maps1-le.dlabel.nii roundtrip written
+label-axis1-maps1-be.dlabel.nii roundtrip written
+label-axis1-maps2-le.dlabel.nii roundtrip written
+label-axis1-maps2-be.dlabel.nii roundtrip written
+scalar-scaled.dscalar.nii roundtrip written
+PASS: 17 independent round trips; values/axes/metadata exact.

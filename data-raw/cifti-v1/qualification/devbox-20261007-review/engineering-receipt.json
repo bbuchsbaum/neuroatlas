@@ -1,0 +1,51 @@
+{
+  "schema": "neuroatlas.cifti-engineering.v1",
+  "source_bindings": {
+    "R/cifti.R": "3842b5abcf869b8ee69eb2038d15ebe2e854062fb1bb454e127742087c2cb071",
+    "R/template_transform.R": "83c76d4afa43ccbbb624cd6ead5d05d6fe5ae16be22996e4095cf42ef0d6597f",
+    "R/surface_transform.R": "802bb15cbecf639b29fc9626fd56b94251c92a8088314cb46207c43ce15cdafa",
+    "R/surface_assets.R": "57778ab2dd7cea2fd7df2c8f101c08c0ddc4340b5168539b4a9e3f626b657447",
+    "DESCRIPTION": "8e1775832fe051f5ca8c3e32b2928eb30f95d0b13a84a080d56e6e0835d4657f",
+    "NAMESPACE": "1dc0146a5f5ffd92f4e4d34142a28d6393f30bfdaa198e3ac26a90dc71262c7d",
+    "tests/testthat/test-cifti.R": "cff0841daf93f1d1f050a4a1ea773f806a26e26f473df626d69bd93355d1bcec",
+    "data-raw/cifti-v1/README.md": "f1195e259cfcb6c7df3da7aefd5394c8fad09a06bf1951af76cdb7332ed119c8",
+    "data-raw/cifti-v1/adapter-fixtures.py": "73577abd04c94df02ba4604bdde46da59a6b3911f74f1d0752e4a8b7922f9a2b",
+    "data-raw/cifti-v1/contract-v1.json": "4658bfb39ae63bfdd6610d8f1d4a262aee0309fde9ab50675221a4979d7527c0",
+    "data-raw/cifti-v1/inspect-workbench.py": "fe61180015a2a7d05fb58c0a4939976d745ca5e6be22fbc80e2e4f60159af8d2",
+    "data-raw/cifti-v1/io-oracle.py": "f97cead034aa4d60f965f8d62dc8758830165cc5ca2e6eabc5cbdf371d96105f",
+    "data-raw/cifti-v1/qualify-adapter.R": "1e4646138ee38d7516e061826a455fabeda25ab3f445431f1e6e8b4ef32e67a0",
+    "data-raw/cifti-v1/roundtrip.R": "4e8487010869cec4d331f3f0f89f6a488daaae206f6e8e6be6fb426fca590816"
+  },
+  "focused_tests": {
+    "passed": 156,
+    "failed": 0,
+    "warnings": 0,
+    "skipped": 0
+  },
+  "full_tests": {
+    "passed": 2926,
+    "failed": 0,
+    "warnings": 44,
+    "skipped": 2,
+    "complete_log_sha256": "3e48ce2083eb79d031525f058a87d2f2836843cb6d181ddb0f5f846d48c4769f",
+    "complete_log_local_path": "/work/code/neuroatlas/data-raw/surface-transforms-v1/work/logs/cifti-publication-review-full-tests.log"
+  },
+  "package_check": {
+    "errors": 0,
+    "warnings": 0,
+    "notes": 3,
+    "manual": true,
+    "args": [
+      "--as-cran",
+      "--no-tests"
+    ],
+    "tests_run_separately": true
+  },
+  "project_lint": "PASS",
+  "website_build": "PASS",
+  "documentation_followup": {
+    "executable_expressions_unchanged": true,
+    "regenerated_rd_validation": "PASS",
+    "rendered_cross_reference_links": "PASS"
+  }
+}

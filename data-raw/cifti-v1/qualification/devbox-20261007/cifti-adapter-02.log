@@ -1,0 +1,7 @@
+ℹ Loading neuroatlas
+Traceback (most recent call last):
+  File "/work/code/neuroatlas-cifti/data-raw/cifti-v1/adapter-fixtures.py", line 6, in <module>
+    import nibabel as nib
+ModuleNotFoundError: No module named 'nibabel'
+Error: system2(python, c("data-raw/cifti-v1/adapter-fixtures.py", "generate",  .... is not TRUE
+Execution halted

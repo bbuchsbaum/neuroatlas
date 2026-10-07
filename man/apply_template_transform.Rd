@@ -9,46 +9,53 @@ apply_template_transform(
   transform,
   target = NULL,
   data_type = c("auto", "continuous", "label", "probability"),
-  interpolation = NULL
+  interpolation = NULL,
+  missing_labels = NULL
 )
 }
 \arguments{
-\item{x}{A volumetric atlas, `NeuroVol`, or `NeuroVec` (channels in dimension
+\item{x}{A volumetric atlas, \code{NeuroVol}, or \code{NeuroVec} (channels in dimension
 4),
-or `SurfaceData` for a native surface operator.}
+or \code{SurfaceData} for a native surface operator.
+A mixed cortical adapter requires \code{CiftiData} with its bound source layout.}
 
-\item{transform}{A verified [get_template_transform()] result.}
+\item{transform}{A verified \code{\link[=get_template_transform]{get_template_transform()}} result.}
 
-\item{target}{Target atlas, `NeuroVol`, or explicit `NeuroSpace`. A bare grid
+\item{target}{Target atlas, \code{NeuroVol}, or explicit \code{NeuroSpace}. A bare grid
 is an assertion by the caller that it is in the transform's target space.
 Attached source/target metadata must agree with the route.
-Surface operators already bind their exact target domain: `NULL` uses that
-domain, or supply the matching `SurfaceGeometry` or `SurfaceDomain`.}
+Surface operators already bind their exact target domain: \code{NULL} uses that
+domain, or supply the matching \code{SurfaceGeometry} or \code{SurfaceDomain}.}
 
-\item{data_type}{`"auto"` uses declared metadata, or label semantics for
+\item{data_type}{\code{"auto"} uses declared metadata, or label semantics for
 atlas
 objects. Unannotated volumes require an explicit type; integer-valued
 samples alone do not imply labels.}
 
-\item{interpolation}{`NULL` selects the type-specific method. Only
-`"nearest"`
-for labels and `"linear"` for continuous/probability data are supported.}
+\item{interpolation}{\code{NULL} selects the type-specific method. Only
+\code{"nearest"}
+for labels and \code{"linear"} for continuous/probability data are supported.}
+
+\item{missing_labels}{Explicit unassigned keys for unsupported CIFTI label
+samples, passed to \code{\link[=apply_cifti_transform]{apply_cifti_transform()}}. Other representations require
+\code{NULL}.}
 }
 \value{
-The transformed atlas or volume. The `neuroatlas_transform` attribute
-  records the route, artifact hashes, interpolation, grids and lost labels.
-  Atlas objects retain semantic IDs, labels and source provenance, including
-  regions that disappear on the target grid.
-  A surface destination returns `SurfaceData` with exact domain, availability
-  and projection provenance.
+The transformed atlas or volume. The \code{neuroatlas_transform} attribute
+records the route, artifact hashes, interpolation, grids and lost labels.
+Atlas objects retain semantic IDs, labels and source provenance, including
+regions that disappear on the target grid.
+A surface destination returns \code{SurfaceData} with exact domain, availability
+and projection provenance.
+A CIFTI destination returns \code{CiftiData} and preserves noncortical support.
 }
 \description{
 Composes the complete route in physical coordinates and samples each input
 channel once. Labels use nearest neighbour; scalar and probability values
 use linear interpolation. For image-to-image transforms, out-of-field samples
 are zero and probability channels are interpolated independently. Surface
-transforms dispatch to [apply_surface_transform()] or
-[apply_surface_projection()], whose unsupported samples are `NA` and whose
+transforms dispatch to \code{\link[=apply_surface_transform]{apply_surface_transform()}} or
+\code{\link[=apply_surface_projection]{apply_surface_projection()}}, whose unsupported samples are \code{NA} and whose
 coverage and missingness semantics are documented separately.
 }
 \examples{

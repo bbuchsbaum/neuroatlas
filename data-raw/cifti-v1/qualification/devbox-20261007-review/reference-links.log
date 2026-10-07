@@ -1,0 +1,16 @@
+-- Building function reference -------------------------------------------------
+Reading 'man/apply_cifti_transform.Rd'
+Writing 'reference/apply_cifti_transform.html'
+Reading 'man/apply_template_transform.Rd'
+Writing 'reference/apply_template_transform.html'
+Reading 'man/get_cifti_transform.Rd'
+Writing 'reference/get_cifti_transform.html'
+Reading 'man/get_template_transform.Rd'
+Writing 'reference/get_template_transform.html'
+Reading 'man/read_cifti.Rd'
+Writing 'reference/read_cifti.html'
+Reading 'man/replace_cifti_values.Rd'
+Writing 'reference/replace_cifti_values.html'
+Reading 'man/write_cifti.Rd'
+Writing 'reference/write_cifti.html'
+CIFTI reference links render correctly.
