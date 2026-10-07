@@ -1,0 +1,18 @@
+{
+  "source_html_sha256": "527ebf1a2d12a9e0e6155d1c519e3d264ccb5ba93aa75ee6c01860bd29acddc9",
+  "selected_view": "MNI6Asym to MNI2009cAsym | 1 mm / Ventricles / deep gray / z = 10 mm (RAS)",
+  "script_sha256": "f1fb9e960889d7aa7b5b85fdc0952bd265afd89b45d772e41ec565420f4e06a5",
+  "pillow": "12.3.0",
+  "font_sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+  "dimensions": [
+    598,
+    438
+  ],
+  "frames": 2,
+  "frame_duration_ms": 1000,
+  "palette": "fixed 64-level grayscale; no dithering",
+  "magnification": "3x nearest neighbor; same intensity window; 64-level quantization",
+  "gif_sha256": "f4b193c40b60620156d5e8014b7261483407aa7f46d2d67f292aec93a2e3aa14",
+  "gif_bytes": 106404,
+  "checks": "Two decoded frames equal rendered frames byte-for-byte; target panels identical; source panels differ; GIF below 128 kB."
+}
