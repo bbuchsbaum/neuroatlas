@@ -1,0 +1,6 @@
+# Preserve checksum-bound qualification receipts and console bytes.
+evidence/** -text
+evidence/**/*.log -whitespace
+contract-v1.json -text
+oracle-refinement-v1.json -text
+input-ordering-receipt.json -text

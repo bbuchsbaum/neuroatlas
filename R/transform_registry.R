@@ -20,7 +20,10 @@
 #' the required optional dependencies and artifacts; it is not a local readiness
 #' check. Exact admitted surface routes also bind `from_domain_id`,
 #' `to_domain_id`, `method`, `engine_revision`, `input_lock_sha256` and
-#' hemisphere.
+#' hemisphere. `from_density` and `to_density` record pinned surface densities;
+#' `route_scope` distinguishes `"roadmap_placeholder"`,
+#' `"exact_surface_domains"`, `"exact_volume_to_surface"`,
+#' `"exact_template_pair"`, and legacy `"coordinate_family"` routes.
 #' Broad surface names remain advisory. Numerical qualification is restricted to
 #' the recorded inputs and methods; it does not establish anatomical accuracy.
 #'
@@ -28,8 +31,9 @@
 #' # All known routes
 #' reg <- space_transform_manifest()
 #'
-#' # Only implemented routes
-#' available <- space_transform_manifest(status = "available")
+#' # Executable routes, with their identity scope
+#' reg[reg$executable, c("from_space", "to_space", "route_scope",
+#'   "hemisphere", "from_density", "to_density", "backend")]
 #' @export
 space_transform_manifest <- function(status = NULL) {
   reg <- .space_transform_registry()
@@ -325,7 +329,9 @@ print.atlas_transform_plan <- function(x, ...) {
     "method",
     "engine_revision",
     "input_lock_sha256",
-    "hemisphere"
+    "hemisphere",
+    "from_density",
+    "to_density"
   )
   for (field in setdiff(fields, names(reg))) reg[[field]] <- NA_character_
   if (!"size_bytes" %in% names(reg)) reg$size_bytes <- NA_real_
@@ -364,6 +370,16 @@ print.atlas_transform_plan <- function(x, ...) {
     !is.na(reg$to_domain_id) & !is.na(reg$qualification) &
     reg$qualification == "passed"
   reg$executable <- volume | (reg$status == "available" & (native | projection))
+  exact_source <- !is.na(reg$from_domain_id)
+  exact_target <- !is.na(reg$to_domain_id)
+  reg$route_scope <- "unqualified_route"
+  reg$route_scope[reg$backend == "internal_affine"] <- "coordinate_family"
+  reg$route_scope[qualified_h5] <- "exact_template_pair"
+  reg$route_scope[exact_target & !exact_source] <- "exact_volume_to_surface"
+  reg$route_scope[exact_source & exact_target] <- "exact_surface_domains"
+  reg$route_scope[
+    reg$status == "planned" & !exact_source & !exact_target
+  ] <- "roadmap_placeholder"
   reg
 }
 

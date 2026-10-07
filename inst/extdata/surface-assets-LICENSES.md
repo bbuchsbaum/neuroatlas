@@ -29,3 +29,13 @@ anatomical audit volume, mesh, cortical mask or sampling matrix from this pinned
 input set is added to the neuroatlas package or proposed release. Exact-domain
 route admission can proceed
 using verified upstream inputs while unresolved redistribution stays explicit.
+
+Density input addendum, reviewed 2026-10-07: fsaverage6 (41k) and fsaverage5
+(10k) spheres use the same pinned TemplateFlow fsaverage revision above. Their
+masks, vertex areas and ordered sphere references use the same pinned neuromaps
+manifest, with separate MD5-verified OSF archives (`0cc48e9d5d5bb0216502888c954805fd`
+and `c61384c271ee2e6b5449222281137414`, respectively). The same FreeSurfer and
+neuromaps notices and upstream-download-only decision apply. SHA-256 identities
+and exact archive members are recorded in `surface-density-inputs-v1.json`;
+raw geometry, masks and areas are not bundled. Area files identify domains but
+ordinary native interpolation does not use them for area conservation.

@@ -1,0 +1,97 @@
+{
+  "status": "PASS",
+  "contract_sha256": "c674b785c5b8ba204386e500aa42e9c89581d123f10ac438f30f8ea56a047a22",
+  "script_sha256": "fc4881e74bc5ec047a012b5f15cb01e2f59a65df15a506aa5707bda1f5167265",
+  "consumer_receipt_sha256": "2737fc67b173d85af5af900a71bfbe11934514a8ed4f9dd415a46e713e3143cd",
+  "numpy_version": "1.26.4",
+  "routes": [
+    {
+      "route": "fsaverage-164k-L_to_fsaverage-41k-L",
+      "target_vertices": 40962,
+      "positive_coefficients": 40962,
+      "maximum_row_mass_error": 0.0,
+      "full_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "available": 37461,
+      "masked_or_unsupported": 3501,
+      "nested_exact_selection": true
+    },
+    {
+      "route": "fsaverage-41k-L_to_fsaverage-164k-L",
+      "target_vertices": 163842,
+      "positive_coefficients": 398585,
+      "maximum_row_mass_error": 2.220446049250313e-16,
+      "full_masked_value_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "available": 149904,
+      "masked_or_unsupported": 13938,
+      "nested_exact_selection": false
+    },
+    {
+      "route": "fsaverage-164k-L_to_fsaverage-10k-L",
+      "target_vertices": 10242,
+      "positive_coefficients": 10242,
+      "maximum_row_mass_error": 0.0,
+      "full_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "available": 9353,
+      "masked_or_unsupported": 889,
+      "nested_exact_selection": true
+    },
+    {
+      "route": "fsaverage-10k-L_to_fsaverage-164k-L",
+      "target_vertices": 163842,
+      "positive_coefficients": 467454,
+      "maximum_row_mass_error": 2.220446049250313e-16,
+      "full_masked_value_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "available": 149852,
+      "masked_or_unsupported": 13990,
+      "nested_exact_selection": false
+    },
+    {
+      "route": "fsaverage-164k-R_to_fsaverage-41k-R",
+      "target_vertices": 40962,
+      "positive_coefficients": 40962,
+      "maximum_row_mass_error": 0.0,
+      "full_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "available": 37452,
+      "masked_or_unsupported": 3510,
+      "nested_exact_selection": true
+    },
+    {
+      "route": "fsaverage-41k-R_to_fsaverage-164k-R",
+      "target_vertices": 163842,
+      "positive_coefficients": 398585,
+      "maximum_row_mass_error": 2.220446049250313e-16,
+      "full_masked_value_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "available": 149879,
+      "masked_or_unsupported": 13963,
+      "nested_exact_selection": false
+    },
+    {
+      "route": "fsaverage-164k-R_to_fsaverage-10k-R",
+      "target_vertices": 10242,
+      "positive_coefficients": 10242,
+      "maximum_row_mass_error": 0.0,
+      "full_masked_value_error": 0.0,
+      "label_mismatches": 0,
+      "available": 9354,
+      "masked_or_unsupported": 888,
+      "nested_exact_selection": true
+    },
+    {
+      "route": "fsaverage-10k-R_to_fsaverage-164k-R",
+      "target_vertices": 163842,
+      "positive_coefficients": 467454,
+      "maximum_row_mass_error": 2.220446049250313e-16,
+      "full_masked_value_error": 2.220446049250313e-16,
+      "label_mismatches": 0,
+      "available": 149872,
+      "masked_or_unsupported": 13970,
+      "nested_exact_selection": false
+    }
+  ]
+}

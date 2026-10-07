@@ -1,0 +1,68 @@
+{
+  "name": "synthetic-13",
+  "source": {
+    "schema": "neuroatlas.surface-domain.v1",
+    "template": "toy",
+    "hemisphere": "L",
+    "density": "6v",
+    "registration": "analytic",
+    "revision": "native-v1",
+    "n_vertices": 6,
+    "n_triangles": 8,
+    "coordinates_sha256": "397b9cf5c341e2ab2a6cac4be2113bab2fe1329f6d85db8bd83ac88f6b98c0f7",
+    "topology_sha256": "9b68f7388ae56d60f95297f4dc3acaff4352cb445df75a71555daee5fcfab712",
+    "cortex_sha256": "9638834d1f629557d9b80fa7eeb64409e238c0ef2e3149a55a39c3796f66e19a",
+    "area_sha256": {},
+    "area_units": {},
+    "id": "bfba382f5c8a985ea1c353ef7a3461cb5e22451824a14af058b42729e718090b"
+  },
+  "target": {
+    "schema": "neuroatlas.surface-domain.v1",
+    "template": "toy",
+    "hemisphere": "L",
+    "density": "6v",
+    "registration": "analytic",
+    "revision": "native-v1",
+    "n_vertices": 6,
+    "n_triangles": 8,
+    "coordinates_sha256": "5024da599bf338b269cc53749fd39e794aa6fa9da9595d9e5317b3615dc92dff",
+    "topology_sha256": "9b68f7388ae56d60f95297f4dc3acaff4352cb445df75a71555daee5fcfab712",
+    "cortex_sha256": "9638834d1f629557d9b80fa7eeb64409e238c0ef2e3149a55a39c3796f66e19a",
+    "area_sha256": {},
+    "area_units": {},
+    "id": "2dcad35665618f45cd595474eccb39b1c02c2fed6aa635834616f045b34cf4e6"
+  },
+  "engine": {
+    "package": "neurotransform",
+    "version": "0.2.0",
+    "source_sha": {},
+    "dll_sha256": "55bb6bf8a4cc31e1d6fe8427bcbe10f45da423b5f5c7b751ff78f2c3f754795f",
+    "r_code_sha256": "0f94d6f24243749257e300d5fa5f99938ba1677875d9b20faf7f29057cef1919"
+  },
+  "sampled_targets_zero_based": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "files": [
+    {
+      "file": "faces.bin",
+      "sha256": "9b68f7388ae56d60f95297f4dc3acaff4352cb445df75a71555daee5fcfab712"
+    },
+    {
+      "file": "source.bin",
+      "sha256": "397b9cf5c341e2ab2a6cac4be2113bab2fe1329f6d85db8bd83ac88f6b98c0f7"
+    },
+    {
+      "file": "target.bin",
+      "sha256": "5024da599bf338b269cc53749fd39e794aa6fa9da9595d9e5317b3615dc92dff"
+    },
+    {
+      "file": "weights.bin",
+      "sha256": "5f20762e5dbfe6bb6625e90f42b98b72ce603e0e6e225266dbdfb6eac495877f"
+    }
+  ]
+}

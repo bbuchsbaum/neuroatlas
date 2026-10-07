@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "input_lock_sha256": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+  "script_sha256": "2150bea6d8a7e481d5bb0d511bda29de2d50f5166d3961387c5346c4b03d91fc",
+  "checks": {
+    "fsaverage-10k-L": {
+      "n_vertices": 10242,
+      "n_triangles": 20480,
+      "cortex_vertices": 9354,
+      "upstream_ordering_equal": true,
+      "high_density_prefix_equal": true,
+      "domain_id": "ff5d8ec2786e876b70b054de0a901fb4e2da007654c50c56bc5eab7533059fef"
+    },
+    "fsaverage-10k-R": {
+      "n_vertices": 10242,
+      "n_triangles": 20480,
+      "cortex_vertices": 9361,
+      "upstream_ordering_equal": true,
+      "high_density_prefix_equal": true,
+      "domain_id": "b7b3bcc512196287d49330bd29bee95ee03d11326d13310ad646ddafdd72cba0"
+    },
+    "fsaverage-41k-L": {
+      "n_vertices": 40962,
+      "n_triangles": 81920,
+      "cortex_vertices": 37476,
+      "upstream_ordering_equal": true,
+      "high_density_prefix_equal": true,
+      "domain_id": "133a93188fd112c5cd57c84e47a58bbd50c73cdfdd6c09c001e2a9e1a32562ac"
+    },
+    "fsaverage-41k-R": {
+      "n_vertices": 40962,
+      "n_triangles": 81920,
+      "cortex_vertices": 37471,
+      "upstream_ordering_equal": true,
+      "high_density_prefix_equal": true,
+      "domain_id": "90dde6a72a443647fe43b84960657f8ad36b600786973b2009cc39e90840b7eb"
+    }
+  }
+}

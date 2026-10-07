@@ -1,0 +1,161 @@
+{
+  "case_manifest_sha256": {
+    "synthetic-01": "b125c849663c56e103c2c512683d88738f8330e4c9f8ba7600e6f2de5576365f",
+    "synthetic-02": "6d1f7e376b12c8f63c7cea29e8098f9ac14cc84c7dbf48a7ae2f7f8a183b835c",
+    "synthetic-03": "847ea317443903cd423ce1fe43527b89195f4968738adc20d070218402dc4ea5",
+    "synthetic-04": "86453857df472eab15c68c902fb2001ccb56b59f5a783d3da97e9626a316c238",
+    "synthetic-05": "89a658256afd9c80aba066279438c14093f2dd1c0c1b20da0f96c0f716e14e74",
+    "synthetic-06": "886aed908a8b5a3cc724769225930a127fd227a932d2e9a742391d0054db0fd5",
+    "synthetic-07": "91ebcc5575543b52cf3d32f76e8664711c77f810d0976bb2ad79337db2ee6d40",
+    "synthetic-08": "47603348c675c03e1c891d663cdca6edbbc64a9c9fc776af618a826fdda07f86",
+    "synthetic-09": "81a9e04264e5b48ebe68e68415ab8bb84556834bdfff3c9f2b79b59fb941bfae",
+    "synthetic-10": "c99e4ba56797b821a962ae661f0060ac88d488cded6d994843809855705701cc",
+    "synthetic-11": "b26be63ef6e964ab581f33aeb3daac4bc9c632fe215f3c93a6be4e54c5061a2e",
+    "synthetic-12": "ac7e8c7f91b2ee98039d0d741995b58f596bd4f4b3218bbcfeffc10900fe0cf8",
+    "synthetic-13": "e64cbb835beca2014c33229ea4d8cd6c1bf98d9052db3d76f1a27469d18d78ef",
+    "synthetic-14": "6238668b6d10ea4831d9b84e6139babc4c3ad462fb87df3cc9feb9b5eefd59df",
+    "fsaverage-164k-L_to_fsaverage-41k-L": "17f0203038e66b284c5d6dd6855125db1a6ec213d3b14a69c029ab3a99e6d9de",
+    "fsaverage-41k-L_to_fsaverage-164k-L": "ee8ff90afa4a0f43564dd2e0f9164f1a8415e2a79c79e6b9a5682dd2e684bc75",
+    "fsaverage-164k-L_to_fsaverage-10k-L": "9d0a943249f3f5717405f573b2fd6dbd51175e5a4f04f0c2cdd0c1b3ec12c09c",
+    "fsaverage-10k-L_to_fsaverage-164k-L": "478f3c88fc6a0d1188a1fbfa92d2f82cccd64684f869a37a33417398bc522784",
+    "fsaverage-164k-R_to_fsaverage-41k-R": "f880f15b7fd32cde003e5d91b969a254ebe1215bea4f253e3bbec9a2e660db5b",
+    "fsaverage-41k-R_to_fsaverage-164k-R": "45b011a961b63112b6a1e7fc3957451e1c4d845252bc6caf1639c18b94bf30b5",
+    "fsaverage-164k-R_to_fsaverage-10k-R": "9be18fb6412c99b75b482cdf4f6e1b0e713322ebea6b2d745f8033365fb34e37",
+    "fsaverage-10k-R_to_fsaverage-164k-R": "724f63c16e80c47e8690d327b3d8caf0838b670ab60964f4532d9c1e2483da25"
+  },
+  "consumer_source_sha256": {
+    "R/surface_assets.R": "bf27bc13efc75e61e26910b8e431147f24035bc62b6f71ddcfab0b9957391e0c",
+    "R/surface_domain.R": "f5d47f290f88fa0a1fb677e6ca679ab3946ef044c1a1e51cc1f8612b4895d551",
+    "R/surface_transform.R": "802bb15cbecf639b29fc9626fd56b94251c92a8088314cb46207c43ce15cdafa",
+    "inst/extdata/surface-inputs-v1.json": "efcd4d03f1361ff3be350f5fa2f640b146677de5cd780ae2a5b523c6151c97e0",
+    "inst/extdata/surface-domains-v1.json": "d1bf67c61d7422f9b9222a7b7f6295c1d94e973a64871f9bc28ca7aac7162110",
+    "inst/extdata/surface-density-inputs-v1.json": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+    "inst/extdata/surface-density-domains-v1.json": "ad34136813f975ef110f2490cd95ecf638690f165c0ec01cd6d7b84d786cdb2c"
+  },
+  "engine_revision": "933edddda462593941e167726e8aaa7168ff103a",
+  "upstream_bindings": [
+    {
+      "file": "engine-build.json",
+      "sha256": "b56f0b44a397123fcec6ca7241d430fabae7e47935e812c76af04cd137831e90"
+    }
+  ],
+  "contract_sha256": "c674b785c5b8ba204386e500aa42e9c89581d123f10ac438f30f8ea56a047a22",
+  "script_sha256": "b10bf493a70657bf70405723d01f240b122a335c9e83982dad4d20f2e0054572",
+  "input_lock_sha256": "05708426e39630280466f92552f2c152dca8424c37dfeaf03592f64bddffc458",
+  "engine": {
+    "package": "neurotransform",
+    "version": "0.2.0",
+    "source_sha": null,
+    "dll_sha256": "55bb6bf8a4cc31e1d6fe8427bcbe10f45da423b5f5c7b751ff78f2c3f754795f",
+    "r_code_sha256": "0f94d6f24243749257e300d5fa5f99938ba1677875d9b20faf7f29057cef1919"
+  },
+  "seed": 20261007,
+  "cases": [
+    "synthetic-01",
+    "synthetic-02",
+    "synthetic-03",
+    "synthetic-04",
+    "synthetic-05",
+    "synthetic-06",
+    "synthetic-07",
+    "synthetic-08",
+    "synthetic-09",
+    "synthetic-10",
+    "synthetic-11",
+    "synthetic-12",
+    "synthetic-13",
+    "synthetic-14",
+    "fsaverage-164k-L_to_fsaverage-41k-L",
+    "fsaverage-41k-L_to_fsaverage-164k-L",
+    "fsaverage-164k-L_to_fsaverage-10k-L",
+    "fsaverage-10k-L_to_fsaverage-164k-L",
+    "fsaverage-164k-R_to_fsaverage-41k-R",
+    "fsaverage-41k-R_to_fsaverage-164k-R",
+    "fsaverage-164k-R_to_fsaverage-10k-R",
+    "fsaverage-10k-R_to_fsaverage-164k-R"
+  ],
+  "synthetic_policy": true,
+  "routes": {
+    "fsaverage-164k-L_to_fsaverage-41k-L": {
+      "from_domain_id": "db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110",
+      "to_domain_id": "133a93188fd112c5cd57c84e47a58bbd50c73cdfdd6c09c001e2a9e1a32562ac",
+      "available": 37461,
+      "target_vertices": 40962,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0,
+      "maximum_x_ramp_error": 0,
+      "operator_id": "8a802b3ec09fa4e8e09ea18af3fc7fa543eef7346f7d4c189a131b031dff376a"
+    },
+    "fsaverage-41k-L_to_fsaverage-164k-L": {
+      "from_domain_id": "133a93188fd112c5cd57c84e47a58bbd50c73cdfdd6c09c001e2a9e1a32562ac",
+      "to_domain_id": "db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110",
+      "available": 149904,
+      "target_vertices": 163842,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0.00017947129504667511,
+      "maximum_x_ramp_error": 0.010189270863258715,
+      "operator_id": "9fac0ba12bac8dade857563868837306bedee21aa4f93b6d09834d8a0aa340f9"
+    },
+    "fsaverage-164k-L_to_fsaverage-10k-L": {
+      "from_domain_id": "db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110",
+      "to_domain_id": "ff5d8ec2786e876b70b054de0a901fb4e2da007654c50c56bc5eab7533059fef",
+      "available": 9353,
+      "target_vertices": 10242,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0,
+      "maximum_x_ramp_error": 0,
+      "operator_id": "f621bb746c226bea43ee9fc5b6318d13b35dbd7fe50d218a2224a07e782a57b5"
+    },
+    "fsaverage-10k-L_to_fsaverage-164k-L": {
+      "from_domain_id": "ff5d8ec2786e876b70b054de0a901fb4e2da007654c50c56bc5eab7533059fef",
+      "to_domain_id": "db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110",
+      "available": 149852,
+      "target_vertices": 163842,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0.00063047122007668438,
+      "maximum_x_ramp_error": 0.033402319541624967,
+      "operator_id": "17a07591293b047ebf47d6bc86c4308bf930836ec12e045239a69014fb494da0"
+    },
+    "fsaverage-164k-R_to_fsaverage-41k-R": {
+      "from_domain_id": "fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b",
+      "to_domain_id": "90dde6a72a443647fe43b84960657f8ad36b600786973b2009cc39e90840b7eb",
+      "available": 37452,
+      "target_vertices": 40962,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0,
+      "maximum_x_ramp_error": 0,
+      "operator_id": "68db9d1e5e5564a472640de82973156fa6de6159965eef967eec190dd46628f3"
+    },
+    "fsaverage-41k-R_to_fsaverage-164k-R": {
+      "from_domain_id": "90dde6a72a443647fe43b84960657f8ad36b600786973b2009cc39e90840b7eb",
+      "to_domain_id": "fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b",
+      "available": 149879,
+      "target_vertices": 163842,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0.00020572159177670088,
+      "maximum_x_ramp_error": 0.01631025137034009,
+      "operator_id": "929327ec5cd935d6f4b5cb5a23945d2a6f42772bed600697f64cc541acbeb381"
+    },
+    "fsaverage-164k-R_to_fsaverage-10k-R": {
+      "from_domain_id": "fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b",
+      "to_domain_id": "b7b3bcc512196287d49330bd29bee95ee03d11326d13310ad646ddafdd72cba0",
+      "available": 9354,
+      "target_vertices": 10242,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0,
+      "maximum_x_ramp_error": 0,
+      "operator_id": "80aa37bc95aa27a29b6f8f618bece55ff32a1395f2a0e7e8e6a325b4eef15898"
+    },
+    "fsaverage-10k-R_to_fsaverage-164k-R": {
+      "from_domain_id": "b7b3bcc512196287d49330bd29bee95ee03d11326d13310ad646ddafdd72cba0",
+      "to_domain_id": "fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b",
+      "available": 149872,
+      "target_vertices": 163842,
+      "face_order_max_error": 0,
+      "area_weighted_x_ramp_rmse": 0.00061891759985075584,
+      "maximum_x_ramp_error": 0.03139833760585415,
+      "operator_id": "01dca4b2e79dbdc37c0a744d4c5a7186b756d9f9d4f5f05a5e569ff29689ef74"
+    }
+  },
+  "status": "consumer checks passed; independent oracle pending"
+}

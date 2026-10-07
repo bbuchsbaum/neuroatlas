@@ -1,0 +1,8 @@
+fsaverage-164k-L_to_fsaverage-41k-L PASS
+fsaverage-41k-L_to_fsaverage-164k-L PASS
+fsaverage-164k-L_to_fsaverage-10k-L PASS
+fsaverage-10k-L_to_fsaverage-164k-L PASS
+fsaverage-164k-R_to_fsaverage-41k-R PASS
+fsaverage-41k-R_to_fsaverage-164k-R PASS
+fsaverage-164k-R_to_fsaverage-10k-R PASS
+fsaverage-10k-R_to_fsaverage-164k-R PASS
