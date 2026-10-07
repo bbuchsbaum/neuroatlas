@@ -1,0 +1,110 @@
+{
+  "status": "PASS",
+  "workbench_version": "Connectome Workbench\nType: Command Line Application\nVersion: 1.5.0\nQt Compiled Version: 5.15.12\nQt Runtime Version: 5.15.13\nCommit: unknown\nCommit Date: unknown\nCompiled with OpenMP: YES\nCompiler: c++ (/usr/bin)\nCompiler Version: 13.2.0\nCompiled Debug: NO\nOperating System: Linux",
+  "cases": [
+    {
+      "file": "scalar-axis0-maps1-le.dscalar.nii",
+      "sha256": "4166295dbc9c5af84ae558fe018e4fbf37975e839cf4725520efb9ea4fcfd941",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-axis0-maps1-be.dscalar.nii",
+      "sha256": "4166295dbc9c5af84ae558fe018e4fbf37975e839cf4725520efb9ea4fcfd941",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-axis0-maps2-le.dscalar.nii",
+      "sha256": "3bbb13b6f08c1b6ef9888854637e9cb8d3540ff639df2e1cf8b202101eb56f9b",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-axis0-maps2-be.dscalar.nii",
+      "sha256": "3bbb13b6f08c1b6ef9888854637e9cb8d3540ff639df2e1cf8b202101eb56f9b",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-axis1-maps1-le.dscalar.nii",
+      "sha256": "4ef7fae4a5486c7d52d5948a800f27a86846fc5c15fafabccf58daf7ff61161d",
+      "type": "CIFTI - Dense Scalar",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-axis1-maps1-be.dscalar.nii",
+      "sha256": "4ef7fae4a5486c7d52d5948a800f27a86846fc5c15fafabccf58daf7ff61161d",
+      "type": "CIFTI - Dense Scalar",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-axis1-maps2-le.dscalar.nii",
+      "sha256": "5548f1728ce0c180cfb0d5178db9bf6164a9fe0bc2894f87bf76767814439bbd",
+      "type": "CIFTI - Dense Scalar",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-axis1-maps2-be.dscalar.nii",
+      "sha256": "5548f1728ce0c180cfb0d5178db9bf6164a9fe0bc2894f87bf76767814439bbd",
+      "type": "CIFTI - Dense Scalar",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis0-maps1-le.dlabel.nii",
+      "sha256": "16b53b32bf8af778ad4b61f4dbdc4b46d9991dd7514313fce38de436835f5de5",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis0-maps1-be.dlabel.nii",
+      "sha256": "16b53b32bf8af778ad4b61f4dbdc4b46d9991dd7514313fce38de436835f5de5",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis0-maps2-le.dlabel.nii",
+      "sha256": "df4b22a505ef4efbd009a59b634f169c42a1feef5a708c855ed1e7164806db6f",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis0-maps2-be.dlabel.nii",
+      "sha256": "df4b22a505ef4efbd009a59b634f169c42a1feef5a708c855ed1e7164806db6f",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis1-maps1-le.dlabel.nii",
+      "sha256": "d888c03141c2319431bbaddefa281aa971a1297dda3c6df5dbb2dc87a64f3092",
+      "type": "CIFTI - Dense Label",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis1-maps1-be.dlabel.nii",
+      "sha256": "d888c03141c2319431bbaddefa281aa971a1297dda3c6df5dbb2dc87a64f3092",
+      "type": "CIFTI - Dense Label",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis1-maps2-le.dlabel.nii",
+      "sha256": "c2a71958ab607ca3abb5ee6b232c6675e08f51fbb42436c543bda2617ced4e8d",
+      "type": "CIFTI - Dense Label",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "label-axis1-maps2-be.dlabel.nii",
+      "sha256": "c2a71958ab607ca3abb5ee6b232c6675e08f51fbb42436c543bda2617ced4e8d",
+      "type": "CIFTI - Dense Label",
+      "inspection_exit_code": 0
+    },
+    {
+      "file": "scalar-scaled.dscalar.nii",
+      "sha256": "d5d6670a0692cac7f280ae00757a7367b6ac6afcf856b1d1393165244ccc4566",
+      "type": "Connectivity Unknown (Could be Unsupported CIFTI File)",
+      "inspection_exit_code": 0
+    }
+  ],
+  "scope": "brain models inspectable; transposed axes have unknown subtype",
+  "resampling_parity_claim": false
+}

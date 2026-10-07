@@ -1,6 +1,6 @@
 Package: neuroatlas
 Title: Neuroimaging Atlases and Parcellations
-Version: 0.2.0
+Version: 0.2.0.9000
 Authors@R: 
     person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1108-4866"))
@@ -71,7 +71,8 @@ Suggests:
     testthat (>= 3.0.0),
     tidyr,
     uwot,
-    withr
+    withr,
+    xml2
 VignetteBuilder:
     knitr
 Remotes:
@@ -120,6 +121,7 @@ Collate:
     'plot_brain.R'
     'ce_shared_exports.R'
     'chart.R'
+    'cifti.R'
     'cluster_explorer.R'
     'coordinate_spaces.R'
     'data-schaefer.R'

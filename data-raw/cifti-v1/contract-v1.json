@@ -1,0 +1,24 @@
+{
+  "schema": "neuroatlas.cifti-qualification-contract.v1",
+  "runtime": "RNifti and optional xml2, no Python or Workbench requirement",
+  "io": {
+    "types": ["CIFTI-2 dense scalar", "CIFTI-2 dense label"],
+    "axes": [0, 1],
+    "value_max_abs_error": 0,
+    "preserve_missing_scalars": true,
+    "preserve_brain_models_indices_structures": true,
+    "preserve_volume_affine_units": true,
+    "preserve_map_metadata_label_keys_names_rgba": true,
+    "preserve_other_nifti_extensions": true,
+    "xml_formatting_need_not_match": true
+  },
+  "cortical_adapter": {
+    "method": "existing qualified native surface operators",
+    "required_binding": "caller-supplied exact cortical operators and common exact volume frame",
+    "compare_adapter_to_direct_surface_application_max_abs_error": 0,
+    "noncortical_value_max_abs_error": 0,
+    "noncortical_support_geometry_units_change": "reject",
+    "missing_label_policy": "explicit existing keys, retain unavailable indices",
+    "inverse_conservation_anatomical_workbench_parity_claims": false
+  }
+}

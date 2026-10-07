@@ -11,40 +11,55 @@ get_template_transform(
   download = TRUE,
   verify = TRUE,
   cache_dir = transform_cache_path(),
-  offline = FALSE
+  offline = FALSE,
+  cortex = NULL,
+  volume_space = NULL
 )
 }
 \arguments{
-\item{from, to}{Exact template identifiers or verified `SurfaceGeometry`
-objects. Surface routes require exact geometries; broad names cannot
+\item{from, to}{Exact template identifiers, verified \code{SurfaceGeometry} objects
+or \code{CiftiData} layouts with explicitly supplied operators and volume frame.
+Surface routes require exact geometries; broad names cannot
 establish vertex ordering or admit execution.}
 
-\item{provider}{Artifact provider, or `"auto"` for registry selection.}
+\item{provider}{Artifact provider, or \code{"auto"} for registry selection.}
 
 \item{download}{Allow missing artifacts to be downloaded.}
 
-\item{verify}{Must be `TRUE`; artifact integrity cannot be disabled.}
+\item{verify}{Must be \code{TRUE}; artifact integrity cannot be disabled.}
 
 \item{cache_dir}{Dedicated transform cache directory.}
 
 \item{offline}{Use only verified local artifacts.}
+
+\item{cortex}{For two \code{CiftiData} layouts, explicitly bound qualified
+cortical
+operators passed to \code{\link[=get_cifti_transform]{get_cifti_transform()}}. Other representations require
+\code{NULL}.}
+
+\item{volume_space}{For CIFTI layouts with voxels, the caller-declared common
+exact frame, passed to \code{\link[=get_cifti_transform]{get_cifti_transform()}}. Other representations
+require
+\code{NULL}.}
 }
 \value{
-A `template_transform` containing the plan, files, pullback morphism,
-  and artifact provenance. Its direction describes image movement; its
-  morphism maps target coordinates into source coordinates for sampling.
-  Surface routes return the operator from [get_surface_transform()] or the
-  `SurfaceProjection` from [get_surface_projection()].
+A \code{template_transform} containing the plan, files, pullback morphism,
+and artifact provenance. Its direction describes image movement; its
+morphism maps target coordinates into source coordinates for sampling.
+Surface routes return the operator from \code{\link[=get_surface_transform]{get_surface_transform()}} or the
+\code{SurfaceProjection} from \code{\link[=get_surface_projection]{get_surface_projection()}}.
+CIFTI layouts return a \code{CiftiTransform} from \code{\link[=get_cifti_transform]{get_cifti_transform()}},
+preserving noncortical geometry and support.
 }
 \description{
 Resolves an available image or exact-domain surface route and loads its
-verified artifacts. Two `SurfaceGeometry` endpoints select an admitted native
+verified artifacts. Two \code{SurfaceGeometry} endpoints select an admitted native
 surface operator. An exact MNI identifier and a pinned surface target select
 a directed population cortical projection. Equal domains require a
 verified diagonal operator with unit weights before admission as an identity.
 Planning and fitting are separate: this function never estimates a
 registration. Nonlinear routes must have a published checksum and a passing
-qualification record in [space_transform_manifest()].
+qualification record in \code{\link[=space_transform_manifest]{space_transform_manifest()}}.
 }
 \examples{
 if (requireNamespace("neurotransform", quietly = TRUE) &&
@@ -53,5 +68,5 @@ if (requireNamespace("neurotransform", quietly = TRUE) &&
 }
 }
 \seealso{
-[apply_template_transform()], [transform_atlas()]
+\code{\link[=apply_template_transform]{apply_template_transform()}}, \code{\link[=transform_atlas]{transform_atlas()}}
 }

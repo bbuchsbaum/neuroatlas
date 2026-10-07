@@ -1,0 +1,11 @@
+ℹ Loading neuroatlas
+down scalar 0 PASS 59414 brainordinates
+down scalar 1 PASS 59414 brainordinates
+down label 0 PASS 59414 brainordinates
+down label 1 PASS 59414 brainordinates
+PASS: cortical outputs, axes, map metadata, labels and extensions.
+up scalar 0 PASS 299883 brainordinates
+up scalar 1 PASS 299883 brainordinates
+up label 0 PASS 299883 brainordinates
+up label 1 PASS 299883 brainordinates
+PASS: cortical outputs, axes, map metadata, labels and extensions.

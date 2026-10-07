@@ -1,0 +1,16 @@
+{
+  "R/cifti.R": "a9465d6e279bb7a83b3f68b627a68b0d66b5569926776ce237feb832fa64ba9d",
+  "R/template_transform.R": "2cdab6c9938111f1d3fc4df544d95949ba293a6e02887372a90ff423dbf9b1e5",
+  "R/surface_transform.R": "802bb15cbecf639b29fc9626fd56b94251c92a8088314cb46207c43ce15cdafa",
+  "R/surface_assets.R": "57778ab2dd7cea2fd7df2c8f101c08c0ddc4340b5168539b4a9e3f626b657447",
+  "DESCRIPTION": "8e1775832fe051f5ca8c3e32b2928eb30f95d0b13a84a080d56e6e0835d4657f",
+  "NAMESPACE": "1dc0146a5f5ffd92f4e4d34142a28d6393f30bfdaa198e3ac26a90dc71262c7d",
+  "tests/testthat/test-cifti.R": "1d75bb22e66f34b08a27d57af3105e8048c546561cee5a3c87160b22ce6f8b5c",
+  "data-raw/cifti-v1/README.md": "f1195e259cfcb6c7df3da7aefd5394c8fad09a06bf1951af76cdb7332ed119c8",
+  "data-raw/cifti-v1/adapter-fixtures.py": "73577abd04c94df02ba4604bdde46da59a6b3911f74f1d0752e4a8b7922f9a2b",
+  "data-raw/cifti-v1/contract-v1.json": "4658bfb39ae63bfdd6610d8f1d4a262aee0309fde9ab50675221a4979d7527c0",
+  "data-raw/cifti-v1/inspect-workbench.py": "fe61180015a2a7d05fb58c0a4939976d745ca5e6be22fbc80e2e4f60159af8d2",
+  "data-raw/cifti-v1/io-oracle.py": "f97cead034aa4d60f965f8d62dc8758830165cc5ca2e6eabc5cbdf371d96105f",
+  "data-raw/cifti-v1/qualify-adapter.R": "1e4646138ee38d7516e061826a455fabeda25ab3f445431f1e6e8b4ef32e67a0",
+  "data-raw/cifti-v1/roundtrip.R": "4e8487010869cec4d331f3f0f89f6a488daaae206f6e8e6be6fb426fca590816"
+}

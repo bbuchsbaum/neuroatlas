@@ -1,0 +1,10 @@
+Documentation changes preserve every executable expression.
+ℹ Updating neuroatlas documentation
+ℹ Loading neuroatlas
+Writing 'read_cifti.Rd'
+Writing 'replace_cifti_values.Rd'
+Writing 'write_cifti.Rd'
+Writing 'get_cifti_transform.Rd'
+Writing 'apply_cifti_transform.Rd'
+Writing 'get_template_transform.Rd'
+Writing 'apply_template_transform.Rd'

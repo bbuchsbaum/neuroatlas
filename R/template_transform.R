@@ -9,25 +9,37 @@
 #' registration. Nonlinear routes must have a published checksum and a passing
 #' qualification record in [space_transform_manifest()].
 #'
-#' @param from,to Exact template identifiers or verified `SurfaceGeometry`
-#'   objects. Surface routes require exact geometries; broad names cannot
+#' @param from,to Exact template identifiers, verified `SurfaceGeometry` objects
+#'   or `CiftiData` layouts with explicitly supplied operators and volume frame.
+#'   Surface routes require exact geometries; broad names cannot
 #'   establish vertex ordering or admit execution.
 #' @param provider Artifact provider, or `"auto"` for registry selection.
 #' @param download Allow missing artifacts to be downloaded.
 #' @param verify Must be `TRUE`; artifact integrity cannot be disabled.
 #' @param cache_dir Dedicated transform cache directory.
 #' @param offline Use only verified local artifacts.
+#' @param cortex For two `CiftiData` layouts, explicitly bound qualified
+#'   cortical
+#'   operators passed to [get_cifti_transform()]. Other representations require
+#'   `NULL`.
+#' @param volume_space For CIFTI layouts with voxels, the caller-declared common
+#'   exact frame, passed to [get_cifti_transform()]. Other representations
+#'   require
+#'   `NULL`.
 #' @return A `template_transform` containing the plan, files, pullback morphism,
 #'   and artifact provenance. Its direction describes image movement; its
 #'   morphism maps target coordinates into source coordinates for sampling.
 #'   Surface routes return the operator from [get_surface_transform()] or the
 #'   `SurfaceProjection` from [get_surface_projection()].
+#'   CIFTI layouts return a `CiftiTransform` from [get_cifti_transform()],
+#'   preserving noncortical geometry and support.
 #' @seealso [apply_template_transform()], [transform_atlas()]
 #' @examples
 #' if (requireNamespace("neurotransform", quietly = TRUE) &&
 #'   requireNamespace("hdf5r", quietly = TRUE)) {
 #'   get_template_transform("MNI152NLin6Asym", "MNI152NLin6Asym")
 #' }
+#' @md
 #' @export
 get_template_transform <- function(
   from,
@@ -36,7 +48,9 @@ get_template_transform <- function(
   download = TRUE,
   verify = TRUE,
   cache_dir = transform_cache_path(),
-  offline = FALSE
+  offline = FALSE,
+  cortex = NULL,
+  volume_space = NULL
 ) {
   provider <- match.arg(provider)
   cache_dir <- .transform_cache_root(cache_dir)
@@ -44,6 +58,25 @@ get_template_transform <- function(
     assertthat::assert_that(is.logical(flag), length(flag) == 1L, !is.na(flag))
   }
   if (!verify) stop("Transform integrity verification cannot be disabled.")
+  if (inherits(from, "CiftiData") || inherits(to, "CiftiData")) {
+    if (
+      !inherits(from, "CiftiData") || !inherits(to, "CiftiData") ||
+        !provider %in% c("auto", "neuroatlas")
+    ) {
+      stop("CIFTI resolution requires two layouts and the neuroatlas provider.")
+    }
+    return(get_cifti_transform(from, to, cortex, volume_space))
+  }
+  if (
+    !is.null(cortex)
+  ) {
+    stop("cortex is only valid for CIFTI layout resolution.")
+  }
+  if (
+    !is.null(volume_space)
+  ) {
+    stop("volume_space is only valid for CIFTI layouts.")
+  }
   if (is.character(from) && inherits(to, "SurfaceGeometry")) {
     if (provider != "auto" && provider != "neuroatlas") {
       stop("No cortical projection registered for this provider.")
@@ -51,7 +84,9 @@ get_template_transform <- function(
     return(get_surface_projection(from, to, cache_dir, download, offline))
   }
   if (inherits(from, "SurfaceGeometry") || inherits(to, "SurfaceGeometry")) {
-    if (!inherits(from, "SurfaceGeometry") || !inherits(to, "SurfaceGeometry")) {
+    if (
+      !inherits(from, "SurfaceGeometry") || !inherits(to, "SurfaceGeometry")
+    ) {
       stop("Supply verified surface geometry for both surface endpoints.")
     }
     atlas_transform_plan(
@@ -201,7 +236,11 @@ get_template_transform <- function(
 
 .check_neurotransform_semantics <- function() {
   root <- system.file("extdata", "transform-engine-probe", package = "neuroatlas")
-  if (!nzchar(root)) stop("Missing bundled transform-engine compatibility probe.")
+  if (
+    !nzchar(root)
+  ) {
+    stop("Missing bundled transform-engine compatibility probe.")
+  }
   expected <- utils::read.csv(file.path(root, "points.csv"))
   compatible <- tryCatch(
     {
@@ -249,6 +288,7 @@ get_template_transform <- function(
 #' @param x A volumetric atlas, `NeuroVol`, or `NeuroVec` (channels in dimension
 #'   4),
 #'   or `SurfaceData` for a native surface operator.
+#'   A mixed cortical adapter requires `CiftiData` with its bound source layout.
 #' @param transform A verified [get_template_transform()] result.
 #' @param target Target atlas, `NeuroVol`, or explicit `NeuroSpace`. A bare grid
 #'   is an assertion by the caller that it is in the transform's target space.
@@ -262,12 +302,16 @@ get_template_transform <- function(
 #' @param interpolation `NULL` selects the type-specific method. Only
 #'   `"nearest"`
 #'   for labels and `"linear"` for continuous/probability data are supported.
+#' @param missing_labels Explicit unassigned keys for unsupported CIFTI label
+#'   samples, passed to [apply_cifti_transform()]. Other representations require
+#'   `NULL`.
 #' @return The transformed atlas or volume. The `neuroatlas_transform` attribute
 #'   records the route, artifact hashes, interpolation, grids and lost labels.
 #'   Atlas objects retain semantic IDs, labels and source provenance, including
 #'   regions that disappear on the target grid.
 #'   A surface destination returns `SurfaceData` with exact domain, availability
 #'   and projection provenance.
+#'   A CIFTI destination returns `CiftiData` and preserves noncortical support.
 #' @examples
 #' if (requireNamespace("neurotransform", quietly = TRUE) &&
 #'   requireNamespace("hdf5r", quietly = TRUE)) {
@@ -276,24 +320,51 @@ get_template_transform <- function(
 #'   transform <- get_template_transform("MNI152NLin6Asym", "MNI152NLin6Asym")
 #'   apply_template_transform(volume, transform, grid, data_type = "continuous")
 #' }
+#' @md
 #' @export
 apply_template_transform <- function(
   x,
   transform,
   target = NULL,
   data_type = c("auto", "continuous", "label", "probability"),
-  interpolation = NULL
+  interpolation = NULL,
+  missing_labels = NULL
 ) {
   data_type <- match.arg(data_type)
+  if (inherits(transform, "CiftiTransform")) {
+    expected <- if (inherits(x, "CiftiData") && x$data_type == "label") {
+      "label"
+    } else {
+      "continuous"
+    }
+    if (
+      !is.null(target) || !is.null(interpolation) ||
+        !data_type %in% c("auto", expected)
+    ) {
+      stop("CIFTI application uses its bound layout and declared map semantics.")
+    }
+    return(apply_cifti_transform(x, transform, missing_labels = missing_labels))
+  }
+  if (!is.null(missing_labels)) stop("missing_labels is only valid for CIFTI.")
   if (inherits(transform, "SurfaceProjection")) {
     if (!is.null(target)) {
-      domain <- if (inherits(target, "SurfaceGeometry")) target$domain else target
+      domain <- if (
+        inherits(target, "SurfaceGeometry")
+      ) {
+        target$domain
+      } else {
+        target
+      }
       .validate_surface_domain(domain)
       if (!identical(domain$id, transform$specification$target$id)) {
         stop("Target domain does not match the cortical projection.")
       }
     }
-    if (!is.null(interpolation)) stop("Projection interpolation follows its data type.")
+    if (
+      !is.null(interpolation)
+    ) {
+      stop("Projection interpolation follows its data type.")
+    }
     return(
       apply_surface_projection(
         x,
@@ -305,7 +376,13 @@ apply_template_transform <- function(
   }
   if (inherits(transform, "SurfaceTransform")) {
     if (!is.null(target)) {
-      domain <- if (inherits(target, "SurfaceGeometry")) target$domain else target
+      domain <- if (
+        inherits(target, "SurfaceGeometry")
+      ) {
+        target$domain
+      } else {
+        target
+      }
       .validate_surface_domain(domain)
       if (!identical(domain$id, transform$specification$to$id)) {
         stop("Target domain does not match the surface transform.")
@@ -393,7 +470,11 @@ apply_template_transform <- function(
     }
     neuroim2::space(target)
   }
-  if (length(dim(target_space)) != 3L) stop("Target grid must be three-dimensional.")
+  if (
+    length(dim(target_space)) != 3L
+  ) {
+    stop("Target grid must be three-dimensional.")
+  }
   values <- if (methods::is(moving, "ClusteredNeuroVol")) {
     methods::as(moving, "array")
   } else {
@@ -439,7 +520,11 @@ apply_template_transform <- function(
         offline = TRUE,
         verify = TRUE
       )
-      if (!identical(path, transform$files[[i]])) stop("Transform cache path changed.")
+      if (
+        !identical(path, transform$files[[i]])
+      ) {
+        stop("Transform cache path changed.")
+      }
     }
     neurotransform::make_resampling_plan(
       transform$morphism,
@@ -466,7 +551,11 @@ apply_template_transform <- function(
     outside = 0,
     modulate = "none"
   )
-  if (any(!is.finite(result_values))) stop("Transform produced non-finite values.")
+  if (
+    any(!is.finite(result_values))
+  ) {
+    stop("Transform produced non-finite values.")
+  }
   lost <- numeric()
   if (data_type == "label") {
     source_ids <- unique(as.numeric(values))
@@ -757,7 +846,11 @@ transform_atlas <- function(
   }
   transform <- get_template_transform(from, to_space, provider = provider, ...)
   if (is.null(target)) {
-    if (is.null(resolution)) stop("Supply 'target' or an explicit 'resolution'.")
+    if (
+      is.null(resolution)
+    ) {
+      stop("Supply 'target' or an explicit 'resolution'.")
+    }
     target <- get_template(to_space, resolution = resolution)
   }
   apply_template_transform(x, transform, target, data_type = "label")

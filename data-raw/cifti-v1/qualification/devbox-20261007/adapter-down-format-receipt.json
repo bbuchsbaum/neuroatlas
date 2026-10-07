@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "nibabel_version": "5.4.2",
+  "numpy_version": "2.4.3",
+  "cases": [
+    {
+      "kind": "scalar",
+      "brain_axis": 0,
+      "shape": [
+        59414,
+        2
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "kind": "scalar",
+      "brain_axis": 1,
+      "shape": [
+        59414,
+        2
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "kind": "label",
+      "brain_axis": 0,
+      "shape": [
+        59414,
+        2
+      ],
+      "max_abs_error": 0
+    },
+    {
+      "kind": "label",
+      "brain_axis": 1,
+      "shape": [
+        59414,
+        2
+      ],
+      "max_abs_error": 0
+    }
+  ]
+}

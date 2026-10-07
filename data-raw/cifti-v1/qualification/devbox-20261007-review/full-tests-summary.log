@@ -1,0 +1,9 @@
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 770.1 s
+
+── Skipped tests (2) ───────────────────────────────────────────────────────────
+• Set NEUROATLAS_TEST_HCPEX_NETWORK=true for upstream integration (1):
+  'test-hcpex.R:219:5'
+• TemplateFlow integration tests are opt-in (1): 'test-space-transforms.R:6:5'
+
+[ FAIL 0 | WARN 44 | SKIP 2 | PASS 2926 ]

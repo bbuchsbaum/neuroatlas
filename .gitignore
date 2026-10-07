@@ -65,6 +65,7 @@ plans/*
 !plans/template-transform-coverage.md
 !plans/resume-neuroatlas.md
 !plans/complexity-review.md
+!plans/cifti-mixed-transforms.md
 
 # Generated template-transform inputs, attempts, and release staging
 data-raw/transform-artifacts-v1-work/

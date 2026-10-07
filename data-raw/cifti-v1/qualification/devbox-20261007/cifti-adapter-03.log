@@ -1,0 +1,10 @@
+ℹ Loading neuroatlas
+down scalar 0 PASS 59414 brainordinates
+down scalar 1 PASS 59414 brainordinates
+down label 0 PASS 59414 brainordinates
+down label 1 PASS 59414 brainordinates
+PASS: cortical outputs, axes, map metadata, labels and extensions.
+Error in .surface_cached_operator(key, specification, cache_dir, offline,  : 
+  Surface operator is unavailable in the offline cache.
+Calls: setNames ... get_template_transform -> get_surface_transform -> .surface_cached_operator
+Execution halted

@@ -1,0 +1,8 @@
+read_cifti reference links PASS
+write_cifti reference links PASS
+replace_cifti_values reference links PASS
+get_cifti_transform reference links PASS
+apply_cifti_transform reference links PASS
+get_template_transform reference links PASS
+Error: all(paste0(links[[topic]], ".html") %in% href) is not TRUE
+Execution halted

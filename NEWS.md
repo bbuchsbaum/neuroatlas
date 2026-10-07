@@ -1,3 +1,19 @@
+# neuroatlas 0.2.0.9000
+
+* CIFTI-2 dense scalar and label maps preserve cortical and volumetric brain
+  models, ordered indices, voxel geometry, map metadata and per-map label tables
+  through `read_cifti()` and `write_cifti()`, using optional RNifti and xml2.
+  `replace_cifti_values()` validates replacement values without changing layouts.
+  Previously unavailable samples remain unavailable after value replacement.
+
+* `get_cifti_transform()` and the template API bind explicitly supplied qualified
+  cortical operators to CIFTI layouts. Application preserves noncortical values
+  by structure/index and rejects changed voxel geometry, support or declared
+  template frames. Unsupported label samples require explicit unassigned keys;
+  unavailable rows remain recorded in map metadata and availability masks.
+  This adapter does not implement cross-frame volume warping, directed
+  rasterization, new surface densities or anatomical qualification.
+
 # neuroatlas 0.2.0
 
 * `get_surface_geometry()` fetches checksum-locked fsaverage 164k and fsLR 32k
