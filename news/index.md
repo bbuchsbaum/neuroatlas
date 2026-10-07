@@ -1,5 +1,28 @@
 # Changelog
 
+## neuroatlas 0.2.0.9000
+
+- CIFTI-2 dense scalar and label maps preserve cortical and volumetric
+  brain models, ordered indices, voxel geometry, map metadata and
+  per-map label tables through
+  [`read_cifti()`](https://bbuchsbaum.github.io/neuroatlas/reference/read_cifti.md)
+  and
+  [`write_cifti()`](https://bbuchsbaum.github.io/neuroatlas/reference/write_cifti.md),
+  using optional RNifti and xml2.
+  [`replace_cifti_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/replace_cifti_values.md)
+  validates replacement values without changing layouts. Previously
+  unavailable samples remain unavailable after value replacement.
+
+- [`get_cifti_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_cifti_transform.md)
+  and the template API bind explicitly supplied qualified cortical
+  operators to CIFTI layouts. Application preserves noncortical values
+  by structure/index and rejects changed voxel geometry, support or
+  declared template frames. Unsupported label samples require explicit
+  unassigned keys; unavailable rows remain recorded in map metadata and
+  availability masks. This adapter does not implement cross-frame volume
+  warping, directed rasterization, new surface densities or anatomical
+  qualification.
+
 ## neuroatlas 0.2.0
 
 - [`get_surface_geometry()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_geometry.md)

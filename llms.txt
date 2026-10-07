@@ -614,6 +614,16 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Resolve a Qualified Population Volume-to-Cortex Projection
 - [`get_surface_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_transform.md)
   : Build or Load a Directed Surface Transform
+- [`get_cifti_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_cifti_transform.md)
+  : Bind Qualified Cortical Operators to a CIFTI Layout
+- [`apply_cifti_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_cifti_transform.md)
+  : Apply Cortical Resampling While Preserving CIFTI Subcortex
+- [`read_cifti()`](https://bbuchsbaum.github.io/neuroatlas/reference/read_cifti.md)
+  : Read CIFTI-2 Dense Scalar or Label Maps
+- [`write_cifti()`](https://bbuchsbaum.github.io/neuroatlas/reference/write_cifti.md)
+  : Write CIFTI-2 Maps With Preserved Brain Models
+- [`replace_cifti_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/replace_cifti_values.md)
+  : Replace Values Without Changing CIFTI Brain Models
 - [`get_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
   [`get_surface_template()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template.md)
   : Fetch a Template from TemplateFlow

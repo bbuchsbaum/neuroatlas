@@ -5,8 +5,10 @@ input channel once. Labels use nearest neighbour; scalar and probability
 values use linear interpolation. For image-to-image transforms,
 out-of-field samples are zero and probability channels are interpolated
 independently. Surface transforms dispatch to
-\[apply_surface_transform()\] or \[apply_surface_projection()\], whose
-unsupported samples are \`NA\` and whose coverage and missingness
+[`apply_surface_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_surface_transform.md)
+or
+[`apply_surface_projection()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_surface_projection.md),
+whose unsupported samples are `NA` and whose coverage and missingness
 semantics are documented separately.
 
 ## Usage
@@ -17,7 +19,8 @@ apply_template_transform(
   transform,
   target = NULL,
   data_type = c("auto", "continuous", "label", "probability"),
-  interpolation = NULL
+  interpolation = NULL,
+  missing_labels = NULL
 )
 ```
 
@@ -25,41 +28,51 @@ apply_template_transform(
 
 - x:
 
-  A volumetric atlas, \`NeuroVol\`, or \`NeuroVec\` (channels in
-  dimension 4), or \`SurfaceData\` for a native surface operator.
+  A volumetric atlas, `NeuroVol`, or `NeuroVec` (channels in dimension
+  4), or `SurfaceData` for a native surface operator. A mixed cortical
+  adapter requires `CiftiData` with its bound source layout.
 
 - transform:
 
-  A verified \[get_template_transform()\] result.
+  A verified
+  [`get_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_transform.md)
+  result.
 
 - target:
 
-  Target atlas, \`NeuroVol\`, or explicit \`NeuroSpace\`. A bare grid is
-  an assertion by the caller that it is in the transform's target space.
+  Target atlas, `NeuroVol`, or explicit `NeuroSpace`. A bare grid is an
+  assertion by the caller that it is in the transform's target space.
   Attached source/target metadata must agree with the route. Surface
-  operators already bind their exact target domain: \`NULL\` uses that
-  domain, or supply the matching \`SurfaceGeometry\` or
-  \`SurfaceDomain\`.
+  operators already bind their exact target domain: `NULL` uses that
+  domain, or supply the matching `SurfaceGeometry` or `SurfaceDomain`.
 
 - data_type:
 
-  \`"auto"\` uses declared metadata, or label semantics for atlas
-  objects. Unannotated volumes require an explicit type; integer-valued
-  samples alone do not imply labels.
+  `"auto"` uses declared metadata, or label semantics for atlas objects.
+  Unannotated volumes require an explicit type; integer-valued samples
+  alone do not imply labels.
 
 - interpolation:
 
-  \`NULL\` selects the type-specific method. Only \`"nearest"\` for
-  labels and \`"linear"\` for continuous/probability data are supported.
+  `NULL` selects the type-specific method. Only `"nearest"` for labels
+  and `"linear"` for continuous/probability data are supported.
+
+- missing_labels:
+
+  Explicit unassigned keys for unsupported CIFTI label samples, passed
+  to
+  [`apply_cifti_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_cifti_transform.md).
+  Other representations require `NULL`.
 
 ## Value
 
-The transformed atlas or volume. The \`neuroatlas_transform\` attribute
+The transformed atlas or volume. The `neuroatlas_transform` attribute
 records the route, artifact hashes, interpolation, grids and lost
 labels. Atlas objects retain semantic IDs, labels and source provenance,
 including regions that disappear on the target grid. A surface
-destination returns \`SurfaceData\` with exact domain, availability and
-projection provenance.
+destination returns `SurfaceData` with exact domain, availability and
+projection provenance. A CIFTI destination returns `CiftiData` and
+preserves noncortical support.
 
 ## Examples
 

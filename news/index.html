@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,11 @@
       <small>Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9000" id="neuroatlas-0209000">neuroatlas 0.2.0.9000<a class="anchor" aria-label="anchor" href="#neuroatlas-0209000"></a></h2>
+<ul><li><p>CIFTI-2 dense scalar and label maps preserve cortical and volumetric brain models, ordered indices, voxel geometry, map metadata and per-map label tables through <code><a href="../reference/read_cifti.html">read_cifti()</a></code> and <code><a href="../reference/write_cifti.html">write_cifti()</a></code>, using optional RNifti and xml2. <code><a href="../reference/replace_cifti_values.html">replace_cifti_values()</a></code> validates replacement values without changing layouts. Previously unavailable samples remain unavailable after value replacement.</p></li>
+<li><p><code><a href="../reference/get_cifti_transform.html">get_cifti_transform()</a></code> and the template API bind explicitly supplied qualified cortical operators to CIFTI layouts. Application preserves noncortical values by structure/index and rejects changed voxel geometry, support or declared template frames. Unsupported label samples require explicit unassigned keys; unavailable rows remain recorded in map metadata and availability masks. This adapter does not implement cross-frame volume warping, directed rasterization, new surface densities or anatomical qualification.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="neuroatlas-020">neuroatlas 0.2.0<a class="anchor" aria-label="anchor" href="#neuroatlas-020"></a></h2>
 <ul><li><p><code><a href="../reference/get_surface_geometry.html">get_surface_geometry()</a></code> fetches checksum-locked fsaverage 164k and fsLR 32k registration geometry, masks and vertex areas. Exact domains admit directed native surface routes through <code><a href="../reference/get_template_transform.html">get_template_transform()</a></code> and <code><a href="../reference/apply_template_transform.html">apply_template_transform()</a></code>; broad surface aliases remain planned.</p></li>

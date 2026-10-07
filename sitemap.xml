@@ -23,6 +23,7 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/MNI152_to_MNI305.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/MNI305_to_MNI152.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/apply_cifti_transform.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/apply_surface_projection.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/apply_surface_transform.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/apply_template_transform.html</loc></url>
@@ -75,6 +76,7 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_aseg_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_brainnetome_atlas.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_cifti_transform.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_fsl_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_ggseg_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_glasser_atlas.html</loc></url>
@@ -144,10 +146,12 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/project_surface_view.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/query_coord.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/query_point.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/read_cifti.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/read_parcel_data.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas_vec.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/register_atlas.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/replace_cifti_values.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/resample.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/ribbon_projection.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/roi_attributes.html</loc></url>
@@ -179,6 +183,7 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/validate_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/validate_atlas_ref.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/validate_parcel_data.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/write_cifti.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/write_parcel_data.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/templateflow.html</loc></url>
 </urlset>

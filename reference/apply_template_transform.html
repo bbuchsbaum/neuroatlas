@@ -3,14 +3,14 @@
 channel once. Labels use nearest neighbour; scalar and probability values
 use linear interpolation. For image-to-image transforms, out-of-field samples
 are zero and probability channels are interpolated independently. Surface
-transforms dispatch to [apply_surface_transform()] or
-[apply_surface_projection()], whose unsupported samples are `NA` and whose
+transforms dispatch to apply_surface_transform() or
+apply_surface_projection(), whose unsupported samples are NA and whose
 coverage and missingness semantics are documented separately."><meta property="og:description" content="Composes the complete route in physical coordinates and samples each input
 channel once. Labels use nearest neighbour; scalar and probability values
 use linear interpolation. For image-to-image transforms, out-of-field samples
 are zero and probability channels are interpolated independently. Surface
-transforms dispatch to [apply_surface_transform()] or
-[apply_surface_projection()], whose unsupported samples are `NA` and whose
+transforms dispatch to apply_surface_transform() or
+apply_surface_projection(), whose unsupported samples are NA and whose
 coverage and missingness semantics are documented separately."><link href="../albers.css" rel="stylesheet"><script>window.albersdownDefaults = window.albersdownDefaults || { family: "red", preset: "homage", style: "minimal" };</script><script src="../albers.js"></script></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
@@ -19,7 +19,7 @@ coverage and missingness semantics are documented separately."><link href="../al
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,8 +56,8 @@ coverage and missingness semantics are documented separately."><link href="../al
 channel once. Labels use nearest neighbour; scalar and probability values
 use linear interpolation. For image-to-image transforms, out-of-field samples
 are zero and probability channels are interpolated independently. Surface
-transforms dispatch to [apply_surface_transform()] or
-[apply_surface_projection()], whose unsupported samples are `NA` and whose
+transforms dispatch to <code><a href="apply_surface_transform.html">apply_surface_transform()</a></code> or
+<code><a href="apply_surface_projection.html">apply_surface_projection()</a></code>, whose unsupported samples are <code>NA</code> and whose
 coverage and missingness semantics are documented separately.</p>
     </div>
 
@@ -68,7 +68,8 @@ coverage and missingness semantics are documented separately.</p>
 <span>  <span class="va">transform</span>,</span>
 <span>  target <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"continuous"</span>, <span class="st">"label"</span>, <span class="st">"probability"</span><span class="op">)</span>,</span>
-<span>  interpolation <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  interpolation <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  missing_labels <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -77,44 +78,52 @@ coverage and missingness semantics are documented separately.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A volumetric atlas, `NeuroVol`, or `NeuroVec` (channels in dimension
+<dd><p>A volumetric atlas, <code>NeuroVol</code>, or <code>NeuroVec</code> (channels in dimension
 4),
-or `SurfaceData` for a native surface operator.</p></dd>
+or <code>SurfaceData</code> for a native surface operator.
+A mixed cortical adapter requires <code>CiftiData</code> with its bound source layout.</p></dd>
 
 
 <dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>
-<dd><p>A verified [get_template_transform()] result.</p></dd>
+<dd><p>A verified <code><a href="get_template_transform.html">get_template_transform()</a></code> result.</p></dd>
 
 
 <dt id="arg-target">target<a class="anchor" aria-label="anchor" href="#arg-target"></a></dt>
-<dd><p>Target atlas, `NeuroVol`, or explicit `NeuroSpace`. A bare grid
+<dd><p>Target atlas, <code>NeuroVol</code>, or explicit <code>NeuroSpace</code>. A bare grid
 is an assertion by the caller that it is in the transform's target space.
 Attached source/target metadata must agree with the route.
-Surface operators already bind their exact target domain: `NULL` uses that
-domain, or supply the matching `SurfaceGeometry` or `SurfaceDomain`.</p></dd>
+Surface operators already bind their exact target domain: <code>NULL</code> uses that
+domain, or supply the matching <code>SurfaceGeometry</code> or <code>SurfaceDomain</code>.</p></dd>
 
 
 <dt id="arg-data-type">data_type<a class="anchor" aria-label="anchor" href="#arg-data-type"></a></dt>
-<dd><p>`"auto"` uses declared metadata, or label semantics for
+<dd><p><code>"auto"</code> uses declared metadata, or label semantics for
 atlas
 objects. Unannotated volumes require an explicit type; integer-valued
 samples alone do not imply labels.</p></dd>
 
 
 <dt id="arg-interpolation">interpolation<a class="anchor" aria-label="anchor" href="#arg-interpolation"></a></dt>
-<dd><p>`NULL` selects the type-specific method. Only
-`"nearest"`
-for labels and `"linear"` for continuous/probability data are supported.</p></dd>
+<dd><p><code>NULL</code> selects the type-specific method. Only
+<code>"nearest"</code>
+for labels and <code>"linear"</code> for continuous/probability data are supported.</p></dd>
+
+
+<dt id="arg-missing-labels">missing_labels<a class="anchor" aria-label="anchor" href="#arg-missing-labels"></a></dt>
+<dd><p>Explicit unassigned keys for unsupported CIFTI label
+samples, passed to <code><a href="apply_cifti_transform.html">apply_cifti_transform()</a></code>. Other representations require
+<code>NULL</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The transformed atlas or volume. The `neuroatlas_transform` attribute
-  records the route, artifact hashes, interpolation, grids and lost labels.
-  Atlas objects retain semantic IDs, labels and source provenance, including
-  regions that disappear on the target grid.
-  A surface destination returns `SurfaceData` with exact domain, availability
-  and projection provenance.</p>
+    <p>The transformed atlas or volume. The <code>neuroatlas_transform</code> attribute
+records the route, artifact hashes, interpolation, grids and lost labels.
+Atlas objects retain semantic IDs, labels and source provenance, including
+regions that disappear on the target grid.
+A surface destination returns <code>SurfaceData</code> with exact domain, availability
+and projection provenance.
+A CIFTI destination returns <code>CiftiData</code> and preserves noncortical support.</p>
     </div>
 
     <div class="section level2">
