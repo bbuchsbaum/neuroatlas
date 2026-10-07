@@ -39,8 +39,8 @@ if (requireNamespace("igraph", quietly = TRUE)) {
   )
   as_igraph(connectivity)
 }
-#> IGRAPH d354435 U-W- 2 1 -- 
+#> IGRAPH 21fe2e1 U-W- 2 1 -- 
 #> + attr: weight (e/n)
-#> + edge from d354435:
+#> + edge from 21fe2e1:
 #> [1] 1--2
 ```

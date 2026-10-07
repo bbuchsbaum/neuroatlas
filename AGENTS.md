@@ -39,7 +39,8 @@ subsetting, and visualization.
 - Follow tidyverse style: 2-space indentation, no tabs, ~80 char lines,
   `snake_case` functions
 - Use `UpperCamelCase` for S3/S4 classes
-- All exports require roxygen2 documentation; run `devtools::document()`
+- All exports require roxygen2 documentation; run
+  [`devtools::document()`](https://devtools.r-lib.org/reference/document.html)
   after changes
 - Use `assertthat` for input validation
 - Check optional packages with
@@ -51,10 +52,15 @@ subsetting, and visualization.
 
 ### Testing Requirements
 
-- Run `devtools::test()` for the full suite, or
+- Run
+  [`devtools::test()`](https://devtools.r-lib.org/reference/test.html)
+  for the full suite, or
   [`testthat::test_file()`](https://testthat.r-lib.org/reference/test_file.html)
   for individual files
-- Tests must `devtools::load_all()` first (or use `devtools::test()`
+- Tests must
+  [`devtools::load_all()`](https://devtools.r-lib.org/reference/load_all.html)
+  first (or use
+  [`devtools::test()`](https://devtools.r-lib.org/reference/test.html)
   which does this)
 - Use `skip_on_cran()` for network-dependent or slow tests
 - Use `make_toy_*()` helpers for synthetic data — avoid requiring atlas
@@ -63,7 +69,8 @@ subsetting, and visualization.
 
 ### Build and Check
 
-- `devtools::check()` or `R CMD check --as-cran` for CRAN compliance
+- [`devtools::check()`](https://devtools.r-lib.org/reference/check.html)
+  or `R CMD check --as-cran` for CRAN compliance
 - No non-ASCII characters in code or data
 - Examples must run in \< 5 seconds (use `\dontrun{}` or `\donttest{}`
   for slow ones)
@@ -74,8 +81,11 @@ subsetting, and visualization.
 - Concise, present-tense commit messages (e.g., “Add Schaefer atlas
   loader”)
 - Group related changes; don’t mix refactors with behavioral changes
-- Ensure `devtools::check()` and `devtools::test()` pass before
-  committing
+- Ensure
+  [`devtools::check()`](https://devtools.r-lib.org/reference/check.html)
+  and
+  [`devtools::test()`](https://devtools.r-lib.org/reference/test.html)
+  pass before committing
 
 ### Key Architecture
 

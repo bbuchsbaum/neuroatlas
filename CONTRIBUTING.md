@@ -13,7 +13,8 @@ directories you change. Use two-space indentation, snake_case function
 names, and synthetic atlas helpers in unit tests. Keep changes scoped
 and document every exported function with roxygen2, including return
 values and a short example. Generate documentation with
-`devtools::document()`; do not edit `NAMESPACE` or `man/` by hand.
+[`devtools::document()`](https://devtools.r-lib.org/reference/document.html);
+do not edit `NAMESPACE` or `man/` by hand.
 
 The repository’s `.lintr` profile checks maintained R code for
 formatting and correctness. Function names use snake_case, with
@@ -54,8 +55,9 @@ devtools::test(stop_on_failure = TRUE)
 devtools::check(manual = TRUE)
 ```
 
-Load the package with `devtools::load_all()` before running an
-individual
+Load the package with
+[`devtools::load_all()`](https://devtools.r-lib.org/reference/load_all.html)
+before running an individual
 [`testthat::test_file()`](https://testthat.r-lib.org/reference/test_file.html).
 Network and slow integration tests must use `skip_on_cran()` and opt-in
 fixtures where appropriate. Report warnings, skips and unavailable
