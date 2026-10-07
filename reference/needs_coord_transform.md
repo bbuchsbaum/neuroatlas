@@ -39,10 +39,10 @@ the template grids differ within the same coordinate system (use
 ## Examples
 
 ``` r
-needs_coord_transform("fsaverage", "MNI152NLin6Asym")  # TRUE
+needs_coord_transform("fsaverage", "MNI152NLin6Asym") # TRUE
 #> [1] TRUE
-needs_coord_transform("fsaverage", "MNI305")            # FALSE
+needs_coord_transform("fsaverage", "MNI305") # FALSE
 #> [1] FALSE
-needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # FALSE
+needs_coord_transform("MNI152NLin6Asym", "MNI152NLin2009cAsym") # FALSE
 #> [1] FALSE
 ```

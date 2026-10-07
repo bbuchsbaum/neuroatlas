@@ -98,6 +98,6 @@ atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
 # data_vol: a NeuroVec with matching spatial dimensions
 # mask:     a brain mask NeuroVol
 cvec <- reduce_atlas_vec(atlas, data_vol, mask)
-ts_mat <- as.matrix(cvec)   # T x K cluster time-series
+ts_mat <- as.matrix(cvec) # T x K cluster time-series
 } # }
 ```

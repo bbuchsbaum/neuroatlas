@@ -46,3 +46,12 @@ objects.
 ## See also
 
 [`get_roi`](https://bbuchsbaum.github.io/neuroatlas/reference/get_roi.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+atlas <- get_schaefer_surfatlas(100)
+roi <- get_roi(atlas, id = atlas$ids[1])
+} # }
+```

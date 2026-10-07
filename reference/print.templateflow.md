@@ -22,3 +22,12 @@ print(x, ...)
 ## Value
 
 The input object `x`, returned invisibly.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+interface <- create_templateflow()
+print(interface)
+} # }
+```

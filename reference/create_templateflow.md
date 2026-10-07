@@ -32,6 +32,6 @@ An S3 object of class `templateflow` (deprecated stub).
 
 ``` r
 if (FALSE) { # \dontrun{
-  # Deprecated. Use get_template(), tflow_spaces(), etc. directly.
+# Deprecated. Use get_template(), tflow_spaces(), etc. directly.
 } # }
 ```

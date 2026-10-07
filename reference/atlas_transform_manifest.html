@@ -9,7 +9,7 @@ implementation status."><link href="../albers.css" rel="stylesheet"><script>wind
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,58 +86,131 @@ For `scope = "space"` this is the space transform registry returned by
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Space-to-space routes</span></span></span>
 <span class="r-in"><span><span class="fu">atlas_transform_manifest</span><span class="op">(</span><span class="st">"space"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             from_space            to_space  transform_type         backend</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1               MNI305              MNI152          affine internal_affine</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2               MNI152              MNI305          affine internal_affine</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      MNI152NLin6Asym MNI152NLin2009cAsym  nonlinear_warp  neurotransform</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  MNI152NLin2009cAsym     MNI152NLin6Asym  nonlinear_warp  neurotransform</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5            fsaverage          fsaverage6 sphere_resample       sphere_nn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6           fsaverage6           fsaverage sphere_resample       sphere_nn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7            fsaverage          fsaverage5 sphere_resample       sphere_nn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8           fsaverage5           fsaverage sphere_resample       sphere_nn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9            fsaverage            fsLR_32k sphere_resample       workbench</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10            fsLR_32k           fsaverage sphere_resample       workbench</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 MNI152NLin2009cAsym           fsaverage        vol2surf       neurosurf</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12           fsaverage MNI152NLin2009cAsym        surf2vol     ribbon_fill</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     confidence reversible</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        exact       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        exact       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3         high       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4         high       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        exact       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6        exact       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7        exact       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8        exact       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9         high       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10        high       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 approximate      FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 approximate      FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                        data_files    status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                            &lt;NA&gt; available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                            &lt;NA&gt; available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5 available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5 available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                    fsaverage/surf/?h.sphere.reg available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                    fsaverage/surf/?h.sphere.reg available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                    fsaverage/surf/?h.sphere.reg available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                    fsaverage/surf/?h.sphere.reg available</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9              fs_LR-deformed_to-fsaverage.?H.sphere.reg.surf.gii   planned</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10                      fsaverage_to-fs_LR.?H.sphere.reg.surf.gii   planned</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                           &lt;NA&gt;   planned</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                           &lt;NA&gt;   planned</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                            notes</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                 FreeSurfer mni152.register.dat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      Inverse of FreeSurfer mni152.register.dat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  neuroatlas ANTs pair; qualified on 1 mm and 2 mm target grids</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  neuroatlas ANTs pair; qualified on 1 mm and 2 mm target grids</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                  Downsample 164k to 41k on registration sphere</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                    Upsample 41k to 164k on registration sphere</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7                  Downsample 164k to 10k on registration sphere</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8                    Upsample 10k to 164k on registration sphere</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9                          HCP sphere registration via Workbench</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10                         HCP sphere registration via Workbench</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11                              Requires white and pial surfaces</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12                             Requires ribbon mask construction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             from_space            to_space  transform_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1               MNI305              MNI152          affine</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2               MNI152              MNI305          affine</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      MNI152NLin6Asym MNI152NLin2009cAsym  nonlinear_warp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  MNI152NLin2009cAsym     MNI152NLin6Asym  nonlinear_warp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5            fsaverage          fsaverage6 sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6           fsaverage6           fsaverage sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7            fsaverage          fsaverage5 sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8           fsaverage5           fsaverage sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9            fsaverage            fsLR_32k sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10            fsLR_32k           fsaverage sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 MNI152NLin2009cAsym           fsaverage        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12           fsaverage MNI152NLin2009cAsym        surf2vol</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13           fsaverage            fsLR_32k sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14            fsLR_32k           fsaverage sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15           fsaverage            fsLR_32k sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16            fsLR_32k           fsaverage sphere_resample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17     MNI152NLin6Asym           fsaverage        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18     MNI152NLin6Asym            fsLR_32k        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19     MNI152NLin6Asym           fsaverage        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20     MNI152NLin6Asym            fsLR_32k        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 MNI152NLin2009cAsym           fsaverage        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 MNI152NLin2009cAsym            fsLR_32k        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 MNI152NLin2009cAsym           fsaverage        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 MNI152NLin2009cAsym            fsLR_32k        vol2surf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     backend  confidence reversible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           internal_affine approximate       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           internal_affine approximate       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3            neurotransform        high       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            neurotransform        high       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 sphere_nn approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                 sphere_nn approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                 sphere_nn approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                 sphere_nn approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                 workbench approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                workbench approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                neurosurf approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12              ribbon_fill approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13    neurotransform_native approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14    neurotransform_native approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15    neurotransform_native approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16    neurotransform_native approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 cbig_registration_fusion approximate      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                          data_files</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                    tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                    tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                      fsaverage/surf/?h.sphere.reg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                      fsaverage/surf/?h.sphere.reg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                      fsaverage/surf/?h.sphere.reg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                      fsaverage/surf/?h.sphere.reg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                fs_LR-deformed_to-fsaverage.?H.sphere.reg.surf.gii</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                        fsaverage_to-fs_LR.?H.sphere.reg.surf.gii</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 CBIG RF-ANTs MNI152 original ras; explicit qualified pullback/native composition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   planned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                notes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                            Legacy FreeSurfer coordinate-family affine; generic MNI152 does not identify an exact template or cortical registration</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                            Legacy FreeSurfer coordinate-family affine; generic MNI152 does not identify an exact template or cortical registration</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                                                                      neuroatlas ANTs pair; qualified on 1 mm and 2 mm target grids</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                                                      neuroatlas ANTs pair; qualified on 1 mm and 2 mm target grids</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                                                                      Downsample 164k to 41k on registration sphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                                                                        Upsample 41k to 164k on registration sphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                                                                      Downsample 164k to 10k on registration sphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                                                                        Upsample 10k to 164k on registration sphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                                                                                              HCP sphere registration via Workbench</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                                                                             HCP sphere registration via Workbench</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                          Unqualified projection; requires exact volume identity and an explicit projection method</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                                     Directed rasterization; not an inverse; requires coverage and conflict policy</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                       Exact pinned domains only; native geometric qualification, no Workbench parity or anatomical accuracy claim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                                       Exact pinned domains only; native geometric qualification, no Workbench parity or anatomical accuracy claim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                                       Exact pinned domains only; native geometric qualification, no Workbench parity or anatomical accuracy claim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                                       Exact pinned domains only; native geometric qualification, no Workbench parity or anatomical accuracy claim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 Exact-domain population sampling, tested on 1mm and 2mm source grids; numerical agreement does not establish anatomical accuracy or reversibility</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                    artifact_id</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                         &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                         &lt;NA&gt;</span>
@@ -151,6 +224,18 @@ For `scope = "space"` this is the space transform registry returned by
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                        &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                        &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                               native_L_down</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                                                 native_L_up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                                               native_R_down</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                                                 native_R_up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17                                       cbig_mni6_fsaverage_L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18                                            cbig_mni6_fsLR_L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19                                       cbig_mni6_fsaverage_R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20                                            cbig_mni6_fsLR_R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21                                   cbig_mni2009c_fsaverage_L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22                                        cbig_mni2009c_fsLR_L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23                                   cbig_mni2009c_fsaverage_R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24                                        cbig_mni2009c_fsLR_R</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          artifact_version   provider</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                    &lt;NA&gt;       &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                    &lt;NA&gt;       &lt;NA&gt;</span>
@@ -164,19 +249,43 @@ For `scope = "space"` this is the space transform registry returned by
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10                   &lt;NA&gt;       &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11                   &lt;NA&gt;       &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12                   &lt;NA&gt;       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                 url</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                                                                                                              &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                                                                                                              &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                                                                                                              &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                                                                                                              &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                                                                                                              &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                                                                                                              &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                                                                                                                              &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                                                                                                             &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                                                                                                             &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                                                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  surface-transforms-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14  surface-transforms-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15  surface-transforms-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16  surface-transforms-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24  surface-projection-v1 neuroatlas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                                                                                                    url</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                                                                                                                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                                                                                                                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                                                                     https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/tpl-MNI152NLin2009cAsym_from-MNI152NLin6Asym_mode-image_xfm.h5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                                                     https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/tpl-MNI152NLin6Asym_from-MNI152NLin2009cAsym_mode-image_xfm.h5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                                                                                                                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                                                                                                                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                                                                                                                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                                                                                                                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                                                                                                                                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                                                                                                                                                                                                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                                                                                                                                                                                                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                                                                                                                                                                                                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                                                                                                                                                                                                                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                                                                                                                                                                                                                                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                                                                                                                                                                                                                                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                                                                                                                                                                                                                                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/lh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/lh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/rh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/rh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/lh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/lh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/rh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 https://raw.githubusercontent.com/ThomasYeoLab/CBIG/634f676630929a71297852d01dd92a287103e861/stable_projects/registration/Wu2017_RegistrationFusion/bin/final_warps_FS5.3/rh.avgMapping_allSub_RF_ANTs_MNI152_orig_to_fsaverage.mat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                              sha256 size_bytes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                              &lt;NA&gt;         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                              &lt;NA&gt;         NA</span>
@@ -190,24 +299,48 @@ For `scope = "space"` this is the space transform registry returned by
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                             &lt;NA&gt;         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                             &lt;NA&gt;         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                             &lt;NA&gt;         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     format              convention qualification   qualification_scope</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  ants_h5 ants_image_pullback_ras        passed template_pair_1mm_2mm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  ants_h5 ants_image_pullback_ras        passed template_pair_1mm_2mm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7     &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8     &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9     &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10    &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11    &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12    &lt;NA&gt;                    &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                       qa_url</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                                             &lt;NA&gt;         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                                                             &lt;NA&gt;         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                                                             &lt;NA&gt;         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                                                             &lt;NA&gt;         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 3961b1e1f04621f8c1961ac8e4e5385813e47579214e0ccd5e62d685265205fd    3584268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 3961b1e1f04621f8c1961ac8e4e5385813e47579214e0ccd5e62d685265205fd    3584268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 c44a8a824ade7c7c2203f2cd91cc6dced7c064d4371a45270cc50bb02d182319    3573633</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 c44a8a824ade7c7c2203f2cd91cc6dced7c064d4371a45270cc50bb02d182319    3573633</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 3961b1e1f04621f8c1961ac8e4e5385813e47579214e0ccd5e62d685265205fd    3584268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 3961b1e1f04621f8c1961ac8e4e5385813e47579214e0ccd5e62d685265205fd    3584268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 c44a8a824ade7c7c2203f2cd91cc6dced7c064d4371a45270cc50bb02d182319    3573633</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 c44a8a824ade7c7c2203f2cd91cc6dced7c064d4371a45270cc50bb02d182319    3573633</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                format                      convention qualification</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3             ants_h5         ants_image_pullback_ras        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4             ants_h5         ants_image_pullback_ras        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10               &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11               &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12               &lt;NA&gt;                            &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 native_barycentric sphere_correspondence_fsaverage        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 native_barycentric sphere_correspondence_fsaverage        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 native_barycentric sphere_correspondence_fsaverage        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 native_barycentric sphere_correspondence_fsaverage        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24          cbig_mat5      zero_based_voxel_to_ras_mm        passed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                          qualification_scope</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                                                       &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                                                       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/qa.json</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/qa.json</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                                                      template_pair_1mm_2mm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                                      template_pair_1mm_2mm</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                                                       &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                                                       &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                                                       &lt;NA&gt;</span>
@@ -216,6 +349,43 @@ For `scope = "space"` this is the space transform registry returned by
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                                                      &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                                                      &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                                                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                     native_closest_barycentric_exact_domains_continuous_label_probability</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                     native_closest_barycentric_exact_domains_continuous_label_probability</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                     native_closest_barycentric_exact_domains_continuous_label_probability</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                     native_closest_barycentric_exact_domains_continuous_label_probability</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 registration_fusion_exact_domains_1mm_2mm_continuous_label_probability_sampling_numerical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                              qa_url</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                         https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/qa.json</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                         https://github.com/bbuchsbaum/neuroatlas/releases/download/transform-artifacts-v1/qa.json</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                                                                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                                                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 https://github.com/bbuchsbaum/neuroatlas/blob/v0.2.0/data-raw/surface-transforms-v1/qualification/devbox-20261006/final/index.md</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                          license</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                                                           &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                                                           &lt;NA&gt;</span>
@@ -229,6 +399,143 @@ For `scope = "space"` this is the space transform registry returned by
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                                                          &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                                                          &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                                                          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                        upstream_download_only; see surface-assets-LICENSES.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                                        upstream_download_only; see surface-assets-LICENSES.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                                        upstream_download_only; see surface-assets-LICENSES.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                                        upstream_download_only; see surface-assets-LICENSES.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 https://github.com/ThomasYeoLab/CBIG/blob/634f676630929a71297852d01dd92a287103e861/LICENSE.md</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                      from_domain_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 662cdee2b9272e0943a8f6a994407782a1b70bde91c943efb61ffc933e1ac912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 1816e589ab705013848a72961864f8618019d7a4ddbf4cb0aad59e09eacd37ac</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                        to_domain_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 662cdee2b9272e0943a8f6a994407782a1b70bde91c943efb61ffc933e1ac912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 1816e589ab705013848a72961864f8618019d7a4ddbf4cb0aad59e09eacd37ac</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 662cdee2b9272e0943a8f6a994407782a1b70bde91c943efb61ffc933e1ac912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 1816e589ab705013848a72961864f8618019d7a4ddbf4cb0aad59e09eacd37ac</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 db673d691ff6afb99706cd39db2511316deb6b345e43d7fa8cc9734a5142e110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 662cdee2b9272e0943a8f6a994407782a1b70bde91c943efb61ffc933e1ac912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 fb6c4cbad68dc5d6881490379e6c2dcff26aac1f1841688121484c6f98cd2a0b</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 1816e589ab705013848a72961864f8618019d7a4ddbf4cb0aad59e09eacd37ac</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         method                          engine_revision</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                         &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                        &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                        &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                        &lt;NA&gt;                                     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  native_closest_barycentric 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14  native_closest_barycentric 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15  native_closest_barycentric 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16  native_closest_barycentric 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 cbig_rf_ants_linear_nearest 933edddda462593941e167726e8aaa7168ff103a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                   input_lock_sha256 hemisphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                                                              &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                                                             &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                                                             &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                                             &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 efcd4d03f1361ff3be350f5fa2f640b146677de5cd780ae2a5b523c6151c97e0          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 efcd4d03f1361ff3be350f5fa2f640b146677de5cd780ae2a5b523c6151c97e0          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 efcd4d03f1361ff3be350f5fa2f640b146677de5cd780ae2a5b523c6151c97e0          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 efcd4d03f1361ff3be350f5fa2f640b146677de5cd780ae2a5b523c6151c97e0          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17                                                             &lt;NA&gt;          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18                                                             &lt;NA&gt;          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19                                                             &lt;NA&gt;          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20                                                             &lt;NA&gt;          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21                                                             &lt;NA&gt;          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22                                                             &lt;NA&gt;          L</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23                                                             &lt;NA&gt;          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24                                                             &lt;NA&gt;          R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    source_representation target_representation executable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                 volume                volume       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                 volume                volume       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                 volume                volume       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                 volume                volume       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                surface               surface      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                surface               surface      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                surface               surface      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                surface               surface      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                surface               surface      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10               surface               surface      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                volume               surface      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12               surface                volume      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13               surface               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14               surface               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15               surface               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16               surface               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17                volume               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18                volume               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19                volume               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20                volume               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21                volume               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22                volume               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23                volume               surface       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24                volume               surface       TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

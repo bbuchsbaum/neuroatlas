@@ -4,7 +4,8 @@ from get_wang_atlas, glasser_surf, or
 schaefer_surf). It returns one ROISurface per
 matched region, carrying the mesh vertices of that area on the appropriate
 hemisphere.
-Because a surface atlas stores each hemisphere on its own mesh, a label
+Because a surface atlas stores each hemisphere on its own mesh, a
+label
 present in both hemispheres yields one ROI per hemisphere, named
 "&amp;lt;label&amp;gt;_left" / "&amp;lt;label&amp;gt;_right"; pass hemi to restrict.
 When selecting by id, results are named by id (ids are unique across
@@ -13,7 +14,8 @@ from get_wang_atlas, glasser_surf, or
 schaefer_surf). It returns one ROISurface per
 matched region, carrying the mesh vertices of that area on the appropriate
 hemisphere.
-Because a surface atlas stores each hemisphere on its own mesh, a label
+Because a surface atlas stores each hemisphere on its own mesh, a
+label
 present in both hemispheres yields one ROI per hemisphere, named
 "&amp;lt;label&amp;gt;_left" / "&amp;lt;label&amp;gt;_right"; pass hemi to restrict.
 When selecting by id, results are named by id (ids are unique across
@@ -25,7 +27,7 @@ hemispheres: 1..K left, K+1..2K right).'><link href="../albers.css" rel="stylesh
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +65,8 @@ from <code><a href="get_wang_atlas.html">get_wang_atlas</a></code>, <code><a hre
 <code>schaefer_surf</code>). It returns one <code><a href="https://bbuchsbaum.github.io/neurosurf/reference/ROISurface.html" class="external-link">ROISurface</a></code> per
 matched region, carrying the mesh vertices of that area on the appropriate
 hemisphere.</p>
-<p>Because a surface atlas stores each hemisphere on its own mesh, a <code>label</code>
+<p>Because a surface atlas stores each hemisphere on its own mesh, a
+<code>label</code>
 present in both hemispheres yields one ROI per hemisphere, named
 <code>"&lt;label&gt;_left"</code> / <code>"&lt;label&gt;_right"</code>; pass <code>hemi</code> to restrict.
 When selecting by <code>id</code>, results are named by id (ids are unique across
@@ -102,6 +105,14 @@ exactly one.</p></dd>
     <div class="dont-index"><p><code><a href="get_roi.html">get_roi</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_schaefer_surfatlas.html">get_schaefer_surfatlas</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">roi</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_roi.html">get_roi</a></span><span class="op">(</span><span class="va">atlas</span>, id <span class="op">=</span> <span class="va">atlas</span><span class="op">$</span><span class="va">ids</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

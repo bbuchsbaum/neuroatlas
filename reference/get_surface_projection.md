@@ -1,0 +1,65 @@
+# Resolve a Qualified Population Volume-to-Cortex Projection
+
+Uses pinned CBIG RF-ANTs population registration-fusion sampling
+coordinates on the exact fsaverage 164k domain. MNI2009c uses the
+qualified MNI6-to-2009c image pullback at those coordinates, without an
+intermediate resampled image. fsLR 32k output additionally uses the
+admitted native surface operator. Population correspondence does not
+substitute for subject registration. Numerical qualification covers the
+locked 1 mm and 2 mm source grids and the four pinned target domains.
+Other grids in the declared frame can be sampled, but have no retained
+grid-specific qualification. The original CBIG reference and MNI6 images
+agree on sampled cortical support, but differ elsewhere.
+
+## Usage
+
+``` r
+get_surface_projection(
+  from,
+  to,
+  cache_dir = transform_cache_path(),
+  download = TRUE,
+  offline = FALSE
+)
+```
+
+## Arguments
+
+- from:
+
+  Exact \`"MNI152NLin6Asym"\` or \`"MNI152NLin2009cAsym"\` identifier.
+  Generic \`"MNI152"\` is insufficient.
+
+- to:
+
+  Verified pinned \`SurfaceGeometry\` for one hemisphere.
+
+- cache_dir:
+
+  Dedicated transform cache directory.
+
+- download:
+
+  Allow downloads of checksum-locked upstream inputs.
+
+- offline:
+
+  Require verified cached inputs and operators.
+
+## Value
+
+A directed \`SurfaceProjection\`, with resident sampling coordinates,
+exact domains, input hashes, engine identity and composition provenance.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+target <- get_surface_geometry("fsaverage", "164k", "L")
+projection <- get_surface_projection("MNI152NLin6Asym", target)
+volume <- get_template("MNI152NLin6Asym", resolution = 2)
+cortex <- apply_surface_projection(volume, projection,
+  source_space = "MNI152NLin6Asym", data_type = "continuous"
+)
+} # }
+```

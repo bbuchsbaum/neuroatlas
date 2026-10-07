@@ -53,3 +53,15 @@ A list with two elements:
 - `boundaries`:
 
   Tibble of boundary edges with columns `x, y, xend, yend, panel`.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+atlas <- get_schaefer_surfatlas(100)
+polygons <- build_brain_polygon_data(atlas,
+  views = "lateral",
+  surface = "inflated"
+)
+} # }
+```

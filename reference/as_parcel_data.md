@@ -93,3 +93,18 @@ or `parcel_data` atlas metadata. See
 for safe joins between Glasser volume and surface representations.
 Numeric vectors are positional: they must already follow the target
 atlas's parcel order.
+
+## Examples
+
+``` r
+x <- parcel_data(data.frame(
+  id = 1:2, label = c("A", "B"),
+  hemi = c("left", "right"), value = c(0.2, 0.7)
+), atlas_id = "toy")
+as_parcel_data(x)
+#> parcel_data
+#>   schema: 1.0.0 
+#>   atlas: toy 
+#>   parcels: 2 
+#>   value_cols: value 
+```

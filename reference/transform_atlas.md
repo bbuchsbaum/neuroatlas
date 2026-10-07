@@ -1,4 +1,4 @@
-# Transform a Volumetric Atlas to Another Template
+# Transform a Volumetric Atlas to a Template or Cortical Surface
 
 Uses atlas metadata to resolve the source space, then applies a verified
 template transform on the requested target grid. Region identities and
@@ -27,12 +27,14 @@ transform_atlas(
 
 - to_space:
 
-  Exact target template identifier.
+  Exact target template identifier or verified \`SurfaceGeometry\`.
 
 - target:
 
   Explicit target atlas, volume or grid. If \`NULL\`, load the requested
-  template through \[get_template()\].
+  template through \[get_template()\]. A \`SurfaceGeometry\` supplies an
+  exact cortical destination, matching \`to_space\` when both are
+  supplied.
 
 - resolution:
 
@@ -48,4 +50,17 @@ transform_atlas(
 
 ## Value
 
-A transformed atlas with updated spatial metadata and history.
+For a volume destination, a transformed atlas with updated spatial
+metadata and history. For a cortical destination, \`SurfaceData\` with
+the original region IDs and names, source atlas reference, coverage and
+lost-label reporting. Population projection does not establish subject
+registration.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+atlas <- get_harvard_oxford_atlas("cortical", resolution = "02")
+transformed <- transform_atlas(atlas, "MNI152NLin2009cAsym", resolution = 2)
+} # }
+```

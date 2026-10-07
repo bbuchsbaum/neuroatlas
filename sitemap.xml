@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/404.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/AGENTS.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/CONTRIBUTING.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/CRAN_guidance.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/CRAN_submission_notes.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/LICENSE-text.html</loc></url>
@@ -22,6 +23,8 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/MNI152_to_MNI305.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/MNI305_to_MNI152.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/apply_surface_projection.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/apply_surface_transform.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/apply_template_transform.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/as_igraph.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/as_parcel_data.html</loc></url>
@@ -87,6 +90,9 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_space_transform.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_subcortical_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_coordinate_space.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_geometry.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_projection.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_transform.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_template.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_template_brainmask.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/get_template_csf.html</loc></url>
@@ -143,6 +149,7 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas_vec.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/register_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/resample.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/ribbon_projection.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/roi_attributes.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/roi_colors_embedding.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/roi_colors_maximin_view.html</loc></url>
@@ -158,6 +165,9 @@
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/sub_atlas.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/subcortical_atlas_options.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/surface_anatomy.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/surface_data.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/surface_domain.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/surface_geometry.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/template_to_coord_space.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/templates.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/neuroatlas/reference/tflow_files.html</loc></url>

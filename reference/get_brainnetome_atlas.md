@@ -44,3 +44,12 @@ and records the upstream assets in
 
 Fan, L. et al. (2016). The Human Brainnetome Atlas: A New Brain Atlas
 Based on Connectional Architecture. Cerebral Cortex, 26(8), 3508-3526.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+atlas <- get_brainnetome_atlas()
+atlas_ref(atlas)
+} # }
+```

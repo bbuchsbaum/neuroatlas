@@ -82,3 +82,19 @@ new_atlas_ref(
 ## Value
 
 An object of class \`"atlas_ref"\`.
+
+## Examples
+
+``` r
+ref <- new_atlas_ref("toy", "two-regions",
+  template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+)
+ref
+#> <atlas_ref>
+#>   family: toy 
+#>   model: two-regions 
+#>   representation: volume 
+#>   template_space: MNI152NLin6Asym 
+#>   coord_space: MNI152 
+#>   confidence: uncertain 
+```

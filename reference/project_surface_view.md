@@ -39,3 +39,19 @@ A list with elements:
 - `view_dir`:
 
   Numeric length-3 view direction vector used for backface culling.
+
+## Examples
+
+``` r
+project_surface_view(rbind(c(0, 0, 0), c(1, 2, 3)),
+  view = "lateral", hemi = "left"
+)
+#> $xy
+#>      [,1] [,2]
+#> [1,]    0    0
+#> [2,]   -2    3
+#> 
+#> $view_dir
+#> [1] -1  0  0
+#> 
+```

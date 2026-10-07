@@ -9,7 +9,7 @@ are defined in."><link href="../albers.css" rel="stylesheet"><script>window.albe
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,8 @@ Examples: "fsaverage", "fsaverage5", "fsaverage6", "fsLR".</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Character string indicating the coordinate space:</p><ul><li><p><code>"MNI305"</code> for fsaverage variants (fsaverage, fsaverage5, fsaverage6)</p></li>
+    <p>Character string indicating the coordinate space:</p><ul><li><p><code>"MNI305"</code> for fsaverage variants (fsaverage, fsaverage5,
+fsaverage6)</p></li>
 <li><p><code>"MNI152"</code> for fsLR (HCP template)</p></li>
 <li><p><code>"Unknown"</code> for unrecognized templates</p></li>
 </ul></div>
@@ -81,11 +82,11 @@ transform is needed when working with MNI152 volumetric data.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_surface_coordinate_space</span><span class="op">(</span><span class="st">"fsaverage"</span><span class="op">)</span>   <span class="co"># "MNI305"</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_surface_coordinate_space</span><span class="op">(</span><span class="st">"fsaverage"</span><span class="op">)</span> <span class="co"># "MNI305"</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MNI305"</span>
-<span class="r-in"><span><span class="fu">get_surface_coordinate_space</span><span class="op">(</span><span class="st">"fsaverage6"</span><span class="op">)</span>  <span class="co"># "MNI305"</span></span></span>
+<span class="r-in"><span><span class="fu">get_surface_coordinate_space</span><span class="op">(</span><span class="st">"fsaverage6"</span><span class="op">)</span> <span class="co"># "MNI305"</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MNI305"</span>
-<span class="r-in"><span><span class="fu">get_surface_coordinate_space</span><span class="op">(</span><span class="st">"fsLR"</span><span class="op">)</span>        <span class="co"># "MNI152"</span></span></span>
+<span class="r-in"><span><span class="fu">get_surface_coordinate_space</span><span class="op">(</span><span class="st">"fsLR"</span><span class="op">)</span> <span class="co"># "MNI152"</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MNI152"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

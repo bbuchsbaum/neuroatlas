@@ -35,8 +35,8 @@ vector if no files match.
 
 ``` r
 # \donttest{
-  # List all T1w files for MNI152NLin2009cAsym template
-  # mni_t1w_files <- tflow_files("MNI152NLin2009cAsym",
-  #                              query_args = list(suffix = "T1w"))
+# List all T1w files for MNI152NLin2009cAsym template
+# mni_t1w_files <- tflow_files("MNI152NLin2009cAsym",
+#                              query_args = list(suffix = "T1w"))
 # }
 ```

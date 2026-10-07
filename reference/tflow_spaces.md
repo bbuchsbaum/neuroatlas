@@ -34,10 +34,10 @@ A character vector of available template space names.
 
 ``` r
 # \donttest{
-  # List all template spaces
-  # all_spaces <- tflow_spaces()
+# List all template spaces
+# all_spaces <- tflow_spaces()
 
-  # List template spaces containing "MNI"
-  # mni_spaces <- tflow_spaces(pattern = "MNI")
+# List template spaces containing "MNI"
+# mni_spaces <- tflow_spaces(pattern = "MNI")
 # }
 ```

@@ -20,3 +20,11 @@ launch_cluster_explorer(...)
 ## Value
 
 Invisibly returns the running app object.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+launch_cluster_explorer()
+} # }
+```

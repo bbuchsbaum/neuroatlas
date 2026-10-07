@@ -9,7 +9,7 @@ the TemplateFlow repository via the pure R templateflow package."><link href="..
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,25 +81,32 @@ the TemplateFlow repository via the pure R <code>templateflow</code> package.</p
 
 
 <dl><dt id="arg-space">space<a class="anchor" aria-label="anchor" href="#arg-space"></a></dt>
-<dd><p>Character string. The primary TemplateFlow identifier for the template space
-(e.g., <code>"MNI152NLin2009cAsym"</code>). Default: <code>"MNI152NLin2009cAsym"</code>.</p></dd>
+<dd><p>Character string. The primary TemplateFlow identifier for the
+  template space
+  (e.g., <code>"MNI152NLin2009cAsym"</code>). Default:
+<code>"MNI152NLin2009cAsym"</code>.</p></dd>
 
 
 <dt id="arg-variant">variant<a class="anchor" aria-label="anchor" href="#arg-variant"></a></dt>
-<dd><p>Character string. A high-level descriptor for common template types.
-Supported: <code>"brain"</code> (default), <code>"head"</code>, <code>"mask"</code>, <code>"probseg"</code>, <code>"dseg"</code>.
-This is used to infer <code>desc</code> and sometimes <code>suffix</code> if they are not explicitly provided.</p></dd>
+<dd><p>Character string. A high-level descriptor for common template
+  types.
+  Supported: <code>"brain"</code> (default), <code>"head"</code>, <code>"mask"</code>,
+<code>"probseg"</code>, <code>"dseg"</code>.
+  This is used to infer <code>desc</code> and sometimes <code>suffix</code> if they are
+not explicitly provided.</p></dd>
 
 
 <dt id="arg-modality">modality<a class="anchor" aria-label="anchor" href="#arg-modality"></a></dt>
-<dd><p>Character string. The imaging modality or primary suffix for the template file.
+<dd><p>Character string. The imaging modality or primary suffix for
+the template file.
 Supported: <code>"T1w"</code> (default), <code>"T2w"</code>, <code>"mask"</code>.
 This is used to infer <code>suffix</code> if not explicitly provided.</p></dd>
 
 
 <dt id="arg-resolution">resolution<a class="anchor" aria-label="anchor" href="#arg-resolution"></a></dt>
-<dd><p>(Optional) Character string specifying the resolution, primarily for
-fsaverage variants (e.g., "06" for fsaverage6).</p></dd>
+<dd><p>(Optional) Character string specifying the resolution,
+primarily for
+     fsaverage variants (e.g., "06" for fsaverage6).</p></dd>
 
 
 <dt id="arg-cohort">cohort<a class="anchor" aria-label="anchor" href="#arg-cohort"></a></dt>
@@ -107,24 +114,29 @@ fsaverage variants (e.g., "06" for fsaverage6).</p></dd>
 
 
 <dt id="arg-desc">desc<a class="anchor" aria-label="anchor" href="#arg-desc"></a></dt>
-<dd><p>Character string. Specific TemplateFlow <code>desc</code> field. Defaults to <code>"brain"</code>.</p></dd>
+<dd><p>Character string. Specific TemplateFlow <code>desc</code> field.
+Defaults to <code>"brain"</code>.</p></dd>
 
 
 <dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
-<dd><p>Character string. Specific TemplateFlow <code>label</code> field (e.g., <code>"GM"</code>, <code>"WM"</code>, <code>"CSF"</code>).</p></dd>
+<dd><p>Character string. Specific TemplateFlow <code>label</code> field
+(e.g., <code>"GM"</code>, <code>"WM"</code>, <code>"CSF"</code>).</p></dd>
 
 
 <dt id="arg-atlas">atlas<a class="anchor" aria-label="anchor" href="#arg-atlas"></a></dt>
-<dd><p>Character string. Specific TemplateFlow <code>atlas</code> field (e.g., <code>"Schaefer2018"</code>).</p></dd>
+<dd><p>Character string. Specific TemplateFlow <code>atlas</code> field
+(e.g., <code>"Schaefer2018"</code>).</p></dd>
 
 
 <dt id="arg-suffix">suffix<a class="anchor" aria-label="anchor" href="#arg-suffix"></a></dt>
-<dd><p>Character string. Specific TemplateFlow <code>suffix</code> field. Overrides
+<dd><p>Character string. Specific TemplateFlow <code>suffix</code> field.
+Overrides
 any <code>suffix</code> inferred from <code>modality</code> or <code>variant</code>.</p></dd>
 
 
 <dt id="arg-extension">extension<a class="anchor" aria-label="anchor" href="#arg-extension"></a></dt>
-<dd><p>Character string. The file extension. Default: <code>".nii.gz"</code>.</p></dd>
+<dd><p>Character string. The file extension. Default:
+<code>".nii.gz"</code>.</p></dd>
 
 
 <dt id="arg-path-only">path_only<a class="anchor" aria-label="anchor" href="#arg-path-only"></a></dt>
@@ -133,7 +145,8 @@ instead of loading as a <code>NeuroVol</code>. Default: <code>FALSE</code>.</p><
 
 
 <dt id="arg-use-cache">use_cache<a class="anchor" aria-label="anchor" href="#arg-use-cache"></a></dt>
-<dd><p>Logical. If <code>TRUE</code> (default), uses memoised NeuroVol loading.</p></dd>
+<dd><p>Logical. If <code>TRUE</code> (default), uses memoised NeuroVol
+loading.</p></dd>
 
 
 <dt id="arg-api-handle">api_handle<a class="anchor" aria-label="anchor" href="#arg-api-handle"></a></dt>
@@ -147,24 +160,29 @@ instead of loading as a <code>NeuroVol</code>. Default: <code>FALSE</code>.</p><
 
 <dt id="arg-template-id">template_id<a class="anchor" aria-label="anchor" href="#arg-template-id"></a></dt>
 <dd><p>The main TemplateFlow template identifier for the surface
-(e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to `get_template`.</p></dd>
+       (e.g., "fsLR", "fsaverage"). This is passed as the `space` argument to
+`get_template`.</p></dd>
 
 
 <dt id="arg-surface-type">surface_type<a class="anchor" aria-label="anchor" href="#arg-surface-type"></a></dt>
-<dd><p>A character string indicating the type of surface to retrieve.
-Common values include: "pial", "white", "inflated", "midthickness", "sphere".
-This is passed as the `suffix` argument to `get_template`.</p></dd>
+<dd><p>A character string indicating the type of surface to
+  retrieve.
+       Common values include: "pial", "white", "inflated", "midthickness",
+"sphere".
+       This is passed as the `suffix` argument to `get_template`.</p></dd>
 
 
 <dt id="arg-hemi">hemi<a class="anchor" aria-label="anchor" href="#arg-hemi"></a></dt>
-<dd><p>Character string, "L" for left hemisphere or "R" for right hemisphere.
-Passed as `hemi` to `get_template`.</p></dd>
+<dd><p>Character string, "L" for left hemisphere or "R" for right
+hemisphere.
+     Passed as `hemi` to `get_template`.</p></dd>
 
 
 <dt id="arg-density">density<a class="anchor" aria-label="anchor" href="#arg-density"></a></dt>
 <dd><p>(Optional) Character string specifying the surface density
-(e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to TemplateFlow
-as `density`.</p></dd>
+       (e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to
+TemplateFlow
+       as `density`.</p></dd>
 
 
 <dt id="arg-load-as-path">load_as_path<a class="anchor" aria-label="anchor" href="#arg-load-as-path"></a></dt>
@@ -174,8 +192,10 @@ Defaults to `TRUE`.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>If any of <code>space</code>, <code>variant</code>, <code>modality</code>, <code>resolution</code>,
-  or <code>label</code> are vectors of length &gt; 1, a named list of results is returned.
+    <p>If any of <code>space</code>, <code>variant</code>, <code>modality</code>,
+  <code>resolution</code>,
+  or <code>label</code> are vectors of length &gt; 1, a named list of results is
+returned.
   Otherwise a single <code><a href="https://bbuchsbaum.github.io/neuroim2/reference/NeuroVol.html" class="external-link">neuroim2::NeuroVol</a></code> or file path string.</p>
 <p>If `load_as_path` is `TRUE`, a character string (path).
         If `load_as_path` is `FALSE`, a `SurfaceGeometry` with attached
@@ -195,20 +215,22 @@ Defaults to `TRUE`.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span>  <span class="co"># Get default MNI T1w brain template</span></span></span>
-<span class="r-in"><span>  <span class="va">mni_brain</span> <span class="op">&lt;-</span> <span class="fu">get_template</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Get default MNI T1w brain template</span></span></span>
+<span class="r-in"><span><span class="va">mni_brain</span> <span class="op">&lt;-</span> <span class="fu">get_template</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="co"># Vectorized: Get MNI brain and mask variants</span></span></span>
-<span class="r-in"><span>  <span class="va">mni_variants</span> <span class="op">&lt;-</span> <span class="fu">get_template</span><span class="op">(</span>variant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"brain"</span>, <span class="st">"mask"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Vectorized: Get MNI brain and mask variants</span></span></span>
+<span class="r-in"><span><span class="va">mni_variants</span> <span class="op">&lt;-</span> <span class="fu">get_template</span><span class="op">(</span>variant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"brain"</span>, <span class="st">"mask"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="co"># Path only</span></span></span>
-<span class="r-in"><span>  <span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_template</span><span class="op">(</span>path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Path only</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_template</span><span class="op">(</span>path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span>  <span class="co"># Get the pial surface for the left hemisphere of fsLR 32k template (as path)</span></span></span>
-<span class="r-in"><span>  <span class="co"># fslr_pial_L_path &lt;- get_surface_template(template_id = "fsLR", surface_type = "pial",</span></span></span>
-<span class="r-in"><span>  <span class="co">#                                        hemi = "L", density = "32k")</span></span></span>
-<span class="r-in"><span>  <span class="co"># print(fslr_pial_L_path)</span></span></span>
+<span class="r-in"><span><span class="co"># Get the pial surface for the left hemisphere of fsLR 32k template (as path)</span></span></span>
+<span class="r-in"><span><span class="co"># fslr_pial_L_path &lt;- get_surface_template(</span></span></span>
+<span class="r-in"><span><span class="co">#   template_id = "fsLR", surface_type = "pial",</span></span></span>
+<span class="r-in"><span><span class="co">#   hemi = "L", density = "32k"</span></span></span>
+<span class="r-in"><span><span class="co"># )</span></span></span>
+<span class="r-in"><span><span class="co"># print(fslr_pial_L_path)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

@@ -41,12 +41,12 @@ exactly (~2mm difference).
 ## Examples
 
 ``` r
-needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym")  # TRUE
+needs_template_warp("MNI152NLin6Asym", "MNI152NLin2009cAsym") # TRUE
 #> [1] TRUE
-needs_template_warp("fsaverage", "fsaverage6")                   # TRUE
+needs_template_warp("fsaverage", "fsaverage6") # TRUE
 #> [1] TRUE
-needs_template_warp("fsaverage", "MNI152")                       # FALSE (different coord spaces)
+needs_template_warp("fsaverage", "MNI152") # FALSE (different coord spaces)
 #> [1] FALSE
-needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym")       # FALSE (identical)
+needs_template_warp("MNI152NLin6Asym", "MNI152NLin6Asym") # FALSE (identical)
 #> [1] FALSE
 ```

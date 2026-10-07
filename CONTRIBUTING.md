@@ -1,56 +1,77 @@
-# CONTRIBUTING
+# Contributing to neuroatlas
 
-### Fixing typos
+Report bugs or propose changes through [GitHub
+issues](https://github.com/bbuchsbaum/neuroatlas/issues). Include a
+small reproducible example,
+[`sessionInfo()`](https://rdrr.io/r/utils/sessionInfo.html), and the
+atlas/template identifiers. Describe the intended behavior and any
+download or optional-package requirements.
 
-Small typos or grammatical errors in documentation may be edited
-directly using the GitHub web interface, so long as the changes are made
-in the *source* file. E.g. edit a `roxygen2` comment in a `.R` file
-below `R/`, not in an `.Rd` file below `man/`.
+Work on a branch and submit a pull request against the repository’s
+default branch. Read `AGENTS.md` and the instructions for the
+directories you change. Use two-space indentation, snake_case function
+names, and synthetic atlas helpers in unit tests. Keep changes scoped
+and document every exported function with roxygen2, including return
+values and a short example. Generate documentation with
+`devtools::document()`; do not edit `NAMESPACE` or `man/` by hand.
 
-### Prerequisites
+The repository’s `.lintr` profile checks maintained R code for
+formatting and correctness. Function names use snake_case, with
+UpperCamelCase constructors and the existing MNI conversion functions
+accepted. Established public argument names and mathematical local
+variables are preserved. The 80-column target excludes string contents
+so URLs and diagnostic text keep their values. Both supported pipe forms
+and explicit or implicit returns are accepted. Short single-line guards
+follow existing package conventions. There is no project rule limiting
+identifier length or cyclomatic complexity; review complex changes with
+their tests and numerical evidence. Downloaded libraries, generated
+websites and frozen qualification snapshots are excluded so their bytes
+and historical results remain intact. New maintained source is checked
+under the same profile as existing code.
 
-Before you make a substantial pull request, you should always file an
-issue and make sure someone from the team agrees that it’s a problem. If
-you’ve found a bug, create an associated issue and illustrate the bug
-with a minimal [reproducible
-example](https://www.tidyverse.org/help/#reprex).
+The project CI lint gate covers package, test and vignette code. Data
+builders and scientific qualification protocols have their own
+dependency environments and execution checks. Run
+`Rscript .github/scripts/lint.R` to reproduce the CI gate. The OS
+matrix, generated documentation, package check, website and coverage
+measurement are required. rOpenSci diagnostics remain visible for
+review; branch naming and complexity recommendations do not determine
+the project gate.
 
-### Pull request process
+Install development dependencies from `DESCRIPTION`. The reproducible
+surface engine setup and machine-specific build receipts are described
+in
+[`plans/resume-neuroatlas.md`](https://bbuchsbaum.github.io/neuroatlas/plans/resume-neuroatlas.md).
+New runtime dependencies or architectural changes should be discussed in
+an issue first.
 
-- We recommend that you create a Git branch for each pull request
-  (PR).  
-- Look at the GitHub Actions build status before and after making
-  changes. The `README` should contain badges for any continuous
-  integration services used by the package.  
-- We require the `tidyverse` [style guide](http://style.tidyverse.org).
-  You can use the [`styler`](https://CRAN.R-project.org/package=styler)
-  package to apply these styles, but please don’t restyle code that has
-  nothing to do with your PR.  
-- We use [`roxygen2`](https://cran.r-project.org/package=roxygen2).  
-- We use [`testthat`](https://cran.r-project.org/package=testthat).
-  Contributions with test cases included are easier to accept.  
-- For user-facing changes, add a bullet to the top of `NEWS.md` below
-  the current development version header describing the changes made
-  followed by your GitHub username, and links to relevant
-  issue(s)/PR(s).
+Run these checks before submitting:
 
-### Code of Conduct
+``` r
 
-Please note that this project is released with a [Contributor Code of
-Conduct](CODE_OF_CONDUCT.md). By contributing to this project you agree
-to abide by its terms.
+devtools::document()
+devtools::test(stop_on_failure = TRUE)
+devtools::check(manual = TRUE)
+```
 
-### Prefer to Email?
+Load the package with `devtools::load_all()` before running an
+individual
+[`testthat::test_file()`](https://testthat.r-lib.org/reference/test_file.html).
+Network and slow integration tests must use `skip_on_cran()` and opt-in
+fixtures where appropriate. Report warnings, skips and unavailable
+checks explicitly. Do not count a skipped check as a pass.
 
-Email the person listed as maintainer in the `DESCRIPTION` file of this
-repo.
+Template mappings need exact input identities, immutable checksums,
+declared direction and data semantics, and independent numerical
+qualification. Freeze acceptance thresholds before evaluating
+candidates. Preserve failed evidence; do not widen thresholds to make an
+existing candidate pass. Interpolation agreement does not establish
+anatomical accuracy, an inverse, or conservation. Follow the licenses of
+externally downloaded inputs separately from this package’s code
+license.
 
-Though note that private discussions over email don’t help others - of
-course email is totally warranted if it’s a sensitive problem of any
-kind.
-
-### Thanks for contributing!
-
-This contributing guide is adapted from the `tidyverse` contributing
-guide available at
-<https://raw.githubusercontent.com/r-lib/usethis/master/inst/templates/tidy-contributing.md>
+Mote’s Git-tracked `.mote/ops/` history is the shared work board. Set a
+distinct actor, inspect `mote board`, and claim/reserve the bounded task
+before editing. Do not run `mote init` in this repository. Commit and
+push relevant Mote operations with the code, and release
+claims/reservations when handing work off.

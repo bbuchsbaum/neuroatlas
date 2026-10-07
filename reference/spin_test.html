@@ -15,7 +15,7 @@ a null distribution of correlations."><link href="../albers.css" rel="stylesheet
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,11 +73,13 @@ a null distribution of correlations.</p>
 
 
 <dl><dt id="arg-map-">map1<a class="anchor" aria-label="anchor" href="#arg-map-"></a></dt>
-<dd><p>Numeric vector of parcel values (length K, aligned to atlas parcels).</p></dd>
+<dd><p>Numeric vector of parcel values (length K, aligned to atlas
+parcels).</p></dd>
 
 
 <dt id="arg-map-">map2<a class="anchor" aria-label="anchor" href="#arg-map-"></a></dt>
-<dd><p>Numeric vector of parcel values (length K, aligned to atlas parcels).</p></dd>
+<dd><p>Numeric vector of parcel values (length K, aligned to atlas
+parcels).</p></dd>
 
 
 <dt id="arg-atlas">atlas<a class="anchor" aria-label="anchor" href="#arg-atlas"></a></dt>
@@ -91,7 +93,8 @@ can provide sphere coordinates.</p></dd>
 
 
 <dt id="arg-cor-method">cor_method<a class="anchor" aria-label="anchor" href="#arg-cor-method"></a></dt>
-<dd><p>Character. Correlation method passed to <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code>.
+<dd><p>Character. Correlation method passed to
+<code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></code>.
 One of <code>"pearson"</code>, <code>"spearman"</code>, or <code>"kendall"</code>.
 Default: <code>"pearson"</code>.</p></dd>
 
@@ -110,7 +113,8 @@ sphere coordinates are fetched via
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list of class <code>"spin_test"</code> with:</p><dl><dt>observed</dt>
-<dd><p>The observed correlation between <code>map1</code> and <code>map2</code>.</p></dd>
+<dd><p>The observed correlation between <code>map1</code> and
+<code>map2</code>.</p></dd>
 
   <dt>null_distribution</dt>
 <dd><p>Numeric vector of length <code>n_perm</code> containing
@@ -152,7 +156,7 @@ correspondence between maps of human brain structure and function.
 <span class="r-in"><span><span class="va">K</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">map1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">map2</span> <span class="op">&lt;-</span> <span class="va">map1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">K</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">res</span>  <span class="op">&lt;-</span> <span class="fu">spin_test</span><span class="op">(</span><span class="va">map1</span>, <span class="va">map2</span>, <span class="va">atlas</span>, n_perm <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">spin_test</span><span class="op">(</span><span class="va">map1</span>, <span class="va">map2</span>, <span class="va">atlas</span>, n_perm <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

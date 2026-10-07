@@ -33,5 +33,6 @@ print(p)
 #>   to_space: MNI152 
 #>   n_steps: 1 
 #>   status: available 
-#>   confidence: exact 
+#>   confidence: approximate 
+#>   warnings: Plan includes low-confidence transform step(s). 
 ```

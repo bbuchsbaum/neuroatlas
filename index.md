@@ -1,4 +1,4 @@
-# neuroatlas ![](reference/figures/logo.png)
+# neuroatlas ![](reference/figures/logo-en.png)
 
 **neuroatlas** provides a unified interface for working with
 neuroimaging atlases and parcellations in R. Whether you’re conducting
@@ -167,7 +167,7 @@ install the pinned revision used for qualification:
 ``` r
 
 pak::pak(c("hdf5r",
-  "bbuchsbaum/neurotransform@9e7550d45d6d6b06155b27717057f4137aaf666e"))
+  "bbuchsbaum/neurotransform@933edddda462593941e167726e8aaa7168ff103a"))
 ```
 
 ``` r
@@ -199,6 +199,48 @@ different parcellations. Use
 [`atlas_overlap()`](https://bbuchsbaum.github.io/neuroatlas/reference/atlas_overlap.md)
 after alignment to compare their regions. See [Verified template
 transforms](https://bbuchsbaum.github.io/neuroatlas/vignettes/template-transforms.Rmd).
+
+### Map exact cortical domains
+
+The pinned fsaverage 164k and fsLR 32k domains support directed native
+surface resampling in both hemispheres. Exact geometry identifies vertex
+ordering, registration, cortical masks and method; a broad name such as
+`"fsaverage"` does not admit a route. Install the pinned engine above
+and optional `gifti`.
+
+``` r
+
+source <- get_surface_geometry("fsaverage", "164k", "L")
+target <- get_surface_geometry("fsLR", "32k", "L")
+operator <- get_template_transform(source, target)
+metric <- surface_data(rep(0.25, source$domain$n_vertices), source$domain)
+mapped <- apply_template_transform(metric, operator)
+mapped$coverage$available
+
+# Population cortical projection preserves atlas region IDs and names.
+atlas <- get_harvard_oxford_atlas("cortical", threshold = 25, resolution = "02")
+cortex <- transform_atlas(atlas, target)
+cortex$label_table
+```
+
+Population projection supports exact MNI152NLin6Asym and
+MNI152NLin2009cAsym sources. Numerical qualification covers their locked
+1 mm and 2 mm grids. Labels use nearest voxel sampling and categorical
+surface votes; continuous and probability maps use trilinear sampling.
+Unsupported cortical values remain `NA`; supported zero is valid.
+Outputs record coverage, lost labels, input hashes and directed
+provenance. Verified inputs and operators can be replayed with
+`offline = TRUE`.
+
+[`ribbon_projection()`](https://bbuchsbaum.github.io/neuroatlas/reference/ribbon_projection.md)
+separately declares ordered white/pial coordinates aligned with a source
+volume. The caller supplies that alignment; this function does not fit
+registration. Population projection and numerical agreement do not
+establish subject registration, anatomical accuracy, area conservation
+or a lossless inverse. The native surface method has separate
+qualification from Workbench’s area-aware resampling. Input assets
+retain their [upstream
+licenses](https://bbuchsbaum.github.io/neuroatlas/data-raw/surface-transforms-v1/LICENSES.md).
 
 ## Palette demos
 

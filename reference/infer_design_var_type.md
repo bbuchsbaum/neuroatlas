@@ -18,3 +18,12 @@ infer_design_var_type(x)
 ## Value
 
 A character scalar.
+
+## Examples
+
+``` r
+infer_design_var_type(c(0.1, 0.2, 0.3))
+#> [1] "continuous"
+infer_design_var_type(c("control", "patient"))
+#> [1] "categorical"
+```

@@ -22,3 +22,19 @@ print(x, ...)
 ## Value
 
 Invisibly returns \`x\`.
+
+## Examples
+
+``` r
+ref <- new_atlas_ref("toy", "two-regions",
+  template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+)
+print(ref)
+#> <atlas_ref>
+#>   family: toy 
+#>   model: two-regions 
+#>   representation: volume 
+#>   template_space: MNI152NLin6Asym 
+#>   coord_space: MNI152 
+#>   confidence: uncertain 
+```

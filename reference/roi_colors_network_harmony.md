@@ -119,7 +119,9 @@ rois <- data.frame(
   roi = 1:10, network = rep(c("Vis", "DMN"), 5),
   x = runif(10, 0, 90), y = runif(10, 0, 100), z = runif(10, 0, 80)
 )
-pal <- roi_colors_network_harmony(rois, xyz_cols = c("x","y","z"),
-                                   network_col = "network")
+pal <- roi_colors_network_harmony(rois,
+  xyz_cols = c("x", "y", "z"),
+  network_col = "network"
+)
 # }
 ```

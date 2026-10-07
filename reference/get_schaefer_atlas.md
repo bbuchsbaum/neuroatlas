@@ -354,14 +354,20 @@ if (FALSE) { # \dontrun{
 atlas <- get_schaefer_atlas(parcels = "300", networks = "7")
 
 # Load high-resolution version
-atlas_hires <- get_schaefer_atlas(parcels = "400",
-                                 networks = "17",
-                                 resolution = "1")
+atlas_hires <- get_schaefer_atlas(
+  parcels = "400",
+  networks = "17",
+  resolution = "1"
+)
 
 # Resample to a different space
-new_space <- neuroim2::NeuroSpace(dim = c(91,109,91),
-                                 spacing = c(2,2,2))
-atlas_resampled <- get_schaefer_atlas(parcels = "300",
-                                     outspace = new_space)
+new_space <- neuroim2::NeuroSpace(
+  dim = c(91, 109, 91),
+  spacing = c(2, 2, 2)
+)
+atlas_resampled <- get_schaefer_atlas(
+  parcels = "300",
+  outspace = new_space
+)
 } # }
 ```

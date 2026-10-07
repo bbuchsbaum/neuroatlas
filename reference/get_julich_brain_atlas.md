@@ -31,3 +31,12 @@ get_julich_brain_atlas(fsl_dir = Sys.getenv("FSLDIR"), download = TRUE, ...)
 ## Value
 
 An \`atlas\` object, or path metadata when \`path_only = TRUE\`.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+atlas <- get_julich_brain_atlas()
+atlas_ref(atlas)
+} # }
+```

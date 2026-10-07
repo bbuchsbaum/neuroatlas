@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -173,19 +173,31 @@ available routes are resolved by
 <code><a href="../reference/get_template_transform.html">get_template_transform()</a></code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/space_transform_manifest.html">space_transform_manifest</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"from_space"</span>, <span class="st">"to_space"</span>, <span class="st">"backend"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;             from_space            to_space         backend    status</span></span>
-<span><span class="co">#&gt; 1               MNI305              MNI152 internal_affine available</span></span>
-<span><span class="co">#&gt; 2               MNI152              MNI305 internal_affine available</span></span>
-<span><span class="co">#&gt; 3      MNI152NLin6Asym MNI152NLin2009cAsym  neurotransform available</span></span>
-<span><span class="co">#&gt; 4  MNI152NLin2009cAsym     MNI152NLin6Asym  neurotransform available</span></span>
-<span><span class="co">#&gt; 5            fsaverage          fsaverage6       sphere_nn available</span></span>
-<span><span class="co">#&gt; 6           fsaverage6           fsaverage       sphere_nn available</span></span>
-<span><span class="co">#&gt; 7            fsaverage          fsaverage5       sphere_nn available</span></span>
-<span><span class="co">#&gt; 8           fsaverage5           fsaverage       sphere_nn available</span></span>
-<span><span class="co">#&gt; 9            fsaverage            fsLR_32k       workbench   planned</span></span>
-<span><span class="co">#&gt; 10            fsLR_32k           fsaverage       workbench   planned</span></span>
-<span><span class="co">#&gt; 11 MNI152NLin2009cAsym           fsaverage       neurosurf   planned</span></span>
-<span><span class="co">#&gt; 12           fsaverage MNI152NLin2009cAsym     ribbon_fill   planned</span></span></code></pre></div>
+<span><span class="co">#&gt;             from_space            to_space                  backend    status</span></span>
+<span><span class="co">#&gt; 1               MNI305              MNI152          internal_affine available</span></span>
+<span><span class="co">#&gt; 2               MNI152              MNI305          internal_affine available</span></span>
+<span><span class="co">#&gt; 3      MNI152NLin6Asym MNI152NLin2009cAsym           neurotransform available</span></span>
+<span><span class="co">#&gt; 4  MNI152NLin2009cAsym     MNI152NLin6Asym           neurotransform available</span></span>
+<span><span class="co">#&gt; 5            fsaverage          fsaverage6                sphere_nn   planned</span></span>
+<span><span class="co">#&gt; 6           fsaverage6           fsaverage                sphere_nn   planned</span></span>
+<span><span class="co">#&gt; 7            fsaverage          fsaverage5                sphere_nn   planned</span></span>
+<span><span class="co">#&gt; 8           fsaverage5           fsaverage                sphere_nn   planned</span></span>
+<span><span class="co">#&gt; 9            fsaverage            fsLR_32k                workbench   planned</span></span>
+<span><span class="co">#&gt; 10            fsLR_32k           fsaverage                workbench   planned</span></span>
+<span><span class="co">#&gt; 11 MNI152NLin2009cAsym           fsaverage                neurosurf   planned</span></span>
+<span><span class="co">#&gt; 12           fsaverage MNI152NLin2009cAsym              ribbon_fill   planned</span></span>
+<span><span class="co">#&gt; 13           fsaverage            fsLR_32k    neurotransform_native available</span></span>
+<span><span class="co">#&gt; 14            fsLR_32k           fsaverage    neurotransform_native available</span></span>
+<span><span class="co">#&gt; 15           fsaverage            fsLR_32k    neurotransform_native available</span></span>
+<span><span class="co">#&gt; 16            fsLR_32k           fsaverage    neurotransform_native available</span></span>
+<span><span class="co">#&gt; 17     MNI152NLin6Asym           fsaverage cbig_registration_fusion available</span></span>
+<span><span class="co">#&gt; 18     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available</span></span>
+<span><span class="co">#&gt; 19     MNI152NLin6Asym           fsaverage cbig_registration_fusion available</span></span>
+<span><span class="co">#&gt; 20     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available</span></span>
+<span><span class="co">#&gt; 21 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available</span></span>
+<span><span class="co">#&gt; 22 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available</span></span>
+<span><span class="co">#&gt; 23 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available</span></span>
+<span><span class="co">#&gt; 24 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available</span></span></code></pre></div>
 <p>Both directions between MNI152NLin6Asym and MNI152NLin2009cAsym are
 available from the <a href="https://github.com/bbuchsbaum/neuroatlas/releases/tag/transform-artifacts-v1" class="external-link">immutable
 artifact release</a>. Each ANTs H5 file is about 86 MiB and is verified

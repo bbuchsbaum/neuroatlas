@@ -84,7 +84,9 @@ rois <- data.frame(
   hemi = rep(c("left", "right"), 5),
   x = runif(10), y = runif(10), z = runif(10)
 )
-pal <- roi_colors_rule_hcl(rois, network_col = "network",
-                            hemi_col = "hemi", xyz_cols = c("x","y","z"))
+pal <- roi_colors_rule_hcl(rois,
+  network_col = "network",
+  hemi_col = "hemi", xyz_cols = c("x", "y", "z")
+)
 # }
 ```

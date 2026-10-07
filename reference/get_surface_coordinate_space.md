@@ -43,10 +43,10 @@ transform is needed when working with MNI152 volumetric data.
 ## Examples
 
 ``` r
-get_surface_coordinate_space("fsaverage")   # "MNI305"
+get_surface_coordinate_space("fsaverage") # "MNI305"
 #> [1] "MNI305"
-get_surface_coordinate_space("fsaverage6")  # "MNI305"
+get_surface_coordinate_space("fsaverage6") # "MNI305"
 #> [1] "MNI305"
-get_surface_coordinate_space("fsLR")        # "MNI152"
+get_surface_coordinate_space("fsLR") # "MNI152"
 #> [1] "MNI152"
 ```

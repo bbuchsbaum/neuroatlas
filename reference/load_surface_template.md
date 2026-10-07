@@ -61,12 +61,16 @@ objects when `hemi` is "both".
 
 ``` r
 if (FALSE) { # \dontrun{
-  # fsaverage6 pial surface as NeuroSurface
-  lh <- load_surface_template("fsaverage", "pial", hemi = "L",
-                              density = "41k", resolution = "06")
+# fsaverage6 pial surface as NeuroSurface
+lh <- load_surface_template("fsaverage", "pial",
+  hemi = "L",
+  density = "41k", resolution = "06"
+)
 
-  # Both hemispheres of fsLR 32k inflated surface
-  both <- load_surface_template("fsLR", "inflated", hemi = "both",
-                                density = "32k")
+# Both hemispheres of fsLR 32k inflated surface
+both <- load_surface_template("fsLR", "inflated",
+  hemi = "both",
+  density = "32k"
+)
 } # }
 ```

@@ -20,9 +20,9 @@ A 4x4 numeric matrix (affine transform in homogeneous coordinates).
 This matrix is derived from FreeSurfer's `mni152.register.dat` file,
 located at `$FREESURFER_HOME/average/mni152.register.dat`.
 
-The transform accounts for the approximately 4mm difference between
-MNI305 and MNI152 coordinate systems. It includes small rotation,
-scaling, and translation components.
+It includes rotation, scaling and translation components. Anatomical
+error depends on position and the source/target registrations; it is not
+a uniform displacement or a qualified volume-to-cortex mapping.
 
 To apply: for a point `p = c(R, A, S)`, compute
 `MNI305_to_MNI152 %*% c(p, 1)` and take the first 3 elements.
@@ -38,6 +38,6 @@ To apply: for a point `p = c(R, A, S)`, compute
 # Transform a point from MNI152 to MNI305
 point_152 <- c(10.695, -18.409, 36.137)
 point_305 <- (MNI152_to_MNI305 %*% c(point_152, 1))[1:3]
-print(point_305)  # approximately c(10, -20, 35)
+print(point_305) # approximately c(10, -20, 35)
 #> [1]  10.00091 -20.00261  34.99848
 ```

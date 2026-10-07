@@ -78,8 +78,10 @@ vols <- list(sub01 = vol1, sub02 = vol2, sub03 = vol3)
 results <- batch_reduce(vols, atlas, mean)
 
 # With file paths
-files <- list(sub01 = "path/to/sub01.nii.gz",
-              sub02 = "path/to/sub02.nii.gz")
+files <- list(
+  sub01 = "path/to/sub01.nii.gz",
+  sub02 = "path/to/sub02.nii.gz"
+)
 results <- batch_reduce(files, atlas, mean, parallel = TRUE)
 } # }
 ```

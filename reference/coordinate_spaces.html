@@ -11,7 +11,7 @@ MNI152 (common fMRI template space)."><link href="../albers.css" rel="stylesheet
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,10 +51,17 @@ MNI152 (common fMRI template space).</p>
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>This documentation topic describes legacy coordinate-family constants
+  and affine helpers. Use exact template identifiers for qualified
+registration.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>FreeSurfer's fsaverage surfaces are defined in MNI305 (Talairach-like) space,
-while most modern fMRI pipelines output data in MNI152 space. The difference
-is approximately 4mm, which matters for accurate volume-to-surface projections.</p>
+    <p>These legacy helpers classify broad coordinate families and apply a fixed
+FreeSurfer affine. They do not establish template-specific registration or
+cortical correspondence. Use exact MNI template identifiers and qualified
+transforms for image resampling or population cortical projection.</p>
     </div>
     <div class="section level2">
     <h2 id="coordinate-spaces">Coordinate Spaces<a class="anchor" aria-label="anchor" href="#coordinate-spaces"></a></h2>
@@ -66,9 +73,9 @@ is approximately 4mm, which matters for accurate volume-to-surface projections.<
     registration to approximate Talairach space.</p></dd>
 
   <dt>MNI152</dt>
-<dd><p>ICBM 2009c space. The de facto standard for volumetric fMRI
-    analysis. Used by FSL, SPM, fMRIPrep, and TemplateFlow's
-    MNI152NLin2009cAsym template.</p></dd>
+<dd><p>A broad coordinate-family label. MNI152NLin6Asym and
+    MNI152NLin2009cAsym are distinct templates; this shorthand does not
+    identify either variant or a registration between them.</p></dd>
 
 
 </dl></div>
@@ -81,6 +88,15 @@ FreeSurfer surface coordinate systems. Human Brain Mapping, 39(9), 3793-3808.
 <a href="https://doi.org/10.1002/hbm.24213" class="external-link">doi:10.1002/hbm.24213</a></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="transform_coords.html">transform_coords</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  from <span class="op">=</span> <span class="st">"MNI305"</span>, to <span class="op">=</span> <span class="st">"MNI152"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         [,1]   [,2]  [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -0.0429 1.5496 1.184</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

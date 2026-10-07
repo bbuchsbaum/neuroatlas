@@ -62,7 +62,9 @@ A list with classes `c("schaefer","surfatlas","atlas")` containing:
 ``` r
 if (FALSE) { # \dontrun{
 # Schaefer 200 parcels, 17 networks on fsaverage6 inflated surface
-atl <- schaefer_surf(parcels = 200, networks = 17,
-                     space = "fsaverage6", surf = "inflated")
+atl <- schaefer_surf(
+  parcels = 200, networks = 17,
+  space = "fsaverage6", surf = "inflated"
+)
 } # }
 ```

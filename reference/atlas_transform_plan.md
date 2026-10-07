@@ -20,16 +20,23 @@ atlas_transform_plan(
 
 - from_space:
 
-  Source space identifier.
+  Source space identifier or a \[surface_domain()\] descriptor.
 
 - to_space:
 
-  Target space identifier.
+  Target space identifier or a \[surface_domain()\] descriptor. Supply
+  descriptors for both endpoints for native surface resampling, or an
+  exact volume-template identifier and target descriptor for projection.
+  Only identical domain descriptors establish surface identity. Named
+  surface routes remain advisory: template names do not bind exact
+  meshes or methods.
 
 - data_type:
 
   Data type being transformed (\`"parcel"\`, \`"vertex"\`, \`"voxel"\`).
-  Used for advisory warnings.
+  Voxel routes stay in volumes; vertex routes stay on surfaces. Parcel
+  planning can also describe a single directed projection. Projection
+  steps are not automatically composed with other routes.
 
 - mode:
 
@@ -39,8 +46,8 @@ atlas_transform_plan(
 - available_only:
 
   Restrict routing to available edges. The default also shows planned
-  routes for diagnostic compatibility. Execution always uses available
-  edges only; retired edges are never selected.
+  routes for diagnostic compatibility. Execution always uses available,
+  executable edges only; retired edges are never selected.
 
 - provider:
 

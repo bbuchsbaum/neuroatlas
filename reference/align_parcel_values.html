@@ -13,7 +13,7 @@ must be represented unless `allow_partial = TRUE`."><link href="../albers.css" r
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,9 +76,10 @@ keys and values.</p></dd>
 
 <dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
 <dd><p>Parcel-key specification. Use a shared column name such as `"id"`,
-or a named character vector to map an atlas metadata column to a differently
-named data column, for example `c(id = "roi_index")`. Composite keys are
-supported. When `NULL`, a safe unique key is inferred.</p></dd>
+  or a named character vector to map an atlas metadata column to a
+differently
+  named data column, for example `c(id = "roi_index")`. Composite keys are
+  supported. When `NULL`, a safe unique key is inferred.</p></dd>
 
 
 <dt id="arg-allow-partial">allow_partial<a class="anchor" aria-label="anchor" href="#arg-allow-partial"></a></dt>
@@ -102,7 +103,8 @@ hemispheres or networks.</p>
 They are never allowed to overwrite canonical metadata.</p>
 <p>Glasser volume and surface IDs number opposite hemispheres first. Any
 Glasser join using <code>id</code> (including renamed or composite keys) therefore
-requires a matching <code>id_convention</code> column, or a <code>parcel_data</code> object
+requires a matching <code>id_convention</code> column, or a <code>parcel_data</code>
+object
 with a matching <code>atlas$id_convention</code>. The convention is
 <code>"hcp_R_first"</code> for volumes and <code>"surfatlas_L_first"</code> for surfaces.
 Only declare a convention
@@ -111,10 +113,12 @@ cause an error. Reload older Glasser atlas objects that lack this metadata.</p>
 <p>To move Glasser values between representations, supply only the shared
 <code>label_full</code> key and value columns, then use <code>by = "label_full"</code>;
 alternatively use <code>by = c("area", "hemi")</code>. For example, select
-<code>source$parcels[c("label_full", "value")]</code> from a <code>parcel_data</code> object.
+<code>source$parcels[c("label_full", "value")]</code> from a <code>parcel_data</code>
+object.
 Representation-specific IDs, labels, colours and provenance in a full
 source table remain consistency checks and must be omitted for such a join.
-A complete <code>parcel_data</code> object remains bound to its source representation.</p>
+A complete <code>parcel_data</code> object remains bound to its source
+representation.</p>
     </div>
 
     <div class="section level2">

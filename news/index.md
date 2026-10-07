@@ -1,6 +1,38 @@
 # Changelog
 
-## neuroatlas 0.1.0.9006
+## neuroatlas 0.2.0
+
+- [`get_surface_geometry()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_geometry.md)
+  fetches checksum-locked fsaverage 164k and fsLR 32k registration
+  geometry, masks and vertex areas. Exact domains admit directed native
+  surface routes through
+  [`get_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_template_transform.md)
+  and
+  [`apply_template_transform()`](https://bbuchsbaum.github.io/neuroatlas/reference/apply_template_transform.md);
+  broad surface aliases remain planned.
+
+- [`get_surface_projection()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_surface_projection.md)
+  adds population cortical projection from exact MNI152NLin6Asym and
+  MNI152NLin2009cAsym templates.
+  [`transform_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/transform_atlas.md)
+  accepts an exact cortical destination and retains source atlas
+  identity and labels. Probability channels keep partial mass;
+  unsupported samples remain missing.
+  [`ribbon_projection()`](https://bbuchsbaum.github.io/neuroatlas/reference/ribbon_projection.md)
+  provides separate caller-aligned white/pial sampling. Numerical
+  qualification is scoped to pinned inputs, methods and grids.
+
+- Verified surface inputs reuse the transform cache with checksum
+  validation, offline replay and selective cleanup. The native engine is
+  pinned to its qualified revision; neuroim2 \>= 0.19.0 is now required.
+
+- Generic MNI305/MNI152 coordinate affines are described as approximate
+  family transforms rather than exact template correspondence.
+
+- Package CI uses neuroatlas’s coding conventions, generated
+  documentation, package checks, website builds and coverage
+  measurement. Complexity review and rOpenSci recommendations remain
+  advisory. The unused eco-atlas workflow runs only on explicit request.
 
 - [`query_point()`](https://bbuchsbaum.github.io/neuroatlas/reference/query_point.md)
   gains `nearest = TRUE`, which returns one row per point and atlas: the

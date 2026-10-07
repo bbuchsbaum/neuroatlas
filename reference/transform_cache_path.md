@@ -18,3 +18,10 @@ transform_cache_path(cache_dir = tools::R_user_dir("neuroatlas", "cache"))
 ## Value
 
 A character path to the transform cache directory.
+
+## Examples
+
+``` r
+transform_cache_path()
+#> [1] "/home/runner/.cache/R/neuroatlas/transforms"
+```

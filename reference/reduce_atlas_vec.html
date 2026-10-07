@@ -11,7 +11,7 @@ time-series per region."><link href="../albers.css" rel="stylesheet"><script>win
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,7 +135,7 @@ in the output.</p>
 <span class="r-in"><span><span class="co"># data_vol: a NeuroVec with matching spatial dimensions</span></span></span>
 <span class="r-in"><span><span class="co"># mask:     a brain mask NeuroVol</span></span></span>
 <span class="r-in"><span><span class="va">cvec</span> <span class="op">&lt;-</span> <span class="fu">reduce_atlas_vec</span><span class="op">(</span><span class="va">atlas</span>, <span class="va">data_vol</span>, <span class="va">mask</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ts_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">cvec</span><span class="op">)</span>   <span class="co"># T x K cluster time-series</span></span></span>
+<span class="r-in"><span><span class="va">ts_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">cvec</span><span class="op">)</span> <span class="co"># T x K cluster time-series</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

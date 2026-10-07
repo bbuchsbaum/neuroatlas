@@ -23,7 +23,7 @@ aborted.
 
 ``` r
 if (FALSE) { # \dontrun{
-  clear_templateflow_cache()
-  clear_templateflow_cache(confirm = FALSE)
+clear_templateflow_cache()
+clear_templateflow_cache(confirm = FALSE)
 } # }
 ```

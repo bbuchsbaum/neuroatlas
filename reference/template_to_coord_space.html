@@ -11,7 +11,7 @@ Handles both surface templates (e.g., fsaverage) and volumetric templates
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,13 +88,13 @@ space transform registry, then maps it to a coordinate space:</p><dl><dt>MNI305<
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"fsaverage"</span><span class="op">)</span>            <span class="co"># "MNI305"</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"fsaverage"</span><span class="op">)</span> <span class="co"># "MNI305"</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MNI305"</span>
-<span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"MNI152NLin6Asym"</span><span class="op">)</span>      <span class="co"># "MNI152"</span></span></span>
+<span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"MNI152NLin6Asym"</span><span class="op">)</span> <span class="co"># "MNI152"</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MNI152"</span>
-<span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"MNI152NLin2009cAsym"</span><span class="op">)</span>   <span class="co"># "MNI152"</span></span></span>
+<span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"MNI152NLin2009cAsym"</span><span class="op">)</span> <span class="co"># "MNI152"</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MNI152"</span>
-<span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"fsLR_32k"</span><span class="op">)</span>              <span class="co"># "MNI152"</span></span></span>
+<span class="r-in"><span><span class="fu">template_to_coord_space</span><span class="op">(</span><span class="st">"fsLR_32k"</span><span class="op">)</span> <span class="co"># "MNI152"</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MNI152"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

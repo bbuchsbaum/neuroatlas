@@ -9,7 +9,7 @@ space and other optional metadata query parameters."><link href="../albers.css" 
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,8 @@ space (e.g., "MNI152NLin2009cAsym").</p></dd>
 
 <dt id="arg-query-args">query_args<a class="anchor" aria-label="anchor" href="#arg-query-args"></a></dt>
 <dd><p>(Optional) A named list of additional query parameters to
-filter the results (e.g., `list(suffix = "T1w", resolution = 1, desc = "brain")`).</p></dd>
+  filter the results (e.g., `list(suffix = "T1w", resolution = 1, desc =
+"brain")`).</p></dd>
 
 
 <dt id="arg-api-handle">api_handle<a class="anchor" aria-label="anchor" href="#arg-api-handle"></a></dt>
@@ -78,9 +79,9 @@ filter the results (e.g., `list(suffix = "T1w", resolution = 1, desc = "brain")`
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span>  <span class="co"># List all T1w files for MNI152NLin2009cAsym template</span></span></span>
-<span class="r-in"><span>  <span class="co"># mni_t1w_files &lt;- tflow_files("MNI152NLin2009cAsym",</span></span></span>
-<span class="r-in"><span>  <span class="co">#                              query_args = list(suffix = "T1w"))</span></span></span>
+<span class="r-in"><span><span class="co"># List all T1w files for MNI152NLin2009cAsym template</span></span></span>
+<span class="r-in"><span><span class="co"># mni_t1w_files &lt;- tflow_files("MNI152NLin2009cAsym",</span></span></span>
+<span class="r-in"><span><span class="co">#                              query_args = list(suffix = "T1w"))</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

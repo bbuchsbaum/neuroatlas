@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,7 +120,8 @@
 
 <dt id="arg-id-convention">id_convention<a class="anchor" aria-label="anchor" href="#arg-id-convention"></a></dt>
 <dd><p>Optional parcel ID convention. Glasser uses
-<code>"hcp_R_first"</code> for volumes and <code>"surfatlas_L_first"</code> for surfaces.</p></dd>
+  <code>"hcp_R_first"</code> for volumes and <code>"surfatlas_L_first"</code> for
+surfaces.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -128,6 +129,21 @@
     <p>An object of class `"atlas_ref"`.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">ref</span> <span class="op">&lt;-</span> <span class="fu">new_atlas_ref</span><span class="op">(</span><span class="st">"toy"</span>, <span class="st">"two-regions"</span>,</span></span>
+<span class="r-in"><span>  template_space <span class="op">=</span> <span class="st">"MNI152NLin6Asym"</span>, coord_space <span class="op">=</span> <span class="st">"MNI152"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ref</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;atlas_ref&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   family: toy </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   model: two-regions </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   representation: volume </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   template_space: MNI152NLin6Asym </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   coord_space: MNI152 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   confidence: uncertain </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

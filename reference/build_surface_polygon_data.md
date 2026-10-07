@@ -66,3 +66,13 @@ A list with components:
 - `boundaries`:
 
   A tibble of projected boundary segments.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+atlas <- get_schaefer_surfatlas(100)
+polygons <- build_surface_polygon_data(atlas, views = "lateral")
+head(polygons$polygons)
+} # }
+```

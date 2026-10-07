@@ -124,8 +124,10 @@ keeps its existing silent behaviour.
 if (FALSE) { # \dontrun{
 atlas <- schaefer_surf(200, 7, space = "fsaverage6", surf = "inflated")
 stat <- neuroim2::read_vol("zstat1.nii.gz")
-proj <- project_cluster_overlay(stat, atlas, sampling = "thickness",
-                                interpolation = "linear")
+proj <- project_cluster_overlay(stat, atlas,
+  sampling = "thickness",
+  interpolation = "linear"
+)
 range(proj$overlay$lh, na.rm = TRUE)
 
 # Draw exactly the projected values

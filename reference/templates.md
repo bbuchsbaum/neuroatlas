@@ -18,8 +18,13 @@ A character vector of available template names
 ``` r
 # \donttest{
 if (requireNamespace("templateflow", quietly = TRUE)) {
-  tryCatch({available <- templates(); head(available)},
-    error = function(e) NULL)
+  tryCatch(
+    {
+      available <- templates()
+      head(available)
+    },
+    error = function(e) NULL
+  )
 }
 #> Warning: `templates()` was deprecated in neuroatlas 0.10.0.
 #> ℹ Please use `tflow_spaces()` instead.

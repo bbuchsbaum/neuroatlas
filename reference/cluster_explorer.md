@@ -194,3 +194,12 @@ A `shiny.appobj`.
 
 Calling `cluster_explorer()` with no arguments launches a synthetic demo
 dataset so the UI can be explored immediately.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+app <- cluster_explorer()
+# Start the interactive viewer with shiny::runApp(app).
+} # }
+```

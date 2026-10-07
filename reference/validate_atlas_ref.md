@@ -17,3 +17,12 @@ validate_atlas_ref(x)
 ## Value
 
 Invisibly returns \`x\` when valid.
+
+## Examples
+
+``` r
+ref <- new_atlas_ref("toy", "two-regions",
+  template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+)
+validate_atlas_ref(ref)
+```

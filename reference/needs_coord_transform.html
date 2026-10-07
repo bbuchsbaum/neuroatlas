@@ -9,7 +9,7 @@ transform (e.g., MNI305 to MNI152)."><link href="../albers.css" rel="stylesheet"
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,11 +83,11 @@ for that).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">needs_coord_transform</span><span class="op">(</span><span class="st">"fsaverage"</span>, <span class="st">"MNI152NLin6Asym"</span><span class="op">)</span>  <span class="co"># TRUE</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">needs_coord_transform</span><span class="op">(</span><span class="st">"fsaverage"</span>, <span class="st">"MNI152NLin6Asym"</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span><span class="fu">needs_coord_transform</span><span class="op">(</span><span class="st">"fsaverage"</span>, <span class="st">"MNI305"</span><span class="op">)</span>            <span class="co"># FALSE</span></span></span>
+<span class="r-in"><span><span class="fu">needs_coord_transform</span><span class="op">(</span><span class="st">"fsaverage"</span>, <span class="st">"MNI305"</span><span class="op">)</span> <span class="co"># FALSE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-in"><span><span class="fu">needs_coord_transform</span><span class="op">(</span><span class="st">"MNI152NLin6Asym"</span>, <span class="st">"MNI152NLin2009cAsym"</span><span class="op">)</span>  <span class="co"># FALSE</span></span></span>
+<span class="r-in"><span><span class="fu">needs_coord_transform</span><span class="op">(</span><span class="st">"MNI152NLin6Asym"</span>, <span class="st">"MNI152NLin2009cAsym"</span><span class="op">)</span> <span class="co"># FALSE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

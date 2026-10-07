@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,12 +128,28 @@ always produce an error.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Glasser ID joins require a matching <code>id_convention</code> in the input table or
-<code>parcel_data</code> atlas metadata. See <code><a href="align_parcel_values.html">align_parcel_values()</a></code> for safe joins
+    <p>Glasser ID joins require a matching <code>id_convention</code> in the input table
+or
+<code>parcel_data</code> atlas metadata. See <code><a href="align_parcel_values.html">align_parcel_values()</a></code>
+for safe joins
 between Glasser volume and surface representations. Numeric vectors are
 positional: they must already follow the target atlas's parcel order.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="parcel_data.html">parcel_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  hemi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"left"</span>, <span class="st">"right"</span><span class="op">)</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.7</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, atlas_id <span class="op">=</span> <span class="st">"toy"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">as_parcel_data</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> parcel_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   schema: 1.0.0 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   atlas: toy </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   parcels: 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   value_cols: value </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

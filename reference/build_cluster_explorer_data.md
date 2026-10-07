@@ -133,3 +133,38 @@ A list with:
 
   List describing whether eager signal prefetch was requested/applied
   and the effective guard thresholds.
+
+## Examples
+
+``` r
+grid <- neuroim2::NeuroSpace(c(2, 1, 1))
+volume <- neuroim2::NeuroVol(array(c(1, 2), c(2, 1, 1)), grid)
+atlas <- structure(
+  list(
+    atlas = volume, ids = 1:2,
+    labels = c("A", "B"), orig_labels = c("A", "B"),
+    hemi = c("left", "right"), name = "toy",
+    cmap = rbind(c(1, 0, 0), c(0, 0, 1)),
+    atlas_ref = new_atlas_ref("toy", "two-regions",
+      template_space = "MNI152NLin6Asym", coord_space = "MNI152"
+    )
+  ),
+  class = "atlas"
+)
+samples <- array(rep(c(0.2, 0.7), 3), c(2, 1, 1, 3))
+data_source <- neuroim2::NeuroVec(
+  samples, neuroim2::NeuroSpace(dim(samples))
+)
+stat_map <- neuroim2::NeuroVol(array(c(4, 5), c(2, 1, 1)), grid)
+clusters <- build_cluster_explorer_data(data_source, atlas, stat_map,
+  threshold = 3, min_cluster_size = 1, tail = "positive"
+)
+#> Warning: clustered volume only contains 1 partition
+clusters$cluster_table
+#> # A tibble: 1 × 12
+#>   cluster_id sign     component_id n_voxels peak_x peak_y peak_z max_stat
+#>   <chr>      <chr>           <int>    <int>  <int>  <int>  <int>    <dbl>
+#> 1 P1         positive            1        2      2      1      1        5
+#> # ℹ 4 more variables: peak_coord <chr>, atlas_label_primary <chr>,
+#> #   n_parcels <int>, parcel_overlap <dbl>
+```

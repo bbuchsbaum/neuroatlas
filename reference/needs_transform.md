@@ -30,14 +30,14 @@ Logical. `TRUE` if a transform is needed, `FALSE` if the spaces match.
 
 ``` r
 # fsaverage + MNI152 volume: transform needed
-needs_transform("fsaverage", "MNI152")  # TRUE
+needs_transform("fsaverage", "MNI152") # TRUE
 #> [1] TRUE
 
 # fsLR + MNI152 volume: no transform needed
-needs_transform("fsLR", "MNI152")  # FALSE
+needs_transform("fsLR", "MNI152") # FALSE
 #> [1] FALSE
 
 # fsaverage + MNI305 volume: no transform needed
-needs_transform("fsaverage", "MNI305")  # FALSE
+needs_transform("fsaverage", "MNI305") # FALSE
 #> [1] FALSE
 ```

@@ -160,19 +160,21 @@ re-reading large NIfTI files.
 
 ``` r
 if (FALSE) { # \dontrun{
-  # Get default MNI T1w brain template
-  mni_brain <- get_template()
+# Get default MNI T1w brain template
+mni_brain <- get_template()
 
-  # Vectorized: Get MNI brain and mask variants
-  mni_variants <- get_template(variant = c("brain", "mask"))
+# Vectorized: Get MNI brain and mask variants
+mni_variants <- get_template(variant = c("brain", "mask"))
 
-  # Path only
-  path <- get_template(path_only = TRUE)
+# Path only
+path <- get_template(path_only = TRUE)
 } # }
 # \donttest{
-  # Get the pial surface for the left hemisphere of fsLR 32k template (as path)
-  # fslr_pial_L_path <- get_surface_template(template_id = "fsLR", surface_type = "pial",
-  #                                        hemi = "L", density = "32k")
-  # print(fslr_pial_L_path)
+# Get the pial surface for the left hemisphere of fsLR 32k template (as path)
+# fslr_pial_L_path <- get_surface_template(
+#   template_id = "fsLR", surface_type = "pial",
+#   hemi = "L", density = "32k"
+# )
+# print(fslr_pial_L_path)
 # }
 ```

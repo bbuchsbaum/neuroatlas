@@ -26,3 +26,12 @@ clear_transform_cache(
 ## Value
 
 The number of artifact files removed, invisibly.
+
+## Examples
+
+``` r
+cache <- tempfile("neuroatlas-example-cache-")
+dir.create(cache)
+clear_transform_cache(cache_dir = cache)
+unlink(cache, recursive = TRUE)
+```

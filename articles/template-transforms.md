@@ -121,19 +121,31 @@ routes are resolved by
 ``` r
 
 space_transform_manifest()[, c("from_space", "to_space", "backend", "status")]
-#>             from_space            to_space         backend    status
-#> 1               MNI305              MNI152 internal_affine available
-#> 2               MNI152              MNI305 internal_affine available
-#> 3      MNI152NLin6Asym MNI152NLin2009cAsym  neurotransform available
-#> 4  MNI152NLin2009cAsym     MNI152NLin6Asym  neurotransform available
-#> 5            fsaverage          fsaverage6       sphere_nn available
-#> 6           fsaverage6           fsaverage       sphere_nn available
-#> 7            fsaverage          fsaverage5       sphere_nn available
-#> 8           fsaverage5           fsaverage       sphere_nn available
-#> 9            fsaverage            fsLR_32k       workbench   planned
-#> 10            fsLR_32k           fsaverage       workbench   planned
-#> 11 MNI152NLin2009cAsym           fsaverage       neurosurf   planned
-#> 12           fsaverage MNI152NLin2009cAsym     ribbon_fill   planned
+#>             from_space            to_space                  backend    status
+#> 1               MNI305              MNI152          internal_affine available
+#> 2               MNI152              MNI305          internal_affine available
+#> 3      MNI152NLin6Asym MNI152NLin2009cAsym           neurotransform available
+#> 4  MNI152NLin2009cAsym     MNI152NLin6Asym           neurotransform available
+#> 5            fsaverage          fsaverage6                sphere_nn   planned
+#> 6           fsaverage6           fsaverage                sphere_nn   planned
+#> 7            fsaverage          fsaverage5                sphere_nn   planned
+#> 8           fsaverage5           fsaverage                sphere_nn   planned
+#> 9            fsaverage            fsLR_32k                workbench   planned
+#> 10            fsLR_32k           fsaverage                workbench   planned
+#> 11 MNI152NLin2009cAsym           fsaverage                neurosurf   planned
+#> 12           fsaverage MNI152NLin2009cAsym              ribbon_fill   planned
+#> 13           fsaverage            fsLR_32k    neurotransform_native available
+#> 14            fsLR_32k           fsaverage    neurotransform_native available
+#> 15           fsaverage            fsLR_32k    neurotransform_native available
+#> 16            fsLR_32k           fsaverage    neurotransform_native available
+#> 17     MNI152NLin6Asym           fsaverage cbig_registration_fusion available
+#> 18     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available
+#> 19     MNI152NLin6Asym           fsaverage cbig_registration_fusion available
+#> 20     MNI152NLin6Asym            fsLR_32k cbig_registration_fusion available
+#> 21 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available
+#> 22 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available
+#> 23 MNI152NLin2009cAsym           fsaverage cbig_registration_fusion available
+#> 24 MNI152NLin2009cAsym            fsLR_32k cbig_registration_fusion available
 ```
 
 Both directions between MNI152NLin6Asym and MNI152NLin2009cAsym are

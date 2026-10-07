@@ -86,7 +86,8 @@ atlas <- get_schaefer_atlas(parcels = "200", networks = "7")
 
 # Create example data (random values in brain space)
 brain_data <- neuroim2::NeuroVol(rnorm(prod(dim(atlas$atlas))),
-                                 space = space(atlas$atlas))
+  space = space(atlas$atlas)
+)
 
 # Compute mean values within each atlas region
 region_means <- reduce_atlas(atlas, brain_data, mean)

@@ -18,7 +18,7 @@ A named list with the following elements:
 
 - MNI152:
 
-  ICBM 2009c space (common fMRI template)
+  Broad MNI152 coordinate family, without template identity
 
 - SCANNER:
 

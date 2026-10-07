@@ -110,7 +110,7 @@ atlas <- get_schaefer_surfatlas(parcels = "100", networks = "7")
 K <- length(atlas$ids)
 map1 <- rnorm(K)
 map2 <- map1 + rnorm(K, sd = 0.5)
-res  <- spin_test(map1, map2, atlas, n_perm = 500, seed = 42)
+res <- spin_test(map1, map2, atlas, n_perm = 500, seed = 42)
 print(res)
 } # }
 ```

@@ -17,6 +17,8 @@ directory.
 ## Examples
 
 ``` r
+# \donttest{
 cat("TemplateFlow cache is at:", show_templateflow_cache_path(), "\n")
 #> TemplateFlow cache is at: /home/runner/.cache/templateflow 
+# }
 ```

@@ -70,3 +70,12 @@ get_harvard_oxford_cortical_subcortical_atlas(...)
 ## Value
 
 An \`atlas\` object, or path metadata when \`path_only = TRUE\`.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+atlas <- get_harvard_oxford_atlas("cortical", threshold = 25)
+atlas_ref(atlas)
+} # }
+```

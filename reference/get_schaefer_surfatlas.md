@@ -95,13 +95,17 @@ for volumetric version
 ``` r
 if (FALSE) { # \dontrun{
 # Load inflated surface atlas
-surf_atlas <- get_schaefer_surfatlas(parcels = "300",
-                                    networks = "7",
-                                    surf = "inflated")
+surf_atlas <- get_schaefer_surfatlas(
+  parcels = "300",
+  networks = "7",
+  surf = "inflated"
+)
 
 # Load pial surface version
-pial_atlas <- get_schaefer_surfatlas(parcels = "400",
-                                    networks = "17",
-                                    surf = "pial")
+pial_atlas <- get_schaefer_surfatlas(
+  parcels = "400",
+  networks = "17",
+  surf = "pial"
+)
 } # }
 ```

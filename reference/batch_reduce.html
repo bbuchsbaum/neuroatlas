@@ -11,7 +11,7 @@ subject column identifying each input."><link href="../albers.css" rel="styleshe
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,8 @@ paths) and combines the results into a single tibble with a
 <dl><dt id="arg-inputs">inputs<a class="anchor" aria-label="anchor" href="#arg-inputs"></a></dt>
 <dd><p>A named list of inputs. Each element can be:</p><ul><li><p>A <code>NeuroVol</code> (3D) or <code>NeuroVec</code> (4D) object</p></li>
 <li><p>A character string file path (read via <code><a href="https://bbuchsbaum.github.io/neuroim2/reference/read_vol.html" class="external-link">neuroim2::read_vol</a></code>)</p></li>
-</ul><p>If unnamed, subjects are auto-named <code>"sub_001"</code>, <code>"sub_002"</code>, etc.</p></dd>
+</ul><p>If unnamed, subjects are auto-named <code>"sub_001"</code>, <code>"sub_002"</code>,
+etc.</p></dd>
 
 
 <dt id="arg-atlas">atlas<a class="anchor" aria-label="anchor" href="#arg-atlas"></a></dt>
@@ -118,8 +119,10 @@ Requires the <span class="pkg">future.apply</span> package.</p></dd>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">batch_reduce</span><span class="op">(</span><span class="va">vols</span>, <span class="va">atlas</span>, <span class="va">mean</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With file paths</span></span></span>
-<span class="r-in"><span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sub01 <span class="op">=</span> <span class="st">"path/to/sub01.nii.gz"</span>,</span></span>
-<span class="r-in"><span>              sub02 <span class="op">=</span> <span class="st">"path/to/sub02.nii.gz"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  sub01 <span class="op">=</span> <span class="st">"path/to/sub01.nii.gz"</span>,</span></span>
+<span class="r-in"><span>  sub02 <span class="op">=</span> <span class="st">"path/to/sub02.nii.gz"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">batch_reduce</span><span class="op">(</span><span class="va">files</span>, <span class="va">atlas</span>, <span class="va">mean</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

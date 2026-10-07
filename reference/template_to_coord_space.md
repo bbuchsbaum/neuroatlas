@@ -45,12 +45,12 @@ checks.
 ## Examples
 
 ``` r
-template_to_coord_space("fsaverage")            # "MNI305"
+template_to_coord_space("fsaverage") # "MNI305"
 #> [1] "MNI305"
-template_to_coord_space("MNI152NLin6Asym")      # "MNI152"
+template_to_coord_space("MNI152NLin6Asym") # "MNI152"
 #> [1] "MNI152"
-template_to_coord_space("MNI152NLin2009cAsym")   # "MNI152"
+template_to_coord_space("MNI152NLin2009cAsym") # "MNI152"
 #> [1] "MNI152"
-template_to_coord_space("fsLR_32k")              # "MNI152"
+template_to_coord_space("fsLR_32k") # "MNI152"
 #> [1] "MNI152"
 ```

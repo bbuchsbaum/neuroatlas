@@ -25,7 +25,15 @@ A data frame with one row per transform route and columns:
 \`artifact_version\`, \`provider\`, \`url\`, \`sha256\`, \`size_bytes\`,
 \`format\`, \`convention\`, \`qualification\`, \`qualification_scope\`,
 \`qa_url\`, and \`license\`. These fields are missing for routes without
-a downloadable artifact.
+a downloadable artifact. \`source_representation\` and
+\`target_representation\` distinguish volumes and surfaces.
+\`executable\` indicates support by the template-transform API, given
+the required optional dependencies and artifacts; it is not a local
+readiness check. Exact admitted surface routes also bind
+\`from_domain_id\`, \`to_domain_id\`, \`method\`, \`engine_revision\`,
+\`input_lock_sha256\` and hemisphere. Broad surface names remain
+advisory. Numerical qualification is restricted to the recorded inputs
+and methods; it does not establish anatomical accuracy.
 
 ## Examples
 

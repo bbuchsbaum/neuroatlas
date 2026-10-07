@@ -9,7 +9,7 @@ transform registry."><link href="../albers.css" rel="stylesheet"><script>window.
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,16 +63,22 @@ transform registry.</p>
 
 
 <dl><dt id="arg-from-space">from_space<a class="anchor" aria-label="anchor" href="#arg-from-space"></a></dt>
-<dd><p>Source space identifier.</p></dd>
+<dd><p>Source space identifier or a [surface_domain()] descriptor.</p></dd>
 
 
 <dt id="arg-to-space">to_space<a class="anchor" aria-label="anchor" href="#arg-to-space"></a></dt>
-<dd><p>Target space identifier.</p></dd>
+<dd><p>Target space identifier or a [surface_domain()] descriptor.
+Supply descriptors for both endpoints for native surface resampling, or an
+exact volume-template identifier and target descriptor for projection.
+Only identical domain descriptors establish surface identity. Named surface
+routes remain advisory: template names do not bind exact meshes or methods.</p></dd>
 
 
 <dt id="arg-data-type">data_type<a class="anchor" aria-label="anchor" href="#arg-data-type"></a></dt>
 <dd><p>Data type being transformed (`"parcel"`, `"vertex"`,
-`"voxel"`). Used for advisory warnings.</p></dd>
+`"voxel"`). Voxel routes stay in volumes; vertex routes stay on surfaces.
+Parcel planning can also describe a single directed projection. Projection
+steps are not automatically composed with other routes.</p></dd>
 
 
 <dt id="arg-mode">mode<a class="anchor" aria-label="anchor" href="#arg-mode"></a></dt>
@@ -83,11 +89,12 @@ transform registry.</p>
 <dt id="arg-available-only">available_only<a class="anchor" aria-label="anchor" href="#arg-available-only"></a></dt>
 <dd><p>Restrict routing to available edges. The default also
 shows planned routes for diagnostic compatibility. Execution always uses
-available edges only; retired edges are never selected.</p></dd>
+available, executable edges only; retired edges are never selected.</p></dd>
 
 
 <dt id="arg-provider">provider<a class="anchor" aria-label="anchor" href="#arg-provider"></a></dt>
-<dd><p>Provider filter, `"auto"`, `"neuroatlas"`, or `"templateflow"`.</p></dd>
+<dd><p>Provider filter, `"auto"`, `"neuroatlas"`, or
+`"templateflow"`.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -11,7 +11,7 @@ uses the XML/image files under `$FSLDIR/data/atlases`."><link href="../albers.cs
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,8 @@ uses the XML/image files under `$FSLDIR/data/atlases`.</p>
 
 
 <dl><dt id="arg-fsl-dir">fsl_dir<a class="anchor" aria-label="anchor" href="#arg-fsl-dir"></a></dt>
-<dd><p>FSL installation directory. Defaults to `Sys.getenv("FSLDIR")`.
+<dd><p>FSL installation directory. Defaults to
+`Sys.getenv("FSLDIR")`.
 `get_julich_brain_atlas()` downloads an FSL-style Julich-Brain cache when
 this is empty and `download = TRUE`.</p></dd>
 
@@ -78,6 +79,14 @@ cache when `fsl_dir` is unset.</p></dd>
     <p>An `atlas` object, or path metadata when `path_only = TRUE`.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">atlas</span> <span class="op">&lt;-</span> <span class="fu">get_julich_brain_atlas</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="atlas_ref.html">atlas_ref</a></span><span class="op">(</span><span class="va">atlas</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

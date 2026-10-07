@@ -60,3 +60,13 @@ get_fsl_atlas(
 ## Value
 
 An \`atlas\` object, or a path/metadata list when \`path_only = TRUE\`.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Requires an FSL installation configured through FSLDIR.
+atlas <- get_fsl_atlas("harvard_oxford_cortical", resolution = 2)
+atlas_ref(atlas)
+} # }
+```
