@@ -1,3 +1,10 @@
+# neuroatlas (development version)
+
+* `plot_brain()` forwards `overlay_tail` to the CPU surface renderer. Positive
+  and negative overlays use the full sequential palette instead of a palette
+  half when thresholding is enabled (#52). By default the tail is inferred
+  from the effective colour limits; mixed-sign limits remain two-sided.
+
 # neuroatlas 0.2.0
 
 * `get_surface_geometry()` fetches checksum-locked fsaverage 164k and fsLR 32k

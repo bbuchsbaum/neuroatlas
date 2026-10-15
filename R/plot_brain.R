@@ -2390,6 +2390,14 @@ build_surface_polygon_data <- function(
 #'   \code{"vik"}.
 #' @param overlay_lim Optional numeric length-2 limits for overlay colour
 #'   mapping.
+#' @param overlay_tail Threshold and palette lookup tail for continuous overlays
+#'   with \code{static_backend = "cpu"}: \code{"positive"}, \code{"negative"},
+#'   or \code{"two_sided"}. One-sided tails use the full overlay palette;
+#'   thresholded two-sided maps use separate palette halves. Default:
+#'   \code{NULL}, which infers a positive tail from nonnegative effective
+#'   \code{overlay_lim}, a negative tail from nonpositive limits, and a
+#'   two-sided tail from mixed-sign limits. When limits are omitted they are
+#'   computed from finite overlay values. An explicit tail overrides inference.
 #' @param overlay_fun Character: interpolation function passed to
 #'   \code{neurosurf::vol_to_surf()} when \code{overlay} is a
 #'   \code{NeuroVol}. One of \code{"avg"}, \code{"nn"}, or \code{"mode"}.
@@ -2618,6 +2626,7 @@ plot_brain <- function(
   anatomy_range = c(0.72, 0.90),
   vals_threshold = NULL,
   parcel_style = NULL,
+  overlay_tail = NULL,
   ...
 ) {
   render_size_missing <- c(
@@ -2782,6 +2791,11 @@ plot_brain <- function(
   camera <- match.arg(camera)
   data_id_mode <- match.arg(data_id_mode)
   overlay_alpha_mode <- match.arg(overlay_alpha_mode)
+  if (!is.null(overlay_tail)) {
+    overlay_tail <- match.arg(
+      overlay_tail, c("two_sided", "positive", "negative")
+    )
+  }
   overlay_interpolation <- match.arg(overlay_interpolation)
   panel_layout <- match.arg(panel_layout)
   border_geom <- match.arg(border_geom)
@@ -2867,6 +2881,7 @@ plot_brain <- function(
         overlay_alpha_ramp = overlay_alpha_ramp,
         overlay_palette = overlay_palette,
         overlay_lim = overlay_lim,
+        overlay_tail = overlay_tail,
         overlay_fun = match.arg(overlay_fun),
         overlay_sampling = match.arg(overlay_sampling),
         overlay_interpolation = overlay_interpolation,

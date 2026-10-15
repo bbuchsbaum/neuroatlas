@@ -1,0 +1,1 @@
+{"actor":"codex-neuroatlas","entity":"bd-01M4Y6EVEYBR8AWX272F0Y0Y71","kind":"note","note_kind":"progress","op":"20261014T215301.534351Z-p37978-c0003-rd1a6-ha0d1f0","text":"Implement explicit CPU tail forwarding and infer from effective unsigned limits; verify native lookup colors.","ts":"2026-10-14T21:53:01.534351Z","v":1}

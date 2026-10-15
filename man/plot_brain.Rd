@@ -92,6 +92,7 @@ plot_brain(
   anatomy_range = c(0.72, 0.9),
   vals_threshold = NULL,
   parcel_style = NULL,
+  overlay_tail = NULL,
   ...
 )
 }
@@ -408,6 +409,15 @@ sub-threshold band.}
 
 \item{parcel_style}{Optional [neurosurf::surface_parcel_style()] object or
 named list of its settings for the CPU parcel renderer.}
+
+\item{overlay_tail}{Threshold and palette lookup tail for continuous overlays
+with \code{static_backend = "cpu"}: \code{"positive"}, \code{"negative"},
+or \code{"two_sided"}. One-sided tails use the full overlay palette;
+thresholded two-sided maps use separate palette halves. Default:
+\code{NULL}, which infers a positive tail from nonnegative effective
+\code{overlay_lim}, a negative tail from nonpositive limits, and a
+two-sided tail from mixed-sign limits. When limits are omitted they are
+computed from finite overlay values. An explicit tail overrides inference.}
 
 \item{...}{Additional arguments (currently unused).}
 }

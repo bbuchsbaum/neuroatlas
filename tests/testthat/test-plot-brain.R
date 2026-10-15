@@ -1342,3 +1342,114 @@ test_that(
     expect_equal(vals[1], 1.5, tolerance = 1e-6)
   }
 )
+
+test_that("CPU overlays use the full sequential lookup for one-sided tails", {
+  skip_if_not_installed("patchwork")
+  atl <- .make_plot_brain_overlay_test_atlas()
+  native_lut <- getFromNamespace(".ns_overlay_lut", "neurosurf")
+  lookup <- NULL
+  local_mocked_bindings(
+    .ns_overlay_lut = function(palette, limits, threshold, tail, n = 256L) {
+      rgba <- native_lut(palette, limits, threshold, tail, n)
+      lookup <<- list(rgba = rgba, tail = tail, limits = limits)
+      rgba
+    },
+    .package = "neurosurf"
+  )
+  reds <- grDevices::colorRampPalette(c(
+    "#FFF5F0", "#FEE0D2", "#FCBBA1", "#FC9272", "#FB6A4A",
+    "#EF3B2C", "#CB181D", "#A50F15", "#67000D"
+  ))(256)
+  blues <- grDevices::colorRampPalette(c("#08306B", "#F7FBFF"))(256)
+
+  for (tail in c("positive", "negative")) {
+    limits <- if (tail == "positive") c(0, 100) else c(-100, 0)
+    palette <- if (tail == "positive") reds else blues
+    values <- if (tail == "positive") c(100 / 17, 50) else c(-50, -100 / 17)
+    for (threshold in c(0, 1e-9, 10)) {
+      fig <- plot_brain(
+        atl,
+        overlay = list(lh = rep(values, each = 2)),
+        overlay_palette = palette, overlay_lim = limits,
+        overlay_tail = tail, overlay_threshold = threshold,
+        views = "lateral", hemis = "left", interactive = FALSE,
+        static_backend = "cpu", anatomy_metric = rep(0, 4),
+        render_width = 40, render_height = 30, render_antialias = 1,
+        orientation_labels = FALSE, colorbar = TRUE
+      )
+      expect_identical(lookup$tail, tail)
+      # Independent full-palette ramp, including the threshold offset. A
+      # two-sided lookup would instead discard half of this palette.
+      endpoints <- if (tail == "positive") {
+        c(threshold, 100)
+      } else {
+        c(-100, -threshold)
+      }
+      t <- (seq(limits[1], limits[2], length.out = 256) - endpoints[1]) /
+        diff(endpoints)
+      expected <- grDevices::colorRamp(palette, space = "Lab")(
+        pmin(1, pmax(0, t))
+      ) / 255
+      expect_equal(lookup$rgba[, 1:3], expected, tolerance = 1e-12)
+      expect_equal(attr(fig, "plot_brain_colorbar")$lim, limits)
+      expect_identical(attr(fig, "plot_brain_colorbar")$palette, palette)
+      expect_identical(attr(fig, "plot_brain_colorbar")$tail, tail)
+      if (tail == "positive" && threshold == 1e-9) {
+        ix <- round(values / 100 * 255) + 1L
+        cols <- lookup$rgba[ix, 1:3]
+        expect_identical(
+          grDevices::rgb(cols[, 1], cols[, 2], cols[, 3]),
+          c("#FEEBE1", "#FA6949")
+        )
+      }
+    }
+  }
+})
+
+test_that("CPU tail inference respects limits and explicit overrides", {
+  skip_if_not_installed("patchwork")
+  atl <- .make_plot_brain_overlay_test_atlas()
+  native_lut <- getFromNamespace(".ns_overlay_lut", "neurosurf")
+  lookup <- NULL
+  local_mocked_bindings(
+    .ns_overlay_lut = function(palette, limits, threshold, tail, n = 256L) {
+      rgba <- native_lut(palette, limits, threshold, tail, n)
+      lookup <<- list(rgba = rgba, tail = tail, limits = limits)
+      rgba
+    },
+    .package = "neurosurf"
+  )
+  palette <- scico::scico(256, palette = "vik")
+  render <- function(limits, tail = NULL, values = c(-50, -5, 5, 50)) {
+    plot_brain(
+      atl,
+      overlay = list(lh = values), overlay_lim = limits,
+      overlay_tail = tail, overlay_threshold = 1e-9,
+      overlay_palette = palette, views = "lateral", hemis = "left",
+      interactive = FALSE, static_backend = "cpu", anatomy_metric = rep(0, 4),
+      render_width = 40, render_height = 30, render_antialias = 1,
+      orientation_labels = FALSE
+    )
+  }
+  render(c(0, 100))
+  expect_identical(lookup$tail, "positive")
+  render(c(-100, 0))
+  expect_identical(lookup$tail, "negative")
+  # Mixed-sign limits remain two-sided even when all observations are positive.
+  render(c(-100, 100), values = c(1, 5, 50, 100))
+  expect_identical(lookup$tail, "two_sided")
+  expect_equal(lookup$rgba, native_lut(
+    palette, c(-100, 100), 1e-9,
+    "two_sided"
+  ))
+  for (tail in c("positive", "negative", "two_sided")) {
+    render(c(0, 100), tail)
+    expect_identical(lookup$tail, tail)
+  }
+  render(NULL, values = c(0, 5, 50, 100))
+  expect_identical(lookup$tail, "positive")
+  expect_equal(lookup$limits, c(0, 100))
+  render(NULL, values = c(-100, -50, -5, 0))
+  expect_identical(lookup$tail, "negative")
+  expect_error(render(c(0, 100), "invalid"), "two_sided.*positive.*negative")
+})

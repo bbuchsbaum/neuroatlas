@@ -299,7 +299,8 @@
   anatomy_style = "publication",
   anatomy_midpoint = NULL,
   anatomy_invert = FALSE,
-  anatomy_range = c(0.72, 0.90)
+  anatomy_range = c(0.72, 0.90),
+  overlay_tail = NULL
 ) {
   if (is.null(overlay)) {
     stop(
@@ -335,6 +336,15 @@
     overlay_lim <- if (length(finite)) range(finite) else c(-1, 1)
     if (overlay_lim[1] == overlay_lim[2]) {
       overlay_lim <- overlay_lim + c(-1, 1) * 1e-8
+    }
+  }
+  if (is.null(overlay_tail)) {
+    overlay_tail <- if (overlay_lim[1] >= 0) {
+      "positive"
+    } else if (overlay_lim[2] <= 0) {
+      "negative"
+    } else {
+      "two_sided"
     }
   }
   alpha_ramp <- overlay_alpha_ramp %||% max(
@@ -394,6 +404,7 @@
         width = render_width,
         height = render_height,
         threshold = overlay_threshold %||% 0,
+        tail = overlay_tail,
         palette = palette,
         limits = overlay_lim,
         overlay_alpha = overlay_alpha,
@@ -475,7 +486,7 @@
     overlay_present = TRUE
   )
   cb <- NULL
-  colorbar_meta <- list(source = resolved_source)
+  colorbar_meta <- list(source = resolved_source, tail = overlay_tail)
   if (
     !identical(colorbar_position, "none") &&
       identical(resolved_source, "overlay")
