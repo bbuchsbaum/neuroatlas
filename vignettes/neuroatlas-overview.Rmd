@@ -138,7 +138,7 @@ left_atlas <- filter_atlas(atlas, hemi == "left")
 roi_metadata(left_atlas)[c("id", "label", "hemi")]
 ```
 
-The result is still an atlas, now containing only the seven selected regions.
+The result is still an atlas, now containing only the eight selected regions.
 Excluded voxels are unlabelled; region IDs are preserved.
 
 Atlas-level subsetting currently applies to volume atlases. For a `surfatlas`,
@@ -149,7 +149,7 @@ error. Use `get_roi()` to extract labelled surface ROIs instead.
 left_meta <- roi_metadata(left_atlas)
 stopifnot(
   inherits(left_atlas, "atlas"),
-  length(left_atlas$ids) == 7L,
+  length(left_atlas$ids) == 8L,
   all(left_meta$hemi == "left")
 )
 ```

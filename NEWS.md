@@ -1,5 +1,10 @@
 # neuroatlas 0.2.0.9000
 
+* `get_aseg_atlas()` labels Left-VentralDC (id 28) as `hemi = "left"`; it was
+  `NA`. Hemispheres are now derived from the FreeSurfer label ids, so the
+  atlas has 8 left and 8 right regions and only Brainstem (16) is midline.
+  `filter_atlas(a, hemi == "left")` now returns 8 regions (#57).
+
 * `plot.atlas()` montages can be re-rendered at another size, e.g. with
   `ggsave()` or by resizing the plot pane. neuroim2 (>= 0.19) rebuilds its
   device-fitted figures on resize, which discarded the atlas recolouring and

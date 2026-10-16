@@ -97,7 +97,16 @@ get_aseg_atlas <- function(outspace = NULL) {
     "VentralDC"
   )
 
-  hemi <- c(rep("left", 4), NA, rep("left", 3), NA, rep("right", 8))
+  # Hemisphere from the FreeSurfer LUT id rather than by position, so every
+  # Left-* structure (including Left-VentralDC, id 28) is "left" (#57).
+  # Brainstem (16) is midline.
+  fs_left <- c(10L, 11L, 12L, 13L, 17L, 18L, 26L, 28L)
+  fs_right <- c(49L, 50L, 51L, 52L, 53L, 54L, 58L, 60L)
+  hemi <- ifelse(
+    ids %in% fs_left,
+    "left",
+    ifelse(ids %in% fs_right, "right", NA_character_)
+  )
   cmap <- tibble::tribble(
     ~red,
     ~green,

@@ -30,3 +30,26 @@ test_that(
     )
   }
 )
+
+test_that(
+  "get_aseg_atlas() assigns every Left-/Right- structure a hemisphere (#57)",
+  {
+    a <- get_aseg_atlas()
+    hemi <- stats::setNames(a$hemi, a$ids)
+    expect_identical(unname(hemi["28"]), "left") # Left-VentralDC
+    expect_identical(unname(hemi["60"]), "right") # Right-VentralDC
+    # Only the midline Brainstem (16) lacks a hemisphere.
+    expect_identical(as.integer(names(hemi)[is.na(hemi)]), 16L)
+    expect_identical(sum(hemi == "left", na.rm = TRUE), 8L)
+    expect_identical(sum(hemi == "right", na.rm = TRUE), 8L)
+    left_ids <- a$ids[which(a$hemi == "left")]
+    expect_true(all(left_ids < 40L))
+    expect_true(all(a$ids[which(a$hemi == "right")] >= 40L))
+    # Each bilateral label appears once per hemisphere.
+    bilateral <- setdiff(unique(a$labels), "Brainstem")
+    for (lab in bilateral) {
+      expect_setequal(a$hemi[a$labels == lab], c("left", "right"))
+    }
+    expect_length(filter_atlas(a, hemi == "left")$ids, 8L)
+  }
+)
