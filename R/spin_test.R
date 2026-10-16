@@ -297,7 +297,7 @@ print.spin_test <- function(x, ...) {
   for (i in seq_len(K)) {
     pid <- atlas$ids[i]
     in_hemi <- vapply(
-      hemi_labels, function(lab) any(lab == pid), logical(1)
+      hemi_labels, function(lab) any(lab == pid, na.rm = TRUE), logical(1)
     )
     if (all(in_hemi)) {
       stop(
@@ -307,7 +307,7 @@ print.spin_test <- function(x, ...) {
     }
     if (!any(in_hemi)) next
     h <- names(hemi_labels)[in_hemi]
-    mask <- hemi_labels[[h]] == pid
+    mask <- which(hemi_labels[[h]] == pid)
     centroids[i, ] <- colMeans(hemi_coords[[h]][mask, , drop = FALSE])
     hemi[i] <- h
   }

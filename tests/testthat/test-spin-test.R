@@ -376,6 +376,16 @@ test_that(
       c(r$left[2, 2], r$right[2, 2])
     })
     expect_lt(abs(stats::cor(draws[1, ], draws[2, ])), 0.1)
+
+    # End to end: the mock rh sphere is the x-mirror of lh, so under the
+    # mirror scheme each rh parcel follows its lh homologue exactly.
+    skip_if_not_installed("Rnanoflann")
+    sa <- make_spin_atlas()
+    res <- spin_test(
+      rnorm(10), rnorm(10), sa$atlas,
+      sphere = sa$sphere, n_perm = 100, seed = 4, hemi_rotation = "mirror"
+    )
+    expect_identical(res$permutations[6:10, ], res$permutations[1:5, ] + 5L)
     set.seed(9)
     draws_m <- replicate(200, {
       r <- neuroatlas:::.spin_hemi_rotations("mirror")
