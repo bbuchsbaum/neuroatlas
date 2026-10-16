@@ -134,6 +134,11 @@ plot.atlas <- function(
 
   # Helper to apply discrete colour scale to a ggplot from plot_montage/ortho
   .apply_atlas_scale <- function(p) {
+    # neuroim2 >= 0.19 wraps figures in a device-fitted `neuro_fig` that is
+    # rebuilt from scratch when drawn at another size (e.g. ggsave()), which
+    # would discard the in-place edit of `p$data` below and replay the
+    # discrete fill scale onto numeric values (#54). Recolour a plain figure.
+    p <- .strip_neuro_fig(p)
     # Convert the continuous 'value' column to factor for discrete scale
     if (!is.data.frame(p$data) || !"value" %in% names(p$data)) {
       stop(
@@ -240,6 +245,27 @@ plot.atlas <- function(
       invisible(plots)
     }
   }
+}
+
+#' Drop neuroim2's device-fitted figure wrapper
+#'
+#' neuroim2 (>= 0.19) returns slice figures of class `neuro_fig` that carry a
+#' `build(canvas)` closure in attribute `"neuro_figure"`. When such a figure is
+#' drawn on a device of a different size, the closure rebuilds it and replays
+#' only components added with `+`, so direct edits (such as recoding
+#' `p$data$value`) are lost. Stripping the wrapper yields the plain patchwork
+#' or ggplot, which draws as-is at any size.
+#' @param p A ggplot, patchwork, or `neuro_fig`.
+#' @return `p` without the `neuro_fig` class and attribute.
+#' @keywords internal
+#' @noRd
+.strip_neuro_fig <- function(p) {
+  if (!inherits(p, "neuro_fig") && is.null(attr(p, "neuro_figure"))) {
+    return(p)
+  }
+  attr(p, "neuro_figure") <- NULL
+  class(p) <- setdiff(class(p), "neuro_fig")
+  p
 }
 
 #' Convert slice-plot values to atlas region-ID strings

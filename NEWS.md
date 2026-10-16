@@ -1,5 +1,11 @@
 # neuroatlas 0.2.0.9000
 
+* `plot.atlas()` montages can be re-rendered at another size, e.g. with
+  `ggsave()` or by resizing the plot pane. neuroim2 (>= 0.19) rebuilds its
+  device-fitted figures on resize, which discarded the atlas recolouring and
+  failed with "Continuous value supplied to a discrete scale". The returned
+  figure is now a plain patchwork with the recolouring applied (#54).
+
 * **Correctness fix; changes `spin_test()` p-values.** `spin_test()` used one
   rotation for both hemispheres and matched rotated centroids against all
   parcels. Because the lh and rh spheres overlap, about half of the parcels
