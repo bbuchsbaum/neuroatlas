@@ -157,10 +157,10 @@ head(color_tbl)
 #>   <int> <chr>  
 #> 1    10 #14E2C6
 #> 2    11 #EEB8C7
-#> 3    12 #A8C3E3
+#> 3    12 #B4C4FE
 #> 4    13 #F6BA4F
-#> 5    16 #81C2FF
-#> 6    17 #87CCBE
+#> 5    16 #8EC6E4
+#> 6    17 #7DD798
 plot(atlas, colors = color_tbl, nslices = 6)
 ```
 
@@ -190,7 +190,7 @@ cols
 #>  6    17 #FD8EB8
 #>  7    18 #F79690
 #>  8    26 #ED9E73
-#>  9    28 #E98292
+#>  9    28 #FB92A2
 #> 10    49 #D97088
 #> 11    50 #C28439
 #> 12    51 #CC7D56

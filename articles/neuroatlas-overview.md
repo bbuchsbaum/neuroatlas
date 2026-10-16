@@ -73,7 +73,7 @@ meta[c("id", "label", "hemi")]
 #>  6    17 Hippocampus left 
 #>  7    18 Amygdala    left 
 #>  8    26 Accumbens   left 
-#>  9    28 VentralDC   NA   
+#>  9    28 VentralDC   left 
 #> 10    49 Thalamus    right
 #> 11    50 Caudate     right
 #> 12    51 Putamen     right
@@ -94,7 +94,7 @@ list_atlases()[c("id", "label", "representation", "default_space")]
 #> # A tibble: 17 × 4
 #>    id                         label                 representation default_space
 #>    <chr>                      <chr>                 <chr>          <chr>        
-#>  1 aseg                       FreeSurfer ASEG subc… volume         MNI152NLin6A…
+#>  1 aseg                       FreeSurfer ASEG subc… volume         MNI152_unspe…
 #>  2 brainnetome                Brainnetome 246-regi… volume         MNI152       
 #>  3 glasser                    Glasser HCP-MMP1.0 (… volume         MNI152NLin20…
 #>  4 glasser_surf               Glasser HCP-MMP1.0 (… surface        fsaverage    
@@ -125,7 +125,7 @@ expressions are intersected.
 left_atlas <- filter_atlas(atlas, hemi == "left")
 
 roi_metadata(left_atlas)[c("id", "label", "hemi")]
-#> # A tibble: 7 × 3
+#> # A tibble: 8 × 3
 #>      id label       hemi 
 #>   <int> <chr>       <chr>
 #> 1    10 Thalamus    left 
@@ -134,10 +134,11 @@ roi_metadata(left_atlas)[c("id", "label", "hemi")]
 #> 4    13 Pallidum    left 
 #> 5    17 Hippocampus left 
 #> 6    18 Amygdala    left 
-#> 7    26 Accumbens   left
+#> 7    26 Accumbens   left 
+#> 8    28 VentralDC   left
 ```
 
-The result is still an atlas, now containing only the seven selected
+The result is still an atlas, now containing only the eight selected
 regions. Excluded voxels are unlabelled; region IDs are preserved.
 
 Atlas-level subsetting currently applies to volume atlases. For a
@@ -245,7 +246,7 @@ mapped_values
 #>  6  -0.468   Hippocampus Hippocampus left 
 #>  7  -0.420   Amygdala    Amygdala    left 
 #>  8  -0.137   Accumbens   Accumbens   left 
-#>  9  -0.175   VentralDC   VentralDC   NA   
+#>  9  -0.175   VentralDC   VentralDC   left 
 #> 10   0.215   Thalamus    Thalamus    right
 #> 11   0.230   Caudate     Caudate     right
 #> 12   0.472   Putamen     Putamen     right
@@ -269,10 +270,10 @@ hemisphere_summary <- stats::aggregate(
   FUN = mean
 )
 hemisphere_summary
-#>      hemi   statistic
-#> 1    left -0.32933258
-#> 2 midline -0.08891959
-#> 3   right  0.30673587
+#>      hemi    statistic
+#> 1    left -0.310060566
+#> 2 midline -0.002682728
+#> 3   right  0.306735873
 ```
 
 The left/right sign difference is an executable check on the orientation

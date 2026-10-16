@@ -111,10 +111,11 @@ points.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>When <code>data_vol</code> is a 3D <code>NeuroVol</code>, the returned tibble contains a
-single row with one column per ROI. If a 4D <code>NeuroVec</code> is supplied, each
-time point is summarised separately and a <code>time</code> column is added to the
-tibble.</p>
+    <p>When <code>data_vol</code> is a 3D <code>NeuroVol</code>, the default
+(<code>format = NULL</code>) is long output: one row per ROI with columns
+<code>region</code> and <code>value</code>; <code>format = "wide"</code> gives a single row
+with one column per ROI. If a 4D <code>NeuroVec</code> is supplied, each time point
+is summarised separately and a <code>time</code> column is added to the tibble.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

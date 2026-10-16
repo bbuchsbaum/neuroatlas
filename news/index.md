@@ -2,6 +2,67 @@
 
 ## neuroatlas 0.2.0.9000
 
+- Documentation and metadata now match the code
+  ([\#58](https://github.com/bbuchsbaum/neuroatlas/issues/58)):
+  `plot_brain(data = ..., static_backend = "cpu")` renders parcel tables
+  through the CPU parcel renderer, like `vals`, instead of aborting;
+  only the combination of `data` with a vertex `overlay` is rejected on
+  that backend.
+  [`list_atlases()`](https://bbuchsbaum.github.io/neuroatlas/reference/list_atlases.md)
+  reports `default_space = "MNI152_unspecified"` for `aseg`, matching
+  [`get_aseg_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_aseg_atlas.md).
+  The
+  [`map_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/map_atlas.md)
+  return value (a tibble), the
+  [`reduce_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/reduce_atlas.md)
+  default long output for a `NeuroVol`, and the
+  [`get_schaefer_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_schaefer_atlas.md)
+  parcel options (“700” and “900”) are documented correctly.
+
+- [`get_aseg_atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_aseg_atlas.md)
+  labels Left-VentralDC (id 28) as `hemi = "left"`; it was `NA`.
+  Hemispheres are now derived from the FreeSurfer label ids, so the
+  atlas has 8 left and 8 right regions and only Brainstem (16) is
+  midline. `filter_atlas(a, hemi == "left")` now returns 8 regions
+  ([\#57](https://github.com/bbuchsbaum/neuroatlas/issues/57)).
+
+- [`plot.atlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/plot-methods.md)
+  montages can be re-rendered at another size, e.g. with `ggsave()` or
+  by resizing the plot pane. neuroim2 (\>= 0.19) rebuilds its
+  device-fitted figures on resize, which discarded the atlas recolouring
+  and failed with “Continuous value supplied to a discrete scale”. The
+  returned figure is now a plain patchwork with the recolouring applied
+  ([\#54](https://github.com/bbuchsbaum/neuroatlas/issues/54)).
+
+- **Correctness fix; changes
+  [`spin_test()`](https://bbuchsbaum.github.io/neuroatlas/reference/spin_test.md)
+  p-values.**
+  [`spin_test()`](https://bbuchsbaum.github.io/neuroatlas/reference/spin_test.md)
+  used one rotation for both hemispheres and matched rotated centroids
+  against all parcels. Because the lh and rh spheres overlap, about half
+  of the parcels were reassigned to the opposite hemisphere in every
+  rotation (mean 0.50 on Schaefer 100/7), so the null did not preserve
+  hemisphere membership. Each hemisphere is now rotated on its own
+  sphere and parcels are matched only within their hemisphere. By
+  default the right-hemisphere rotation is the left rotation reflected
+  across the midline, as in Alexander-Bloch et al. (2018);
+  `hemi_rotation = "independent"` draws a separate rotation per
+  hemisphere. A K x 3 centroid `sphere` now requires `atlas$hemi`. The
+  result gains `hemi_rotation` and `permutations` (the K x `n_perm`
+  reassignment indices). Re-run spin tests computed with earlier
+  versions ([\#56](https://github.com/bbuchsbaum/neuroatlas/issues/56)).
+
+- [`spin_test()`](https://bbuchsbaum.github.io/neuroatlas/reference/spin_test.md)
+  finds the sphere automatically for fsaverage6 and fsaverage5 atlases
+  such as
+  [`get_schaefer_surfatlas()`](https://bbuchsbaum.github.io/neuroatlas/reference/get_schaefer_surfatlas.md).
+  TemplateFlow indexes fsaverage surfaces by density only, so the
+  internal fsaverage mappings no longer send a `res-` entity
+  (“Resolution ‘06’ not available”). This also fixes TemplateFlow
+  geometry lookup for `schaefer_surf(space = "fsaverage5")` and the
+  fsaverage5 surface fallback of the cluster-explorer overlay
+  ([\#55](https://github.com/bbuchsbaum/neuroatlas/issues/55)).
+
 - Accept neurosurf’s `0.1.0` CRAN-preparation version and pin its tested
   GitHub revision. This fixes CI dependency resolution after upstream
   release numbering replaced the higher-numbered development version.

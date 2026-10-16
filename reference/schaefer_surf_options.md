@@ -34,11 +34,11 @@ opts <- schaefer_surf_options()
 head(opts)
 #>        space parcels networks     surf cbig_space template_id tf_resolution
 #> 1  fsaverage     100        7 inflated  fsaverage   fsaverage          <NA>
-#> 2 fsaverage5     100        7 inflated fsaverage5   fsaverage            05
-#> 3 fsaverage6     100        7 inflated fsaverage6   fsaverage            06
+#> 2 fsaverage5     100        7 inflated fsaverage5   fsaverage          <NA>
+#> 3 fsaverage6     100        7 inflated fsaverage6   fsaverage          <NA>
 #> 4  fsaverage     200        7 inflated  fsaverage   fsaverage          <NA>
-#> 5 fsaverage5     200        7 inflated fsaverage5   fsaverage            05
-#> 6 fsaverage6     200        7 inflated fsaverage6   fsaverage            06
+#> 5 fsaverage5     200        7 inflated fsaverage5   fsaverage          <NA>
+#> 6 fsaverage6     200        7 inflated fsaverage6   fsaverage          <NA>
 #>   tf_density
 #> 1       164k
 #> 2        10k

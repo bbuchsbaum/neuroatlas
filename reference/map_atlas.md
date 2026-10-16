@@ -46,7 +46,10 @@ map_atlas(x, vals, thresh = NULL, pos = FALSE, ...)
 
 ## Value
 
-Returns the atlas object with mapped values
+For atlas objects, a tibble with one row per region and columns
+`statistic` (the possibly thresholded values), `label` (the original
+atlas labels), and, when available, `region` and `hemi`. The atlas
+itself is not modified.
 
 ## Examples
 

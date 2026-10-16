@@ -42,8 +42,9 @@ load_surface_template(
 
 - resolution:
 
-  Optional resolution string (TemplateFlow `res` argument), e.g., "06"
-  for fsaverage6.
+  Optional resolution string (TemplateFlow `res` argument). Leave `NULL`
+  for fsaverage surfaces, which TemplateFlow indexes by `density` only
+  (e.g., `"41k"` for fsaverage6).
 
 - ...:
 
@@ -64,7 +65,7 @@ if (FALSE) { # \dontrun{
 # fsaverage6 pial surface as NeuroSurface
 lh <- load_surface_template("fsaverage", "pial",
   hemi = "L",
-  density = "41k", resolution = "06"
+  density = "41k"
 )
 
 # Both hemispheres of fsLR 32k inflated surface

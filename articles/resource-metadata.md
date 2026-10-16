@@ -121,17 +121,17 @@ the retained region identifiers:
 
 left <- filter_atlas(a, hemi == "left")
 atlas_metadata(left)$content$regions
-#> [1] 7
+#> [1] 8
 atlas_history(left)[, c("step", "action", "details")]
 #> # A tibble: 2 × 3
 #>    step action details                   
 #>   <int> <chr>  <chr>                     
 #> 1     1 load   Loaded bundled ASEG atlas.
-#> 2     2 subset Kept 7 of 17 ROIs.
+#> 2     2 subset Kept 8 of 17 ROIs.
 tail(atlas_history(left)$parameters, 1)
 #> [[1]]
 #> [[1]]$keep_ids
-#> [1] 10 11 12 13 17 18 26
+#> [1] 10 11 12 13 17 18 26 28
 ```
 
 Resampling changes the current grid while preserving the original

@@ -164,7 +164,7 @@ into the object when an accessor exists:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    17 Hippocampus left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>    18 Amygdala    left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    26 Accumbens   left </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    28 VentralDC   <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    28 VentralDC   left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    49 Thalamus    right</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>    50 Caudate     right</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>    51 Putamen     right</span></span>
@@ -180,7 +180,7 @@ families without loading them:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 4</span></span></span>
 <span><span class="co">#&gt;    id                         label                 representation default_space</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> aseg                       FreeSurfer ASEG subc… volume         MNI152NLin6A…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> aseg                       FreeSurfer ASEG subc… volume         MNI152_unspe…</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> brainnetome                Brainnetome 246-regi… volume         MNI152       </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> glasser                    Glasser HCP-MMP1.0 (… volume         MNI152NLin20…</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> glasser_surf               Glasser HCP-MMP1.0 (… surface        fsaverage    </span></span>
@@ -207,7 +207,7 @@ expressed through metadata. Multiple expressions are intersected.</p>
 <code class="sourceCode R"><span><span class="va">left_atlas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_atlas.html">filter_atlas</a></span><span class="op">(</span><span class="va">atlas</span>, <span class="va">hemi</span> <span class="op">==</span> <span class="st">"left"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/roi_metadata.html">roi_metadata</a></span><span class="op">(</span><span class="va">left_atlas</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"label"</span>, <span class="st">"hemi"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 3</span></span></span>
 <span><span class="co">#&gt;      id label       hemi </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    10 Thalamus    left </span></span>
@@ -216,8 +216,9 @@ expressed through metadata. Multiple expressions are intersected.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    13 Pallidum    left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    17 Hippocampus left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    18 Amygdala    left </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>    26 Accumbens   left</span></span></code></pre></div>
-<p>The result is still an atlas, now containing only the seven selected
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>    26 Accumbens   left </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>    28 VentralDC   left</span></span></code></pre></div>
+<p>The result is still an atlas, now containing only the eight selected
 regions. Excluded voxels are unlabelled; region IDs are preserved.</p>
 <p>Atlas-level subsetting currently applies to volume atlases. For a
 <code>surfatlas</code>, both <code><a href="../reference/filter_atlas.html">filter_atlas()</a></code> and
@@ -307,7 +308,7 @@ object.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  -<span style="color: #BB0000;">0.468</span>   Hippocampus Hippocampus left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  -<span style="color: #BB0000;">0.420</span>   Amygdala    Amygdala    left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  -<span style="color: #BB0000;">0.137</span>   Accumbens   Accumbens   left </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  -<span style="color: #BB0000;">0.175</span>   VentralDC   VentralDC   <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  -<span style="color: #BB0000;">0.175</span>   VentralDC   VentralDC   left </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   0.215   Thalamus    Thalamus    right</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>   0.230   Caudate     Caudate     right</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>   0.472   Putamen     Putamen     right</span></span>
@@ -327,10 +328,10 @@ group explicit and then compute a hemisphere-level summary:</p>
 <span>  FUN <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">hemisphere_summary</span></span>
-<span><span class="co">#&gt;      hemi   statistic</span></span>
-<span><span class="co">#&gt; 1    left -0.32933258</span></span>
-<span><span class="co">#&gt; 2 midline -0.08891959</span></span>
-<span><span class="co">#&gt; 3   right  0.30673587</span></span></code></pre></div>
+<span><span class="co">#&gt;      hemi    statistic</span></span>
+<span><span class="co">#&gt; 1    left -0.310060566</span></span>
+<span><span class="co">#&gt; 2 midline -0.002682728</span></span>
+<span><span class="co">#&gt; 3   right  0.306735873</span></span></code></pre></div>
 <p>The left/right sign difference is an executable check on the
 orientation of our synthetic gradient, not a claim about brain
 organisation.</p>

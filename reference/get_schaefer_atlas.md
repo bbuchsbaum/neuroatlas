@@ -207,7 +207,7 @@ sy_1000_17(
 - parcels:
 
   Character string specifying number of parcels. Options: "100", "200",
-  "300", "400", "500", "600", "800", "1000"
+  "300", "400", "500", "600", "700", "800", "900", "1000"
 
 - networks:
 

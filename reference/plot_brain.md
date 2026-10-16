@@ -166,8 +166,8 @@ plot_brain(
 
   Static renderer: the existing `"ggplot"` polygon path or deterministic
   `"cpu"` rasterization. With a vertex `overlay` the CPU path renders
-  continuous publication overlays; with parcel `vals` (and no overlay)
-  it renders a publication parcel map through
+  continuous publication overlays; with parcel `vals` or `data` (and no
+  overlay) it renders a publication parcel map through
   \[neurosurf::render_surface_parcels()\]: smooth antialiased parcel
   edges, a sulcal-depth underlay, soft lighting, a light medial wall,
   and an automatically arranged figure. Neither needs OpenGL or a
@@ -525,7 +525,10 @@ plot_brain(
   Optional data frame, tibble, or `parcel_data` object with one row per
   parcel. When supplied, `value` is aligned to the atlas with
   [`align_parcel_values()`](https://bbuchsbaum.github.io/neuroatlas/reference/align_parcel_values.md)
-  before rendering. Supply either `data` or `vals`, not both.
+  before rendering and then treated exactly like `vals` (including by
+  `static_backend = "cpu"`). Supply either `data` or `vals`, not both.
+  With `static_backend = "cpu"`, `data` cannot be combined with a vertex
+  `overlay`.
 
 - value:
 

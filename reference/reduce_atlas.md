@@ -65,10 +65,11 @@ A `tibble` with format depending on the `format` parameter:
 
 ## Details
 
-When `data_vol` is a 3D `NeuroVol`, the returned tibble contains a
-single row with one column per ROI. If a 4D `NeuroVec` is supplied, each
-time point is summarised separately and a `time` column is added to the
-tibble.
+When `data_vol` is a 3D `NeuroVol`, the default (`format = NULL`) is
+long output: one row per ROI with columns `region` and `value`;
+`format = "wide"` gives a single row with one column per ROI. If a 4D
+`NeuroVec` is supplied, each time point is summarised separately and a
+`time` column is added to the tibble.
 
 ## See also
 

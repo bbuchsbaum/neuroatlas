@@ -57,8 +57,10 @@ get_surface_template(
 
 - resolution:
 
-  (Optional) Character string specifying the resolution, primarily for
-  fsaverage variants (e.g., "06" for fsaverage6).
+  (Optional) Character string specifying the TemplateFlow `res` entity.
+  TemplateFlow indexes fsaverage surfaces by `density` only (e.g.,
+  `"41k"` for fsaverage6, `"10k"` for fsaverage5), so leave this `NULL`
+  for fsaverage.
 
 - cohort:
 
