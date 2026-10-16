@@ -2245,8 +2245,11 @@ build_surface_polygon_data <- function(
 #'   system.
 #' @param data Optional data frame, tibble, or \code{parcel_data} object with
 #'   one row per parcel. When supplied, \code{value} is aligned to the atlas
-#'   with \code{\link{align_parcel_values}()} before rendering. Supply either
-#'   \code{data} or \code{vals}, not both.
+#'   with \code{\link{align_parcel_values}()} before rendering and then
+#'   treated exactly like \code{vals} (including by
+#'   \code{static_backend = "cpu"}). Supply either \code{data} or
+#'   \code{vals}, not both. With \code{static_backend = "cpu"}, \code{data}
+#'   cannot be combined with a vertex \code{overlay}.
 #' @param value Numeric column in \code{data}, supplied as a bare name or
 #'   character string.
 #' @param by Parcel-key specification for \code{data}. Use a shared column name
@@ -2282,7 +2285,8 @@ build_surface_polygon_data <- function(
 #' @param static_backend Static renderer: the existing \code{"ggplot"} polygon
 #'   path or deterministic \code{"cpu"} rasterization. With a vertex
 #'   \code{overlay} the CPU path renders continuous publication overlays; with
-#'   parcel \code{vals} (and no overlay) it renders a publication parcel map
+#'   parcel \code{vals} or \code{data} (and no overlay) it renders a
+#'   publication parcel map
 #'   through [neurosurf::render_surface_parcels()]: smooth antialiased parcel
 #'   edges, a sulcal-depth underlay, soft lighting, a light medial wall, and an
 #'   automatically arranged figure. Neither needs OpenGL or a browser.
@@ -2807,12 +2811,18 @@ plot_brain <- function(
       )
     }
   }
-  if (data_present && !interactive && identical(static_backend, "cpu")) {
+  # `data` has already been aligned to `vals`, so on its own it takes the CPU
+  # parcel path below (#58). The CPU overlay renderer draws only the vertex
+  # overlay, so parcel values cannot be combined with one there.
+  if (
+    data_present && overlay_present && !interactive &&
+      identical(static_backend, "cpu")
+  ) {
     cli::cli_abort(
       c(
-        "Parcel-level {.arg data} are not supported by {.code static_backend = 'cpu'}.",
-        "i" = "Use the default {.code static_backend = 'ggplot'} for parcel maps.",
-        "i" = "The CPU backend expects a vertex-wise {.arg overlay}."
+        "Parcel-level {.arg data} cannot be combined with a vertex-wise {.arg overlay} under {.code static_backend = 'cpu'}.",
+        "i" = "Drop {.arg overlay} to render the parcel map with the CPU backend.",
+        "i" = "Or use the default {.code static_backend = 'ggplot'}."
       ),
       class = c("neuroatlas_error_unsupported", "neuroatlas_error")
     )

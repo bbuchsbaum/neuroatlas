@@ -219,7 +219,8 @@ sy_1000_17(
 }
 \arguments{
 \item{parcels}{Character string specifying number of parcels.
-Options: "100", "200", "300", "400", "500", "600", "800", "1000"}
+Options: "100", "200", "300", "400", "500", "600", "700", "800", "900",
+"1000"}
 
 \item{networks}{Character string specifying network count.
 Options: "7", "17"}

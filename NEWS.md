@@ -1,5 +1,15 @@
 # neuroatlas 0.2.0.9000
 
+* Documentation and metadata now match the code (#58):
+  `plot_brain(data = ..., static_backend = "cpu")` renders parcel tables
+  through the CPU parcel renderer, like `vals`, instead of aborting; only the
+  combination of `data` with a vertex `overlay` is rejected on that backend.
+  `list_atlases()` reports `default_space = "MNI152_unspecified"` for `aseg`,
+  matching `get_aseg_atlas()`. The `map_atlas()` return value (a tibble), the
+  `reduce_atlas()` default long output for a `NeuroVol`, and the
+  `get_schaefer_atlas()` parcel options ("700" and "900") are documented
+  correctly.
+
 * `get_aseg_atlas()` labels Left-VentralDC (id 28) as `hemi = "left"`; it was
   `NA`. Hemispheres are now derived from the FreeSurfer label ids, so the
   atlas has 8 left and 8 right regions and only Brainstem (16) is midline.

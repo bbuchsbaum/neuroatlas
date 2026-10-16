@@ -54,10 +54,11 @@ Applies a summary function to data within each ROI defined by an atlas.
 This is an S3 generic function.
 }
 \details{
-When \code{data_vol} is a 3D \code{NeuroVol}, the returned tibble contains a
-single row with one column per ROI. If a 4D \code{NeuroVec} is supplied, each
-time point is summarised separately and a \code{time} column is added to the
-tibble.
+When \code{data_vol} is a 3D \code{NeuroVol}, the default
+(\code{format = NULL}) is long output: one row per ROI with columns
+\code{region} and \code{value}; \code{format = "wide"} gives a single row
+with one column per ROI. If a 4D \code{NeuroVec} is supplied, each time point
+is summarised separately and a \code{time} column is added to the tibble.
 }
 \examples{
 \dontrun{

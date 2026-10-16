@@ -143,8 +143,11 @@ test_that(
 )
 
 test_that(
-  "CPU renderer rejects parcel tables with a useful route",
+  "CPU renderer rejects parcel tables combined with an overlay with a useful route",
   {
+    # Parcel tables alone are rendered by the CPU parcel path (#58); the CPU
+    # overlay renderer cannot also draw parcel values, so the combination
+    # still errors and routes users to the ggplot backend.
     atlas <- make_parcel_plot_test_atlas()
     results <- tibble::tibble(id = 1:2, statistic = c(1, 2))
 
@@ -153,10 +156,12 @@ test_that(
         atlas,
         data = results,
         value = statistic,
+        overlay = list(lh = c(0, 1, 2, 3)),
         static_backend = "cpu",
         interactive = FALSE
       ),
-      "default.*ggplot"
+      "default.*ggplot",
+      class = "neuroatlas_error_unsupported"
     )
   }
 )

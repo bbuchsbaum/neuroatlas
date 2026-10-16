@@ -275,7 +275,9 @@ get_atlas <- function(name, ...) {
     label = "FreeSurfer ASEG subcortical atlas",
     family = "aseg",
     loader = "get_aseg_atlas",
-    default_space = "MNI152NLin6Asym",
+    # Must match get_aseg_atlas(): the bundled volume's template lineage is
+    # unverified, so no specific MNI152 variant is claimed (#58).
+    default_space = "MNI152_unspecified",
     representation = "volume",
     aliases = c("freesurfer_aseg")
   )

@@ -149,3 +149,28 @@ test_that(
 )
 
 # Surface reduction needs a separate integration fixture and supported data API.
+
+test_that(
+  "documented return shapes of map_atlas() and reduce_atlas() hold (#58)",
+  {
+    a <- get_aseg_atlas()
+    m <- map_atlas(a, seq_along(a$orig_labels))
+    expect_s3_class(m, "tbl_df")
+    expect_false(inherits(m, "atlas"))
+    expect_named(m, c("statistic", "label", "region", "hemi"))
+    expect_equal(nrow(m), length(a$orig_labels))
+
+    vol <- neuroatlas:::.get_atlas_volume(a)
+    set.seed(1)
+    dv <- neuroim2::NeuroVol(
+      array(stats::rnorm(prod(dim(vol))), dim(vol)),
+      neuroim2::space(vol)
+    )
+    long <- reduce_atlas(a, dv, mean)
+    expect_named(long, c("region", "value"))
+    expect_equal(nrow(long), length(a$ids))
+    wide <- reduce_atlas(a, dv, mean, format = "wide")
+    expect_equal(nrow(wide), 1L)
+    expect_equal(ncol(wide), length(a$ids))
+  }
+)

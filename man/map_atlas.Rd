@@ -33,7 +33,10 @@ for the mapped values. Values outside this range will be clamped.}
 otherwise the absolute values are used.}
 }
 \value{
-Returns the atlas object with mapped values
+For atlas objects, a tibble with one row per region and columns
+  \code{statistic} (the possibly thresholded values), \code{label} (the
+  original atlas labels), and, when available, \code{region} and
+  \code{hemi}. The atlas itself is not modified.
 }
 \description{
 Maps a set of values to regions/parcels in an atlas object. This can be used

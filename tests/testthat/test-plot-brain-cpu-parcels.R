@@ -356,3 +356,47 @@ test_that(
     expect_true(all(is.finite(anatomy$metric)))
   }
 )
+
+test_that(
+  "parcel `data` renders through the CPU parcel path like `vals` (#58)",
+  {
+    atl <- .make_parcel_render_atlas()
+    vals <- c(3, NA, -2.5, 1, NA, 2.2, NA, -3)
+    tbl <- tibble::tibble(id = rev(atl$ids), z = rev(vals))
+    anatomy <- list(
+      lh = rep(0, length(atl$lh_atlas@data)),
+      rh = rep(0, length(atl$rh_atlas@data))
+    )
+    render <- function(...) {
+      plot_brain(
+        atl,
+        ...,
+        interactive = FALSE,
+        static_backend = "cpu",
+        palette = "vik",
+        lim = c(-3, 3),
+        views = "lateral",
+        anatomy_metric = anatomy,
+        colorbar = FALSE,
+        render_width = 60L,
+        render_height = 40L,
+        render_antialias = 1L
+      )
+    }
+    from_vals <- render(vals = vals)
+    from_data <- render(data = tbl, value = z, allow_partial = FALSE)
+    expect_s3_class(from_data, "parcel_brain_figure")
+    expect_identical(
+      attr(from_data, "plot_brain_backend"),
+      "cpu_deferred_parcels"
+    )
+    expect_identical(names(from_data$panels), names(from_vals$panels))
+    for (nm in names(from_vals$panels)) {
+      expect_identical(
+        from_data$panels[[nm]]$raster,
+        from_vals$panels[[nm]]$raster,
+        info = nm
+      )
+    }
+  }
+)

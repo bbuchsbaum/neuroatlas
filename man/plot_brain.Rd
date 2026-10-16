@@ -138,7 +138,8 @@ returns a static \code{ggplot2} object.}
 \item{static_backend}{Static renderer: the existing \code{"ggplot"} polygon
 path or deterministic \code{"cpu"} rasterization. With a vertex
 \code{overlay} the CPU path renders continuous publication overlays; with
-parcel \code{vals} (and no overlay) it renders a publication parcel map
+parcel \code{vals} or \code{data} (and no overlay) it renders a
+publication parcel map
 through [neurosurf::render_surface_parcels()]: smooth antialiased parcel
 edges, a sulcal-depth underlay, soft lighting, a light medial wall, and an
 automatically arranged figure. Neither needs OpenGL or a browser.}
@@ -382,8 +383,11 @@ far-side folds through the mesh.}
 
 \item{data}{Optional data frame, tibble, or \code{parcel_data} object with
 one row per parcel. When supplied, \code{value} is aligned to the atlas
-with \code{\link{align_parcel_values}()} before rendering. Supply either
-\code{data} or \code{vals}, not both.}
+with \code{\link{align_parcel_values}()} before rendering and then
+treated exactly like \code{vals} (including by
+\code{static_backend = "cpu"}). Supply either \code{data} or
+\code{vals}, not both. With \code{static_backend = "cpu"}, \code{data}
+cannot be combined with a vertex \code{overlay}.}
 
 \item{value}{Numeric column in \code{data}, supplied as a bare name or
 character string.}

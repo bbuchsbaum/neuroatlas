@@ -53,3 +53,30 @@ test_that(
     expect_length(filter_atlas(a, hemi == "left")$ids, 8L)
   }
 )
+
+test_that(
+  "registry default_space for aseg matches get_aseg_atlas() (#58)",
+  {
+    reg <- list_atlases()
+    a <- get_aseg_atlas()
+    expect_identical(
+      reg$default_space[reg$id == "aseg"],
+      a$template_space
+    )
+    expect_identical(a$template_space, "MNI152_unspecified")
+  }
+)
+
+test_that(
+  "get_schaefer_atlas() documents every accepted parcel count (#58)",
+  {
+    rd <- testthat::test_path("..", "..", "man", "get_schaefer_atlas.Rd")
+    skip_if_not(file.exists(rd), "package sources not available")
+    txt <- paste(readLines(rd, warn = FALSE), collapse = " ")
+    param <- regmatches(txt, regexpr("\\\\item\\{parcels\\}\\{[^}]*\\}", txt))
+    accepted <- eval(formals(get_schaefer_atlas)$parcels)
+    for (p in accepted) {
+      expect_match(param, paste0('"', p, '"'), fixed = TRUE, info = p)
+    }
+  }
+)

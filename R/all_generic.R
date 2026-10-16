@@ -40,7 +40,10 @@ get_roi <- function(x, label = NULL, id = NULL, hemi = NULL) {
 #'   for the mapped values. Values outside this range will be clamped.
 #' @param ... Additional arguments passed to methods
 #'
-#' @return Returns the atlas object with mapped values
+#' @return For atlas objects, a tibble with one row per region and columns
+#'   \code{statistic} (the possibly thresholded values), \code{label} (the
+#'   original atlas labels), and, when available, \code{region} and
+#'   \code{hemi}. The atlas itself is not modified.
 #'
 #' @examples
 #' \dontrun{

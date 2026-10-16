@@ -468,7 +468,8 @@ schaefer_metainfo <- function(
 #' }
 #'
 #' @param parcels Character string specifying number of parcels.
-#'   Options: "100", "200", "300", "400", "500", "600", "800", "1000"
+#'   Options: "100", "200", "300", "400", "500", "600", "700", "800", "900",
+#'   "1000"
 #' @param networks Character string specifying network count.
 #'   Options: "7", "17"
 #' @param resolution Character string specifying MNI space resolution in mm.
