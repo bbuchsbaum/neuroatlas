@@ -11,7 +11,8 @@ spin_test(
   n_perm = 1000L,
   cor_method = c("pearson", "spearman", "kendall"),
   sphere = NULL,
-  seed = NULL
+  seed = NULL,
+  hemi_rotation = c("mirror", "independent")
 )
 }
 \arguments{
@@ -23,7 +24,9 @@ parcels).}
 
 \item{atlas}{A surface atlas object (class \code{"surfatlas"}) with
 \code{lh_atlas} and \code{rh_atlas} fields, or any atlas whose geometry
-can provide sphere coordinates.}
+can provide sphere coordinates. When \code{sphere} is a K x 3 centroid
+matrix, \code{atlas$hemi} must give each parcel's hemisphere
+(\code{"left"} or \code{"right"}).}
 
 \item{n_perm}{Integer. Number of spin permutations. Default: 1000.}
 
@@ -32,12 +35,25 @@ can provide sphere coordinates.}
 One of \code{"pearson"}, \code{"spearman"}, or \code{"kendall"}.
 Default: \code{"pearson"}.}
 
-\item{sphere}{Optional list with elements \code{lh} and \code{rh}, each an
-N x 3 matrix of sphere vertex coordinates. If \code{NULL} (default),
-sphere coordinates are fetched via
-\code{\link{load_surface_template}(..., "sphere")}.}
+\item{sphere}{Optional sphere geometry. Either a list with elements
+\code{lh} and \code{rh}, each an N x 3 matrix of sphere vertex
+coordinates for that hemisphere (in the hemisphere's own sphere
+coordinate frame), or a K x 3 matrix of parcel centroids in
+\code{atlas$ids} order. If \code{NULL} (default), sphere coordinates are
+fetched via \code{\link{load_surface_template}(..., "sphere")} using the
+atlas's \code{surface_space}.}
 
 \item{seed}{Optional integer seed for reproducibility.}
+
+\item{hemi_rotation}{Character. How the right-hemisphere rotation relates
+to the left-hemisphere rotation in each permutation. \code{"mirror"}
+(default, as in Alexander-Bloch et al. 2018) draws one random rotation
+for the left hemisphere and applies its reflection across the
+mid-sagittal (x = 0) plane to the right hemisphere, so homologous
+locations rotate homologously. \code{"independent"} draws a separate
+random rotation for each hemisphere. In both cases each hemisphere is
+rotated on its own sphere and parcels are only reassigned within their
+own hemisphere.}
 }
 \value{
 A list of class \code{"spin_test"} with:
@@ -49,29 +65,41 @@ A list of class \code{"spin_test"} with:
   \item{p_value}{Two-sided p-value: proportion of null correlations with
     absolute value >= the observed absolute correlation.}
   \item{n_perm}{Number of permutations performed.}
+  \item{hemi_rotation}{The hemisphere rotation scheme used.}
+  \item{permutations}{K x \code{n_perm} integer matrix; column \code{i}
+    gives, for each parcel, the index of the parcel whose \code{map2}
+    value it receives in permutation \code{i}.}
 }
 }
 \description{
 Tests whether the spatial correlation between two parcellated brain maps is
 stronger than expected by chance, using the spin-test framework of
-Alexander-Bloch et al. (2018). Parcel centroids on a sphere surface are
-randomly rotated and reassigned to the nearest original centroid, generating
-a null distribution of correlations.
+Alexander-Bloch et al. (2018). Parcel centroids on each hemisphere's sphere
+are randomly rotated and reassigned to the nearest original centroid of the
+same hemisphere, generating a null distribution of correlations that
+preserves spatial autocorrelation and hemisphere membership.
 }
 \details{
 The algorithm:
 \enumerate{
-  \item Compute parcel centroids on the sphere surface by averaging the
-    sphere coordinates of vertices belonging to each parcel.
+  \item Compute parcel centroids on each hemisphere's sphere by averaging
+    the sphere coordinates of that hemisphere's vertices belonging to each
+    parcel.
   \item For each permutation, generate a uniform random 3D rotation matrix
-    (from the Haar measure on SO(3)), rotate all centroids, then reassign
-    each rotated centroid to its nearest original centroid using
-    \code{\link[Rnanoflann]{nn}}.
+    (from the Haar measure on SO(3)) for the left hemisphere and derive the
+    right-hemisphere rotation according to \code{hemi_rotation}. Rotate the
+    centroids of each hemisphere with that hemisphere's rotation, then
+    reassign each rotated centroid to its nearest original centroid in the
+    \emph{same} hemisphere using \code{\link[Rnanoflann]{nn}}.
   \item Compute the correlation of \code{map1} with the permuted
     \code{map2} (values shuffled according to the reassignment).
   \item The p-value is \code{(sum(abs(null) >= abs(observed)) + 1) /
     (n_perm + 1)}.
 }
+
+Nearest-centroid reassignment can map several rotated parcels to the same
+original parcel (sampling with replacement), as in the original
+Alexander-Bloch et al. (2018) procedure.
 }
 \examples{
 \dontrun{

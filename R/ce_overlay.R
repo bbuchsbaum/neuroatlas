@@ -485,19 +485,19 @@ project_cluster_overlay <- function(
 
 .surface_template_defaults <- function(surface_space) {
   if (is.null(surface_space) || !nzchar(surface_space)) {
-    return(list(template_id = "fsaverage", density = "41k", resolution = "06"))
+    return(list(template_id = "fsaverage", density = "41k", resolution = NULL))
   }
 
   switch(as.character(surface_space),
     fsaverage6 = list(
       template_id = "fsaverage",
       density = "41k",
-      resolution = "06"
+      resolution = NULL
     ),
     fsaverage5 = list(
       template_id = "fsaverage",
       density = "10k",
-      resolution = "05"
+      resolution = NULL
     ),
     fsaverage = list(
       template_id = "fsaverage",

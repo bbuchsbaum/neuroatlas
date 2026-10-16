@@ -929,9 +929,10 @@ get_template_wm <- function(
 #'        (e.g., "32k" for fsLR, "164k" for fsaverage). Forwarded to
 #' TemplateFlow
 #'        as `density`.
-#' @param resolution (Optional) Character string specifying the resolution,
-#'   primarily for
-#'        fsaverage variants (e.g., "06" for fsaverage6).
+#' @param resolution (Optional) Character string specifying the TemplateFlow
+#'   \code{res} entity. TemplateFlow indexes fsaverage surfaces by
+#'   \code{density} only (e.g., \code{"41k"} for fsaverage6, \code{"10k"} for
+#'   fsaverage5), so leave this \code{NULL} for fsaverage.
 #' @param load_as_path Logical, whether to return only the path to the file.
 #'        Defaults to `TRUE`.
 #' @return If `load_as_path` is `TRUE`, a character string (path).
@@ -1010,7 +1011,8 @@ get_surface_template <- function(
 #' @param density Optional surface density (TemplateFlow \code{density}
 #'   argument).
 #' @param resolution Optional resolution string (TemplateFlow \code{res}
-#'   argument), e.g., "06" for fsaverage6.
+#'   argument). Leave \code{NULL} for fsaverage surfaces, which TemplateFlow
+#'   indexes by \code{density} only (e.g., \code{"41k"} for fsaverage6).
 #' @param ... Additional arguments forwarded to
 #'   \code{\link{get_surface_template}}.
 #'
@@ -1023,7 +1025,7 @@ get_surface_template <- function(
 #' # fsaverage6 pial surface as NeuroSurface
 #' lh <- load_surface_template("fsaverage", "pial",
 #'   hemi = "L",
-#'   density = "41k", resolution = "06"
+#'   density = "41k"
 #' )
 #'
 #' # Both hemispheres of fsLR 32k inflated surface

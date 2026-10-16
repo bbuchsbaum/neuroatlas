@@ -1,5 +1,25 @@
 # neuroatlas 0.2.0.9000
 
+* **Correctness fix; changes `spin_test()` p-values.** `spin_test()` used one
+  rotation for both hemispheres and matched rotated centroids against all
+  parcels. Because the lh and rh spheres overlap, about half of the parcels
+  were reassigned to the opposite hemisphere in every rotation (mean 0.50 on
+  Schaefer 100/7), so the null did not preserve hemisphere membership. Each
+  hemisphere is now rotated on its own sphere and parcels are matched only
+  within their hemisphere. By default the right-hemisphere rotation is the
+  left rotation reflected across the midline, as in Alexander-Bloch et al.
+  (2018); `hemi_rotation = "independent"` draws a separate rotation per
+  hemisphere. A K x 3 centroid `sphere` now requires `atlas$hemi`. The result
+  gains `hemi_rotation` and `permutations` (the K x `n_perm` reassignment
+  indices). Re-run spin tests computed with earlier versions (#56).
+
+* `spin_test()` finds the sphere automatically for fsaverage6 and fsaverage5
+  atlases such as `get_schaefer_surfatlas()`. TemplateFlow indexes fsaverage
+  surfaces by density only, so the internal fsaverage mappings no longer send a
+  `res-` entity ("Resolution '06' not available"). This also fixes TemplateFlow
+  geometry lookup for `schaefer_surf(space = "fsaverage5")` and the
+  fsaverage5 surface fallback of the cluster-explorer overlay (#55).
+
 * Accept neurosurf's `0.1.0` CRAN-preparation version and pin its tested GitHub
   revision. This fixes CI dependency resolution after upstream release numbering
   replaced the higher-numbered development version.

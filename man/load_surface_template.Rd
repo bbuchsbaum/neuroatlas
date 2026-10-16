@@ -27,7 +27,8 @@ a named list with elements \code{L} and \code{R} is returned.}
 argument).}
 
 \item{resolution}{Optional resolution string (TemplateFlow \code{res}
-argument), e.g., "06" for fsaverage6.}
+argument). Leave \code{NULL} for fsaverage surfaces, which TemplateFlow
+indexes by \code{density} only (e.g., \code{"41k"} for fsaverage6).}
 
 \item{...}{Additional arguments forwarded to
 \code{\link{get_surface_template}}.}
@@ -47,7 +48,7 @@ as a \code{neurosurf::SurfaceGeometry} object (or a left/right list).
 # fsaverage6 pial surface as NeuroSurface
 lh <- load_surface_template("fsaverage", "pial",
   hemi = "L",
-  density = "41k", resolution = "06"
+  density = "41k"
 )
 
 # Both hemispheres of fsLR 32k inflated surface

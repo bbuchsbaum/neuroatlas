@@ -50,9 +50,10 @@ the template file.
 Supported: \code{"T1w"} (default), \code{"T2w"}, \code{"mask"}.
 This is used to infer \code{suffix} if not explicitly provided.}
 
-\item{resolution}{(Optional) Character string specifying the resolution,
-primarily for
-     fsaverage variants (e.g., "06" for fsaverage6).}
+\item{resolution}{(Optional) Character string specifying the TemplateFlow
+\code{res} entity. TemplateFlow indexes fsaverage surfaces by
+\code{density} only (e.g., \code{"41k"} for fsaverage6, \code{"10k"} for
+fsaverage5), so leave this \code{NULL} for fsaverage.}
 
 \item{cohort}{Character string. Optional cohort identifier.}
 

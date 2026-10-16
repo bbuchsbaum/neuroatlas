@@ -947,7 +947,8 @@ get_schaefer_surfatlas <- function(
 #'
 #' @param space Character scalar, one of "fsaverage", "fsaverage5", "fsaverage6"
 #' @return A named list with fields `space`, `cbig_space`, `template_id`,
-#'   `tf_resolution`, and `tf_density`.
+#'   `tf_resolution`, and `tf_density`. `tf_resolution` is `NULL`: TemplateFlow
+#'   indexes fsaverage surfaces by density (`den-`) only (#55).
 #' @keywords internal
 #' @noRd
 .schaefer_surface_space_mapping <- function(space) {
@@ -971,7 +972,7 @@ get_schaefer_surfatlas <- function(
         space = "fsaverage5",
         cbig_space = "fsaverage5",
         template_id = "fsaverage",
-        tf_resolution = "05",
+        tf_resolution = NULL,
         tf_density = "10k"
       )
     )
@@ -982,7 +983,7 @@ get_schaefer_surfatlas <- function(
     space = "fsaverage6",
     cbig_space = "fsaverage6",
     template_id = "fsaverage",
-    tf_resolution = "06",
+    tf_resolution = NULL,
     tf_density = "41k"
   )
 }
