@@ -32,12 +32,12 @@ expect_labels_on_their_hemisphere <- function(atlas) {
 }
 
 test_that("HOCPAL values map to 0-based table rows, missing rows filled", {
-  # Rows 2-3 (Superior Frontal Gyrus) are absent, as in TemplateFlow.
+  # Rows 2-3 (Insular Cortex) are absent, as in TemplateFlow.
   tsv <- write_ho_tsv(
     c(0, 1, 4, 5),
     c(
       "Left Frontal Pole", "Right Frontal Pole",
-      "Left Middle Frontal Gyrus", "Right Middle Frontal Gyrus"
+      "Left Superior Frontal Gyrus", "Right Superior Frontal Gyrus"
     )
   )
   on.exit(unlink(tsv))
@@ -46,8 +46,8 @@ test_that("HOCPAL values map to 0-based table rows, missing rows filled", {
     info$labels,
     c(
       "Left Frontal Pole", "Right Frontal Pole",
-      "Left Superior Frontal Gyrus", "Right Superior Frontal Gyrus",
-      "Left Middle Frontal Gyrus", "Right Middle Frontal Gyrus"
+      "Left Insular Cortex", "Right Insular Cortex",
+      "Left Superior Frontal Gyrus", "Right Superior Frontal Gyrus"
     )
   )
 })
@@ -110,7 +110,7 @@ test_that("HOCPAL loader puts Left labels at x < 0 and Right at x > 0", {
     c(0, 1, 4, 5),
     c(
       "Left Frontal Pole", "Right Frontal Pole",
-      "Left Middle Frontal Gyrus", "Right Middle Frontal Gyrus"
+      "Left Superior Frontal Gyrus", "Right Superior Frontal Gyrus"
     )
   )
   on.exit(unlink(tsv))
