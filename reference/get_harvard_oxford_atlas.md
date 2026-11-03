@@ -5,6 +5,14 @@ cortical/subcortical parcellations. By default this uses TemplateFlow,
 which does not require a local FSL installation. Set \`source = "fsl"\`
 to read from \`\$FSLDIR\`.
 
+TemplateFlow's cortical label tables (\`HOCPA\`, \`HOCPAL\`) number
+their rows from 0 while the \`dseg\` volumes use 1 for the first region,
+so volume value \`v\` is matched to table row \`v - 1\`. The subcortical
+table (\`HOSPA\`) lists Background as row 0 and is matched directly.
+Cortical regions missing from TemplateFlow's tables are named from the
+FSL Harvard-Oxford cortical list; in \`HOCPAL\`, odd values are left and
+even values right.
+
 ## Usage
 
 ``` r

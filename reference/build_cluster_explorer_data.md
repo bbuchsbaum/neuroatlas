@@ -159,7 +159,6 @@ stat_map <- neuroim2::NeuroVol(array(c(4, 5), c(2, 1, 1)), grid)
 clusters <- build_cluster_explorer_data(data_source, atlas, stat_map,
   threshold = 3, min_cluster_size = 1, tail = "positive"
 )
-#> Warning: clustered volume only contains 1 partition
 clusters$cluster_table
 #> # A tibble: 1 × 12
 #>   cluster_id sign     component_id n_voxels peak_x peak_y peak_z max_stat
