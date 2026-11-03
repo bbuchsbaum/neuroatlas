@@ -1,5 +1,15 @@
 # neuroatlas 0.2.0.9000
 
+* Harvard-Oxford atlases from TemplateFlow now carry the right region names
+  (#59). TemplateFlow's cortical label tables (`HOCPA`, `HOCPAL`) number
+  their rows from 0 while the volumes start at 1, so every cortical region
+  took its neighbour's name, and in
+  `get_harvard_oxford_cortical_subcortical_atlas()` left and right were
+  swapped. Volume value `v` is now matched to table row `v - 1`; the
+  subcortical table (`HOSPA`) was already correct and is unchanged. The 22
+  cortical regions missing from TemplateFlow's tables, previously `RegionN`,
+  are named from the FSL Harvard-Oxford cortical list.
+
 * Documentation and metadata now match the code (#58):
   `plot_brain(data = ..., static_backend = "cpu")` renders parcel tables
   through the CPU parcel renderer, like `vals`, instead of aborting; only the
