@@ -218,6 +218,13 @@ get_fsl_atlas <- function(
 #' parcellations. By default this uses TemplateFlow, which does not require a
 #' local FSL installation. Set `source = "fsl"` to read from `$FSLDIR`.
 #'
+#' TemplateFlow's cortical label tables (`HOCPA`, `HOCPAL`) number their rows
+#' from 0 while the `dseg` volumes use 1 for the first region, so volume value
+#' `v` is matched to table row `v - 1`. The subcortical table (`HOSPA`) lists
+#' Background as row 0 and is matched directly. Cortical regions missing from
+#' TemplateFlow's tables are named from the FSL Harvard-Oxford cortical list;
+#' in `HOCPAL`, odd values are left and even values right.
+#'
 #' @param type One of `"cortical"`, `"subcortical"`, or
 #'   `"cortical_subcortical"`.
 #' @param threshold Maximum-probability threshold, one of `0`, `25`, or `50`.
@@ -351,7 +358,7 @@ get_harvard_oxford_atlas <- function(
 
   ids <- sort(unique(as.integer(as.vector(vol))))
   ids <- ids[ids != 0L]
-  label_info <- .read_label_table(label_path, ids)
+  label_info <- .harvard_oxford_tf_labels(label_path, ids, atlas_id)
   label_map <- as.list(ids)
   names(label_map) <- label_info$labels
 
@@ -759,6 +766,141 @@ get_julich_brain_atlas <- function(
     )
   }
   images[which(idx)[1], ]
+}
+
+# Harvard-Oxford cortical region names in FSL order
+# (HarvardOxford-Cortical.xml, label index 0-47).
+.ho_cortical_names <- c(
+  "Frontal Pole",
+  "Insular Cortex",
+  "Superior Frontal Gyrus",
+  "Middle Frontal Gyrus",
+  "Inferior Frontal Gyrus, pars triangularis",
+  "Inferior Frontal Gyrus, pars opercularis",
+  "Precentral Gyrus",
+  "Temporal Pole",
+  "Superior Temporal Gyrus, anterior division",
+  "Superior Temporal Gyrus, posterior division",
+  "Middle Temporal Gyrus, anterior division",
+  "Middle Temporal Gyrus, posterior division",
+  "Middle Temporal Gyrus, temporooccipital part",
+  "Inferior Temporal Gyrus, anterior division",
+  "Inferior Temporal Gyrus, posterior division",
+  "Inferior Temporal Gyrus, temporooccipital part",
+  "Postcentral Gyrus",
+  "Superior Parietal Lobule",
+  "Supramarginal Gyrus, anterior division",
+  "Supramarginal Gyrus, posterior division",
+  "Angular Gyrus",
+  "Lateral Occipital Cortex, superior division",
+  "Lateral Occipital Cortex, inferior division",
+  "Intracalcarine Cortex",
+  "Frontal Medial Cortex",
+  "Juxtapositional Lobule Cortex (formerly Supplementary Motor Cortex)",
+  "Subcallosal Cortex",
+  "Paracingulate Gyrus",
+  "Cingulate Gyrus, anterior division",
+  "Cingulate Gyrus, posterior division",
+  "Precuneous Cortex",
+  "Cuneal Cortex",
+  "Frontal Orbital Cortex",
+  "Parahippocampal Gyrus, anterior division",
+  "Parahippocampal Gyrus, posterior division",
+  "Lingual Gyrus",
+  "Temporal Fusiform Cortex, anterior division",
+  "Temporal Fusiform Cortex, posterior division",
+  "Temporal Occipital Fusiform Cortex",
+  "Occipital Fusiform Gyrus",
+  "Frontal Operculum Cortex",
+  "Central Opercular Cortex",
+  "Parietal Operculum Cortex",
+  "Planum Polare",
+  "Heschl's Gyrus (includes H1 and H2)",
+  "Planum Temporale",
+  "Supracalcarine Cortex",
+  "Occipital Pole"
+)
+
+#' Names for Harvard-Oxford cortical volume values from the FSL list
+#'
+#' `HOCPA` value `v` is cortical region `v`; `HOCPAL` value `v` is cortical
+#' region `ceiling(v / 2)`, left for odd `v` and right for even `v`. Returns
+#' `NA` where no name is known.
+#' @keywords internal
+#' @noRd
+.ho_canonical_labels <- function(atlas_id, ids) {
+  ids <- as.integer(ids)
+  n <- length(.ho_cortical_names)
+  out <- rep(NA_character_, length(ids))
+  if (identical(atlas_id, "HOCPA")) {
+    ok <- ids >= 1L & ids <= n
+    out[ok] <- .ho_cortical_names[ids[ok]]
+  } else if (identical(atlas_id, "HOCPAL")) {
+    region <- (ids + 1L) %/% 2L
+    ok <- ids >= 1L & region <= n
+    side <- ifelse(ids %% 2L == 1L, "Left", "Right")
+    out[ok] <- paste(side[ok], .ho_cortical_names[region[ok]])
+  }
+  out
+}
+
+#' Smallest `index` in a TemplateFlow label table, or `NA`
+#' @keywords internal
+#' @noRd
+.label_table_min_index <- function(label_path) {
+  if (is.null(label_path) || !file.exists(label_path)) {
+    return(NA_integer_)
+  }
+  tbl <- tryCatch(
+    utils::read.table(
+      label_path,
+      header = TRUE,
+      sep = "\t",
+      stringsAsFactors = FALSE,
+      comment.char = "",
+      check.names = FALSE,
+      quote = ""
+    ),
+    error = function(e) NULL
+  )
+  if (is.null(tbl) || nrow(tbl) == 0L) {
+    return(NA_integer_)
+  }
+  cn <- tolower(colnames(tbl))
+  idx <- if ("index" %in% cn) tbl[[which(cn == "index")[1]]] else tbl[[1]]
+  idx <- suppressWarnings(as.integer(idx))
+  if (all(is.na(idx))) NA_integer_ else min(idx, na.rm = TRUE)
+}
+
+#' Labels for a TemplateFlow Harvard-Oxford dseg volume
+#'
+#' The cortical tables (`HOCPA`, `HOCPAL`) are 0-based while their volumes
+#' are 1-based, so value `v` reads table row `v - 1`. A table that already
+#' starts at 1 is read directly, as is `HOSPA`, whose row 0 is Background.
+#' Values missing from the table are named from `.ho_canonical_labels()`,
+#' falling back to `RegionN` (`N` = volume value).
+#' @keywords internal
+#' @noRd
+.harvard_oxford_tf_labels <- function(label_path, ids, atlas_id) {
+  ids <- as.integer(ids)
+  offset <- 0L
+  if (atlas_id %in% c("HOCPA", "HOCPAL")) {
+    min_index <- .label_table_min_index(label_path)
+    if (!is.na(min_index) && min_index == 0L) {
+      offset <- 1L
+    }
+  }
+
+  label_info <- .read_label_table(label_path, ids - offset)
+  labels <- label_info$labels
+  missing <- labels == paste0("Region", ids - offset)
+  if (any(missing)) {
+    fill <- .ho_canonical_labels(atlas_id, ids[missing])
+    fill[is.na(fill)] <- paste0("Region", ids[missing][is.na(fill)])
+    labels[missing] <- fill
+  }
+  label_info$labels <- labels
+  label_info
 }
 
 #' @keywords internal
