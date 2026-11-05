@@ -319,7 +319,8 @@ test_that(
       sphere = cent_plain, n_perm = 200, seed = 3
     )
     hemi <- sa$atlas$hemi
-    expect_false(any(apply(res$permutations, 2, function(p) any(hemi[p] != hemi))))
+    crosses <- apply(res$permutations, 2, function(p) any(hemi[p] != hemi))
+    expect_false(any(crosses))
 
     no_hemi <- sa$atlas
     no_hemi$hemi <- NULL
@@ -443,7 +444,8 @@ test_that(
     res <- spin_test(m1, m2, at, n_perm = 100, seed = 1)
     expect_s3_class(res, "spin_test")
     hemi <- at$hemi
-    expect_false(any(apply(res$permutations, 2, function(p) any(hemi[p] != hemi))))
+    crosses <- apply(res$permutations, 2, function(p) any(hemi[p] != hemi))
+    expect_false(any(crosses))
   }
 )
 

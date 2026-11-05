@@ -281,8 +281,9 @@ print.spin_test <- function(x, ...) {
   hemi_coords <- list(left = sphere$lh, right = sphere$rh)
   for (h in names(hemi_labels)) {
     n_lab <- length(hemi_labels[[h]])
-    if (n_lab > 0 && (is.null(hemi_coords[[h]]) ||
-      nrow(hemi_coords[[h]]) != n_lab)) {
+    sphere_missing <- is.null(hemi_coords[[h]]) ||
+      nrow(hemi_coords[[h]]) != n_lab
+    if (n_lab > 0 && sphere_missing) {
       stop(
         "Sphere for the ", h, " hemisphere has ",
         if (is.null(hemi_coords[[h]])) 0L else nrow(hemi_coords[[h]]),
