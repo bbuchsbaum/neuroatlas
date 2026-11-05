@@ -77,7 +77,7 @@ VignetteBuilder:
     knitr
 Remotes:
     bbuchsbaum/neuroim2,
-    bbuchsbaum/neurosurf@b8bb05d01dcf7360141850ad56b173d7df2f8079,
+    bbuchsbaum/neurosurf@v0.1.0.9001,
     bbuchsbaum/neurotransform@933edddda462593941e167726e8aaa7168ff103a,
     bbuchsbaum/albersdown,
     bbuchsbaum/templateflow,
