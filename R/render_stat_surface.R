@@ -270,6 +270,7 @@
   overlay_alpha,
   overlay_alpha_ramp,
   overlay_palette,
+  overlay_magnitude_opacity = NULL,
   overlay_lim,
   overlay_fun,
   overlay_sampling,
@@ -355,6 +356,17 @@
   )
   panel_levels <- character()
 
+  supports_fade <- "magnitude_opacity" %in%
+    names(formals(neurosurf::render_surface_rgba))
+  if (!is.null(overlay_magnitude_opacity) && !supports_fade) {
+    warning("This neurosurf cannot fade overlays by magnitude; ",
+            "'overlay_magnitude_opacity' is ignored.", call. = FALSE)
+  }
+  fade_args <- if (!is.null(overlay_magnitude_opacity) && supports_fade) {
+    list(magnitude_opacity = overlay_magnitude_opacity)
+  } else {
+    list()
+  }
   for (view in views) {
     for (hemi in hemis) {
       hk <- if (hemi == "left") "lh" else "rh"
@@ -380,7 +392,7 @@
         override = anatomy_metric,
         source = anatomy_metric_source
       )
-      rendered <- neurosurf::render_surface_rgba(
+      rendered <- do.call(neurosurf::render_surface_rgba, c(list(
         geometry = atlas_hemi@geometry,
         vertex_values = values,
         anatomy_metric = anatomy$metric,
@@ -402,7 +414,7 @@
         medial_wall = medial_wall,
         background = bg,
         outer_contour = TRUE
-      )
+      ), fade_args))
       default_label <- paste0(
         tools::toTitleCase(hemi),
         " ",
