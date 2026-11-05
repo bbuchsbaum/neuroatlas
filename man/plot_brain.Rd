@@ -47,6 +47,7 @@ plot_brain(
   overlay_alpha = 0.45,
   overlay_alpha_mode = c("constant", "threshold"),
   overlay_alpha_ramp = NULL,
+  overlay_magnitude_opacity = NULL,
   overlay_palette = "vik",
   overlay_lim = NULL,
   overlay_border = FALSE,
@@ -270,6 +271,15 @@ absolute-value distance above \code{overlay_threshold} over which
 \code{overlay_alpha_mode = "threshold"} reaches full opacity. If
 \code{NULL}, a small data-driven ramp is chosen from the rendered overlay
 values. Use \code{0} to disable ramping while keeping the threshold mode.}
+
+\item{overlay_magnitude_opacity}{Optional fade by magnitude for the CPU
+static backend: \code{NULL} (default) or a list with optional
+\code{low}, \code{high} (a number or \code{"range"}, the colour limits),
+\code{gamma} and \code{floor}, as accepted by
+\code{neurosurf::surface_layer(magnitude_opacity =)}. Weak values become
+transparent over the anatomy, with the same rule the interactive surface
+viewer applies. Requires a neurosurf whose \code{render_surface_rgba()}
+supports it; otherwise it is ignored with a warning.}
 
 \item{overlay_palette}{scico palette for overlay colour mapping. Default:
 \code{"vik"}.}
