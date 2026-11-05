@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,11 @@
       <small>Source: <a href="https://github.com/bbuchsbaum/neuroatlas/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9001" id="neuroatlas-0209001">neuroatlas 0.2.0.9001<a class="anchor" aria-label="anchor" href="#neuroatlas-0209001"></a></h2>
+<ul><li>
+<code>plot_brain(overlay_magnitude_opacity =)</code> fades overlay colours by |value| on the CPU static backend, with the rule neurosurf report scenes apply, so a static figure matches the interactive surface. It needs a neurosurf whose <code>render_surface_rgba()</code> accepts <code>magnitude_opacity</code>; otherwise it is ignored with a warning.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9000" id="neuroatlas-0209000">neuroatlas 0.2.0.9000<a class="anchor" aria-label="anchor" href="#neuroatlas-0209000"></a></h2>
 <ul><li><p>Harvard-Oxford atlases from TemplateFlow now carry the right region names (<a href="https://github.com/bbuchsbaum/neuroatlas/issues/59" class="external-link">#59</a>). TemplateFlow’s cortical label tables (<code>HOCPA</code>, <code>HOCPAL</code>) number their rows from 0 while the volumes start at 1, so every cortical region took its neighbour’s name, and in <code><a href="../reference/get_harvard_oxford_atlas.html">get_harvard_oxford_cortical_subcortical_atlas()</a></code> left and right were swapped. Volume value <code>v</code> is now matched to table row <code>v - 1</code>; the subcortical table (<code>HOSPA</code>) was already correct and is unchanged. The 22 cortical regions missing from TemplateFlow’s tables, previously <code>RegionN</code>, are named from the FSL Harvard-Oxford cortical list.</p></li>

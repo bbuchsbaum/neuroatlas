@@ -11,7 +11,7 @@ the legacy ggseg-based visualisation pipeline."><link href="../albers.css" rel="
 
     <a class="navbar-brand me-2" href="../index.html">neuroatlas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,6 +94,7 @@ the legacy ggseg-based visualisation pipeline.</p>
 <span>  overlay_alpha <span class="op">=</span> <span class="fl">0.45</span>,</span>
 <span>  overlay_alpha_mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"constant"</span>, <span class="st">"threshold"</span><span class="op">)</span>,</span>
 <span>  overlay_alpha_ramp <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  overlay_magnitude_opacity <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  overlay_palette <span class="op">=</span> <span class="st">"vik"</span>,</span>
 <span>  overlay_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  overlay_border <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -404,6 +405,17 @@ absolute-value distance above <code>overlay_threshold</code> over which
 <code>overlay_alpha_mode = "threshold"</code> reaches full opacity. If
 <code>NULL</code>, a small data-driven ramp is chosen from the rendered overlay
 values. Use <code>0</code> to disable ramping while keeping the threshold mode.</p></dd>
+
+
+<dt id="arg-overlay-magnitude-opacity">overlay_magnitude_opacity<a class="anchor" aria-label="anchor" href="#arg-overlay-magnitude-opacity"></a></dt>
+<dd><p>Optional fade by magnitude for the CPU
+static backend: <code>NULL</code> (default) or a list with optional
+<code>low</code>, <code>high</code> (a number or <code>"range"</code>, the colour limits),
+<code>gamma</code> and <code>floor</code>, as accepted by
+<code>neurosurf::surface_layer(magnitude_opacity =)</code>. Weak values become
+transparent over the anatomy, with the same rule the interactive surface
+viewer applies. Requires a neurosurf whose <code>render_surface_rgba()</code>
+supports it; otherwise it is ignored with a warning.</p></dd>
 
 
 <dt id="arg-overlay-palette">overlay_palette<a class="anchor" aria-label="anchor" href="#arg-overlay-palette"></a></dt>

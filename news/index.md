@@ -1,5 +1,13 @@
 # Changelog
 
+## neuroatlas 0.2.0.9001
+
+- `plot_brain(overlay_magnitude_opacity =)` fades overlay colours by
+  \|value\| on the CPU static backend, with the rule neurosurf report
+  scenes apply, so a static figure matches the interactive surface. It
+  needs a neurosurf whose `render_surface_rgba()` accepts
+  `magnitude_opacity`; otherwise it is ignored with a warning.
+
 ## neuroatlas 0.2.0.9000
 
 - Harvard-Oxford atlases from TemplateFlow now carry the right region
